@@ -11,6 +11,10 @@ extension ContextExtensions on BuildContext {
 
   StatusColors get status => Theme.of(this).extension<StatusColors>()!;
 
+  AppPalette get palette => Theme.of(this).extension<AppPalette>()!;
+
+  AppTypography get typography => Theme.of(this).extension<AppTypography>()!;
+
   void showToast(String message, {SnackBarAction? action}) {
     ScaffoldMessenger.of(this).showSnackBar(SnackBar(content: Text(message), action: action));
   }

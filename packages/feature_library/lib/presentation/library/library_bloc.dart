@@ -17,6 +17,10 @@ class LibraryBloc extends Bloc<LibraryEvent, LibraryState> {
     on<LibraryStarted>(_onStarted);
     on<LibraryBookmarksUpdated>(_onBookmarksUpdated);
     on<LibraryBooksUpdated>(_onBooksUpdated);
+    on<LibraryViewChanged>(_onViewChanged);
+    on<LibraryFilterChanged>(_onFilterChanged);
+    on<LibraryQueryChanged>(_onQueryChanged);
+    on<LibrarySearchScopeChanged>(_onSearchScopeChanged);
   }
 
   final BookmarkRepository _bookmarkRepository;
@@ -24,7 +28,11 @@ class LibraryBloc extends Bloc<LibraryEvent, LibraryState> {
   StreamSubscription<AppResult<List<Bookmark>>>? _bookmarkSubscription;
   StreamSubscription<AppResult<List<Book>>>? _bookSubscription;
   List<Bookmark>? _bookmarks;
-  Map<String, Book> _booksById = const {};
+  List<Book>? _books;
+  LibraryView _view = LibraryView.books;
+  LibraryFilter _filter = LibraryFilter.all;
+  LibrarySearchScope _scope = LibrarySearchScope.allBooks;
+  String _query = "";
   AppError? _error;
 
   Future<void> _onStarted(LibraryStarted event, Emitter<LibraryState> emit) async {
@@ -55,8 +63,28 @@ class LibraryBloc extends Bloc<LibraryEvent, LibraryState> {
         _error = error;
       case Success(:final data):
         _error = null;
-        _booksById = {for (final book in data) book.id: book};
+        _books = data;
     }
+    _emitState(emit);
+  }
+
+  void _onViewChanged(LibraryViewChanged event, Emitter<LibraryState> emit) {
+    _view = event.view;
+    _emitState(emit);
+  }
+
+  void _onFilterChanged(LibraryFilterChanged event, Emitter<LibraryState> emit) {
+    _filter = event.filter;
+    _emitState(emit);
+  }
+
+  void _onQueryChanged(LibraryQueryChanged event, Emitter<LibraryState> emit) {
+    _query = event.query;
+    _emitState(emit);
+  }
+
+  void _onSearchScopeChanged(LibrarySearchScopeChanged event, Emitter<LibraryState> emit) {
+    _scope = event.scope;
     _emitState(emit);
   }
 
@@ -66,12 +94,70 @@ class LibraryBloc extends Bloc<LibraryEvent, LibraryState> {
       return;
     }
     final bookmarks = _bookmarks;
-    if (bookmarks == null) return;
-    if (bookmarks.isEmpty) {
-      emit(const LibraryEmpty());
-      return;
+    final books = _books;
+    if (bookmarks == null || books == null) return;
+
+    final marksByBook = <String, List<Bookmark>>{};
+    for (final mark in bookmarks) {
+      marksByBook.putIfAbsent(mark.bookId, () => []).add(mark);
     }
-    emit(LibraryLoaded(bookmarks: bookmarks, booksById: _booksById));
+
+    final summaries = <LibraryBookSummary>[];
+    for (final book in books) {
+      final marks = marksByBook[book.id] ?? const [];
+      final sorted = [...marks]..sort((a, b) => b.createdAt.compareTo(a.createdAt));
+      summaries.add(
+        LibraryBookSummary(
+          book: book,
+          markCount: marks.length,
+          starredCount: marks.where((mark) => mark.isFavorite).length,
+          featuredMark: sorted.isEmpty ? null : sorted.first,
+        ),
+      );
+    }
+    summaries.sort((a, b) => b.markCount.compareTo(a.markCount));
+
+    final visibleSummaries = switch (_filter) {
+      LibraryFilter.all => summaries,
+      LibraryFilter.reading => summaries,
+      LibraryFilter.finished => const <LibraryBookSummary>[],
+    };
+
+    final booksById = {for (final book in books) book.id: book};
+    final query = _query.trim().toLowerCase();
+    final results = <LibraryMarkResult>[];
+    if (query.isNotEmpty || _scope != LibrarySearchScope.allBooks) {
+      for (final mark in bookmarks) {
+        final book = booksById[mark.bookId];
+        if (book == null) continue;
+        final matchesScope = switch (_scope) {
+          LibrarySearchScope.allBooks => true,
+          LibrarySearchScope.starred => mark.isFavorite,
+          LibrarySearchScope.myNotes => false,
+        };
+        if (!matchesScope) continue;
+        final haystack = "${mark.quote} ${book.title}".toLowerCase();
+        if (haystack.contains(query)) {
+          results.add(LibraryMarkResult(mark: mark, book: book));
+        }
+      }
+      results.sort((a, b) => b.mark.createdAt.compareTo(a.mark.createdAt));
+    }
+
+    emit(
+      LibraryLoaded(
+        books: visibleSummaries,
+        totalBooks: books.length,
+        totalMarks: bookmarks.length,
+        readingCount: books.length,
+        finishedCount: 0,
+        view: _view,
+        filter: _filter,
+        query: _query,
+        searchScope: _scope,
+        results: results,
+      ),
+    );
   }
 
   @override

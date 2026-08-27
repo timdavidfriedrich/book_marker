@@ -51,7 +51,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get errorUnexpected => 'An unexpected error occurred.';
 
   @override
-  String get libraryTitle => 'Your marks';
+  String get libraryTitle => 'Library';
 
   @override
   String get libraryEmptyMessage => 'No marks yet. Take a photo of a book page to get started.';
@@ -164,4 +164,223 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get bookmarkDetailFavoriteRemove => 'Remove from favorites';
+
+  @override
+  String libraryHeaderStats(int books, int marks) {
+    return '$books books · $marks marks';
+  }
+
+  @override
+  String get librarySearchHint => 'Search books and marks…';
+
+  @override
+  String get libraryTabBooks => 'books';
+
+  @override
+  String get libraryTabShelves => 'shelves';
+
+  @override
+  String get libraryAddShelfLabel => '+ shelf';
+
+  @override
+  String libraryFilterAll(int count) {
+    return 'all $count';
+  }
+
+  @override
+  String libraryFilterReading(int count) {
+    return 'reading $count';
+  }
+
+  @override
+  String libraryFilterFinished(int count) {
+    return 'finished $count';
+  }
+
+  @override
+  String libraryMarksCount(int count) {
+    return '$count marks';
+  }
+
+  @override
+  String libraryStarredCount(int count) {
+    return '$count starred';
+  }
+
+  @override
+  String get libraryStatusReading => 'reading';
+
+  @override
+  String get libraryShelvesPlaceholder => 'Shelves arrive in the next update.';
+
+  @override
+  String get librarySearchScopeAll => 'all books';
+
+  @override
+  String get librarySearchScopeStarred => 'starred';
+
+  @override
+  String get librarySearchScopeNotes => 'my notes';
+
+  @override
+  String librarySearchCount(int marks, int books) {
+    return '$marks marks in $books books';
+  }
+
+  @override
+  String get navLibraryLabel => 'library';
+
+  @override
+  String get navThemesLabel => 'themes';
+
+  @override
+  String get profileYouLabel => 'you';
+
+  @override
+  String pageShortLabel(int page) {
+    return 'p.$page';
+  }
+
+  @override
+  String markVoiceLabel(String duration) {
+    return 'voice $duration';
+  }
+
+  @override
+  String get comingSoonMessage => 'Coming soon.';
+
+  @override
+  String get themesTitle => 'Themes';
+
+  @override
+  String get themesSubtitlePlaceholder => 'Gather marks across your books';
+
+  @override
+  String get themesPlaceholderMessage =>
+      'Themes gather marks from across your books. They arrive in the next update.';
+
+  @override
+  String bookDetailAllFilter(int count) {
+    return 'all $count';
+  }
+
+  @override
+  String get bookDetailStarredFilter => 'starred';
+
+  @override
+  String get bookDetailVoiceFilter => 'with voice';
+
+  @override
+  String bookDetailMarksStat(int count) {
+    return '$count marks';
+  }
+
+  @override
+  String bookDetailStarredStat(int count) {
+    return '$count starred';
+  }
+
+  @override
+  String get bookDetailEmptyMessage => 'No marks in this book yet.';
+
+  @override
+  String get captureSteadyHint => 'hold steady for sharper text';
+
+  @override
+  String get captureModeOnePage => 'one page';
+
+  @override
+  String get captureModeSpread => 'spread';
+
+  @override
+  String get captureMarkingInto => 'marking into';
+
+  @override
+  String get captureSwitchButton => 'switch';
+
+  @override
+  String get captureGalleryLabel => 'from gallery';
+
+  @override
+  String get captureGalleryPlaceholder => 'Importing from the gallery is coming soon.';
+
+  @override
+  String get captureLightOn => 'light on';
+
+  @override
+  String get captureLightOff => 'light off';
+
+  @override
+  String get addBookQuestionTitle => 'Which book is this?';
+
+  @override
+  String get addBookInLibraryLabel => 'in your library';
+
+  @override
+  String get addBookNotInLibraryLabel => 'not in your library, yet';
+
+  @override
+  String get addBookSelectButton => 'select';
+
+  @override
+  String get addBookAddButton => '+ add';
+
+  @override
+  String get addBookCatalogueFooter =>
+      'Catalogue results arrive from an online book service. No match? Scan the barcode, or type the title yourself.';
+
+  @override
+  String get addBookNoCatalogueResults =>
+      'No catalogue matches. Scan the barcode or refine your search.';
+
+  @override
+  String get markingModeText => 'text';
+
+  @override
+  String get markingModePhoto => 'photo';
+
+  @override
+  String get markingContinueButton => 'Continue';
+
+  @override
+  String markingSaveSheetTitle(String book) {
+    return 'Save to $book';
+  }
+
+  @override
+  String get markingPageFieldLabel => 'page';
+
+  @override
+  String get markingPageAutoLabel => 'auto';
+
+  @override
+  String get markingNoteHint => 'what did this land on?';
+
+  @override
+  String get markingVoiceHint => 'hold to say it out loud';
+
+  @override
+  String get markingDoneButton => 'Done';
+
+  @override
+  String bookmarkDetailPhotoMeta(int page, String date) {
+    return 'page $page · shot $date';
+  }
+
+  @override
+  String bookmarkDetailShotMeta(String date) {
+    return 'shot $date';
+  }
+
+  @override
+  String get bookmarkDetailNotePlaceholder => 'Add a note — coming soon.';
+
+  @override
+  String get bookmarkDetailStarredLabel => 'starred';
+
+  @override
+  String get bookmarkDetailShareLabel => 'share';
+
+  @override
+  String get bookmarkDetailMoreLabel => 'more';
 }

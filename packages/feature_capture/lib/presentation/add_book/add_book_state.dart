@@ -5,18 +5,12 @@ sealed class AddBookState {
   const AddBookState();
 }
 
-class const AddBookInitial() extends AddBookState;
-
-class const AddBookLoading() extends AddBookState;
-
-class const AddBookResults({
-  required final List<Book> books,
-}) extends AddBookState;
-
-class const AddBookEmpty() extends AddBookState;
-
-class const AddBookFailure({
-  required final AppError error,
+class const AddBookLoaded({
+  required final String query,
+  required final List<Book> libraryMatches,
+  required final List<Book> catalogueResults,
+  required final bool isCatalogueLoading,
+  required final AppError? catalogueError,
 }) extends AddBookState;
 
 class const AddBookSaved({

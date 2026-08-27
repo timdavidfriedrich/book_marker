@@ -1,4 +1,5 @@
 import 'package:core/error/app_result.dart';
+import 'package:feature_capture/domain/mark_text.dart';
 import 'package:feature_capture/domain/save_bookmark_use_case.dart';
 import 'package:feature_capture/domain/text_recognition_repository.dart';
 import 'package:feature_capture/presentation/marking/marking_event.dart';
@@ -7,37 +8,49 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
 import 'package:shared/domain/entities/bookmark.dart';
 import 'package:shared/domain/entities/highlight_region.dart';
+import 'package:shared/domain/repositories/book_repository.dart';
 import 'package:shared/presentation/navigation/marking_arguments.dart';
 import 'package:uuid/uuid.dart';
 
 const _uuid = Uuid();
-const _quoteSeparator = " ";
 
 @injectable
 class MarkingBloc extends Bloc<MarkingEvent, MarkingState> {
   MarkingBloc(
     this._textRecognitionRepository,
     this._saveBookmarkUseCase,
+    this._bookRepository,
     @factoryParam this._arguments,
   ) : super(const MarkingProcessing()) {
     on<MarkingStarted>(_onStarted);
     on<MarkingLineToggled>(_onLineToggled);
     on<MarkingPageNumberChanged>(_onPageNumberChanged);
+    on<MarkingStarToggled>(_onStarToggled);
     on<MarkingSaveRequested>(_onSaveRequested);
   }
 
   final TextRecognitionRepository _textRecognitionRepository;
   final SaveBookmarkUseCase _saveBookmarkUseCase;
+  final BookRepository _bookRepository;
   final MarkingArguments _arguments;
 
   Future<void> _onStarted(MarkingStarted event, Emitter<MarkingState> emit) async {
     emit(const MarkingProcessing());
+    var bookTitle = "";
+    var bookAuthors = const <String>[];
+    if (await _bookRepository.getBook(_arguments.bookId) case Success(:final data)) {
+      bookTitle = data.title;
+      bookAuthors = data.authors;
+    }
     emit(switch (await _textRecognitionRepository.recognizePage(_arguments.imagePath)) {
       Success(:final data) => MarkingReady(
         page: data,
         imagePath: _arguments.imagePath,
+        bookTitle: bookTitle,
+        bookAuthors: bookAuthors,
         selectedIndexes: const {},
         pageNumber: data.detectedPageNumber,
+        isStarred: false,
         isSaving: false,
         saveError: null,
       ),
@@ -46,65 +59,94 @@ class MarkingBloc extends Bloc<MarkingEvent, MarkingState> {
   }
 
   void _onLineToggled(MarkingLineToggled event, Emitter<MarkingState> emit) {
-    final currentState = state;
-    if (currentState is! MarkingReady) return;
-    final selectedIndexes = Set<int>.from(currentState.selectedIndexes);
-    if (!selectedIndexes.add(event.index)) selectedIndexes.remove(event.index);
-    emit(
-      MarkingReady(
-        page: currentState.page,
-        imagePath: currentState.imagePath,
-        selectedIndexes: selectedIndexes,
-        pageNumber: currentState.pageNumber,
-        isSaving: false,
-        saveError: null,
-      ),
-    );
+    if (state case final MarkingReady current) {
+      final selectedIndexes = Set<int>.from(current.selectedIndexes);
+      if (!selectedIndexes.add(event.index)) selectedIndexes.remove(event.index);
+      emit(
+        MarkingReady(
+          page: current.page,
+          imagePath: current.imagePath,
+          bookTitle: current.bookTitle,
+          bookAuthors: current.bookAuthors,
+          selectedIndexes: selectedIndexes,
+          pageNumber: current.pageNumber,
+          isStarred: current.isStarred,
+          isSaving: false,
+          saveError: null,
+        ),
+      );
+    }
   }
 
   void _onPageNumberChanged(MarkingPageNumberChanged event, Emitter<MarkingState> emit) {
-    final currentState = state;
-    if (currentState is! MarkingReady) return;
-    emit(
-      MarkingReady(
-        page: currentState.page,
-        imagePath: currentState.imagePath,
-        selectedIndexes: currentState.selectedIndexes,
-        pageNumber: event.pageNumber,
-        isSaving: false,
-        saveError: null,
-      ),
-    );
+    if (state case final MarkingReady current) {
+      emit(
+        MarkingReady(
+          page: current.page,
+          imagePath: current.imagePath,
+          bookTitle: current.bookTitle,
+          bookAuthors: current.bookAuthors,
+          selectedIndexes: current.selectedIndexes,
+          pageNumber: event.pageNumber,
+          isStarred: current.isStarred,
+          isSaving: false,
+          saveError: null,
+        ),
+      );
+    }
+  }
+
+  void _onStarToggled(MarkingStarToggled event, Emitter<MarkingState> emit) {
+    if (state case final MarkingReady current) {
+      emit(
+        MarkingReady(
+          page: current.page,
+          imagePath: current.imagePath,
+          bookTitle: current.bookTitle,
+          bookAuthors: current.bookAuthors,
+          selectedIndexes: current.selectedIndexes,
+          pageNumber: current.pageNumber,
+          isStarred: !current.isStarred,
+          isSaving: false,
+          saveError: null,
+        ),
+      );
+    }
   }
 
   Future<void> _onSaveRequested(MarkingSaveRequested event, Emitter<MarkingState> emit) async {
-    final currentState = state;
-    if (currentState is! MarkingReady || currentState.selectedIndexes.isEmpty) return;
-    emit(
-      MarkingReady(
-        page: currentState.page,
-        imagePath: currentState.imagePath,
-        selectedIndexes: currentState.selectedIndexes,
-        pageNumber: currentState.pageNumber,
-        isSaving: true,
-        saveError: null,
-      ),
-    );
-
-    switch (await _saveBookmarkUseCase(_buildBookmark(currentState))) {
-      case Success():
-        emit(const MarkingSaved());
-      case Failure(:final error):
-        emit(
-          MarkingReady(
-            page: currentState.page,
-            imagePath: currentState.imagePath,
-            selectedIndexes: currentState.selectedIndexes,
-            pageNumber: currentState.pageNumber,
-            isSaving: false,
-            saveError: error,
-          ),
-        );
+    if (state case final MarkingReady current when current.selectedIndexes.isNotEmpty) {
+      emit(
+        MarkingReady(
+          page: current.page,
+          imagePath: current.imagePath,
+          bookTitle: current.bookTitle,
+          bookAuthors: current.bookAuthors,
+          selectedIndexes: current.selectedIndexes,
+          pageNumber: current.pageNumber,
+          isStarred: current.isStarred,
+          isSaving: true,
+          saveError: null,
+        ),
+      );
+      switch (await _saveBookmarkUseCase(_buildBookmark(current))) {
+        case Success():
+          emit(const MarkingSaved());
+        case Failure(:final error):
+          emit(
+            MarkingReady(
+              page: current.page,
+              imagePath: current.imagePath,
+              bookTitle: current.bookTitle,
+              bookAuthors: current.bookAuthors,
+              selectedIndexes: current.selectedIndexes,
+              pageNumber: current.pageNumber,
+              isStarred: current.isStarred,
+              isSaving: false,
+              saveError: error,
+            ),
+          );
+      }
     }
   }
 
@@ -115,7 +157,7 @@ class MarkingBloc extends Bloc<MarkingEvent, MarkingState> {
       id: _uuid.v4(),
       bookId: _arguments.bookId,
       pageNumber: state.pageNumber,
-      quote: selectedLines.map((line) => line.text).join(_quoteSeparator),
+      quote: joinMarkedLines(selectedLines.map((line) => line.text)),
       photoPath: _arguments.imagePath,
       imageAspectRatio: state.page.aspectRatio,
       highlights: selectedLines
@@ -129,7 +171,7 @@ class MarkingBloc extends Bloc<MarkingEvent, MarkingState> {
             ),
           )
           .toList(),
-      isFavorite: false,
+      isFavorite: state.isStarred,
       createdAt: DateTime.now().toUtc(),
     );
   }

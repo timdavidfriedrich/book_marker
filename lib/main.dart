@@ -22,6 +22,7 @@ class const App({
       onGenerateTitle: (context) => context.s.appTitle,
       theme: AppTheme.light,
       darkTheme: AppTheme.dark,
+      themeMode: ThemeMode.light,
       localizationsDelegates: const [
         AppLocalizations.delegate,
         GlobalMaterialLocalizations.delegate,

@@ -1,4 +1,5 @@
 import 'package:core/theme/spacing.dart';
+import 'package:core/theme/theme_extensions.dart';
 import 'package:feature_capture/presentation/add_book/add_book_bloc.dart';
 import 'package:feature_capture/presentation/add_book/add_book_event.dart';
 import 'package:feature_capture/presentation/add_book/add_book_state.dart';
@@ -6,36 +7,128 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:shared/domain/entities/book.dart';
+import 'package:shared/presentation/extensions/accent_extensions.dart';
 import 'package:shared/presentation/extensions/app_error_extensions.dart';
 import 'package:shared/presentation/extensions/context_extensions.dart';
 import 'package:shared/presentation/navigation/navigation_extensions.dart';
-
-const _thumbnailWidth = 40.0;
+import 'package:shared/presentation/widgets/book_cover.dart';
+import 'package:shared/presentation/widgets/circle_icon_button.dart';
+import 'package:shared/presentation/widgets/ink_tap_box.dart';
+import 'package:shared/presentation/widgets/section_label.dart';
 
 class const AddBookScreen({
   super.key,
 }) extends HookWidget {
   @override
   Widget build(BuildContext context) {
-    final searchController = useTextEditingController();
+    final controller = useTextEditingController();
     return Scaffold(
-      appBar: AppBar(title: Text(context.s.addBookTitle)),
+      backgroundColor: Colors.transparent,
       body: BlocListener<AddBookBloc, AddBookState>(
         listenWhen: (previous, current) => current is AddBookSaved,
         listener: (context, state) {
-          if (state is AddBookSaved) {
-            context.closeScreenWithResult(state.bookId);
-          }
+          if (state is AddBookSaved) context.closeScreenWithResult(state.bookId);
         },
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(Spacing.m),
-              child: _SearchField(controller: searchController),
-            ),
-            const Expanded(child: _Results()),
-          ],
+        child: DraggableScrollableSheet(
+          initialChildSize: 0.5,
+          minChildSize: 0.5,
+          maxChildSize: 0.95,
+          builder: (context, scrollController) =>
+              _Sheet(controller: controller, scrollController: scrollController),
         ),
+      ),
+    );
+  }
+}
+
+class const _Sheet({
+  required final TextEditingController _controller,
+  required final ScrollController _scrollController,
+}) extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: context.c.surfaceContainerLowest,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(Spacing.radiusXxl)),
+      ),
+      child: BlocBuilder<AddBookBloc, AddBookState>(
+        builder: (context, state) {
+          if (state is! AddBookLoaded) {
+            return const Center(child: CircularProgressIndicator());
+          }
+          final showTitle = state.query.trim().isEmpty;
+          return Column(
+            children: [
+              const SizedBox(height: Spacing.s),
+              Container(
+                width: 44,
+                height: 5,
+                decoration: BoxDecoration(
+                  color: context.c.outline,
+                  borderRadius: BorderRadius.circular(Spacing.radiusFull),
+                ),
+              ),
+              Expanded(
+                child: ListView(
+                  controller: _scrollController,
+                  padding: const EdgeInsets.fromLTRB(Spacing.l, Spacing.l, Spacing.l, Spacing.xxl),
+                  children: [
+                    Row(
+                      children: [
+                        Expanded(
+                          child: showTitle
+                              ? Text(context.s.addBookQuestionTitle, style: context.t.headlineSmall)
+                              : const SizedBox.shrink(),
+                        ),
+                        const SizedBox(width: Spacing.s),
+                        CircleIconButton(
+                          icon: Icons.close,
+                          tooltip: context.s.close,
+                          onPressed: context.closeScreen,
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: Spacing.m),
+                    Row(
+                      children: [
+                        Expanded(child: _SearchField(controller: _controller, query: state.query)),
+                        const SizedBox(width: Spacing.s),
+                        _BarcodeButton(controller: _controller),
+                      ],
+                    ),
+                    const SizedBox(height: Spacing.l),
+                    if (state.libraryMatches.isNotEmpty) ...[
+                      SectionLabel(
+                        text: context.s.addBookInLibraryLabel,
+                        dotColor: context.palette.amber.solid,
+                      ),
+                      const SizedBox(height: Spacing.s),
+                      for (final book in state.libraryMatches) ...[
+                        _OwnedTile(book: book),
+                        const SizedBox(height: Spacing.s),
+                      ],
+                    ],
+                    if (state.query.trim().isNotEmpty) ...[
+                      const SizedBox(height: Spacing.s),
+                      SectionLabel(
+                        text: context.s.addBookNotInLibraryLabel,
+                        dotColor: context.c.outline,
+                      ),
+                      const SizedBox(height: Spacing.s),
+                      _CatalogueSection(state: state),
+                    ],
+                    const SizedBox(height: Spacing.l),
+                    Text(
+                      context.s.addBookCatalogueFooter,
+                      style: context.typography.monoLabel.copyWith(color: context.c.onSurfaceVariant),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          );
+        },
       ),
     );
   }
@@ -43,90 +136,196 @@ class const AddBookScreen({
 
 class const _SearchField({
   required final TextEditingController _controller,
+  required final String _query,
 }) extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return TextField(
       controller: _controller,
       textInputAction: TextInputAction.search,
-      onSubmitted: (query) => context.read<AddBookBloc>().add(AddBookSearched(query)),
+      style: context.t.bodyLarge,
+      onChanged: (value) => context.read<AddBookBloc>().add(AddBookQueryChanged(value)),
       decoration: InputDecoration(
         hintText: context.s.addBookSearchHint,
-        prefixIcon: const Icon(Icons.search),
-        suffixIcon: IconButton(
-          tooltip: context.s.addBookScanButton,
-          icon: const Icon(Icons.qr_code_scanner),
-          onPressed: () => _scanBarcode(context, _controller),
-        ),
+        prefixIcon: Icon(Icons.search, color: context.c.onSurfaceVariant),
+        suffixIcon: _query.isEmpty
+            ? null
+            : IconButton(
+                icon: Icon(Icons.close, color: context.c.onSurfaceVariant),
+                onPressed: () {
+                  _controller.clear();
+                  context.read<AddBookBloc>().add(const AddBookQueryChanged(""));
+                },
+              ),
       ),
     );
   }
 }
 
-class const _Results() extends StatelessWidget {
+class const _BarcodeButton({
+  required final TextEditingController _controller,
+}) extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<AddBookBloc, AddBookState>(
-      builder: (context, state) => switch (state) {
-        AddBookInitial() => _Message(text: context.s.addBookInitialMessage),
-        AddBookLoading() => const Center(child: CircularProgressIndicator()),
-        AddBookEmpty() => _Message(text: context.s.addBookEmptyMessage),
-        AddBookFailure(:final error) => _Message(text: error.toMessage(context)),
-        AddBookResults(:final books) => _BookList(books: books),
-        AddBookSaved() => const Center(child: CircularProgressIndicator()),
-      },
+    return IconButton(
+      onPressed: () => _scanBarcode(context, _controller),
+      tooltip: context.s.addBookScanButton,
+      icon: const Icon(Icons.qr_code_scanner),
+      iconSize: Spacing.iconM,
+      style: IconButton.styleFrom(
+        backgroundColor: context.c.inverseSurface,
+        foregroundColor: context.palette.amber.solid,
+        fixedSize: const Size.square(56),
+        minimumSize: const Size.square(56),
+        padding: EdgeInsets.zero,
+        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(Spacing.radiusL)),
+      ),
     );
   }
 }
 
-class const _BookList({
-  required final List<Book> _books,
+class const _OwnedTile({
+  required final Book _book,
 }) extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return ListView.builder(
-      padding: const EdgeInsets.symmetric(horizontal: Spacing.m),
-      itemCount: _books.length,
-      itemBuilder: (context, index) {
-        final book = _books[index];
-        return ListTile(
-          leading: _Thumbnail(url: book.thumbnailUrl),
-          title: Text(book.title),
-          subtitle: Text(
-            book.authors.isEmpty ? context.s.bookAuthorsUnknown : book.authors.join(", "),
+    final accent = _book.id.accent;
+    final swatch = context.palette.resolve(accent);
+    return Container(
+      padding: const EdgeInsets.all(Spacing.s),
+      decoration: BoxDecoration(color: swatch.fill, borderRadius: BorderRadius.circular(Spacing.radiusL)),
+      child: Row(
+        children: [
+          BookCover(accent: accent, url: _book.thumbnailUrl, width: 44, height: 56, radius: Spacing.radiusS),
+          const SizedBox(width: Spacing.s),
+          Expanded(child: _TileText(book: _book, titleColor: swatch.onFill, subtitleColor: swatch.onFillVariant)),
+          const SizedBox(width: Spacing.s),
+          _PillButton(
+            label: context.s.addBookSelectButton,
+            background: context.palette.teal.solid,
+            foreground: context.palette.teal.onSolid,
+            onTap: () => context.closeScreenWithResult(_book.id),
           ),
-          onTap: () => context.read<AddBookBloc>().add(AddBookSelected(book)),
-        );
-      },
+        ],
+      ),
     );
   }
 }
 
-class const _Thumbnail({
-  required final String? _url,
+class const _CatalogueSection({
+  required final AddBookLoaded _state,
 }) extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final url = _url;
-    if (url == null) return const Icon(Icons.menu_book);
-    return Image.network(
-      url,
-      width: _thumbnailWidth,
-      fit: BoxFit.contain,
-      errorBuilder: (context, error, stackTrace) => const Icon(Icons.menu_book),
+    if (_state.isCatalogueLoading) {
+      return const Padding(
+        padding: EdgeInsets.all(Spacing.l),
+        child: Center(child: CircularProgressIndicator()),
+      );
+    }
+    if (_state.catalogueError case final error?) {
+      return Padding(
+        padding: const EdgeInsets.all(Spacing.m),
+        child: Text(
+          error.toMessage(context),
+          style: context.t.bodyMedium?.copyWith(color: context.c.onSurfaceVariant),
+        ),
+      );
+    }
+    if (_state.catalogueResults.isEmpty) {
+      return Padding(
+        padding: const EdgeInsets.all(Spacing.m),
+        child: Text(
+          context.s.addBookNoCatalogueResults,
+          style: context.t.bodyMedium?.copyWith(color: context.c.onSurfaceVariant),
+        ),
+      );
+    }
+    return Column(
+      children: [
+        for (final book in _state.catalogueResults) ...[
+          _CatalogueTile(book: book),
+          const SizedBox(height: Spacing.s),
+        ],
+      ],
     );
   }
 }
 
-class const _Message({
-  required final String _text,
+class const _CatalogueTile({
+  required final Book _book,
 }) extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(Spacing.l),
-        child: Text(_text, textAlign: TextAlign.center),
+    final swatch = context.palette.resolve(AccentColor.sand);
+    return Container(
+      padding: const EdgeInsets.all(Spacing.s),
+      decoration: BoxDecoration(color: swatch.fill, borderRadius: BorderRadius.circular(Spacing.radiusL)),
+      child: Row(
+        children: [
+          BookCover(accent: AccentColor.sand, url: _book.thumbnailUrl, width: 44, height: 56, radius: Spacing.radiusS),
+          const SizedBox(width: Spacing.s),
+          Expanded(child: _TileText(book: _book, titleColor: swatch.onFill, subtitleColor: swatch.onFillVariant)),
+          const SizedBox(width: Spacing.s),
+          _PillButton(
+            label: context.s.addBookAddButton,
+            background: context.c.inverseSurface,
+            foreground: context.c.onInverseSurface,
+            onTap: () => context.read<AddBookBloc>().add(AddBookCatalogueSelected(_book)),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class const _TileText({
+  required final Book _book,
+  required final Color _titleColor,
+  required final Color _subtitleColor,
+}) extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final authors = _book.authors.isEmpty ? context.s.bookAuthorsUnknown : _book.authors.join(", ");
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          _book.title,
+          maxLines: 2,
+          overflow: TextOverflow.ellipsis,
+          style: context.t.titleMedium?.copyWith(color: _titleColor),
+        ),
+        const SizedBox(height: Spacing.xxxs),
+        Text(
+          authors,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: context.typography.monoLabel.copyWith(color: _subtitleColor),
+        ),
+      ],
+    );
+  }
+}
+
+class const _PillButton({
+  required final String _label,
+  required final Color _background,
+  required final Color _foreground,
+  required final VoidCallback _onTap,
+}) extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return InkTapBox(
+      onTap: _onTap,
+      color: _background,
+      radius: Spacing.radiusFull,
+      padding: const EdgeInsets.symmetric(horizontal: Spacing.m, vertical: Spacing.xs),
+      child: Text(
+        _label,
+        style: context.t.labelMedium?.copyWith(color: _foreground, fontSize: 14),
       ),
     );
   }
@@ -137,5 +336,5 @@ Future<void> _scanBarcode(BuildContext context, TextEditingController controller
   final code = await context.pushBarcodeScanner();
   if (code == null) return;
   controller.text = code;
-  addBookBloc.add(AddBookSearched(code));
+  addBookBloc.add(AddBookQueryChanged(code));
 }

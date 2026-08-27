@@ -12,4 +12,6 @@ class const MarkingPageNumberChanged(
   final int? pageNumber,
 ) extends MarkingEvent;
 
+class const MarkingStarToggled() extends MarkingEvent;
+
 class const MarkingSaveRequested() extends MarkingEvent;

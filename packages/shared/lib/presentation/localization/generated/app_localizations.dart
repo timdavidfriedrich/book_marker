@@ -174,7 +174,7 @@ abstract class AppLocalizations {
   /// No description provided for @libraryTitle.
   ///
   /// In en, this message translates to:
-  /// **'Your marks'**
+  /// **'Library'**
   String get libraryTitle;
 
   /// No description provided for @libraryEmptyMessage.
@@ -392,6 +392,378 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Remove from favorites'**
   String get bookmarkDetailFavoriteRemove;
+
+  /// No description provided for @libraryHeaderStats.
+  ///
+  /// In en, this message translates to:
+  /// **'{books} books · {marks} marks'**
+  String libraryHeaderStats(int books, int marks);
+
+  /// No description provided for @librarySearchHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Search books and marks…'**
+  String get librarySearchHint;
+
+  /// No description provided for @libraryTabBooks.
+  ///
+  /// In en, this message translates to:
+  /// **'books'**
+  String get libraryTabBooks;
+
+  /// No description provided for @libraryTabShelves.
+  ///
+  /// In en, this message translates to:
+  /// **'shelves'**
+  String get libraryTabShelves;
+
+  /// No description provided for @libraryAddShelfLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'+ shelf'**
+  String get libraryAddShelfLabel;
+
+  /// No description provided for @libraryFilterAll.
+  ///
+  /// In en, this message translates to:
+  /// **'all {count}'**
+  String libraryFilterAll(int count);
+
+  /// No description provided for @libraryFilterReading.
+  ///
+  /// In en, this message translates to:
+  /// **'reading {count}'**
+  String libraryFilterReading(int count);
+
+  /// No description provided for @libraryFilterFinished.
+  ///
+  /// In en, this message translates to:
+  /// **'finished {count}'**
+  String libraryFilterFinished(int count);
+
+  /// No description provided for @libraryMarksCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} marks'**
+  String libraryMarksCount(int count);
+
+  /// No description provided for @libraryStarredCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} starred'**
+  String libraryStarredCount(int count);
+
+  /// No description provided for @libraryStatusReading.
+  ///
+  /// In en, this message translates to:
+  /// **'reading'**
+  String get libraryStatusReading;
+
+  /// No description provided for @libraryShelvesPlaceholder.
+  ///
+  /// In en, this message translates to:
+  /// **'Shelves arrive in the next update.'**
+  String get libraryShelvesPlaceholder;
+
+  /// No description provided for @librarySearchScopeAll.
+  ///
+  /// In en, this message translates to:
+  /// **'all books'**
+  String get librarySearchScopeAll;
+
+  /// No description provided for @librarySearchScopeStarred.
+  ///
+  /// In en, this message translates to:
+  /// **'starred'**
+  String get librarySearchScopeStarred;
+
+  /// No description provided for @librarySearchScopeNotes.
+  ///
+  /// In en, this message translates to:
+  /// **'my notes'**
+  String get librarySearchScopeNotes;
+
+  /// No description provided for @librarySearchCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{marks} marks in {books} books'**
+  String librarySearchCount(int marks, int books);
+
+  /// No description provided for @navLibraryLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'library'**
+  String get navLibraryLabel;
+
+  /// No description provided for @navThemesLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'themes'**
+  String get navThemesLabel;
+
+  /// No description provided for @profileYouLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'you'**
+  String get profileYouLabel;
+
+  /// No description provided for @pageShortLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'p.{page}'**
+  String pageShortLabel(int page);
+
+  /// No description provided for @markVoiceLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'voice {duration}'**
+  String markVoiceLabel(String duration);
+
+  /// No description provided for @comingSoonMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Coming soon.'**
+  String get comingSoonMessage;
+
+  /// No description provided for @themesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Themes'**
+  String get themesTitle;
+
+  /// No description provided for @themesSubtitlePlaceholder.
+  ///
+  /// In en, this message translates to:
+  /// **'Gather marks across your books'**
+  String get themesSubtitlePlaceholder;
+
+  /// No description provided for @themesPlaceholderMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Themes gather marks from across your books. They arrive in the next update.'**
+  String get themesPlaceholderMessage;
+
+  /// No description provided for @bookDetailAllFilter.
+  ///
+  /// In en, this message translates to:
+  /// **'all {count}'**
+  String bookDetailAllFilter(int count);
+
+  /// No description provided for @bookDetailStarredFilter.
+  ///
+  /// In en, this message translates to:
+  /// **'starred'**
+  String get bookDetailStarredFilter;
+
+  /// No description provided for @bookDetailVoiceFilter.
+  ///
+  /// In en, this message translates to:
+  /// **'with voice'**
+  String get bookDetailVoiceFilter;
+
+  /// No description provided for @bookDetailMarksStat.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} marks'**
+  String bookDetailMarksStat(int count);
+
+  /// No description provided for @bookDetailStarredStat.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} starred'**
+  String bookDetailStarredStat(int count);
+
+  /// No description provided for @bookDetailEmptyMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'No marks in this book yet.'**
+  String get bookDetailEmptyMessage;
+
+  /// No description provided for @captureSteadyHint.
+  ///
+  /// In en, this message translates to:
+  /// **'hold steady for sharper text'**
+  String get captureSteadyHint;
+
+  /// No description provided for @captureModeOnePage.
+  ///
+  /// In en, this message translates to:
+  /// **'one page'**
+  String get captureModeOnePage;
+
+  /// No description provided for @captureModeSpread.
+  ///
+  /// In en, this message translates to:
+  /// **'spread'**
+  String get captureModeSpread;
+
+  /// No description provided for @captureMarkingInto.
+  ///
+  /// In en, this message translates to:
+  /// **'marking into'**
+  String get captureMarkingInto;
+
+  /// No description provided for @captureSwitchButton.
+  ///
+  /// In en, this message translates to:
+  /// **'switch'**
+  String get captureSwitchButton;
+
+  /// No description provided for @captureGalleryLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'from gallery'**
+  String get captureGalleryLabel;
+
+  /// No description provided for @captureGalleryPlaceholder.
+  ///
+  /// In en, this message translates to:
+  /// **'Importing from the gallery is coming soon.'**
+  String get captureGalleryPlaceholder;
+
+  /// No description provided for @captureLightOn.
+  ///
+  /// In en, this message translates to:
+  /// **'light on'**
+  String get captureLightOn;
+
+  /// No description provided for @captureLightOff.
+  ///
+  /// In en, this message translates to:
+  /// **'light off'**
+  String get captureLightOff;
+
+  /// No description provided for @addBookQuestionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Which book is this?'**
+  String get addBookQuestionTitle;
+
+  /// No description provided for @addBookInLibraryLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'in your library'**
+  String get addBookInLibraryLabel;
+
+  /// No description provided for @addBookNotInLibraryLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'not in your library, yet'**
+  String get addBookNotInLibraryLabel;
+
+  /// No description provided for @addBookSelectButton.
+  ///
+  /// In en, this message translates to:
+  /// **'select'**
+  String get addBookSelectButton;
+
+  /// No description provided for @addBookAddButton.
+  ///
+  /// In en, this message translates to:
+  /// **'+ add'**
+  String get addBookAddButton;
+
+  /// No description provided for @addBookCatalogueFooter.
+  ///
+  /// In en, this message translates to:
+  /// **'Catalogue results arrive from an online book service. No match? Scan the barcode, or type the title yourself.'**
+  String get addBookCatalogueFooter;
+
+  /// No description provided for @addBookNoCatalogueResults.
+  ///
+  /// In en, this message translates to:
+  /// **'No catalogue matches. Scan the barcode or refine your search.'**
+  String get addBookNoCatalogueResults;
+
+  /// No description provided for @markingModeText.
+  ///
+  /// In en, this message translates to:
+  /// **'text'**
+  String get markingModeText;
+
+  /// No description provided for @markingModePhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'photo'**
+  String get markingModePhoto;
+
+  /// No description provided for @markingContinueButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue'**
+  String get markingContinueButton;
+
+  /// No description provided for @markingSaveSheetTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Save to {book}'**
+  String markingSaveSheetTitle(String book);
+
+  /// No description provided for @markingPageFieldLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'page'**
+  String get markingPageFieldLabel;
+
+  /// No description provided for @markingPageAutoLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'auto'**
+  String get markingPageAutoLabel;
+
+  /// No description provided for @markingNoteHint.
+  ///
+  /// In en, this message translates to:
+  /// **'what did this land on?'**
+  String get markingNoteHint;
+
+  /// No description provided for @markingVoiceHint.
+  ///
+  /// In en, this message translates to:
+  /// **'hold to say it out loud'**
+  String get markingVoiceHint;
+
+  /// No description provided for @markingDoneButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Done'**
+  String get markingDoneButton;
+
+  /// No description provided for @bookmarkDetailPhotoMeta.
+  ///
+  /// In en, this message translates to:
+  /// **'page {page} · shot {date}'**
+  String bookmarkDetailPhotoMeta(int page, String date);
+
+  /// No description provided for @bookmarkDetailShotMeta.
+  ///
+  /// In en, this message translates to:
+  /// **'shot {date}'**
+  String bookmarkDetailShotMeta(String date);
+
+  /// No description provided for @bookmarkDetailNotePlaceholder.
+  ///
+  /// In en, this message translates to:
+  /// **'Add a note — coming soon.'**
+  String get bookmarkDetailNotePlaceholder;
+
+  /// No description provided for @bookmarkDetailStarredLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'starred'**
+  String get bookmarkDetailStarredLabel;
+
+  /// No description provided for @bookmarkDetailShareLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'share'**
+  String get bookmarkDetailShareLabel;
+
+  /// No description provided for @bookmarkDetailMoreLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'more'**
+  String get bookmarkDetailMoreLabel;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

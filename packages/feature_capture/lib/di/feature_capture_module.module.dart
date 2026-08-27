@@ -42,6 +42,7 @@ class FeatureCapturePackageModule extends _i526.MicroPackageModule {
         _i1072.MarkingBloc(
           gh<_i981.TextRecognitionRepository>(),
           gh<_i493.SaveBookmarkUseCase>(),
+          gh<_i748.BookRepository>(),
           _arguments,
         ));
   }

@@ -10,8 +10,11 @@ class const MarkingProcessing() extends MarkingState;
 class const MarkingReady({
   required final RecognizedPage page,
   required final String imagePath,
+  required final String bookTitle,
+  required final List<String> bookAuthors,
   required final Set<int> selectedIndexes,
   required final int? pageNumber,
+  required final bool isStarred,
   required final bool isSaving,
   required final AppError? saveError,
 }) extends MarkingState;
