@@ -35,11 +35,23 @@ class const BookRepositoryImpl(
       return Success(
         remoteBooks.map((it) => it.toBook(id: _uuid.v4(), timestamp: timestamp)).toList(),
       );
-    } on DioException {
+    } on DioException catch (exception) {
+      final response = exception.response;
+      if (response != null) {
+        return Failure(ApiError(_serverMessage(response)));
+      }
       return const Failure(ConnectionError());
     } on Object {
       return const Failure(UnexpectedError());
     }
+  }
+
+  String _serverMessage(Response<dynamic> response) {
+    final data = response.data;
+    if (data is Map && data["error"] is Map && (data["error"] as Map)["message"] is String) {
+      return (data["error"] as Map)["message"] as String;
+    }
+    return "HTTP ${response.statusCode}";
   }
 
   @override
@@ -67,6 +79,26 @@ class const BookRepositoryImpl(
   Future<AppResult<()>> markBookUsed(String id) async {
     try {
       await _localDataSource.touchBook(id, DateTime.now().toUtc());
+      return const Success(());
+    } on Object {
+      return const Failure(UnexpectedError());
+    }
+  }
+
+  @override
+  Future<AppResult<()>> setStatus(String id, BookStatus status) async {
+    try {
+      await _localDataSource.setStatus(id, status.value);
+      return const Success(());
+    } on Object {
+      return const Failure(UnexpectedError());
+    }
+  }
+
+  @override
+  Future<AppResult<()>> deleteBook(String id) async {
+    try {
+      await _localDataSource.deleteBook(id);
       return const Success(());
     } on Object {
       return const Failure(UnexpectedError());

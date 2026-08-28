@@ -129,6 +129,36 @@ abstract class AppLocalizations {
   /// **'Try again'**
   String get tryAgain;
 
+  /// No description provided for @commonRename.
+  ///
+  /// In en, this message translates to:
+  /// **'Rename'**
+  String get commonRename;
+
+  /// No description provided for @commonChangeColor.
+  ///
+  /// In en, this message translates to:
+  /// **'Change color'**
+  String get commonChangeColor;
+
+  /// No description provided for @commonDelete.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete'**
+  String get commonDelete;
+
+  /// No description provided for @commonAutomatic.
+  ///
+  /// In en, this message translates to:
+  /// **'Automatic'**
+  String get commonAutomatic;
+
+  /// No description provided for @accentPickerTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose a color'**
+  String get accentPickerTitle;
+
   /// No description provided for @error.
   ///
   /// In en, this message translates to:
@@ -729,6 +759,12 @@ abstract class AppLocalizations {
   /// **'Done'**
   String get markingDoneButton;
 
+  /// No description provided for @markingNewThemeChip.
+  ///
+  /// In en, this message translates to:
+  /// **'+ new'**
+  String get markingNewThemeChip;
+
   /// No description provided for @bookmarkDetailPhotoMeta.
   ///
   /// In en, this message translates to:
@@ -759,11 +795,281 @@ abstract class AppLocalizations {
   /// **'share'**
   String get bookmarkDetailShareLabel;
 
+  /// No description provided for @markShareBody.
+  ///
+  /// In en, this message translates to:
+  /// **'“{quote}”\n\n— {source}'**
+  String markShareBody(String quote, String source);
+
   /// No description provided for @bookmarkDetailMoreLabel.
   ///
   /// In en, this message translates to:
   /// **'more'**
   String get bookmarkDetailMoreLabel;
+
+  /// No description provided for @bookmarkDetailNoteHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Add a note…'**
+  String get bookmarkDetailNoteHint;
+
+  /// No description provided for @libraryStatusFinished.
+  ///
+  /// In en, this message translates to:
+  /// **'finished'**
+  String get libraryStatusFinished;
+
+  /// No description provided for @libraryFinishedFooter.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} finished books'**
+  String libraryFinishedFooter(int count);
+
+  /// No description provided for @libraryShowFinished.
+  ///
+  /// In en, this message translates to:
+  /// **'show them'**
+  String get libraryShowFinished;
+
+  /// No description provided for @bookDetailMarkFinished.
+  ///
+  /// In en, this message translates to:
+  /// **'Mark as finished'**
+  String get bookDetailMarkFinished;
+
+  /// No description provided for @bookDetailMarkReading.
+  ///
+  /// In en, this message translates to:
+  /// **'Mark as reading'**
+  String get bookDetailMarkReading;
+
+  /// No description provided for @themesHeaderStats.
+  ///
+  /// In en, this message translates to:
+  /// **'{themes} themes · {marks} marks from {books} books'**
+  String themesHeaderStats(int themes, int marks, int books);
+
+  /// No description provided for @themesBooksCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} books'**
+  String themesBooksCount(int count);
+
+  /// No description provided for @themesNewThemeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'New theme'**
+  String get themesNewThemeLabel;
+
+  /// No description provided for @themesNewThemeTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'New theme'**
+  String get themesNewThemeTitle;
+
+  /// No description provided for @themesNewThemeHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Theme name'**
+  String get themesNewThemeHint;
+
+  /// No description provided for @themeDetailStats.
+  ///
+  /// In en, this message translates to:
+  /// **'{marks} marks · {books} books · {starred} starred'**
+  String themeDetailStats(int marks, int books, int starred);
+
+  /// No description provided for @themeDetailAddMarks.
+  ///
+  /// In en, this message translates to:
+  /// **'Add marks to this theme'**
+  String get themeDetailAddMarks;
+
+  /// No description provided for @themeDetailEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No marks in this theme yet.'**
+  String get themeDetailEmpty;
+
+  /// No description provided for @themeAddMarksTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Add marks'**
+  String get themeAddMarksTitle;
+
+  /// No description provided for @themeRenameTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Rename theme'**
+  String get themeRenameTitle;
+
+  /// No description provided for @themeDeleteTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete theme?'**
+  String get themeDeleteTitle;
+
+  /// No description provided for @themeDeleteMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'The theme is removed. Your marks and books stay.'**
+  String get themeDeleteMessage;
+
+  /// No description provided for @shelfRenameTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Rename shelf'**
+  String get shelfRenameTitle;
+
+  /// No description provided for @shelfDeleteTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete shelf?'**
+  String get shelfDeleteTitle;
+
+  /// No description provided for @shelfDeleteMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'The shelf is removed. Your books stay.'**
+  String get shelfDeleteMessage;
+
+  /// No description provided for @bookDeleteAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete book'**
+  String get bookDeleteAction;
+
+  /// No description provided for @bookDeleteTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete book?'**
+  String get bookDeleteTitle;
+
+  /// No description provided for @bookDeleteMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'This deletes the book and all its marks. This can\'t be undone.'**
+  String get bookDeleteMessage;
+
+  /// No description provided for @markDeleteAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete mark'**
+  String get markDeleteAction;
+
+  /// No description provided for @markDeleteTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete mark?'**
+  String get markDeleteTitle;
+
+  /// No description provided for @markDeleteMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'This deletes the mark. This can\'t be undone.'**
+  String get markDeleteMessage;
+
+  /// No description provided for @libraryNewShelfLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'New shelf'**
+  String get libraryNewShelfLabel;
+
+  /// No description provided for @libraryNewShelfTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'New shelf'**
+  String get libraryNewShelfTitle;
+
+  /// No description provided for @libraryNewShelfHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Shelf name'**
+  String get libraryNewShelfHint;
+
+  /// No description provided for @shelfDetailStats.
+  ///
+  /// In en, this message translates to:
+  /// **'{books} books · {marks} marks'**
+  String shelfDetailStats(int books, int marks);
+
+  /// No description provided for @shelfDetailAddBooks.
+  ///
+  /// In en, this message translates to:
+  /// **'Add books to this shelf'**
+  String get shelfDetailAddBooks;
+
+  /// No description provided for @shelfDetailEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No books on this shelf yet.'**
+  String get shelfDetailEmpty;
+
+  /// No description provided for @shelfAddBooksTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Add books'**
+  String get shelfAddBooksTitle;
+
+  /// No description provided for @settingsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Settings'**
+  String get settingsTitle;
+
+  /// No description provided for @settingsProfileNameHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Your name'**
+  String get settingsProfileNameHint;
+
+  /// No description provided for @settingsStats.
+  ///
+  /// In en, this message translates to:
+  /// **'{books} books · {marks} marks · {themes} themes'**
+  String settingsStats(int books, int marks, int themes);
+
+  /// No description provided for @settingsLanguageLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Language'**
+  String get settingsLanguageLabel;
+
+  /// No description provided for @settingsLanguageSystem.
+  ///
+  /// In en, this message translates to:
+  /// **'System'**
+  String get settingsLanguageSystem;
+
+  /// No description provided for @settingsLanguageEnglish.
+  ///
+  /// In en, this message translates to:
+  /// **'English'**
+  String get settingsLanguageEnglish;
+
+  /// No description provided for @settingsLanguageGerman.
+  ///
+  /// In en, this message translates to:
+  /// **'German'**
+  String get settingsLanguageGerman;
+
+  /// No description provided for @settingsAboutLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'About'**
+  String get settingsAboutLabel;
+
+  /// No description provided for @settingsVersionLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Version {version}'**
+  String settingsVersionLabel(String version);
+
+  /// No description provided for @settingsLicensesLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Open-source licenses'**
+  String get settingsLicensesLabel;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

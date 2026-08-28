@@ -11,3 +11,7 @@ class const BookDetailStarted() extends BookDetailEvent;
 class const BookDetailBookmarksUpdated(final AppResult<List<Bookmark>> result) extends BookDetailEvent;
 
 class const BookDetailFilterChanged(final BookDetailFilter filter) extends BookDetailEvent;
+
+class const BookDetailStatusToggled() extends BookDetailEvent;
+
+class const BookDetailDeleteRequested() extends BookDetailEvent;

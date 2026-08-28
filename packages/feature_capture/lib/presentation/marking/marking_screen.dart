@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:core/theme/spacing.dart';
@@ -7,28 +8,32 @@ import 'package:feature_capture/domain/recognized_page.dart';
 import 'package:feature_capture/presentation/marking/marking_bloc.dart';
 import 'package:feature_capture/presentation/marking/marking_event.dart';
 import 'package:feature_capture/presentation/marking/marking_state.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:record/record.dart';
+import 'package:shared/domain/entities/mark_theme.dart';
 import 'package:shared/presentation/extensions/app_error_extensions.dart';
 import 'package:shared/presentation/extensions/context_extensions.dart';
 import 'package:shared/presentation/navigation/navigation_extensions.dart';
 import 'package:shared/presentation/widgets/circle_icon_button.dart';
 import 'package:shared/presentation/widgets/ink_tap_box.dart';
+import 'package:shared/presentation/widgets/name_input_dialog.dart';
 import 'package:shared/presentation/widgets/page_pill.dart';
 import 'package:shared/presentation/widgets/paper_card.dart';
+import 'package:shared/presentation/widgets/selectable_chip.dart';
+import 'package:uuid/uuid.dart';
 
-const _lineBorderOpacity = 0.15;
-const _wrapHyphens = {"-", "‐", "­"};
+const _uuid = Uuid();
+const _minVoiceMs = 500;
 
-String _spanText(String raw) {
-  final text = raw.trim();
-  if (text.isNotEmpty && _wrapHyphens.contains(text[text.length - 1])) {
-    return text.substring(0, text.length - 1);
-  }
-  return "$text ";
+String _formatDuration(int milliseconds) {
+  final duration = Duration(milliseconds: milliseconds);
+  final minutes = duration.inMinutes;
+  final seconds = duration.inSeconds % 60;
+  return "$minutes:${seconds.toString().padLeft(2, "0")}";
 }
 
 class const MarkingScreen({
@@ -85,7 +90,7 @@ class const _Editor({
   @override
   Widget build(BuildContext context) {
     final mode = useState(0);
-    final canContinue = _state.selectedIndexes.isNotEmpty;
+    final canContinue = _state.selectedWordIndexes.isNotEmpty;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: Spacing.l),
       child: Column(
@@ -103,9 +108,14 @@ class const _Editor({
           Expanded(
             child: PaperCard(
               padding: const EdgeInsets.all(Spacing.m),
-              child: mode.value == 0
-                  ? _ReadingText(state: _state)
-                  : _PhotoSelectable(state: _state),
+              child: IndexedStack(
+                index: mode.value,
+                sizing: StackFit.expand,
+                children: [
+                  _ReadingText(state: _state, isActive: mode.value == 0),
+                  _PhotoSelectable(state: _state),
+                ],
+              ),
             ),
           ),
           const SizedBox(height: Spacing.m),
@@ -202,48 +212,71 @@ class const _ModeToggle({
 
 class const _ReadingText({
   required final MarkingReady _state,
+  required final bool _isActive,
 }) extends HookWidget {
   @override
   Widget build(BuildContext context) {
-    final lines = _state.page.lines;
-    final bloc = context.read<MarkingBloc>();
-    final recognizers = useMemoized(
-      () => List.generate(
-        lines.length,
-        (index) => TapGestureRecognizer()..onTap = () => bloc.add(MarkingLineToggled(index)),
-      ),
-      [lines.length],
-    );
-    useEffect(() {
-      return () {
-        for (final recognizer in recognizers) {
-          recognizer.dispose();
-        }
-      };
-    }, [recognizers]);
-
-    if (lines.isEmpty) {
-      return Center(
-        child: Text(context.s.markingNoTextMessage, textAlign: TextAlign.center),
-      );
+    final words = _state.page.words;
+    if (words.isEmpty) {
+      return Center(child: Text(context.s.markingNoTextMessage, textAlign: TextAlign.center));
     }
+    final layout = useMemoized(() {
+      final buffer = StringBuffer();
+      final ranges = <List<int>>[];
+      for (var index = 0; index < words.length; index++) {
+        final start = buffer.length;
+        buffer.write(words[index].text);
+        ranges.add([start, buffer.length]);
+        if (index < words.length - 1) buffer.write(" ");
+      }
+      return (text: buffer.toString(), ranges: ranges);
+    }, [words.length]);
+    final controller = useTextEditingController(text: layout.text);
+    final focusNode = useFocusNode();
+    final bloc = context.read<MarkingBloc>();
 
-    final highlight = context.palette.amber.solid;
+    useEffect(() {
+      void listener() {
+        final selection = controller.selection;
+        if (selection.start < 0 || selection.end < 0) return;
+        final next = <int>{};
+        for (var index = 0; index < layout.ranges.length; index++) {
+          if (layout.ranges[index][0] < selection.end && layout.ranges[index][1] > selection.start) {
+            next.add(index);
+          }
+        }
+        if (bloc.state case final MarkingReady current
+            when next.length == current.selectedWordIndexes.length &&
+                next.containsAll(current.selectedWordIndexes)) {
+          return;
+        }
+        bloc.add(MarkingWordsSelected(next));
+      }
+
+      controller.addListener(listener);
+      return () => controller.removeListener(listener);
+    }, [controller]);
+
+    useEffect(() {
+      if (_isActive) focusNode.requestFocus();
+      return null;
+    }, [_isActive]);
+
     return SingleChildScrollView(
-      child: Text.rich(
-        TextSpan(
-          children: [
-            for (var index = 0; index < lines.length; index++)
-              TextSpan(
-                text: _spanText(lines[index].text),
-                recognizer: recognizers[index],
-                style: _state.selectedIndexes.contains(index)
-                    ? context.typography.readingBody.copyWith(
-                        background: Paint()..color = highlight,
-                      )
-                    : context.typography.readingBody,
-              ),
-          ],
+      child: TextField(
+        controller: controller,
+        focusNode: focusNode,
+        readOnly: true,
+        showCursor: false,
+        maxLines: null,
+        style: context.typography.readingBody,
+        decoration: const InputDecoration(
+          isCollapsed: true,
+          filled: false,
+          border: InputBorder.none,
+          enabledBorder: InputBorder.none,
+          focusedBorder: InputBorder.none,
+          contentPadding: EdgeInsets.zero,
         ),
       ),
     );
@@ -265,13 +298,8 @@ class const _PhotoSelectable({
             return Stack(
               children: [
                 Positioned.fill(child: Image.file(File(_state.imagePath), fit: BoxFit.fill)),
-                for (var index = 0; index < page.lines.length; index++)
-                  _LineBox(
-                    line: page.lines[index],
-                    size: size,
-                    isSelected: _state.selectedIndexes.contains(index),
-                    onTap: () => context.read<MarkingBloc>().add(MarkingLineToggled(index)),
-                  ),
+                for (final index in _state.selectedWordIndexes)
+                  if (index < page.words.length) _WordBox(word: page.words[index], size: size),
               ],
             );
           },
@@ -281,33 +309,19 @@ class const _PhotoSelectable({
   }
 }
 
-class const _LineBox({
-  required final RecognizedLine _line,
+class const _WordBox({
+  required final RecognizedWord _word,
   required final Size _size,
-  required final bool _isSelected,
-  required final VoidCallback _onTap,
 }) extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Positioned(
-      left: _line.left * _size.width,
-      top: _line.top * _size.height,
-      width: _line.width * _size.width,
-      height: _line.height * _size.height,
-      child: GestureDetector(
-        behavior: HitTestBehavior.opaque,
-        onTap: _onTap,
-        child: DecoratedBox(
-          decoration: BoxDecoration(
-            color: _isSelected ? context.palette.amber.solid.withValues(alpha: 0.4) : null,
-            border: Border.all(
-              color: _isSelected
-                  ? context.palette.amber.solid
-                  : context.c.onSurface.withValues(alpha: _lineBorderOpacity),
-              width: Spacing.borderWidthThin,
-            ),
-          ),
-        ),
+      left: _word.left * _size.width,
+      top: _word.top * _size.height,
+      width: _word.width * _size.width,
+      height: _word.height * _size.height,
+      child: DecoratedBox(
+        decoration: BoxDecoration(color: context.palette.amber.solid.withValues(alpha: 0.4)),
       ),
     );
   }
@@ -332,6 +346,14 @@ class const _SaveSheet() extends HookWidget {
   @override
   Widget build(BuildContext context) {
     final pageController = useTextEditingController();
+    final noteController = useTextEditingController();
+    final initialQuote = switch (context.read<MarkingBloc>().state) {
+      MarkingReady(:final selectedWordIndexes, :final page) => joinMarkedLines(
+        (selectedWordIndexes.toList()..sort()).map((index) => page.words[index].text),
+      ),
+      _ => "",
+    };
+    final quoteController = useTextEditingController(text: initialQuote);
     return DraggableScrollableSheet(
       initialChildSize: 0.55,
       minChildSize: 0.55,
@@ -346,10 +368,6 @@ class const _SaveSheet() extends HookWidget {
           listener: (context, state) => Navigator.of(context).pop(),
           builder: (context, state) {
             if (state is! MarkingReady) return const SizedBox.shrink();
-            final orderedIndexes = state.selectedIndexes.toList()..sort();
-            final quote = joinMarkedLines(
-              orderedIndexes.map((index) => state.page.lines[index].text),
-            );
             return ListView(
               controller: scrollController,
               padding: EdgeInsets.fromLTRB(
@@ -404,7 +422,21 @@ class const _SaveSheet() extends HookWidget {
                     color: context.palette.amber.fill,
                     borderRadius: BorderRadius.circular(Spacing.radiusL),
                   ),
-                  child: Text('“$quote”', style: context.typography.readingQuoteItalic),
+                  child: TextField(
+                    controller: quoteController,
+                    minLines: 1,
+                    maxLines: 5,
+                    style: context.typography.readingQuoteItalic,
+                    onChanged: (value) => context.read<MarkingBloc>().add(MarkingQuoteEdited(value)),
+                    decoration: const InputDecoration(
+                      isDense: true,
+                      filled: false,
+                      border: InputBorder.none,
+                      enabledBorder: InputBorder.none,
+                      focusedBorder: InputBorder.none,
+                      contentPadding: EdgeInsets.zero,
+                    ),
+                  ),
                 ),
                 const SizedBox(height: Spacing.m),
                 _PageField(
@@ -412,9 +444,11 @@ class const _SaveSheet() extends HookWidget {
                   wasDetected: state.page.detectedPageNumber != null,
                 ),
                 const SizedBox(height: Spacing.s),
-                const _NotePlaceholder(),
+                _NoteField(controller: noteController),
                 const SizedBox(height: Spacing.m),
-                const _VoicePlaceholder(),
+                _VoiceRecorder(voicePath: state.voicePath, voiceDurationMs: state.voiceDurationMs),
+                const SizedBox(height: Spacing.m),
+                _ThemeChips(themes: state.availableThemes, selected: state.selectedThemeIds),
                 const SizedBox(height: Spacing.m),
                 Row(
                   children: [
@@ -506,50 +540,139 @@ class const _PageField({
   }
 }
 
-class const _NotePlaceholder() extends StatelessWidget {
+class const _NoteField({
+  required final TextEditingController _controller,
+}) extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(Spacing.m),
+      padding: const EdgeInsets.symmetric(horizontal: Spacing.m, vertical: Spacing.xs),
       decoration: BoxDecoration(
         color: context.c.surfaceContainerHigh,
         borderRadius: BorderRadius.circular(Spacing.radiusM),
       ),
-      child: Text(
-        context.s.markingNoteHint,
-        style: context.t.bodyLarge?.copyWith(color: context.c.onSurfaceVariant),
+      child: TextField(
+        controller: _controller,
+        minLines: 1,
+        maxLines: 3,
+        textCapitalization: TextCapitalization.sentences,
+        style: context.t.bodyLarge,
+        onChanged: (value) => context.read<MarkingBloc>().add(MarkingNoteChanged(value)),
+        decoration: InputDecoration(
+          isDense: true,
+          filled: false,
+          border: InputBorder.none,
+          enabledBorder: InputBorder.none,
+          focusedBorder: InputBorder.none,
+          contentPadding: EdgeInsets.zero,
+          hintText: context.s.markingNoteHint,
+        ),
       ),
     );
   }
 }
 
-class const _VoicePlaceholder() extends StatelessWidget {
+class const _VoiceRecorder({
+  required final String? _voicePath,
+  required final int? _voiceDurationMs,
+}) extends HookWidget {
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: Spacing.m, vertical: Spacing.s),
-      decoration: BoxDecoration(
-        color: context.palette.coral.solid,
-        borderRadius: BorderRadius.circular(Spacing.radiusFull),
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 28,
-            height: 28,
-            alignment: Alignment.center,
-            decoration: BoxDecoration(color: context.palette.coral.onSolid, shape: BoxShape.circle),
-            child: Icon(Icons.mic_rounded, size: Spacing.iconS, color: context.palette.coral.solid),
-          ),
-          const SizedBox(width: Spacing.s),
-          Expanded(
-            child: Text(
-              context.s.markingVoiceHint,
-              style: context.t.bodyLarge?.copyWith(color: context.palette.coral.onSolid),
+    final recorder = useMemoized(AudioRecorder.new);
+    useEffect(() => recorder.dispose, [recorder]);
+    final isRecording = useState(false);
+    final stopwatch = useMemoized(Stopwatch.new);
+    final elapsed = useState(Duration.zero);
+
+    useEffect(() {
+      if (!isRecording.value) return null;
+      final timer = Timer.periodic(const Duration(milliseconds: 200), (_) {
+        elapsed.value = stopwatch.elapsed;
+      });
+      return timer.cancel;
+    }, [isRecording.value]);
+
+    Future<void> start() async {
+      if (!await recorder.hasPermission()) {
+        if (context.mounted) context.showToast(context.s.errorUnexpected);
+        return;
+      }
+      final directory = await getApplicationDocumentsDirectory();
+      final path = "${directory.path}/voice_${_uuid.v4()}.m4a";
+      await recorder.start(const RecordConfig(), path: path);
+      stopwatch
+        ..reset()
+        ..start();
+      elapsed.value = Duration.zero;
+      isRecording.value = true;
+    }
+
+    Future<void> stop() async {
+      if (!isRecording.value) return;
+      stopwatch.stop();
+      final path = await recorder.stop();
+      isRecording.value = false;
+      final milliseconds = stopwatch.elapsedMilliseconds;
+      if (path != null && milliseconds > _minVoiceMs && context.mounted) {
+        context.read<MarkingBloc>().add(MarkingVoiceRecorded(path, milliseconds));
+      }
+    }
+
+    final coral = context.palette.coral;
+    if (_voicePath != null && !isRecording.value) {
+      return Container(
+        padding: const EdgeInsets.symmetric(horizontal: Spacing.m, vertical: Spacing.xs),
+        decoration: BoxDecoration(color: coral.solid, borderRadius: BorderRadius.circular(Spacing.radiusFull)),
+        child: Row(
+          children: [
+            Icon(Icons.graphic_eq, color: coral.onSolid, size: Spacing.iconM),
+            const SizedBox(width: Spacing.s),
+            Expanded(
+              child: Text(
+                context.s.markVoiceLabel(_formatDuration(_voiceDurationMs ?? 0)),
+                style: context.t.bodyLarge?.copyWith(color: coral.onSolid),
+              ),
             ),
-          ),
-          Icon(Icons.graphic_eq, color: context.palette.coral.onSolid, size: Spacing.iconM),
-        ],
+            IconButton(
+              onPressed: () => context.read<MarkingBloc>().add(const MarkingVoiceCleared()),
+              icon: const Icon(Icons.close),
+              iconSize: Spacing.iconM,
+              color: coral.onSolid,
+            ),
+          ],
+        ),
+      );
+    }
+
+    final label = isRecording.value
+        ? _formatDuration(elapsed.value.inMilliseconds)
+        : context.s.markingVoiceHint;
+    return Listener(
+      onPointerDown: (_) => start(),
+      onPointerUp: (_) => stop(),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: Spacing.m, vertical: Spacing.s),
+        decoration: BoxDecoration(color: coral.solid, borderRadius: BorderRadius.circular(Spacing.radiusFull)),
+        child: Row(
+          children: [
+            Container(
+              width: 28,
+              height: 28,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(color: coral.onSolid, shape: BoxShape.circle),
+              child: Icon(Icons.mic_rounded, size: Spacing.iconS, color: coral.solid),
+            ),
+            const SizedBox(width: Spacing.s),
+            Expanded(
+              child: Text(label, style: context.t.bodyLarge?.copyWith(color: coral.onSolid)),
+            ),
+            Icon(
+              isRecording.value ? Icons.fiber_manual_record : Icons.graphic_eq,
+              color: coral.onSolid,
+              size: Spacing.iconM,
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -569,4 +692,42 @@ class const _StarToggle({
       onPressed: () => context.read<MarkingBloc>().add(const MarkingStarToggled()),
     );
   }
+}
+
+class const _ThemeChips({
+  required final List<MarkTheme> _themes,
+  required final Set<String> _selected,
+}) extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Wrap(
+      spacing: Spacing.xs,
+      runSpacing: Spacing.xs,
+      children: [
+        for (final theme in _themes)
+          SelectableChip(
+            label: theme.name,
+            selected: _selected.contains(theme.id),
+            selectedColor: context.palette.teal.solid,
+            selectedTextColor: context.palette.teal.onSolid,
+            onTap: () => context.read<MarkingBloc>().add(MarkingThemeToggled(theme.id)),
+          ),
+        SelectableChip(
+          label: context.s.markingNewThemeChip,
+          selected: false,
+          onTap: () => _promptNewMarkingTheme(context),
+        ),
+      ],
+    );
+  }
+}
+
+Future<void> _promptNewMarkingTheme(BuildContext context) async {
+  final bloc = context.read<MarkingBloc>();
+  final name = await showNameInputDialog(
+    context,
+    title: context.s.themesNewThemeTitle,
+    hint: context.s.themesNewThemeHint,
+  );
+  if (name != null && name.trim().isNotEmpty) bloc.add(MarkingThemeCreateRequested(name));
 }

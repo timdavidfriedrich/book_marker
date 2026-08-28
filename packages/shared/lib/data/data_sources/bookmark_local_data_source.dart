@@ -10,6 +10,10 @@ abstract class BookmarkLocalDataSource {
   Future<void> insertBookmark(LocalBookmark bookmark);
 
   Future<void> setFavorite(String id, {required bool isFavorite});
+
+  Future<void> setNote(String id, String? note);
+
+  Future<void> deleteBookmark(String id);
 }
 
 @Injectable(as: BookmarkLocalDataSource)
@@ -38,4 +42,14 @@ class const BookmarkLocalDataSourceImpl(
     final statement = _database.update(_database.bookmarks)..where((table) => table.id.equals(id));
     return statement.write(BookmarksCompanion(isFavorite: Value(isFavorite)));
   }
+
+  @override
+  Future<void> setNote(String id, String? note) {
+    final statement = _database.update(_database.bookmarks)..where((table) => table.id.equals(id));
+    return statement.write(BookmarksCompanion(note: Value(note)));
+  }
+
+  @override
+  Future<void> deleteBookmark(String id) =>
+      (_database.delete(_database.bookmarks)..where((table) => table.id.equals(id))).go();
 }

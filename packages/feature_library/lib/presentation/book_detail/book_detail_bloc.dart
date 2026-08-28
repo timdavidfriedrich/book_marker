@@ -21,6 +21,8 @@ class BookDetailBloc extends Bloc<BookDetailEvent, BookDetailState> {
     on<BookDetailStarted>(_onStarted);
     on<BookDetailBookmarksUpdated>(_onBookmarksUpdated);
     on<BookDetailFilterChanged>(_onFilterChanged);
+    on<BookDetailStatusToggled>(_onStatusToggled);
+    on<BookDetailDeleteRequested>(_onDeleteRequested);
   }
 
   final BookmarkRepository _bookmarkRepository;
@@ -64,7 +66,33 @@ class BookDetailBloc extends Bloc<BookDetailEvent, BookDetailState> {
     _emitState(emit);
   }
 
+  Future<void> _onStatusToggled(
+    BookDetailStatusToggled event,
+    Emitter<BookDetailState> emit,
+  ) async {
+    final book = _book;
+    if (book == null) return;
+    final next = book.status == BookStatus.reading ? BookStatus.finished : BookStatus.reading;
+    if (await _bookRepository.setStatus(book.id, next) case Success()) {
+      _book = book.copyWith(status: next);
+      _emitState(emit);
+    }
+  }
+
+  Future<void> _onDeleteRequested(
+    BookDetailDeleteRequested event,
+    Emitter<BookDetailState> emit,
+  ) async {
+    for (final mark in _marks) {
+      await _bookmarkRepository.deleteBookmark(mark.id);
+    }
+    if (await _bookRepository.deleteBook(_bookId) case Success()) {
+      emit(const BookDetailDeleted());
+    }
+  }
+
   void _emitState(Emitter<BookDetailState> emit) {
+    if (state is BookDetailDeleted) return;
     if (_error case final AppError error) {
       emit(BookDetailFailure(error: error));
       return;
@@ -74,7 +102,7 @@ class BookDetailBloc extends Bloc<BookDetailEvent, BookDetailState> {
     final visible = switch (_filter) {
       BookDetailFilter.all => _marks,
       BookDetailFilter.starred => _marks.where((mark) => mark.isFavorite).toList(),
-      BookDetailFilter.withVoice => const <Bookmark>[],
+      BookDetailFilter.withVoice => _marks.where((mark) => mark.voicePath != null).toList(),
     };
     emit(
       BookDetailLoaded(

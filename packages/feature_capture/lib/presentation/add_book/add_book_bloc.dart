@@ -9,7 +9,8 @@ import 'package:injectable/injectable.dart';
 import 'package:shared/domain/entities/book.dart';
 import 'package:shared/domain/repositories/book_repository.dart';
 
-const _minCatalogueQueryLength = 2;
+const _minCatalogueQueryLength = 3;
+const _debounceDuration = Duration(milliseconds: 500);
 
 @injectable
 class AddBookBloc extends Bloc<AddBookEvent, AddBookState> {
@@ -26,14 +27,17 @@ class AddBookBloc extends Bloc<AddBookEvent, AddBookState> {
     on<AddBookStarted>(_onStarted);
     on<AddBookBooksUpdated>(_onBooksUpdated);
     on<AddBookQueryChanged>(_onQueryChanged);
+    on<AddBookCatalogueRequested>(_onCatalogueRequested);
     on<AddBookCatalogueSelected>(_onCatalogueSelected);
   }
 
   final BookRepository _bookRepository;
   StreamSubscription<AppResult<List<Book>>>? _subscription;
+  Timer? _debounce;
   List<Book> _libraryBooks = const [];
   List<Book> _catalogue = const [];
   String _query = "";
+  String _lastSearched = "";
   bool _isCatalogueLoading = false;
 
   Future<void> _onStarted(AddBookStarted event, Emitter<AddBookState> emit) async {
@@ -50,15 +54,29 @@ class AddBookBloc extends Bloc<AddBookEvent, AddBookState> {
     }
   }
 
-  Future<void> _onQueryChanged(AddBookQueryChanged event, Emitter<AddBookState> emit) async {
+  void _onQueryChanged(AddBookQueryChanged event, Emitter<AddBookState> emit) {
     _query = event.query;
+    _debounce?.cancel();
     final trimmed = _query.trim();
     if (trimmed.length < _minCatalogueQueryLength) {
       _catalogue = const [];
       _isCatalogueLoading = false;
+      _lastSearched = "";
       _emitState(emit);
       return;
     }
+    _emitState(emit);
+    _debounce = Timer(_debounceDuration, () => add(const AddBookCatalogueRequested()));
+  }
+
+  Future<void> _onCatalogueRequested(
+    AddBookCatalogueRequested event,
+    Emitter<AddBookState> emit,
+  ) async {
+    final trimmed = _query.trim();
+    if (trimmed.length < _minCatalogueQueryLength) return;
+    if (trimmed == _lastSearched) return;
+    _lastSearched = trimmed;
     _isCatalogueLoading = true;
     _emitState(emit);
     final result = await _bookRepository.searchBooks(trimmed);
@@ -70,6 +88,7 @@ class AddBookBloc extends Bloc<AddBookEvent, AddBookState> {
         _catalogue = data.where((book) => !ownedIds.contains(book.id)).toList();
         _emitState(emit, catalogueError: null);
       case Failure(:final error):
+        _lastSearched = "";
         _catalogue = const [];
         _emitState(emit, catalogueError: error);
     }
@@ -105,6 +124,7 @@ class AddBookBloc extends Bloc<AddBookEvent, AddBookState> {
 
   @override
   Future<void> close() async {
+    _debounce?.cancel();
     await _subscription?.cancel();
     return super.close();
   }

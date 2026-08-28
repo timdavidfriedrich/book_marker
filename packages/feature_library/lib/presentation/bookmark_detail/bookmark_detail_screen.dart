@@ -1,3 +1,4 @@
+import 'package:audioplayers/audioplayers.dart';
 import 'package:core/theme/spacing.dart';
 import 'package:feature_library/presentation/bookmark_detail/bookmark_detail_bloc.dart';
 import 'package:feature_library/presentation/bookmark_detail/bookmark_detail_event.dart';
@@ -5,15 +6,18 @@ import 'package:feature_library/presentation/bookmark_detail/bookmark_detail_sta
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:shared/domain/entities/book.dart';
 import 'package:shared/domain/entities/bookmark.dart';
 import 'package:shared/presentation/extensions/app_error_extensions.dart';
 import 'package:shared/presentation/extensions/context_extensions.dart';
 import 'package:shared/presentation/navigation/navigation_extensions.dart';
 import 'package:shared/presentation/widgets/circle_icon_button.dart';
+import 'package:shared/presentation/widgets/confirm_dialog.dart';
 import 'package:shared/presentation/widgets/highlight_image.dart';
 import 'package:shared/presentation/widgets/ink_tap_box.dart';
 import 'package:shared/presentation/widgets/paper_card.dart';
+import 'package:shared/presentation/widgets/sheet_action_tile.dart';
 
 class const BookmarkDetailScreen({
   super.key,
@@ -22,7 +26,9 @@ class const BookmarkDetailScreen({
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
-        child: BlocBuilder<BookmarkDetailBloc, BookmarkDetailState>(
+        child: BlocConsumer<BookmarkDetailBloc, BookmarkDetailState>(
+          listenWhen: (previous, current) => current is BookmarkDetailDeleted,
+          listener: (context, state) => context.closeScreen(),
           builder: (context, state) => switch (state) {
             BookmarkDetailLoading() => const Center(child: CircularProgressIndicator()),
             BookmarkDetailFailure(:final error) => Center(
@@ -35,6 +41,7 @@ class const BookmarkDetailScreen({
               bookmark: bookmark,
               book: book,
             ),
+            BookmarkDetailDeleted() => const SizedBox.shrink(),
           },
         ),
       ),
@@ -65,9 +72,13 @@ class const _Content({
                 : _TextView(bookmark: _bookmark),
           ),
           const SizedBox(height: Spacing.m),
+          if (_bookmark.voicePath case final String path) ...[
+            _VoicePlayer(path: path, durationMs: _bookmark.voiceDurationMs ?? 0),
+            const SizedBox(height: Spacing.m),
+          ],
           _NoteCard(bookmark: _bookmark),
           const SizedBox(height: Spacing.m),
-          _Actions(isStarred: _bookmark.isFavorite),
+          _Actions(bookmark: _bookmark, book: _book),
           const SizedBox(height: Spacing.s),
         ],
       ),
@@ -196,9 +207,10 @@ class const _TextView({
 
 class const _NoteCard({
   required final Bookmark _bookmark,
-}) extends StatelessWidget {
+}) extends HookWidget {
   @override
   Widget build(BuildContext context) {
+    final controller = useTextEditingController(text: _bookmark.note ?? "");
     return Container(
       padding: const EdgeInsets.all(Spacing.m),
       decoration: BoxDecoration(
@@ -213,9 +225,23 @@ class const _NoteCard({
             style: context.typography.readingQuoteItalic.copyWith(color: context.c.onSurface),
           ),
           const SizedBox(height: Spacing.xs),
-          Text(
-            context.s.bookmarkDetailNotePlaceholder,
-            style: context.t.bodyMedium?.copyWith(color: context.c.onSurfaceVariant),
+          TextField(
+            controller: controller,
+            minLines: 1,
+            maxLines: 4,
+            textCapitalization: TextCapitalization.sentences,
+            style: context.t.bodyMedium?.copyWith(color: context.c.onSurface),
+            onChanged: (value) =>
+                context.read<BookmarkDetailBloc>().add(BookmarkDetailNoteChanged(value)),
+            decoration: InputDecoration(
+              isDense: true,
+              filled: false,
+              border: InputBorder.none,
+              enabledBorder: InputBorder.none,
+              focusedBorder: InputBorder.none,
+              contentPadding: EdgeInsets.zero,
+              hintText: context.s.bookmarkDetailNoteHint,
+            ),
           ),
         ],
       ),
@@ -224,7 +250,8 @@ class const _NoteCard({
 }
 
 class const _Actions({
-  required final bool _isStarred,
+  required final Bookmark _bookmark,
+  required final Book? _book,
 }) extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -232,9 +259,9 @@ class const _Actions({
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         _ActionButton(
-          icon: _isStarred ? Icons.star_rounded : Icons.star_outline_rounded,
+          icon: _bookmark.isFavorite ? Icons.star_rounded : Icons.star_outline_rounded,
           label: context.s.bookmarkDetailStarredLabel,
-          highlighted: _isStarred,
+          highlighted: _bookmark.isFavorite,
           onTap: () =>
               context.read<BookmarkDetailBloc>().add(const BookmarkDetailFavoriteToggled()),
         ),
@@ -243,16 +270,65 @@ class const _Actions({
           icon: Icons.north_east,
           label: context.s.bookmarkDetailShareLabel,
           highlighted: false,
-          onTap: () => context.showToast(context.s.comingSoonMessage),
+          onTap: () => _shareMark(context, _bookmark, _book),
         ),
         const SizedBox(width: Spacing.xl),
         _ActionButton(
           icon: Icons.more_horiz,
           label: context.s.bookmarkDetailMoreLabel,
           highlighted: false,
-          onTap: () => context.showToast(context.s.comingSoonMessage),
+          onTap: () => _showMarkMenu(context),
         ),
       ],
+    );
+  }
+}
+
+Future<void> _shareMark(BuildContext context, Bookmark bookmark, Book? book) async {
+  final page = bookmark.pageNumber;
+  final source = book == null
+      ? context.s.libraryUnknownBook
+      : (page == null ? book.title : "${book.title}, ${context.s.pageShortLabel(page)}");
+  await Share.share(context.s.markShareBody(bookmark.quote, source));
+}
+
+Future<void> _showMarkMenu(BuildContext context) async {
+  final bloc = context.read<BookmarkDetailBloc>();
+  final deleteRequested = await showModalBottomSheet<bool>(
+    context: context,
+    useRootNavigator: true,
+    builder: (_) => const _MarkMenu(),
+  );
+  if (deleteRequested != true || !context.mounted) return;
+  final confirmed = await showConfirmDialog(
+    context,
+    title: context.s.markDeleteTitle,
+    message: context.s.markDeleteMessage,
+    confirmLabel: context.s.commonDelete,
+    destructive: true,
+  );
+  if (confirmed) bloc.add(const BookmarkDetailDeleteRequested());
+}
+
+class const _MarkMenu() extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.all(Spacing.l),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            SheetActionTile(
+              icon: Icons.delete_outline,
+              label: context.s.markDeleteAction,
+              destructive: true,
+              onTap: () => Navigator.of(context).pop(true),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
@@ -281,6 +357,56 @@ class const _ActionButton({
           style: context.typography.monoCaption.copyWith(color: context.c.onSurfaceVariant),
         ),
       ],
+    );
+  }
+}
+
+class const _VoicePlayer({
+  required final String _path,
+  required final int _durationMs,
+}) extends HookWidget {
+  @override
+  Widget build(BuildContext context) {
+    final player = useMemoized(AudioPlayer.new);
+    useEffect(() => player.dispose, [player]);
+    final playing = useState(false);
+    useEffect(() {
+      final subscription = player.onPlayerComplete.listen((_) => playing.value = false);
+      return subscription.cancel;
+    }, [player]);
+
+    final coral = context.palette.coral;
+    final duration = Duration(milliseconds: _durationMs);
+    final label = "${duration.inMinutes}:${(duration.inSeconds % 60).toString().padLeft(2, "0")}";
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: Spacing.m, vertical: Spacing.xs),
+      decoration: BoxDecoration(color: coral.solid, borderRadius: BorderRadius.circular(Spacing.radiusFull)),
+      child: Row(
+        children: [
+          IconButton(
+            onPressed: () async {
+              if (playing.value) {
+                await player.pause();
+                playing.value = false;
+              } else {
+                await player.play(DeviceFileSource(_path));
+                playing.value = true;
+              }
+            },
+            icon: Icon(playing.value ? Icons.pause : Icons.play_arrow),
+            color: coral.onSolid,
+            iconSize: Spacing.iconM,
+          ),
+          const SizedBox(width: Spacing.xs),
+          Expanded(
+            child: Text(
+              context.s.markVoiceLabel(label),
+              style: context.t.bodyLarge?.copyWith(color: coral.onSolid),
+            ),
+          ),
+          Icon(Icons.graphic_eq, color: coral.onSolid, size: Spacing.iconM),
+        ],
+      ),
     );
   }
 }

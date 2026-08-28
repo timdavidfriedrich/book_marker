@@ -14,6 +14,11 @@ extension NavigationExtension on BuildContext {
       push(NavigationRoute.libraryBook.path.replaceFirst(":$parameterId", bookId));
   void pushBookmarkDetail(String bookmarkId) =>
       push(NavigationRoute.libraryMark.path.replaceFirst(":$parameterId", bookmarkId));
+  void pushThemeDetail(String themeId) =>
+      push(NavigationRoute.themeDetail.path.replaceFirst(":$parameterId", themeId));
+  void pushShelfDetail(String shelfId) =>
+      push(NavigationRoute.libraryShelf.path.replaceFirst(":$parameterId", shelfId));
+  void pushSettings() => push(NavigationRoute.settings.path);
   void closeScreen() => pop();
   void closeScreenWithResult(String result) => pop(result);
 }

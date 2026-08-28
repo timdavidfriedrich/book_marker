@@ -16,6 +16,8 @@ class BookmarkDetailBloc extends Bloc<BookmarkDetailEvent, BookmarkDetailState> 
   ) : super(const BookmarkDetailLoading()) {
     on<BookmarkDetailStarted>(_onStarted);
     on<BookmarkDetailFavoriteToggled>(_onFavoriteToggled);
+    on<BookmarkDetailNoteChanged>(_onNoteChanged);
+    on<BookmarkDetailDeleteRequested>(_onDeleteRequested);
   }
 
   final BookmarkRepository _bookmarkRepository;
@@ -46,6 +48,35 @@ class BookmarkDetailBloc extends Bloc<BookmarkDetailEvent, BookmarkDetailState> 
           book: currentState.book,
         ),
       );
+    }
+  }
+
+  Future<void> _onNoteChanged(
+    BookmarkDetailNoteChanged event,
+    Emitter<BookmarkDetailState> emit,
+  ) async {
+    final currentState = state;
+    if (currentState is! BookmarkDetailLoaded) return;
+    final trimmed = event.note?.trim();
+    final nextNote = (trimmed == null || trimmed.isEmpty) ? null : trimmed;
+    if (await _bookmarkRepository.setNote(currentState.bookmark.id, nextNote) case Success()) {
+      emit(
+        BookmarkDetailLoaded(
+          bookmark: currentState.bookmark.copyWith(note: nextNote),
+          book: currentState.book,
+        ),
+      );
+    }
+  }
+
+  Future<void> _onDeleteRequested(
+    BookmarkDetailDeleteRequested event,
+    Emitter<BookmarkDetailState> emit,
+  ) async {
+    final currentState = state;
+    if (currentState is! BookmarkDetailLoaded) return;
+    if (await _bookmarkRepository.deleteBookmark(currentState.bookmark.id) case Success()) {
+      emit(const BookmarkDetailDeleted());
     }
   }
 

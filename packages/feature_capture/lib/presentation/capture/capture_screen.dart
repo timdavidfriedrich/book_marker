@@ -9,6 +9,7 @@ import 'package:feature_capture/presentation/capture/capture_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:shared/domain/entities/book.dart';
 import 'package:shared/presentation/extensions/accent_extensions.dart';
 import 'package:shared/presentation/extensions/context_extensions.dart';
@@ -86,6 +87,19 @@ class const CaptureScreen({
       }
     }
 
+    Future<void> pickFromGallery(String bookId) async {
+      try {
+        final file = await ImagePicker().pickImage(source: ImageSource.gallery);
+        if (file == null) return;
+        await shutdown();
+        if (!context.mounted) return;
+        await context.pushMarking(MarkingArguments(imagePath: file.path, bookId: bookId));
+        if (context.mounted) await initialize();
+      } on Object {
+        if (context.mounted) context.showToast(context.s.errorUnexpected);
+      }
+    }
+
     useEffect(() {
       unawaited(initialize());
       return () {
@@ -124,6 +138,7 @@ class const CaptureScreen({
                 torchOn: torchOn.value,
                 onToggleTorch: toggleTorch,
                 onCapture: capture,
+                onGallery: pickFromGallery,
               ),
               const SizedBox(height: Spacing.s),
             ],
@@ -354,6 +369,7 @@ class const _Controls({
   required final bool _torchOn,
   required final Future<void> Function() _onToggleTorch,
   required final Future<void> Function(String) _onCapture,
+  required final Future<void> Function(String) _onGallery,
 }) extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -365,7 +381,9 @@ class const _Controls({
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            const _GalleryButton(),
+            _GalleryButton(
+              onTap: selectedBookId == null ? null : () => _onGallery(selectedBookId),
+            ),
             _ShutterButton(
               enabled: canCapture,
               onTap: canCapture ? () => _onCapture(selectedBookId) : null,
@@ -378,7 +396,9 @@ class const _Controls({
   }
 }
 
-class const _GalleryButton() extends StatelessWidget {
+class const _GalleryButton({
+  required final VoidCallback? _onTap,
+}) extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final swatch = context.palette.resolve(AccentColor.sand);
@@ -388,7 +408,7 @@ class const _GalleryButton() extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           IconButton(
-            onPressed: () => context.showToast(context.s.captureGalleryPlaceholder),
+            onPressed: _onTap,
             tooltip: context.s.captureGalleryLabel,
             icon: const Icon(Icons.photo_library_outlined),
             iconSize: Spacing.iconM,

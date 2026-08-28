@@ -12,8 +12,10 @@ import 'package:shared/presentation/extensions/context_extensions.dart';
 import 'package:shared/presentation/navigation/navigation_extensions.dart';
 import 'package:shared/presentation/widgets/book_cover.dart';
 import 'package:shared/presentation/widgets/circle_icon_button.dart';
+import 'package:shared/presentation/widgets/confirm_dialog.dart';
 import 'package:shared/presentation/widgets/mark_card.dart';
 import 'package:shared/presentation/widgets/selectable_chip.dart';
+import 'package:shared/presentation/widgets/sheet_action_tile.dart';
 
 class const BookDetailScreen({
   super.key,
@@ -21,7 +23,9 @@ class const BookDetailScreen({
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: BlocBuilder<BookDetailBloc, BookDetailState>(
+      body: BlocConsumer<BookDetailBloc, BookDetailState>(
+        listenWhen: (previous, current) => current is BookDetailDeleted,
+        listener: (context, state) => context.closeScreen(),
         builder: (context, state) => switch (state) {
           BookDetailLoading() => const Center(child: CircularProgressIndicator()),
           BookDetailFailure(:final error) => Center(
@@ -31,6 +35,7 @@ class const BookDetailScreen({
             ),
           ),
           BookDetailLoaded() => _Content(state: state),
+          BookDetailDeleted() => const SizedBox.shrink(),
         },
       ),
     );
@@ -105,12 +110,17 @@ class const _Content({
                   separatorBuilder: (context, index) => const SizedBox(height: Spacing.m),
                   itemBuilder: (context, index) {
                     final mark = _state.marks[index];
+                    final voiceMs = mark.voiceDurationMs;
                     return MarkCard(
                       accent: accent,
                       quote: "“${mark.quote}”",
                       thumbnailUrl: book.thumbnailUrl,
                       page: mark.pageNumber,
+                      note: mark.note,
                       isStarred: mark.isFavorite,
+                      hasVoice: mark.voicePath != null,
+                      voiceDuration: voiceMs == null ? null : Duration(milliseconds: voiceMs),
+                      voicePath: mark.voicePath,
                       onTap: () => context.pushBookmarkDetail(mark.id),
                     );
                   },
@@ -154,7 +164,7 @@ class const _Header({
                   CircleIconButton(
                     icon: Icons.more_horiz,
                     backgroundColor: context.c.surfaceContainerLowest,
-                    onPressed: () => context.showToast(context.s.comingSoonMessage),
+                    onPressed: () => _showBookMenu(context, _book.status),
                   ),
                 ],
               ),
@@ -178,6 +188,11 @@ class const _Header({
                           children: [
                             _StatChip(label: context.s.bookDetailMarksStat(_state.totalCount)),
                             _StatChip(label: context.s.bookDetailStarredStat(_state.starredCount)),
+                            _StatChip(
+                              label: _book.status == BookStatus.finished
+                                  ? context.s.libraryStatusFinished
+                                  : context.s.libraryStatusReading,
+                            ),
                           ],
                         ),
                       ],
@@ -205,6 +220,58 @@ class const _StatChip({
         borderRadius: BorderRadius.circular(Spacing.radiusFull),
       ),
       child: Text(_label, style: context.typography.monoLabel.copyWith(color: context.c.onSurface)),
+    );
+  }
+}
+
+Future<void> _showBookMenu(BuildContext context, BookStatus status) async {
+  final bloc = context.read<BookDetailBloc>();
+  final deleteRequested = await showModalBottomSheet<bool>(
+    context: context,
+    useRootNavigator: true,
+    builder: (_) => BlocProvider.value(value: bloc, child: _BookMenu(status: status)),
+  );
+  if (deleteRequested != true || !context.mounted) return;
+  final confirmed = await showConfirmDialog(
+    context,
+    title: context.s.bookDeleteTitle,
+    message: context.s.bookDeleteMessage,
+    confirmLabel: context.s.commonDelete,
+    destructive: true,
+  );
+  if (confirmed) bloc.add(const BookDetailDeleteRequested());
+}
+
+class const _BookMenu({
+  required final BookStatus _status,
+}) extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final toFinished = _status == BookStatus.reading;
+    return SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.all(Spacing.l),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            SheetActionTile(
+              icon: toFinished ? Icons.check_circle_outline : Icons.menu_book_outlined,
+              label: toFinished ? context.s.bookDetailMarkFinished : context.s.bookDetailMarkReading,
+              onTap: () {
+                context.read<BookDetailBloc>().add(const BookDetailStatusToggled());
+                Navigator.of(context).pop();
+              },
+            ),
+            SheetActionTile(
+              icon: Icons.delete_outline,
+              label: context.s.bookDeleteAction,
+              destructive: true,
+              onTap: () => Navigator.of(context).pop(true),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

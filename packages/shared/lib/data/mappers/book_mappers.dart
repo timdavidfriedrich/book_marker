@@ -6,6 +6,8 @@ const _isbn13Type = "ISBN_13";
 const _isbn10Type = "ISBN_10";
 const _insecureScheme = "http://";
 const _secureScheme = "https://";
+const _statusReading = "reading";
+const _statusFinished = "finished";
 
 extension LocalBookMappers on LocalBook {
   Book toBook() {
@@ -15,6 +17,7 @@ extension LocalBookMappers on LocalBook {
       authors: authors,
       isbn: isbn,
       thumbnailUrl: thumbnailUrl,
+      status: status.toBookStatus(),
       createdAt: createdAt,
       lastUsedAt: lastUsedAt,
     );
@@ -29,6 +32,7 @@ extension BookMappers on Book {
       authors: authors,
       isbn: isbn,
       thumbnailUrl: thumbnailUrl,
+      status: status.value,
       createdAt: createdAt,
       lastUsedAt: lastUsedAt,
     );
@@ -44,10 +48,25 @@ extension RemoteBookMappers on RemoteBook {
       authors: info?.authors ?? const [],
       isbn: info?.industryIdentifiers.toIsbn(),
       thumbnailUrl: info?.imageLinks.toThumbnailUrl(),
+      status: BookStatus.reading,
       createdAt: timestamp,
       lastUsedAt: timestamp,
     );
   }
+}
+
+extension BookStatusValueMappers on String {
+  BookStatus toBookStatus() => switch (this) {
+    _statusFinished => BookStatus.finished,
+    _ => BookStatus.reading,
+  };
+}
+
+extension BookStatusMappers on BookStatus {
+  String get value => switch (this) {
+    BookStatus.reading => _statusReading,
+    BookStatus.finished => _statusFinished,
+  };
 }
 
 extension _IsbnMappers on List<RemoteIndustryIdentifier>? {

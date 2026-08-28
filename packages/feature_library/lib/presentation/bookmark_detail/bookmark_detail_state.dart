@@ -16,3 +16,5 @@ class const BookmarkDetailLoaded({
 class const BookmarkDetailFailure({
   required final AppError error,
 }) extends BookmarkDetailState;
+
+class const BookmarkDetailDeleted() extends BookmarkDetailState;

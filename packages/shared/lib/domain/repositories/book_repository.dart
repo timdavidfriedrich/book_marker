@@ -11,4 +11,8 @@ abstract class BookRepository {
   Future<AppResult<()>> saveBook(Book book);
 
   Future<AppResult<()>> markBookUsed(String id);
+
+  Future<AppResult<()>> setStatus(String id, BookStatus status);
+
+  Future<AppResult<()>> deleteBook(String id);
 }

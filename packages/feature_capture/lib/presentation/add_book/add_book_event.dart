@@ -11,4 +11,6 @@ class const AddBookBooksUpdated(final AppResult<List<Book>> result) extends AddB
 
 class const AddBookQueryChanged(final String query) extends AddBookEvent;
 
+class const AddBookCatalogueRequested() extends AddBookEvent;
+
 class const AddBookCatalogueSelected(final Book book) extends AddBookEvent;

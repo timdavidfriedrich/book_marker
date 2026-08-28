@@ -21,3 +21,5 @@ class const BookDetailLoaded({
 class const BookDetailFailure({
   required final AppError error,
 }) extends BookDetailState;
+
+class const BookDetailDeleted() extends BookDetailState;

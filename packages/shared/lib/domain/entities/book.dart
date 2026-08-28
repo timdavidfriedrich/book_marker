@@ -2,6 +2,9 @@ import 'package:dart_mappable/dart_mappable.dart';
 
 part 'book.mapper.dart';
 
+@MappableEnum()
+enum BookStatus { reading, finished }
+
 @MappableClass()
 class const Book({
   required final String id,
@@ -9,6 +12,7 @@ class const Book({
   required final List<String> authors,
   required final String? isbn,
   required final String? thumbnailUrl,
+  required final BookStatus status,
   required final DateTime createdAt,
   required final DateTime lastUsedAt,
 }) with BookMappable;

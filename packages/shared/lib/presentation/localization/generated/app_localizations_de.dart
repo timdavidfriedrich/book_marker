@@ -28,6 +28,21 @@ class AppLocalizationsDe extends AppLocalizations {
   String get tryAgain => 'Erneut versuchen';
 
   @override
+  String get commonRename => 'Umbenennen';
+
+  @override
+  String get commonChangeColor => 'Farbe ändern';
+
+  @override
+  String get commonDelete => 'Löschen';
+
+  @override
+  String get commonAutomatic => 'Automatisch';
+
+  @override
+  String get accentPickerTitle => 'Farbe wählen';
+
+  @override
   String get error => 'Fehler';
 
   @override
@@ -364,6 +379,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get markingDoneButton => 'Fertig';
 
   @override
+  String get markingNewThemeChip => '+ neu';
+
+  @override
   String bookmarkDetailPhotoMeta(int page, String date) {
     return 'Seite $page · aufgenommen $date';
   }
@@ -383,5 +401,159 @@ class AppLocalizationsDe extends AppLocalizations {
   String get bookmarkDetailShareLabel => 'teilen';
 
   @override
+  String markShareBody(String quote, String source) {
+    return '„$quote“\n\n— $source';
+  }
+
+  @override
   String get bookmarkDetailMoreLabel => 'mehr';
+
+  @override
+  String get bookmarkDetailNoteHint => 'Notiz hinzufügen…';
+
+  @override
+  String get libraryStatusFinished => 'fertig';
+
+  @override
+  String libraryFinishedFooter(int count) {
+    return '$count fertige Bücher';
+  }
+
+  @override
+  String get libraryShowFinished => 'anzeigen';
+
+  @override
+  String get bookDetailMarkFinished => 'Als fertig markieren';
+
+  @override
+  String get bookDetailMarkReading => 'Als am Lesen markieren';
+
+  @override
+  String themesHeaderStats(int themes, int marks, int books) {
+    return '$themes Themen · $marks Markierungen aus $books Büchern';
+  }
+
+  @override
+  String themesBooksCount(int count) {
+    return '$count Bücher';
+  }
+
+  @override
+  String get themesNewThemeLabel => 'Neues Thema';
+
+  @override
+  String get themesNewThemeTitle => 'Neues Thema';
+
+  @override
+  String get themesNewThemeHint => 'Themenname';
+
+  @override
+  String themeDetailStats(int marks, int books, int starred) {
+    return '$marks Markierungen · $books Bücher · $starred mit Stern';
+  }
+
+  @override
+  String get themeDetailAddMarks => 'Markierungen hinzufügen';
+
+  @override
+  String get themeDetailEmpty => 'Noch keine Markierungen in diesem Thema.';
+
+  @override
+  String get themeAddMarksTitle => 'Markierungen hinzufügen';
+
+  @override
+  String get themeRenameTitle => 'Thema umbenennen';
+
+  @override
+  String get themeDeleteTitle => 'Thema löschen?';
+
+  @override
+  String get themeDeleteMessage =>
+      'Das Thema wird entfernt. Deine Markierungen und Bücher bleiben.';
+
+  @override
+  String get shelfRenameTitle => 'Regal umbenennen';
+
+  @override
+  String get shelfDeleteTitle => 'Regal löschen?';
+
+  @override
+  String get shelfDeleteMessage => 'Das Regal wird entfernt. Deine Bücher bleiben.';
+
+  @override
+  String get bookDeleteAction => 'Buch löschen';
+
+  @override
+  String get bookDeleteTitle => 'Buch löschen?';
+
+  @override
+  String get bookDeleteMessage =>
+      'Damit werden das Buch und alle seine Markierungen gelöscht. Das kann nicht rückgängig gemacht werden.';
+
+  @override
+  String get markDeleteAction => 'Markierung löschen';
+
+  @override
+  String get markDeleteTitle => 'Markierung löschen?';
+
+  @override
+  String get markDeleteMessage =>
+      'Damit wird die Markierung gelöscht. Das kann nicht rückgängig gemacht werden.';
+
+  @override
+  String get libraryNewShelfLabel => 'Neues Regal';
+
+  @override
+  String get libraryNewShelfTitle => 'Neues Regal';
+
+  @override
+  String get libraryNewShelfHint => 'Regalname';
+
+  @override
+  String shelfDetailStats(int books, int marks) {
+    return '$books Bücher · $marks Markierungen';
+  }
+
+  @override
+  String get shelfDetailAddBooks => 'Bücher hinzufügen';
+
+  @override
+  String get shelfDetailEmpty => 'Noch keine Bücher in diesem Regal.';
+
+  @override
+  String get shelfAddBooksTitle => 'Bücher hinzufügen';
+
+  @override
+  String get settingsTitle => 'Einstellungen';
+
+  @override
+  String get settingsProfileNameHint => 'Dein Name';
+
+  @override
+  String settingsStats(int books, int marks, int themes) {
+    return '$books Bücher · $marks Markierungen · $themes Themen';
+  }
+
+  @override
+  String get settingsLanguageLabel => 'Sprache';
+
+  @override
+  String get settingsLanguageSystem => 'System';
+
+  @override
+  String get settingsLanguageEnglish => 'Englisch';
+
+  @override
+  String get settingsLanguageGerman => 'Deutsch';
+
+  @override
+  String get settingsAboutLabel => 'Über';
+
+  @override
+  String settingsVersionLabel(String version) {
+    return 'Version $version';
+  }
+
+  @override
+  String get settingsLicensesLabel => 'Open-Source-Lizenzen';
 }

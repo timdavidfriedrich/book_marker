@@ -1,6 +1,7 @@
+import 'package:core/theme/accent_color.dart';
 import 'package:flutter/material.dart';
 
-enum AccentColor { amber, teal, coral, sand }
+export 'package:core/theme/accent_color.dart';
 
 class const AccentSwatch({
   required final Color fill,

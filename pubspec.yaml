@@ -12,6 +12,7 @@ workspace:
   - packages/feature_capture
   - packages/feature_library
   - packages/feature_themes
+  - packages/feature_settings
 
 dependencies:
   flutter:
@@ -22,6 +23,7 @@ dependencies:
   feature_capture:
   feature_library:
   feature_themes:
+  feature_settings:
   flutter_bloc: ^9.1.1
   get_it: ^9.2.1
   go_router: ^18.0.0

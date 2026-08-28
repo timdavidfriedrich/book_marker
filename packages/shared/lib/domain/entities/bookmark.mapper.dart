@@ -34,6 +34,18 @@ class BookmarkMapper extends ClassMapperBase<Bookmark> {
   );
   static String _$quote(Bookmark v) => v.quote;
   static const Field<Bookmark, String> _f$quote = Field('quote', _$quote);
+  static String? _$note(Bookmark v) => v.note;
+  static const Field<Bookmark, String> _f$note = Field('note', _$note);
+  static String? _$voicePath(Bookmark v) => v.voicePath;
+  static const Field<Bookmark, String> _f$voicePath = Field(
+    'voicePath',
+    _$voicePath,
+  );
+  static int? _$voiceDurationMs(Bookmark v) => v.voiceDurationMs;
+  static const Field<Bookmark, int> _f$voiceDurationMs = Field(
+    'voiceDurationMs',
+    _$voiceDurationMs,
+  );
   static String _$photoPath(Bookmark v) => v.photoPath;
   static const Field<Bookmark, String> _f$photoPath = Field(
     'photoPath',
@@ -66,6 +78,9 @@ class BookmarkMapper extends ClassMapperBase<Bookmark> {
     #bookId: _f$bookId,
     #pageNumber: _f$pageNumber,
     #quote: _f$quote,
+    #note: _f$note,
+    #voicePath: _f$voicePath,
+    #voiceDurationMs: _f$voiceDurationMs,
     #photoPath: _f$photoPath,
     #imageAspectRatio: _f$imageAspectRatio,
     #highlights: _f$highlights,
@@ -79,6 +94,9 @@ class BookmarkMapper extends ClassMapperBase<Bookmark> {
       bookId: data.dec(_f$bookId),
       pageNumber: data.dec(_f$pageNumber),
       quote: data.dec(_f$quote),
+      note: data.dec(_f$note),
+      voicePath: data.dec(_f$voicePath),
+      voiceDurationMs: data.dec(_f$voiceDurationMs),
       photoPath: data.dec(_f$photoPath),
       imageAspectRatio: data.dec(_f$imageAspectRatio),
       highlights: data.dec(_f$highlights),
@@ -155,6 +173,9 @@ abstract class BookmarkCopyWith<$R, $In extends Bookmark, $Out>
     String? bookId,
     int? pageNumber,
     String? quote,
+    String? note,
+    String? voicePath,
+    int? voiceDurationMs,
     String? photoPath,
     double? imageAspectRatio,
     List<HighlightRegion>? highlights,
@@ -189,6 +210,9 @@ class _BookmarkCopyWithImpl<$R, $Out>
     String? bookId,
     Object? pageNumber = $none,
     String? quote,
+    Object? note = $none,
+    Object? voicePath = $none,
+    Object? voiceDurationMs = $none,
     String? photoPath,
     double? imageAspectRatio,
     List<HighlightRegion>? highlights,
@@ -200,6 +224,9 @@ class _BookmarkCopyWithImpl<$R, $Out>
       if (bookId != null) #bookId: bookId,
       if (pageNumber != $none) #pageNumber: pageNumber,
       if (quote != null) #quote: quote,
+      if (note != $none) #note: note,
+      if (voicePath != $none) #voicePath: voicePath,
+      if (voiceDurationMs != $none) #voiceDurationMs: voiceDurationMs,
       if (photoPath != null) #photoPath: photoPath,
       if (imageAspectRatio != null) #imageAspectRatio: imageAspectRatio,
       if (highlights != null) #highlights: highlights,
@@ -213,6 +240,9 @@ class _BookmarkCopyWithImpl<$R, $Out>
     bookId: data.get(#bookId, or: $value.bookId),
     pageNumber: data.get(#pageNumber, or: $value.pageNumber),
     quote: data.get(#quote, or: $value.quote),
+    note: data.get(#note, or: $value.note),
+    voicePath: data.get(#voicePath, or: $value.voicePath),
+    voiceDurationMs: data.get(#voiceDurationMs, or: $value.voiceDurationMs),
     photoPath: data.get(#photoPath, or: $value.photoPath),
     imageAspectRatio: data.get(#imageAspectRatio, or: $value.imageAspectRatio),
     highlights: data.get(#highlights, or: $value.highlights),

@@ -8,6 +8,52 @@
 
 part of 'book.dart';
 
+class BookStatusMapper extends EnumMapper<BookStatus> {
+  BookStatusMapper._();
+
+  static BookStatusMapper? _instance;
+  static BookStatusMapper ensureInitialized() {
+    if (_instance == null) {
+      MapperContainer.globals.use(_instance = BookStatusMapper._());
+    }
+    return _instance!;
+  }
+
+  static BookStatus fromValue(dynamic value) {
+    ensureInitialized();
+    return MapperContainer.globals.fromValue(value);
+  }
+
+  @override
+  BookStatus decode(dynamic value) {
+    switch (value) {
+      case r'reading':
+        return BookStatus.reading;
+      case r'finished':
+        return BookStatus.finished;
+      default:
+        throw MapperException.unknownEnumValue(value);
+    }
+  }
+
+  @override
+  dynamic encode(BookStatus self) {
+    switch (self) {
+      case BookStatus.reading:
+        return r'reading';
+      case BookStatus.finished:
+        return r'finished';
+    }
+  }
+}
+
+extension BookStatusMapperExtension on BookStatus {
+  String toValue() {
+    BookStatusMapper.ensureInitialized();
+    return MapperContainer.globals.toValue<BookStatus>(this) as String;
+  }
+}
+
 class BookMapper extends ClassMapperBase<Book> {
   BookMapper._();
 
@@ -15,6 +61,7 @@ class BookMapper extends ClassMapperBase<Book> {
   static BookMapper ensureInitialized() {
     if (_instance == null) {
       MapperContainer.globals.use(_instance = BookMapper._());
+      BookStatusMapper.ensureInitialized();
     }
     return _instance!;
   }
@@ -38,6 +85,8 @@ class BookMapper extends ClassMapperBase<Book> {
     'thumbnailUrl',
     _$thumbnailUrl,
   );
+  static BookStatus _$status(Book v) => v.status;
+  static const Field<Book, BookStatus> _f$status = Field('status', _$status);
   static DateTime _$createdAt(Book v) => v.createdAt;
   static const Field<Book, DateTime> _f$createdAt = Field(
     'createdAt',
@@ -56,6 +105,7 @@ class BookMapper extends ClassMapperBase<Book> {
     #authors: _f$authors,
     #isbn: _f$isbn,
     #thumbnailUrl: _f$thumbnailUrl,
+    #status: _f$status,
     #createdAt: _f$createdAt,
     #lastUsedAt: _f$lastUsedAt,
   };
@@ -67,6 +117,7 @@ class BookMapper extends ClassMapperBase<Book> {
       authors: data.dec(_f$authors),
       isbn: data.dec(_f$isbn),
       thumbnailUrl: data.dec(_f$thumbnailUrl),
+      status: data.dec(_f$status),
       createdAt: data.dec(_f$createdAt),
       lastUsedAt: data.dec(_f$lastUsedAt),
     );
@@ -125,6 +176,7 @@ abstract class BookCopyWith<$R, $In extends Book, $Out>
     List<String>? authors,
     String? isbn,
     String? thumbnailUrl,
+    BookStatus? status,
     DateTime? createdAt,
     DateTime? lastUsedAt,
   });
@@ -151,6 +203,7 @@ class _BookCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, Book, $Out>
     List<String>? authors,
     Object? isbn = $none,
     Object? thumbnailUrl = $none,
+    BookStatus? status,
     DateTime? createdAt,
     DateTime? lastUsedAt,
   }) => $apply(
@@ -160,6 +213,7 @@ class _BookCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, Book, $Out>
       if (authors != null) #authors: authors,
       if (isbn != $none) #isbn: isbn,
       if (thumbnailUrl != $none) #thumbnailUrl: thumbnailUrl,
+      if (status != null) #status: status,
       if (createdAt != null) #createdAt: createdAt,
       if (lastUsedAt != null) #lastUsedAt: lastUsedAt,
     }),
@@ -171,6 +225,7 @@ class _BookCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, Book, $Out>
     authors: data.get(#authors, or: $value.authors),
     isbn: data.get(#isbn, or: $value.isbn),
     thumbnailUrl: data.get(#thumbnailUrl, or: $value.thumbnailUrl),
+    status: data.get(#status, or: $value.status),
     createdAt: data.get(#createdAt, or: $value.createdAt),
     lastUsedAt: data.get(#lastUsedAt, or: $value.lastUsedAt),
   );

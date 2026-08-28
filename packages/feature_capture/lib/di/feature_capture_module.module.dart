@@ -19,6 +19,7 @@ import 'package:feature_capture/presentation/marking/marking_bloc.dart'
 import 'package:injectable/injectable.dart' as _i526;
 import 'package:shared/domain/repositories/book_repository.dart' as _i748;
 import 'package:shared/domain/repositories/bookmark_repository.dart' as _i245;
+import 'package:shared/domain/repositories/theme_repository.dart' as _i640;
 import 'package:shared/presentation/navigation/marking_arguments.dart' as _i851;
 
 class FeatureCapturePackageModule extends _i526.MicroPackageModule {
@@ -43,6 +44,7 @@ class FeatureCapturePackageModule extends _i526.MicroPackageModule {
           gh<_i981.TextRecognitionRepository>(),
           gh<_i493.SaveBookmarkUseCase>(),
           gh<_i748.BookRepository>(),
+          gh<_i640.ThemeRepository>(),
           _arguments,
         ));
   }

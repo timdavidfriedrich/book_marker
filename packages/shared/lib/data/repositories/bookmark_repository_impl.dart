@@ -58,4 +58,28 @@ class const BookmarkRepositoryImpl(
       return const Failure(UnexpectedError());
     }
   }
+
+  @override
+  Future<AppResult<()>> setNote(String id, String? note) async {
+    try {
+      await _localDataSource.setNote(id, note);
+      return const Success(());
+    } on Object {
+      return const Failure(UnexpectedError());
+    }
+  }
+
+  @override
+  Future<AppResult<()>> deleteBookmark(String id) async {
+    try {
+      final localBookmark = await _localDataSource.readBookmark(id);
+      await _localDataSource.deleteBookmark(id);
+      if (localBookmark != null) {
+        await _imageStorageDataSource.deleteImage(localBookmark.photoPath);
+      }
+      return const Success(());
+    } on Object {
+      return const Failure(UnexpectedError());
+    }
+  }
 }

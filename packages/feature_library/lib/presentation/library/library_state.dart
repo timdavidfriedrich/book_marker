@@ -1,6 +1,7 @@
 import 'package:core/error/app_error.dart';
 import 'package:shared/domain/entities/book.dart';
 import 'package:shared/domain/entities/bookmark.dart';
+import 'package:shared/domain/entities/shelf.dart';
 
 enum LibraryView { books, shelves }
 
@@ -20,6 +21,13 @@ class const LibraryMarkResult({
   required final Book book,
 });
 
+class const LibraryShelfSummary({
+  required final Shelf shelf,
+  required final int bookCount,
+  required final int markCount,
+  required final List<Book> previewBooks,
+});
+
 sealed class LibraryState {
   const LibraryState();
 }
@@ -37,6 +45,7 @@ class const LibraryLoaded({
   required final String query,
   required final LibrarySearchScope searchScope,
   required final List<LibraryMarkResult> results,
+  required final List<LibraryShelfSummary> shelves,
 }) extends LibraryState {
   bool get isSearching =>
       query.trim().isNotEmpty || searchScope != LibrarySearchScope.allBooks;

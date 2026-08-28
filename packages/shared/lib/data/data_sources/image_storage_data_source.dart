@@ -7,6 +7,8 @@ const _imagesFolder = "bookmark_photos";
 
 abstract class ImageStorageDataSource {
   Future<String> persistImage(String sourcePath, String id);
+
+  Future<void> deleteImage(String path);
 }
 
 @Injectable(as: ImageStorageDataSource)
@@ -21,5 +23,11 @@ class const ImageStorageDataSourceImpl() implements ImageStorageDataSource {
     final targetPath = "${targetDirectory.path}/$id.jpg";
     await File(sourcePath).copy(targetPath);
     return targetPath;
+  }
+
+  @override
+  Future<void> deleteImage(String path) async {
+    final file = File(path);
+    if (file.existsSync()) await file.delete();
   }
 }

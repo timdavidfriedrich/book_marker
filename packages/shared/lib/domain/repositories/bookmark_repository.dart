@@ -9,4 +9,8 @@ abstract class BookmarkRepository {
   Future<AppResult<()>> saveBookmark(Bookmark bookmark);
 
   Future<AppResult<()>> setFavorite(String id, {required bool isFavorite});
+
+  Future<AppResult<()>> setNote(String id, String? note);
+
+  Future<AppResult<()>> deleteBookmark(String id);
 }

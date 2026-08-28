@@ -10,6 +10,10 @@ abstract class BookLocalDataSource {
   Future<void> upsertBook(LocalBook book);
 
   Future<void> touchBook(String id, DateTime lastUsedAt);
+
+  Future<void> setStatus(String id, String status);
+
+  Future<void> deleteBook(String id);
 }
 
 @Injectable(as: BookLocalDataSource)
@@ -38,4 +42,14 @@ class const BookLocalDataSourceImpl(
     final statement = _database.update(_database.books)..where((table) => table.id.equals(id));
     return statement.write(BooksCompanion(lastUsedAt: Value(lastUsedAt)));
   }
+
+  @override
+  Future<void> setStatus(String id, String status) {
+    final statement = _database.update(_database.books)..where((table) => table.id.equals(id));
+    return statement.write(BooksCompanion(status: Value(status)));
+  }
+
+  @override
+  Future<void> deleteBook(String id) =>
+      (_database.delete(_database.books)..where((table) => table.id.equals(id))).go();
 }

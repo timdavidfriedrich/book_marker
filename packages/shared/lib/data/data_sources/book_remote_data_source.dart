@@ -27,7 +27,7 @@ class const BookRemoteDataSourceImpl(
         "q": isIsbn ? "$_isbnQueryPrefix$trimmed" : trimmed,
         "fields": _fields,
         "maxResults": _maxResults,
-        "key": googleBooksApiKey,
+        if (googleBooksApiKey.isNotEmpty) "key": googleBooksApiKey,
       },
     );
     final items = (response.data?["items"] as List<dynamic>?) ?? const [];

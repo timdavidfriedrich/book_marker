@@ -6,14 +6,19 @@ import 'package:feature_library/presentation/library/library_event.dart';
 import 'package:feature_library/presentation/library/library_state.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
-import 'package:shared/domain/entities/book.dart';
+import 'package:shared/domain/entities/book.dart' show Book, BookStatus;
 import 'package:shared/domain/entities/bookmark.dart';
+import 'package:shared/domain/entities/shelf.dart';
 import 'package:shared/domain/repositories/book_repository.dart';
 import 'package:shared/domain/repositories/bookmark_repository.dart';
+import 'package:shared/domain/repositories/shelf_repository.dart';
+
+const _shelfPreviewLimit = 3;
 
 @injectable
 class LibraryBloc extends Bloc<LibraryEvent, LibraryState> {
-  LibraryBloc(this._bookmarkRepository, this._bookRepository) : super(const LibraryLoading()) {
+  LibraryBloc(this._bookmarkRepository, this._bookRepository, this._shelfRepository)
+    : super(const LibraryLoading()) {
     on<LibraryStarted>(_onStarted);
     on<LibraryBookmarksUpdated>(_onBookmarksUpdated);
     on<LibraryBooksUpdated>(_onBooksUpdated);
@@ -21,14 +26,22 @@ class LibraryBloc extends Bloc<LibraryEvent, LibraryState> {
     on<LibraryFilterChanged>(_onFilterChanged);
     on<LibraryQueryChanged>(_onQueryChanged);
     on<LibrarySearchScopeChanged>(_onSearchScopeChanged);
+    on<LibraryShelvesUpdated>(_onShelvesUpdated);
+    on<LibraryShelfMembershipUpdated>(_onShelfMembershipUpdated);
+    on<LibraryShelfCreateRequested>(_onShelfCreateRequested);
   }
 
   final BookmarkRepository _bookmarkRepository;
   final BookRepository _bookRepository;
+  final ShelfRepository _shelfRepository;
   StreamSubscription<AppResult<List<Bookmark>>>? _bookmarkSubscription;
   StreamSubscription<AppResult<List<Book>>>? _bookSubscription;
+  StreamSubscription<AppResult<List<Shelf>>>? _shelfSubscription;
+  StreamSubscription<AppResult<Map<String, Set<String>>>>? _shelfMembershipSubscription;
   List<Bookmark>? _bookmarks;
   List<Book>? _books;
+  List<Shelf> _shelves = const [];
+  Map<String, Set<String>> _shelfMembership = const {};
   LibraryView _view = LibraryView.books;
   LibraryFilter _filter = LibraryFilter.all;
   LibrarySearchScope _scope = LibrarySearchScope.allBooks;
@@ -38,12 +51,43 @@ class LibraryBloc extends Bloc<LibraryEvent, LibraryState> {
   Future<void> _onStarted(LibraryStarted event, Emitter<LibraryState> emit) async {
     await _bookmarkSubscription?.cancel();
     await _bookSubscription?.cancel();
+    await _shelfSubscription?.cancel();
+    await _shelfMembershipSubscription?.cancel();
     _bookmarkSubscription = _bookmarkRepository.watchBookmarks().listen(
       (result) => add(LibraryBookmarksUpdated(result)),
     );
     _bookSubscription = _bookRepository.watchBooks().listen(
       (result) => add(LibraryBooksUpdated(result)),
     );
+    _shelfSubscription = _shelfRepository.watchShelves().listen(
+      (result) => add(LibraryShelvesUpdated(result)),
+    );
+    _shelfMembershipSubscription = _shelfRepository.watchShelfMembership().listen(
+      (result) => add(LibraryShelfMembershipUpdated(result)),
+    );
+  }
+
+  void _onShelvesUpdated(LibraryShelvesUpdated event, Emitter<LibraryState> emit) {
+    if (event.result case Success(:final data)) {
+      _shelves = data;
+      _emitState(emit);
+    }
+  }
+
+  void _onShelfMembershipUpdated(LibraryShelfMembershipUpdated event, Emitter<LibraryState> emit) {
+    if (event.result case Success(:final data)) {
+      _shelfMembership = data;
+      _emitState(emit);
+    }
+  }
+
+  Future<void> _onShelfCreateRequested(
+    LibraryShelfCreateRequested event,
+    Emitter<LibraryState> emit,
+  ) async {
+    final name = event.name.trim();
+    if (name.isEmpty) return;
+    await _shelfRepository.createShelf(name);
   }
 
   void _onBookmarksUpdated(LibraryBookmarksUpdated event, Emitter<LibraryState> emit) {
@@ -117,10 +161,14 @@ class LibraryBloc extends Bloc<LibraryEvent, LibraryState> {
     }
     summaries.sort((a, b) => b.markCount.compareTo(a.markCount));
 
+    final readingCount = summaries.where((it) => it.book.status == BookStatus.reading).length;
+    final finishedCount = summaries.where((it) => it.book.status == BookStatus.finished).length;
     final visibleSummaries = switch (_filter) {
       LibraryFilter.all => summaries,
-      LibraryFilter.reading => summaries,
-      LibraryFilter.finished => const <LibraryBookSummary>[],
+      LibraryFilter.reading =>
+        summaries.where((it) => it.book.status == BookStatus.reading).toList(),
+      LibraryFilter.finished =>
+        summaries.where((it) => it.book.status == BookStatus.finished).toList(),
     };
 
     final booksById = {for (final book in books) book.id: book};
@@ -144,18 +192,31 @@ class LibraryBloc extends Bloc<LibraryEvent, LibraryState> {
       results.sort((a, b) => b.mark.createdAt.compareTo(a.mark.createdAt));
     }
 
+    final shelfSummaries = _shelves.map((shelf) {
+      final bookIds = _shelfMembership[shelf.id] ?? const <String>{};
+      final shelfBooks = bookIds.map((id) => booksById[id]).whereType<Book>().toList();
+      final markCount = bookmarks.where((mark) => bookIds.contains(mark.bookId)).length;
+      return LibraryShelfSummary(
+        shelf: shelf,
+        bookCount: bookIds.length,
+        markCount: markCount,
+        previewBooks: shelfBooks.take(_shelfPreviewLimit).toList(),
+      );
+    }).toList();
+
     emit(
       LibraryLoaded(
         books: visibleSummaries,
         totalBooks: books.length,
         totalMarks: bookmarks.length,
-        readingCount: books.length,
-        finishedCount: 0,
+        readingCount: readingCount,
+        finishedCount: finishedCount,
         view: _view,
         filter: _filter,
         query: _query,
         searchScope: _scope,
         results: results,
+        shelves: shelfSummaries,
       ),
     );
   }
@@ -164,6 +225,8 @@ class LibraryBloc extends Bloc<LibraryEvent, LibraryState> {
   Future<void> close() async {
     await _bookmarkSubscription?.cancel();
     await _bookSubscription?.cancel();
+    await _shelfSubscription?.cancel();
+    await _shelfMembershipSubscription?.cancel();
     return super.close();
   }
 }

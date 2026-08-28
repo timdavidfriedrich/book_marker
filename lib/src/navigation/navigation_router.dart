@@ -20,6 +20,17 @@ import 'package:feature_library/presentation/bookmark_detail/bookmark_detail_scr
 import 'package:feature_library/presentation/library/library_bloc.dart';
 import 'package:feature_library/presentation/library/library_event.dart';
 import 'package:feature_library/presentation/library/library_screen.dart';
+import 'package:feature_library/presentation/shelf_detail/shelf_detail_bloc.dart';
+import 'package:feature_library/presentation/shelf_detail/shelf_detail_event.dart';
+import 'package:feature_library/presentation/shelf_detail/shelf_detail_screen.dart';
+import 'package:feature_settings/presentation/settings/settings_bloc.dart';
+import 'package:feature_settings/presentation/settings/settings_event.dart';
+import 'package:feature_settings/presentation/settings/settings_screen.dart';
+import 'package:feature_themes/presentation/theme_detail/theme_detail_bloc.dart';
+import 'package:feature_themes/presentation/theme_detail/theme_detail_event.dart';
+import 'package:feature_themes/presentation/theme_detail/theme_detail_screen.dart';
+import 'package:feature_themes/presentation/themes/themes_bloc.dart';
+import 'package:feature_themes/presentation/themes/themes_event.dart';
 import 'package:feature_themes/presentation/themes/themes_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -62,7 +73,10 @@ class NavigationRouter {
             routes: [
               GoRoute(
                 path: NavigationRoute.themes.path,
-                builder: (context, state) => const ThemesScreen(),
+                builder: (context, state) => BlocProvider(
+                  create: (_) => sl<ThemesBloc>()..add(const ThemesStarted()),
+                  child: const ThemesScreen(),
+                ),
               ),
             ],
           ),
@@ -89,6 +103,34 @@ class NavigationRouter {
                   ..add(const BookmarkDetailStarted()),
             child: const BookmarkDetailScreen(),
           ),
+        ),
+      ),
+      GoRoute(
+        path: NavigationRoute.libraryShelf.path,
+        parentNavigatorKey: _rootNavigatorKey,
+        builder: (context, state) => BlocProvider(
+          create: (_) =>
+              sl<ShelfDetailBloc>(param1: state.pathParameters[parameterId])
+                ..add(const ShelfDetailStarted()),
+          child: const ShelfDetailScreen(),
+        ),
+      ),
+      GoRoute(
+        path: NavigationRoute.themeDetail.path,
+        parentNavigatorKey: _rootNavigatorKey,
+        builder: (context, state) => BlocProvider(
+          create: (_) =>
+              sl<ThemeDetailBloc>(param1: state.pathParameters[parameterId])
+                ..add(const ThemeDetailStarted()),
+          child: const ThemeDetailScreen(),
+        ),
+      ),
+      GoRoute(
+        path: NavigationRoute.settings.path,
+        parentNavigatorKey: _rootNavigatorKey,
+        builder: (context, state) => BlocProvider(
+          create: (_) => sl<SettingsBloc>()..add(const SettingsStarted()),
+          child: const SettingsScreen(),
         ),
       ),
       GoRoute(

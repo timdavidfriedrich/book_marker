@@ -4,6 +4,10 @@
 <dict>
 	<key>NSCameraUsageDescription</key>
 	<string>Book Marker uses the camera to photograph book pages and scan book barcodes.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Book Marker lets you pick a photo of a book page from your library to mark.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Book Marker records short voice notes for your marks.</string>
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
 	<key>CFBundleDevelopmentRegion</key>

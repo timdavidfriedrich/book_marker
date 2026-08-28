@@ -8,7 +8,8 @@ import 'package:feature_capture/domain/text_recognition_repository.dart';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 import 'package:injectable/injectable.dart';
 
-const _minMargin = 0.15;
+const _edgeMargin = 0.18;
+const _maxPageNumber = 3000;
 final _pageNumberPattern = RegExp(r"^\d{1,4}$");
 
 @Injectable(as: TextRecognitionRepository)
@@ -20,14 +21,20 @@ class const TextRecognitionRepositoryImpl() implements TextRecognitionRepository
       final imageSize = await _readImageSize(imagePath);
       final recognizedText = await recognizer.processImage(InputImage.fromFilePath(imagePath));
       final lines = <RecognizedLine>[];
+      final words = <RecognizedWord>[];
       for (final block in recognizedText.blocks) {
         for (final line in block.lines) {
+          final lineIndex = lines.length;
           lines.add(_toRecognizedLine(line, imageSize));
+          for (final element in line.elements) {
+            words.add(_toRecognizedWord(element, lineIndex, imageSize));
+          }
         }
       }
       return Success(
         RecognizedPage(
           lines: lines,
+          words: words,
           detectedPageNumber: _detectPageNumber(lines),
           aspectRatio: imageSize.width / imageSize.height,
         ),
@@ -50,14 +57,38 @@ class const TextRecognitionRepositoryImpl() implements TextRecognitionRepository
     );
   }
 
+  RecognizedWord _toRecognizedWord(TextElement element, int lineIndex, ui.Size imageSize) {
+    final box = element.boundingBox;
+    return RecognizedWord(
+      text: element.text,
+      left: (box.left / imageSize.width).clamp(0.0, 1.0),
+      top: (box.top / imageSize.height).clamp(0.0, 1.0),
+      width: (box.width / imageSize.width).clamp(0.0, 1.0),
+      height: (box.height / imageSize.height).clamp(0.0, 1.0),
+      lineIndex: lineIndex,
+    );
+  }
+
   int? _detectPageNumber(List<RecognizedLine> lines) {
-    final candidates = lines.where((line) {
+    int? best;
+    var bestScore = double.infinity;
+    for (final line in lines) {
       final text = line.text.trim();
-      final isNearEdge = line.top < _minMargin || line.top + line.height > 1 - _minMargin;
-      return _pageNumberPattern.hasMatch(text) && isNearEdge;
-    }).toList()..sort((first, second) => second.top.compareTo(first.top));
-    if (candidates.isEmpty) return null;
-    return int.tryParse(candidates.first.text.trim());
+      if (!_pageNumberPattern.hasMatch(text)) continue;
+      final value = int.tryParse(text);
+      if (value == null || value > _maxPageNumber) continue;
+      final topDistance = line.top;
+      final bottomDistance = 1 - (line.top + line.height);
+      final edgeDistance = topDistance < bottomDistance ? topDistance : bottomDistance;
+      if (edgeDistance > _edgeMargin) continue;
+      // * bias slightly toward the bottom margin, where page numbers sit more often
+      final score = edgeDistance + (bottomDistance < topDistance ? 0.0 : 0.01);
+      if (score < bestScore) {
+        best = value;
+        bestScore = score;
+      }
+    }
+    return best;
   }
 
   Future<ui.Size> _readImageSize(String imagePath) async {
