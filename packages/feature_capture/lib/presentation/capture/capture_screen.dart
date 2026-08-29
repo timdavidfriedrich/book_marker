@@ -3,25 +3,35 @@ import 'dart:async';
 import 'package:camera/camera.dart';
 import 'package:core/theme/spacing.dart';
 import 'package:core/theme/theme_extensions.dart';
+import 'package:feature_capture/domain/capture_mode.dart';
 import 'package:feature_capture/presentation/capture/capture_bloc.dart';
 import 'package:feature_capture/presentation/capture/capture_event.dart';
 import 'package:feature_capture/presentation/capture/capture_state.dart';
+import 'package:feature_capture/presentation/capture/page_detection_cubit.dart';
+import 'package:feature_capture/presentation/capture/page_detection_state.dart';
+import 'package:feature_capture/presentation/extensions/camera_image_extensions.dart';
+import 'package:feature_capture/presentation/extensions/page_quad_extensions.dart';
+import 'package:feature_capture/presentation/widgets/page_corner_dot.dart';
+import 'package:feature_capture/presentation/widgets/page_quad_overlay.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:shared/domain/entities/book.dart';
+import 'package:shared/domain/entities/page_quad.dart';
 import 'package:shared/presentation/extensions/accent_extensions.dart';
 import 'package:shared/presentation/extensions/context_extensions.dart';
+import 'package:shared/presentation/navigation/crop_arguments.dart';
 import 'package:shared/presentation/navigation/marking_arguments.dart';
 import 'package:shared/presentation/navigation/navigation_extensions.dart';
 import 'package:shared/presentation/widgets/book_cover.dart';
 import 'package:shared/presentation/widgets/ink_tap_box.dart';
+import 'package:shared/presentation/widgets/segmented_toggle.dart';
 
 const _shutterOuter = 88.0;
 const _shutterInner = 60.0;
-const _cornerDot = 14.0;
 const _controlIcon = 56.0;
+const _dotDuration = Duration(milliseconds: 120);
 
 class const CaptureScreen({
   super.key,
@@ -31,6 +41,7 @@ class const CaptureScreen({
     final controller = useState<CameraController?>(null);
     final hasError = useState(false);
     final torchOn = useState(false);
+    final detectionCubit = context.read<PageDetectionCubit>();
 
     Future<void> initialize() async {
       if (controller.value != null) return;
@@ -40,8 +51,23 @@ class const CaptureScreen({
           hasError.value = true;
           return;
         }
-        final created = CameraController(cameras.first, ResolutionPreset.veryHigh, enableAudio: false);
+        final description = cameras.first;
+        final created = CameraController(
+          description,
+          ResolutionPreset.veryHigh,
+          enableAudio: false,
+          imageFormatGroup: ImageFormatGroup.yuv420,
+        );
         await created.initialize();
+        try {
+          await created.startImageStream(
+            (image) => detectionCubit.frameReceived(
+              image.toCameraFrame(description.sensorOrientation),
+            ),
+          );
+        } on Object {
+          // * without an image stream the preview still works, only live detection is off
+        }
         controller.value = created;
       } on Object {
         hasError.value = true;
@@ -54,6 +80,7 @@ class const CaptureScreen({
       torchOn.value = false;
       if (camera == null) return;
       try {
+        if (camera.value.isStreamingImages) await camera.stopImageStream();
         await camera.setFlashMode(FlashMode.off);
       } on Object {
         // camera may already be closing
@@ -73,14 +100,27 @@ class const CaptureScreen({
       }
     }
 
+    Future<void> openNext(String bookId, String imagePath, CaptureMode mode) {
+      return switch (mode) {
+        CaptureMode.auto => context.pushMarking(
+          MarkingArguments(imagePath: imagePath, bookId: bookId, pageQuad: null),
+        ),
+        CaptureMode.manual => context.pushCrop(
+          CropArguments(imagePath: imagePath, bookId: bookId),
+        ),
+      };
+    }
+
     Future<void> capture(String bookId) async {
       final camera = controller.value;
       if (camera == null) return;
       try {
+        if (camera.value.isStreamingImages) await camera.stopImageStream();
         final file = await camera.takePicture();
+        final mode = detectionCubit.state.mode;
         await shutdown();
         if (!context.mounted) return;
-        await context.pushMarking(MarkingArguments(imagePath: file.path, bookId: bookId));
+        await openNext(bookId, file.path, mode);
         if (context.mounted) await initialize();
       } on Object {
         if (context.mounted) context.showToast(context.s.errorUnexpected);
@@ -91,9 +131,10 @@ class const CaptureScreen({
       try {
         final file = await ImagePicker().pickImage(source: ImageSource.gallery);
         if (file == null) return;
+        final mode = detectionCubit.state.mode;
         await shutdown();
         if (!context.mounted) return;
-        await context.pushMarking(MarkingArguments(imagePath: file.path, bookId: bookId));
+        await openNext(bookId, file.path, mode);
         if (context.mounted) await initialize();
       } on Object {
         if (context.mounted) context.showToast(context.s.errorUnexpected);
@@ -221,10 +262,8 @@ class const _Preview({
               )
             else
               const Center(child: CircularProgressIndicator()),
-            _CornerDot(alignment: Alignment.topLeft, color: context.palette.amber.solid),
-            _CornerDot(alignment: Alignment.topRight, color: context.palette.amber.solid),
-            _CornerDot(alignment: Alignment.bottomLeft, color: context.palette.coral.solid),
-            _CornerDot(alignment: Alignment.bottomRight, color: context.palette.coral.solid),
+            const _DetectionOverlay(),
+            const _CaptureModeOverlay(),
           ],
         ),
       ),
@@ -232,24 +271,106 @@ class const _Preview({
   }
 }
 
-class const _CornerDot({
-  required final Alignment _alignment,
-  required final Color _color,
+class const _DetectionOverlay() extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<PageDetectionCubit, PageDetectionState>(
+      builder: (context, state) => LayoutBuilder(
+        builder: (context, constraints) {
+          if (state.mode != CaptureMode.auto) return const SizedBox.shrink();
+          final size = constraints.biggest;
+          final frame = _frameRect(size, state.frameAspectRatio);
+          final quad = state.quad;
+          return Stack(
+            children: [
+              if (quad != null && frame != null)
+                Positioned.fromRect(
+                  rect: frame,
+                  child: PageQuadOverlay(quad: quad, lineColor: context.palette.amber.solid),
+                ),
+              for (final corner in PageCorner.values)
+                _OverlayDot(
+                  key: ValueKey(corner),
+                  corner: corner,
+                  center: _cornerOffset(corner, size, frame, quad),
+                ),
+            ],
+          );
+        },
+      ),
+    );
+  }
+}
+
+class const _OverlayDot({
+  required final PageCorner _corner,
+  required final Offset _center,
+  super.key,
 }) extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Align(
-      alignment: _alignment,
-      child: Padding(
-        padding: const EdgeInsets.all(Spacing.m),
-        child: Container(
-          width: _cornerDot,
-          height: _cornerDot,
-          decoration: BoxDecoration(color: _color, shape: BoxShape.circle),
+    return AnimatedPositioned(
+      duration: _dotDuration,
+      curve: Curves.easeOut,
+      left: _center.dx - PageCornerDot.size / 2,
+      top: _center.dy - PageCornerDot.size / 2,
+      child: PageCornerDot(corner: _corner),
+    );
+  }
+}
+
+class const _CaptureModeOverlay() extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<PageDetectionCubit, PageDetectionState>(
+      buildWhen: (previous, current) => previous.mode != current.mode,
+      builder: (context, state) => Align(
+        alignment: Alignment.bottomCenter,
+        child: Padding(
+          padding: const EdgeInsets.all(Spacing.m),
+          child: SegmentedToggle(
+            labels: [context.s.captureModeAuto, context.s.captureModeManual],
+            selectedIndex: switch (state.mode) {
+              CaptureMode.auto => 0,
+              CaptureMode.manual => 1,
+            },
+            onChanged: (index) => context.read<PageDetectionCubit>().selectMode(
+              index == 0 ? CaptureMode.auto : CaptureMode.manual,
+            ),
+            trackColor: context.c.surfaceContainerHigh,
+            activeColor: context.palette.paperFill,
+            activeTextColor: context.palette.paperText,
+          ),
         ),
       ),
     );
   }
+}
+
+Rect? _frameRect(Size size, double? aspectRatio) {
+  if (aspectRatio == null) return null;
+  if (aspectRatio > size.width / size.height) {
+    final width = size.height * aspectRatio;
+    return Rect.fromLTWH((size.width - width) / 2, 0, width, size.height);
+  }
+  final height = size.width / aspectRatio;
+  return Rect.fromLTWH(0, (size.height - height) / 2, size.width, height);
+}
+
+Offset _cornerOffset(PageCorner corner, Size size, Rect? frame, PageQuad? quad) {
+  if (quad == null || frame == null) return _defaultCornerOffset(corner, size);
+  final point = quad.pointAt(corner);
+  return Offset(frame.left + point.x * frame.width, frame.top + point.y * frame.height);
+}
+
+Offset _defaultCornerOffset(PageCorner corner, Size size) {
+  const inset = Spacing.m + PageCornerDot.size / 2;
+  return switch (corner) {
+    PageCorner.topLeft => const Offset(inset, inset),
+    PageCorner.topRight => Offset(size.width - inset, inset),
+    PageCorner.bottomRight => Offset(size.width - inset, size.height - inset),
+    PageCorner.bottomLeft => Offset(inset, size.height - inset),
+  };
 }
 
 class const _BookBar() extends StatelessWidget {

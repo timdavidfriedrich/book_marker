@@ -3,8 +3,12 @@ import 'dart:ui' as ui;
 
 import 'package:core/error/app_error.dart';
 import 'package:core/error/app_result.dart';
+import 'package:feature_capture/data/spell_check_data_source.dart';
+import 'package:feature_capture/domain/mark_text.dart';
 import 'package:feature_capture/domain/recognized_page.dart';
+import 'package:feature_capture/domain/spell_check_report.dart';
 import 'package:feature_capture/domain/text_recognition_repository.dart';
+import 'package:feature_capture/domain/word_quality.dart';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 import 'package:injectable/injectable.dart';
 
@@ -13,7 +17,9 @@ const _maxPageNumber = 3000;
 final _pageNumberPattern = RegExp(r"^\d{1,4}$");
 
 @Injectable(as: TextRecognitionRepository)
-class const TextRecognitionRepositoryImpl() implements TextRecognitionRepository {
+class const TextRecognitionRepositoryImpl(
+  final SpellCheckDataSource _spellCheckDataSource,
+) implements TextRecognitionRepository {
   @override
   Future<AppResult<RecognizedPage>> recognizePage(String imagePath) async {
     final recognizer = TextRecognizer(script: TextRecognitionScript.latin);
@@ -21,20 +27,29 @@ class const TextRecognitionRepositoryImpl() implements TextRecognitionRepository
       final imageSize = await _readImageSize(imagePath);
       final recognizedText = await recognizer.processImage(InputImage.fromFilePath(imagePath));
       final lines = <RecognizedLine>[];
-      final words = <RecognizedWord>[];
+      final elements = <RecognizedWord>[];
       for (final block in recognizedText.blocks) {
         for (final line in block.lines) {
           final lineIndex = lines.length;
           lines.add(_toRecognizedLine(line, imageSize));
           for (final element in line.elements) {
-            words.add(_toRecognizedWord(element, lineIndex, imageSize));
+            elements.add(_toRecognizedWord(element, lineIndex, imageSize));
           }
+        }
+      }
+      var words = mergeSplitWords(markWrappedWords(elements));
+      var spelling = await _spellCheckDataSource.checkPage(_texts(words));
+      if (spelling != null) {
+        final joined = await _joinBrokenWords(words, spelling);
+        if (joined != null) {
+          words = joined;
+          spelling = await _spellCheckDataSource.checkPage(_texts(words));
         }
       }
       return Success(
         RecognizedPage(
           lines: lines,
-          words: words,
+          words: markUncertainWords(words, spelling),
           detectedPageNumber: _detectPageNumber(lines),
           aspectRatio: imageSize.width / imageSize.height,
         ),
@@ -45,6 +60,32 @@ class const TextRecognitionRepositoryImpl() implements TextRecognitionRepository
       await recognizer.close();
     }
   }
+
+  Future<List<RecognizedWord>?> _joinBrokenWords(
+    List<RecognizedWord> words,
+    SpellCheckReport spelling,
+  ) async {
+    final candidates = joinCandidates(words, spelling.misspelled);
+    if (candidates.isEmpty) return null;
+    final unknownJoins = await _spellCheckDataSource.checkWords([
+      for (final candidate in candidates) candidate.joined,
+    ]);
+    if (unknownJoins == null) return null;
+    final accepted = <int>{};
+    for (var index = 0; index < candidates.length; index++) {
+      final candidate = candidates[index];
+      final joinIsWord = !unknownJoins.contains(index);
+      // * two unknown fragments at a line break are one broken word, even if the join is misread
+      final bothUnknown =
+          spelling.misspelled.contains(candidate.index) &&
+          spelling.misspelled.contains(candidate.index + 1);
+      if (joinIsWord || (candidate.crossesLine && bothUnknown)) accepted.add(candidate.index);
+    }
+    if (accepted.isEmpty) return null;
+    return applyJoins(words, accepted);
+  }
+
+  List<String> _texts(List<RecognizedWord> words) => [for (final word in words) word.text];
 
   RecognizedLine _toRecognizedLine(TextLine line, ui.Size imageSize) {
     final box = line.boundingBox;
@@ -66,6 +107,9 @@ class const TextRecognitionRepositoryImpl() implements TextRecognitionRepository
       width: (box.width / imageSize.width).clamp(0.0, 1.0),
       height: (box.height / imageSize.height).clamp(0.0, 1.0),
       lineIndex: lineIndex,
+      confidence: element.confidence,
+      isUncertain: false,
+      joinsWithNext: false,
     );
   }
 

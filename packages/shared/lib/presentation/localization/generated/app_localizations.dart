@@ -423,12 +423,6 @@ abstract class AppLocalizations {
   /// **'Remove from favorites'**
   String get bookmarkDetailFavoriteRemove;
 
-  /// No description provided for @libraryHeaderStats.
-  ///
-  /// In en, this message translates to:
-  /// **'{books} books · {marks} marks'**
-  String libraryHeaderStats(int books, int marks);
-
   /// No description provided for @librarySearchHint.
   ///
   /// In en, this message translates to:
@@ -663,6 +657,42 @@ abstract class AppLocalizations {
   /// **'light off'**
   String get captureLightOff;
 
+  /// No description provided for @captureModeAuto.
+  ///
+  /// In en, this message translates to:
+  /// **'auto'**
+  String get captureModeAuto;
+
+  /// No description provided for @captureModeManual.
+  ///
+  /// In en, this message translates to:
+  /// **'manual'**
+  String get captureModeManual;
+
+  /// No description provided for @cropTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Mark the page'**
+  String get cropTitle;
+
+  /// No description provided for @cropHint.
+  ///
+  /// In en, this message translates to:
+  /// **'drag the dots onto the page corners'**
+  String get cropHint;
+
+  /// No description provided for @cropLoadingMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Finding the page…'**
+  String get cropLoadingMessage;
+
+  /// No description provided for @cropContinueButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue'**
+  String get cropContinueButton;
+
   /// No description provided for @addBookQuestionTitle.
   ///
   /// In en, this message translates to:
@@ -759,6 +789,48 @@ abstract class AppLocalizations {
   /// **'Done'**
   String get markingDoneButton;
 
+  /// No description provided for @markingUncertainLegend.
+  ///
+  /// In en, this message translates to:
+  /// **'= uncertain words, tap to correct'**
+  String get markingUncertainLegend;
+
+  /// No description provided for @markingCorrectionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Unsure word'**
+  String get markingCorrectionTitle;
+
+  /// No description provided for @markingCorrectionHint.
+  ///
+  /// In en, this message translates to:
+  /// **'compare it with the photo and fix what the scan got wrong'**
+  String get markingCorrectionHint;
+
+  /// No description provided for @markingJoinNextButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Join with “{word}” after'**
+  String markingJoinNextButton(String word);
+
+  /// No description provided for @markingJoinPreviousButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Join with “{word}” before'**
+  String markingJoinPreviousButton(String word);
+
+  /// No description provided for @markingCorrectionApplyButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Apply'**
+  String get markingCorrectionApplyButton;
+
+  /// No description provided for @markingUnsureWordsLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 word may be misread — check the quote} other{{count} words may be misread — check the quote}}'**
+  String markingUnsureWordsLabel(int count);
+
   /// No description provided for @markingNewThemeChip.
   ///
   /// In en, this message translates to:
@@ -768,7 +840,7 @@ abstract class AppLocalizations {
   /// No description provided for @bookmarkDetailPhotoMeta.
   ///
   /// In en, this message translates to:
-  /// **'page {page} · shot {date}'**
+  /// **'page {page}, shot {date}'**
   String bookmarkDetailPhotoMeta(int page, String date);
 
   /// No description provided for @bookmarkDetailShotMeta.
@@ -843,12 +915,6 @@ abstract class AppLocalizations {
   /// **'Mark as reading'**
   String get bookDetailMarkReading;
 
-  /// No description provided for @themesHeaderStats.
-  ///
-  /// In en, this message translates to:
-  /// **'{themes} themes · {marks} marks from {books} books'**
-  String themesHeaderStats(int themes, int marks, int books);
-
   /// No description provided for @themesBooksCount.
   ///
   /// In en, this message translates to:
@@ -876,7 +942,7 @@ abstract class AppLocalizations {
   /// No description provided for @themeDetailStats.
   ///
   /// In en, this message translates to:
-  /// **'{marks} marks · {books} books · {starred} starred'**
+  /// **'{marks} marks in {books} books,\n{starred} starred'**
   String themeDetailStats(int marks, int books, int starred);
 
   /// No description provided for @themeDetailAddMarks.
@@ -990,7 +1056,7 @@ abstract class AppLocalizations {
   /// No description provided for @shelfDetailStats.
   ///
   /// In en, this message translates to:
-  /// **'{books} books · {marks} marks'**
+  /// **'{books} books, {marks} marks'**
   String shelfDetailStats(int books, int marks);
 
   /// No description provided for @shelfDetailAddBooks.
@@ -1026,7 +1092,7 @@ abstract class AppLocalizations {
   /// No description provided for @settingsStats.
   ///
   /// In en, this message translates to:
-  /// **'{books} books · {marks} marks · {themes} themes'**
+  /// **'{books} books\n{marks} marks\n{themes} themes'**
   String settingsStats(int books, int marks, int themes);
 
   /// No description provided for @settingsLanguageLabel.

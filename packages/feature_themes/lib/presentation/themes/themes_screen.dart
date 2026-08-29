@@ -51,25 +51,9 @@ class const _Content({
         children: [
           const SizedBox(height: Spacing.m),
           Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(context.s.themesTitle, style: context.t.displaySmall),
-                    const SizedBox(height: Spacing.xxs),
-                    Text(
-                      context.s.themesHeaderStats(
-                        _state.themes.length,
-                        _state.totalMarks,
-                        _state.totalBooks,
-                      ),
-                      style: context.typography.monoLabel.copyWith(color: context.c.onSurfaceVariant),
-                    ),
-                  ],
-                ),
-              ),
+              Expanded(child: Text(context.s.themesTitle, style: context.t.displaySmall)),
               ProfileAvatar(onTap: () => context.pushSettings()),
             ],
           ),
@@ -146,7 +130,10 @@ class const _NewThemeTile() extends StatelessWidget {
             width: _accentDotSize,
             height: _accentDotSize,
             alignment: Alignment.center,
-            decoration: BoxDecoration(color: context.c.surfaceContainerLowest, shape: BoxShape.circle),
+            decoration: BoxDecoration(
+              color: context.c.surfaceContainerLowest,
+              shape: BoxShape.circle,
+            ),
             child: Icon(Icons.add, size: Spacing.iconL, color: context.c.onSurfaceVariant),
           ),
           const Spacer(),

@@ -8,6 +8,10 @@ import 'package:feature_capture/presentation/barcode_scanner/barcode_scanner_scr
 import 'package:feature_capture/presentation/capture/capture_bloc.dart';
 import 'package:feature_capture/presentation/capture/capture_event.dart';
 import 'package:feature_capture/presentation/capture/capture_screen.dart';
+import 'package:feature_capture/presentation/capture/page_detection_cubit.dart';
+import 'package:feature_capture/presentation/crop/crop_bloc.dart';
+import 'package:feature_capture/presentation/crop/crop_event.dart';
+import 'package:feature_capture/presentation/crop/crop_screen.dart';
 import 'package:feature_capture/presentation/marking/marking_bloc.dart';
 import 'package:feature_capture/presentation/marking/marking_event.dart';
 import 'package:feature_capture/presentation/marking/marking_screen.dart';
@@ -36,6 +40,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:injectable/injectable.dart';
+import 'package:shared/presentation/navigation/crop_arguments.dart';
 import 'package:shared/presentation/navigation/marking_arguments.dart';
 import 'package:shared/presentation/navigation/routes.dart';
 
@@ -138,8 +143,11 @@ class NavigationRouter {
         parentNavigatorKey: _rootNavigatorKey,
         builder: (context, state) => Theme(
           data: AppTheme.dark,
-          child: BlocProvider(
-            create: (_) => sl<CaptureBloc>()..add(const CaptureStarted()),
+          child: MultiBlocProvider(
+            providers: [
+              BlocProvider(create: (_) => sl<CaptureBloc>()..add(const CaptureStarted())),
+              BlocProvider(create: (_) => sl<PageDetectionCubit>()),
+            ],
             child: const CaptureScreen(),
           ),
         ),
@@ -166,6 +174,21 @@ class NavigationRouter {
             path: "scan",
             parentNavigatorKey: _rootNavigatorKey,
             builder: (context, state) => const BarcodeScannerScreen(),
+          ),
+          GoRoute(
+            path: "crop",
+            parentNavigatorKey: _rootNavigatorKey,
+            builder: (context, state) {
+              final arguments = state.extra;
+              if (arguments is! CropArguments) return const CaptureScreen();
+              return Theme(
+                data: AppTheme.dark,
+                child: BlocProvider(
+                  create: (_) => sl<CropBloc>(param1: arguments)..add(const CropStarted()),
+                  child: const CropScreen(),
+                ),
+              );
+            },
           ),
           GoRoute(
             path: "mark",

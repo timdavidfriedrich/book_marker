@@ -182,11 +182,6 @@ class AppLocalizationsDe extends AppLocalizations {
   String get bookmarkDetailFavoriteRemove => 'Aus Favoriten entfernen';
 
   @override
-  String libraryHeaderStats(int books, int marks) {
-    return '$books Bücher · $marks Markierungen';
-  }
-
-  @override
   String get librarySearchHint => 'Bücher und Markierungen suchen…';
 
   @override
@@ -327,6 +322,24 @@ class AppLocalizationsDe extends AppLocalizations {
   String get captureLightOff => 'Licht aus';
 
   @override
+  String get captureModeAuto => 'auto';
+
+  @override
+  String get captureModeManual => 'manuell';
+
+  @override
+  String get cropTitle => 'Seite markieren';
+
+  @override
+  String get cropHint => 'zieh die Punkte auf die Seitenecken';
+
+  @override
+  String get cropLoadingMessage => 'Seite wird gesucht…';
+
+  @override
+  String get cropContinueButton => 'Weiter';
+
+  @override
   String get addBookQuestionTitle => 'Welches Buch ist das?';
 
   @override
@@ -379,11 +392,45 @@ class AppLocalizationsDe extends AppLocalizations {
   String get markingDoneButton => 'Fertig';
 
   @override
+  String get markingUncertainLegend => '= unsichere Wörter, zum Korrigieren tippen';
+
+  @override
+  String get markingCorrectionTitle => 'Unsicheres Wort';
+
+  @override
+  String get markingCorrectionHint =>
+      'vergleich es mit dem Foto und korrigier, was der Scan falsch gelesen hat';
+
+  @override
+  String markingJoinNextButton(String word) {
+    return 'Mit „$word“ danach verbinden';
+  }
+
+  @override
+  String markingJoinPreviousButton(String word) {
+    return 'Mit „$word“ davor verbinden';
+  }
+
+  @override
+  String get markingCorrectionApplyButton => 'Übernehmen';
+
+  @override
+  String markingUnsureWordsLabel(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Wörter könnten falsch erkannt sein — prüf das Zitat',
+      one: '1 Wort könnte falsch erkannt sein — prüf das Zitat',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get markingNewThemeChip => '+ neu';
 
   @override
   String bookmarkDetailPhotoMeta(int page, String date) {
-    return 'Seite $page · aufgenommen $date';
+    return 'Seite $page, aufgenommen $date';
   }
 
   @override
@@ -429,11 +476,6 @@ class AppLocalizationsDe extends AppLocalizations {
   String get bookDetailMarkReading => 'Als am Lesen markieren';
 
   @override
-  String themesHeaderStats(int themes, int marks, int books) {
-    return '$themes Themen · $marks Markierungen aus $books Büchern';
-  }
-
-  @override
   String themesBooksCount(int count) {
     return '$count Bücher';
   }
@@ -449,7 +491,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String themeDetailStats(int marks, int books, int starred) {
-    return '$marks Markierungen · $books Bücher · $starred mit Stern';
+    return '$marks Markierungen in $books Büchern,\n$starred favorisiert';
   }
 
   @override
@@ -511,7 +553,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String shelfDetailStats(int books, int marks) {
-    return '$books Bücher · $marks Markierungen';
+    return '$books Bücher, $marks Markierungen';
   }
 
   @override
@@ -531,7 +573,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String settingsStats(int books, int marks, int themes) {
-    return '$books Bücher · $marks Markierungen · $themes Themen';
+    return '$books Bücher\n$marks Markierungen\n$themes Themen';
   }
 
   @override

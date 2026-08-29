@@ -10,6 +10,7 @@ enum NavigationRoute {
   capture("/capture"),
   addBook("/capture/add-book"),
   barcodeScanner("/capture/scan"),
+  crop("/capture/crop"),
   marking("/capture/mark"),
   settings("/settings");
 

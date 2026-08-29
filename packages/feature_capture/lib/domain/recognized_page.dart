@@ -20,4 +20,8 @@ class const RecognizedWord({
   required final double width,
   required final double height,
   required final int lineIndex,
+  required final double? confidence,
+  required final bool isUncertain,
+  required final bool joinsWithNext,
+  final List<String> suggestions = const [],
 });

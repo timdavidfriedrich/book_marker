@@ -11,6 +11,15 @@ class const MarkingWordsSelected(
   final Set<int> wordIndexes,
 ) extends MarkingEvent;
 
+class const MarkingWordCorrected(
+  final int wordIndex,
+  final String text,
+) extends MarkingEvent;
+
+class const MarkingWordsMerged(
+  final int wordIndex,
+) extends MarkingEvent;
+
 class const MarkingPageNumberChanged(
   final int? pageNumber,
 ) extends MarkingEvent;

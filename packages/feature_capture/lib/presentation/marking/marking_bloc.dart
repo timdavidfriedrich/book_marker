@@ -3,8 +3,9 @@ import 'dart:async';
 import 'package:core/error/app_error.dart';
 import 'package:core/error/app_result.dart';
 import 'package:feature_capture/domain/mark_text.dart';
+import 'package:feature_capture/domain/recognize_captured_page_use_case.dart';
+import 'package:feature_capture/domain/recognized_page.dart';
 import 'package:feature_capture/domain/save_bookmark_use_case.dart';
-import 'package:feature_capture/domain/text_recognition_repository.dart';
 import 'package:feature_capture/presentation/marking/marking_event.dart';
 import 'package:feature_capture/presentation/marking/marking_state.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -22,7 +23,7 @@ const _uuid = Uuid();
 @injectable
 class MarkingBloc extends Bloc<MarkingEvent, MarkingState> {
   MarkingBloc(
-    this._textRecognitionRepository,
+    this._recognizeCapturedPageUseCase,
     this._saveBookmarkUseCase,
     this._bookRepository,
     this._themeRepository,
@@ -30,6 +31,8 @@ class MarkingBloc extends Bloc<MarkingEvent, MarkingState> {
   ) : super(const MarkingProcessing()) {
     on<MarkingStarted>(_onStarted);
     on<MarkingWordsSelected>(_onWordsSelected);
+    on<MarkingWordCorrected>(_onWordCorrected);
+    on<MarkingWordsMerged>(_onWordsMerged);
     on<MarkingPageNumberChanged>(_onPageNumberChanged);
     on<MarkingNoteChanged>(_onNoteChanged);
     on<MarkingQuoteEdited>(_onQuoteEdited);
@@ -42,7 +45,7 @@ class MarkingBloc extends Bloc<MarkingEvent, MarkingState> {
     on<MarkingSaveRequested>(_onSaveRequested);
   }
 
-  final TextRecognitionRepository _textRecognitionRepository;
+  final RecognizeCapturedPageUseCase _recognizeCapturedPageUseCase;
   final SaveBookmarkUseCase _saveBookmarkUseCase;
   final BookRepository _bookRepository;
   final ThemeRepository _themeRepository;
@@ -63,15 +66,18 @@ class MarkingBloc extends Bloc<MarkingEvent, MarkingState> {
       bookTitle = data.title;
       bookAuthors = data.authors;
     }
-    emit(switch (await _textRecognitionRepository.recognizePage(_arguments.imagePath)) {
+    emit(switch (await _recognizeCapturedPageUseCase(
+      imagePath: _arguments.imagePath,
+      pageQuad: _arguments.pageQuad,
+    )) {
       Success(:final data) => MarkingReady(
-        page: data,
-        imagePath: _arguments.imagePath,
+        page: data.page,
+        imagePath: data.imagePath,
         bookTitle: bookTitle,
         bookAuthors: bookAuthors,
         selectedWordIndexes: const {},
         quoteOverride: null,
-        pageNumber: data.detectedPageNumber,
+        pageNumber: data.page.detectedPageNumber,
         note: null,
         voicePath: null,
         voiceDurationMs: null,
@@ -111,8 +117,120 @@ class MarkingBloc extends Bloc<MarkingEvent, MarkingState> {
 
   void _onWordsSelected(MarkingWordsSelected event, Emitter<MarkingState> emit) {
     if (state case final MarkingReady current) {
-      emit(_ready(current, selectedWordIndexes: event.wordIndexes, keepQuote: false));
+      emit(
+        _ready(
+          current,
+          selectedWordIndexes: _withJoinedNeighbours(event.wordIndexes, current.page.words),
+          keepQuote: false,
+        ),
+      );
     }
+  }
+
+  Set<int> _withJoinedNeighbours(Set<int> indexes, List<RecognizedWord> words) {
+    final expanded = <int>{};
+    for (final index in indexes) {
+      if (index < 0 || index >= words.length) continue;
+      expanded.add(index);
+      if (words[index].joinsWithNext && index + 1 < words.length) expanded.add(index + 1);
+      if (index > 0 && words[index - 1].joinsWithNext) expanded.add(index - 1);
+    }
+    return expanded;
+  }
+
+  void _onWordCorrected(MarkingWordCorrected event, Emitter<MarkingState> emit) {
+    final text = event.text.trim();
+    if (text.isEmpty) return;
+    if (state case final MarkingReady current
+        when event.wordIndex >= 0 && event.wordIndex < current.page.words.length) {
+      final source = current.page.words;
+      final indexes = <int>[event.wordIndex];
+      while (source[indexes.last].joinsWithNext && indexes.last + 1 < source.length) {
+        indexes.add(indexes.last + 1);
+      }
+      final words = [
+        ...source.sublist(0, event.wordIndex),
+        _corrected(source, indexes, text),
+        ...source.sublist(indexes.last + 1),
+      ];
+      emit(
+        _ready(
+          current,
+          page: _pageWith(current, words),
+          selectedWordIndexes: _remapSelection(
+            current.selectedWordIndexes,
+            event.wordIndex,
+            indexes.length - 1,
+          ),
+        ),
+      );
+    }
+  }
+
+  RecognizedWord _corrected(List<RecognizedWord> words, List<int> indexes, String text) {
+    final first = words[indexes.first];
+    var left = first.left;
+    var top = first.top;
+    var right = first.left + first.width;
+    var bottom = first.top + first.height;
+    for (final index in indexes) {
+      final word = words[index];
+      left = left < word.left ? left : word.left;
+      top = top < word.top ? top : word.top;
+      right = right > word.left + word.width ? right : word.left + word.width;
+      bottom = bottom > word.top + word.height ? bottom : word.top + word.height;
+    }
+    return RecognizedWord(
+      text: text,
+      left: left,
+      top: top,
+      width: right - left,
+      height: bottom - top,
+      lineIndex: first.lineIndex,
+      confidence: first.confidence,
+      isUncertain: false,
+      joinsWithNext: false,
+    );
+  }
+
+  void _onWordsMerged(MarkingWordsMerged event, Emitter<MarkingState> emit) {
+    if (state case final MarkingReady current
+        when event.wordIndex >= 0 && event.wordIndex + 1 < current.page.words.length) {
+      final words = applyJoins(current.page.words, {event.wordIndex});
+      emit(
+        _ready(
+          current,
+          page: _pageWith(current, words),
+          selectedWordIndexes: _remapSelection(
+            current.selectedWordIndexes,
+            event.wordIndex,
+            current.page.words.length - words.length,
+          ),
+        ),
+      );
+    }
+  }
+
+  Set<int> _remapSelection(Set<int> selection, int keptIndex, int removed) {
+    if (removed <= 0) return selection;
+    return {
+      for (final index in selection)
+        if (index <= keptIndex)
+          index
+        else if (index <= keptIndex + removed)
+          keptIndex
+        else
+          index - removed,
+    };
+  }
+
+  RecognizedPage _pageWith(MarkingReady current, List<RecognizedWord> words) {
+    return RecognizedPage(
+      lines: current.page.lines,
+      words: words,
+      detectedPageNumber: current.page.detectedPageNumber,
+      aspectRatio: current.page.aspectRatio,
+    );
   }
 
   void _onPageNumberChanged(MarkingPageNumberChanged event, Emitter<MarkingState> emit) {
@@ -169,6 +287,7 @@ class MarkingBloc extends Bloc<MarkingEvent, MarkingState> {
 
   MarkingReady _ready(
     MarkingReady current, {
+    RecognizedPage? page,
     Set<int>? selectedWordIndexes,
     String? quoteOverride,
     bool keepQuote = true,
@@ -184,7 +303,7 @@ class MarkingBloc extends Bloc<MarkingEvent, MarkingState> {
     AppError? saveError,
   }) {
     return MarkingReady(
-      page: current.page,
+      page: page ?? current.page,
       imagePath: current.imagePath,
       bookTitle: current.bookTitle,
       bookAuthors: current.bookAuthors,
@@ -209,7 +328,7 @@ class MarkingBloc extends Bloc<MarkingEvent, MarkingState> {
     final override = state.quoteOverride?.trim();
     final quote = (override != null && override.isNotEmpty)
         ? override
-        : joinMarkedLines(selectedWords.map((word) => word.text));
+        : joinMarkedWords(state.page.words, orderedIndexes);
     return Bookmark(
       id: _uuid.v4(),
       bookId: _arguments.bookId,
@@ -218,7 +337,7 @@ class MarkingBloc extends Bloc<MarkingEvent, MarkingState> {
       note: (trimmedNote == null || trimmedNote.isEmpty) ? null : trimmedNote,
       voicePath: state.voicePath,
       voiceDurationMs: state.voiceDurationMs,
-      photoPath: _arguments.imagePath,
+      photoPath: state.imagePath,
       imageAspectRatio: state.page.aspectRatio,
       highlights: selectedWords
           .map(

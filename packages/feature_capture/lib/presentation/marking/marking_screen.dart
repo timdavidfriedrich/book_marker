@@ -5,9 +5,12 @@ import 'package:core/theme/spacing.dart';
 import 'package:core/theme/theme_extensions.dart';
 import 'package:feature_capture/domain/mark_text.dart';
 import 'package:feature_capture/domain/recognized_page.dart';
+import 'package:feature_capture/presentation/extensions/recognized_page_extensions.dart';
 import 'package:feature_capture/presentation/marking/marking_bloc.dart';
 import 'package:feature_capture/presentation/marking/marking_event.dart';
 import 'package:feature_capture/presentation/marking/marking_state.dart';
+import 'package:feature_capture/presentation/widgets/uncertain_word_chip.dart';
+import 'package:feature_capture/presentation/widgets/word_correction_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -28,6 +31,10 @@ import 'package:uuid/uuid.dart';
 
 const _uuid = Uuid();
 const _minVoiceMs = 500;
+const _highlightPadding = 2.0;
+const _legendSampleWidth = 28.0;
+const _legendSampleHeight = 16.0;
+const _highlightFillOpacity = 0.22;
 
 String _formatDuration(int milliseconds) {
   final duration = Duration(milliseconds: milliseconds);
@@ -104,6 +111,10 @@ class const _Editor({
               _ModeToggle(index: mode.value, onChanged: (value) => mode.value = value),
             ],
           ),
+          if (_state.page.wordGroups().any((group) => group.number != null)) ...[
+            const SizedBox(height: Spacing.s),
+            const _UncertainLegend(),
+          ],
           const SizedBox(height: Spacing.m),
           Expanded(
             child: PaperCard(
@@ -112,7 +123,7 @@ class const _Editor({
                 index: mode.value,
                 sizing: StackFit.expand,
                 children: [
-                  _ReadingText(state: _state, isActive: mode.value == 0),
+                  _ReadingText(state: _state),
                   _PhotoSelectable(state: _state),
                 ],
               ),
@@ -210,9 +221,38 @@ class const _ModeToggle({
   }
 }
 
+class const _UncertainLegend() extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Badge(
+          label: const Text("1"),
+          alignment: AlignmentDirectional.topEnd,
+          offset: uncertainBadgeInlineOffset,
+          child: Container(
+            width: _legendSampleWidth,
+            height: _legendSampleHeight,
+            decoration: BoxDecoration(
+              color: context.palette.sky.fill,
+              borderRadius: BorderRadius.circular(Spacing.radiusS),
+            ),
+          ),
+        ),
+        const SizedBox(width: Spacing.m + uncertainBadgeSize),
+        Expanded(
+          child: Text(
+            context.s.markingUncertainLegend,
+            style: context.typography.monoCaption.copyWith(color: context.c.onSurfaceVariant),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
 class const _ReadingText({
   required final MarkingReady _state,
-  required final bool _isActive,
 }) extends HookWidget {
   @override
   Widget build(BuildContext context) {
@@ -220,64 +260,69 @@ class const _ReadingText({
     if (words.isEmpty) {
       return Center(child: Text(context.s.markingNoTextMessage, textAlign: TextAlign.center));
     }
-    final layout = useMemoized(() {
-      final buffer = StringBuffer();
-      final ranges = <List<int>>[];
-      for (var index = 0; index < words.length; index++) {
-        final start = buffer.length;
-        buffer.write(words[index].text);
-        ranges.add([start, buffer.length]);
-        if (index < words.length - 1) buffer.write(" ");
-      }
-      return (text: buffer.toString(), ranges: ranges);
-    }, [words.length]);
-    final controller = useTextEditingController(text: layout.text);
-    final focusNode = useFocusNode();
     final bloc = context.read<MarkingBloc>();
-
-    useEffect(() {
-      void listener() {
-        final selection = controller.selection;
-        if (selection.start < 0 || selection.end < 0) return;
-        final next = <int>{};
-        for (var index = 0; index < layout.ranges.length; index++) {
-          if (layout.ranges[index][0] < selection.end && layout.ranges[index][1] > selection.start) {
-            next.add(index);
-          }
+    final layout = useMemoized(() {
+      final groups = _state.page.wordGroups();
+      final spans = <InlineSpan>[];
+      final ranges = [for (var index = 0; index < words.length; index++) <int>[0, 0]];
+      var offset = 0;
+      for (var groupIndex = 0; groupIndex < groups.length; groupIndex++) {
+        final group = groups[groupIndex];
+        final int length;
+        if (group.number case final int number) {
+          spans.add(
+            WidgetSpan(
+              alignment: PlaceholderAlignment.middle,
+              child: UncertainWordChip(
+                text: group.text,
+                number: number,
+                onTap: () =>
+                    showWordCorrectionSheet(context, wordIndex: group.indexes.first),
+              ),
+            ),
+          );
+          length = 1;
+        } else {
+          spans.add(TextSpan(text: group.text));
+          length = group.text.length;
         }
-        if (bloc.state case final MarkingReady current
-            when next.length == current.selectedWordIndexes.length &&
-                next.containsAll(current.selectedWordIndexes)) {
-          return;
+        for (final index in group.indexes) {
+          ranges[index] = [offset, offset + length];
         }
-        bloc.add(MarkingWordsSelected(next));
+        offset += length;
+        if (groupIndex < groups.length - 1) {
+          spans.add(const TextSpan(text: " "));
+          offset += 1;
+        }
       }
+      return (spans: spans, ranges: ranges);
+    }, [_state.page]);
 
-      controller.addListener(listener);
-      return () => controller.removeListener(listener);
-    }, [controller]);
+    final textSpan = useMemoized(
+      () => TextSpan(children: layout.spans, style: context.typography.readingBody),
+      [layout],
+    );
 
-    useEffect(() {
-      if (_isActive) focusNode.requestFocus();
-      return null;
-    }, [_isActive]);
+    void selectionChanged(TextSelection selection) {
+      if (selection.start < 0 || selection.end < 0) return;
+      final next = <int>{};
+      for (var index = 0; index < layout.ranges.length; index++) {
+        if (layout.ranges[index][0] < selection.end && layout.ranges[index][1] > selection.start) {
+          next.add(index);
+        }
+      }
+      if (bloc.state case final MarkingReady current
+          when next.length == current.selectedWordIndexes.length &&
+              next.containsAll(current.selectedWordIndexes)) {
+        return;
+      }
+      bloc.add(MarkingWordsSelected(next));
+    }
 
     return SingleChildScrollView(
-      child: TextField(
-        controller: controller,
-        focusNode: focusNode,
-        readOnly: true,
-        showCursor: false,
-        maxLines: null,
-        style: context.typography.readingBody,
-        decoration: const InputDecoration(
-          isCollapsed: true,
-          filled: false,
-          border: InputBorder.none,
-          enabledBorder: InputBorder.none,
-          focusedBorder: InputBorder.none,
-          contentPadding: EdgeInsets.zero,
-        ),
+      child: SelectableText.rich(
+        textSpan,
+        onSelectionChanged: (selection, cause) => selectionChanged(selection),
       ),
     );
   }
@@ -298,6 +343,18 @@ class const _PhotoSelectable({
             return Stack(
               children: [
                 Positioned.fill(child: Image.file(File(_state.imagePath), fit: BoxFit.fill)),
+                for (final group in page.wordGroups())
+                  if (group.number case final int number)
+                    for (var member = 0; member < group.indexes.length; member++)
+                      _UncertainHighlight(
+                        word: page.words[group.indexes[member]],
+                        number: member == 0 ? number : null,
+                        size: size,
+                        onTap: () => showWordCorrectionSheet(
+                          context,
+                          wordIndex: group.indexes.first,
+                        ),
+                      ),
                 for (final index in _state.selectedWordIndexes)
                   if (index < page.words.length) _WordBox(word: page.words[index], size: size),
               ],
@@ -327,6 +384,48 @@ class const _WordBox({
   }
 }
 
+class const _UncertainHighlight({
+  required final RecognizedWord _word,
+  required final int? _number,
+  required final Size _size,
+  required final VoidCallback _onTap,
+}) extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final swatch = context.palette.sky;
+    return Positioned(
+      left: _word.left * _size.width - _highlightPadding,
+      top: _word.top * _size.height - _highlightPadding,
+      width: _word.width * _size.width + _highlightPadding * 2,
+      height: _word.height * _size.height + _highlightPadding * 2,
+      child: Badge(
+        isLabelVisible: _number != null,
+        label: Text("${_number ?? 0}"),
+        alignment: AlignmentDirectional.topEnd,
+        offset: const Offset(uncertainBadgeSize / 2, -uncertainBadgeSize / 2),
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(Spacing.radiusS),
+            border: Border.all(color: swatch.solid, width: Spacing.borderWidthThin),
+          ),
+          child: InkTapBox(
+            onTap: _onTap,
+            color: swatch.solid.withValues(alpha: _highlightFillOpacity),
+            radius: Spacing.radiusS,
+            child: const SizedBox.expand(),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+int _uncertainSelectionCount(MarkingReady state) {
+  return state.selectedWordIndexes
+      .where((index) => index < state.page.words.length && state.page.words[index].isUncertain)
+      .length;
+}
+
 Future<void> _openSaveSheet(BuildContext context) async {
   final bloc = context.read<MarkingBloc>();
   await showModalBottomSheet<void>(
@@ -348,8 +447,9 @@ class const _SaveSheet() extends HookWidget {
     final pageController = useTextEditingController();
     final noteController = useTextEditingController();
     final initialQuote = switch (context.read<MarkingBloc>().state) {
-      MarkingReady(:final selectedWordIndexes, :final page) => joinMarkedLines(
-        (selectedWordIndexes.toList()..sort()).map((index) => page.words[index].text),
+      MarkingReady(:final selectedWordIndexes, :final page) => joinMarkedWords(
+        page.words,
+        selectedWordIndexes,
       ),
       _ => "",
     };
@@ -438,6 +538,10 @@ class const _SaveSheet() extends HookWidget {
                     ),
                   ),
                 ),
+                if (_uncertainSelectionCount(state) case final count when count > 0) ...[
+                  const SizedBox(height: Spacing.s),
+                  _UnsureHint(count: count),
+                ],
                 const SizedBox(height: Spacing.m),
                 _PageField(
                   controller: pageController,
@@ -477,6 +581,26 @@ class const _SaveSheet() extends HookWidget {
           },
         ),
       ),
+    );
+  }
+}
+
+class const _UnsureHint({
+  required final int _count,
+}) extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Icon(Icons.error_outline, size: Spacing.iconS, color: context.palette.coral.solid),
+        const SizedBox(width: Spacing.xs),
+        Expanded(
+          child: Text(
+            context.s.markingUnsureWordsLabel(_count),
+            style: context.typography.monoCaption.copyWith(color: context.palette.coral.solid),
+          ),
+        ),
+      ],
     );
   }
 }

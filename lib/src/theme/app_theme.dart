@@ -64,11 +64,20 @@ const _sand = AccentSwatch(
   onFillVariant: _mutedBrown,
 );
 
+const _sky = AccentSwatch(
+  fill: Color(0xFFD9E8F5),
+  solid: Color(0xFF3E7CB1),
+  onSolid: Color(0xFFF3F8FC),
+  onFill: Color(0xFF14283A),
+  onFillVariant: Color(0xFF4E7290),
+);
+
 const _palette = AppPalette(
   amber: _amber,
   teal: _teal,
   coral: _coral,
   sand: _sand,
+  sky: _sky,
   paperFill: _paperCard,
   paperText: _paperText,
   paperTextFaint: _paperTextFaint,
@@ -111,6 +120,13 @@ abstract final class AppTheme {
       textTheme: textTheme,
       splashFactory: NoSplash.splashFactory,
       extensions: const [_palette, _typography, _statusLight],
+      badgeTheme: BadgeThemeData(
+        backgroundColor: _sky.solid,
+        textColor: _sky.onSolid,
+        textStyle: _typography.monoBadge.copyWith(fontSize: 10, height: 1),
+        largeSize: 14,
+        padding: const EdgeInsets.symmetric(horizontal: 3),
+      ),
       appBarTheme: AppBarTheme(
         backgroundColor: colorScheme.surface,
         surfaceTintColor: Colors.transparent,

@@ -26,9 +26,11 @@ class const SelectableChip({
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text(
-            _label,
-            style: context.t.labelMedium?.copyWith(color: foreground, fontSize: 14),
+          Flexible(
+            child: Text(
+              _label,
+              style: context.t.labelMedium?.copyWith(color: foreground, fontSize: 14),
+            ),
           ),
           if (_trailing case final Widget trailing) ...[
             const SizedBox(width: Spacing.xxs),

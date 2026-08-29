@@ -57,22 +57,10 @@ class const _Loaded({
           const SizedBox(height: Spacing.m),
           if (!_state.isSearching) ...[
             Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(context.s.libraryTitle, style: context.t.displaySmall),
-                      const SizedBox(height: Spacing.xxs),
-                      Text(
-                        context.s.libraryHeaderStats(_state.totalBooks, _state.totalMarks),
-                        style: context.typography.monoLabel.copyWith(
-                          color: context.c.onSurfaceVariant,
-                        ),
-                      ),
-                    ],
-                  ),
+                  child: Text(context.s.libraryTitle, style: context.t.displaySmall),
                 ),
                 ProfileAvatar(onTap: () => context.pushSettings()),
               ],
@@ -238,25 +226,6 @@ class const _BookList({
                   },
                 ),
         ),
-        if (_state.filter != LibraryFilter.finished && _state.finishedCount > 0)
-          Padding(
-            padding: const EdgeInsets.only(top: Spacing.s, bottom: Spacing.s),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  context.s.libraryFinishedFooter(_state.finishedCount),
-                  style: context.typography.monoLabel.copyWith(color: context.c.onSurfaceVariant),
-                ),
-                TextButton(
-                  onPressed: () => context.read<LibraryBloc>().add(
-                    const LibraryFilterChanged(LibraryFilter.finished),
-                  ),
-                  child: Text(context.s.libraryShowFinished),
-                ),
-              ],
-            ),
-          ),
       ],
     );
   }
