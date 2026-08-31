@@ -13,6 +13,10 @@ class const QuoteDetailNoteChanged(
   final String? note,
 ) extends QuoteDetailEvent;
 
+class const QuoteDetailPageNumbersChanged(
+  final List<int> pageNumbers,
+) extends QuoteDetailEvent;
+
 class const QuoteDetailThemesUpdated(
   final AppResult<List<QuoteTheme>> result,
 ) extends QuoteDetailEvent;

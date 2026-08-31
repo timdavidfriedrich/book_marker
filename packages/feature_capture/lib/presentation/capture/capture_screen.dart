@@ -1,9 +1,11 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:camera/camera.dart';
 import 'package:core/theme/spacing.dart';
 import 'package:core/theme/theme_extensions.dart';
 import 'package:feature_capture/domain/capture_mode.dart';
+import 'package:feature_capture/domain/capture_span.dart';
 import 'package:feature_capture/presentation/capture/capture_bloc.dart';
 import 'package:feature_capture/presentation/capture/capture_event.dart';
 import 'package:feature_capture/presentation/capture/capture_state.dart';
@@ -19,6 +21,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:shared/domain/entities/book.dart';
+import 'package:shared/domain/entities/captured_shot.dart';
 import 'package:shared/domain/entities/page_quad.dart';
 import 'package:shared/presentation/extensions/accent_extensions.dart';
 import 'package:shared/presentation/extensions/context_extensions.dart';
@@ -32,6 +35,13 @@ const _shutterOuter = 88.0;
 const _shutterInner = 60.0;
 const _controlIcon = 56.0;
 const _dotDuration = Duration(milliseconds: 120);
+const _shotWidth = 44.0;
+const _shotHeight = 60.0;
+const _removeBadge = 18.0;
+const _removeIcon = 12.0;
+const _shotCacheWidth = 132;
+
+typedef _ContinueCallback = Future<void> Function(String bookId, List<CapturedShot> shots);
 
 class const CaptureScreen({
   super.key,
@@ -42,6 +52,7 @@ class const CaptureScreen({
     final hasError = useState(false);
     final torchOn = useState(false);
     final detectionCubit = context.read<PageDetectionCubit>();
+    final captureBloc = context.read<CaptureBloc>();
 
     Future<void> initialize() async {
       if (controller.value != null) return;
@@ -100,15 +111,28 @@ class const CaptureScreen({
       }
     }
 
-    Future<void> openNext(String bookId, String imagePath, CaptureMode mode) {
-      return switch (mode) {
-        CaptureMode.auto => context.pushMarking(
-          MarkingArguments(imagePath: imagePath, bookId: bookId, pageQuad: null),
-        ),
-        CaptureMode.manual => context.pushCrop(
-          CropArguments(imagePath: imagePath, bookId: bookId),
-        ),
-      };
+    CaptureSpan currentSpan() => switch (captureBloc.state) {
+      CaptureReady(:final span) || CaptureEmpty(:final span) => span,
+      _ => CaptureSpan.onePage,
+    };
+
+    Future<void> collect(
+      String bookId,
+      String imagePath,
+      CaptureMode mode,
+      CaptureSpan span,
+    ) async {
+      PageQuad? quad;
+      if (mode == CaptureMode.manual) {
+        quad = await context.pushCrop(CropArguments(imagePath: imagePath));
+        if (quad == null || !context.mounted) return;
+      }
+      final shot = CapturedShot(imagePath: imagePath, pageQuad: quad);
+      if (span == CaptureSpan.spread) {
+        captureBloc.add(CaptureShotTaken(shot));
+        return;
+      }
+      await context.pushMarking(MarkingArguments(shots: [shot], bookId: bookId));
     }
 
     Future<void> capture(String bookId) async {
@@ -120,7 +144,7 @@ class const CaptureScreen({
         final mode = detectionCubit.state.mode;
         await shutdown();
         if (!context.mounted) return;
-        await openNext(bookId, file.path, mode);
+        await collect(bookId, file.path, mode, currentSpan());
         if (context.mounted) await initialize();
       } on Object {
         if (context.mounted) context.showToast(context.s.errorUnexpected);
@@ -129,16 +153,28 @@ class const CaptureScreen({
 
     Future<void> pickFromGallery(String bookId) async {
       try {
-        final file = await ImagePicker().pickImage(source: ImageSource.gallery);
-        if (file == null) return;
-        final mode = detectionCubit.state.mode;
+        final files = await ImagePicker().pickMultiImage();
+        if (files.isEmpty) return;
+        // * several picked images are the pages of one quote, so they become a spread
+        final span = files.length > 1 ? CaptureSpan.spread : currentSpan();
+        if (span != currentSpan()) captureBloc.add(CaptureSpanSelected(span));
         await shutdown();
-        if (!context.mounted) return;
-        await openNext(bookId, file.path, mode);
+        for (final file in files) {
+          if (!context.mounted) return;
+          // * a gallery photo was never framed by live detection, so its page is marked by hand
+          await collect(bookId, file.path, CaptureMode.manual, span);
+        }
         if (context.mounted) await initialize();
       } on Object {
         if (context.mounted) context.showToast(context.s.errorUnexpected);
       }
+    }
+
+    Future<void> continueWithSpread(String bookId, List<CapturedShot> shots) async {
+      await shutdown();
+      if (!context.mounted) return;
+      await context.pushMarking(MarkingArguments(shots: shots, bookId: bookId));
+      if (context.mounted) await initialize();
     }
 
     useEffect(() {
@@ -158,7 +194,7 @@ class const CaptureScreen({
           child: Column(
             children: [
               const SizedBox(height: Spacing.s),
-              const _ModeToggle(),
+              const _SpanToggle(),
               const SizedBox(height: Spacing.m),
               Expanded(
                 child: _Preview(
@@ -169,10 +205,7 @@ class const CaptureScreen({
               const SizedBox(height: Spacing.m),
               const _BookBar(),
               const SizedBox(height: Spacing.s),
-              Text(
-                context.s.captureSteadyHint,
-                style: context.typography.monoLabel.copyWith(color: context.c.onSurfaceVariant),
-              ),
+              _CaptureTray(onContinue: continueWithSpread),
               const SizedBox(height: Spacing.m),
               _Controls(
                 camera: controller.value,
@@ -190,36 +223,154 @@ class const CaptureScreen({
   }
 }
 
-class const _ModeToggle() extends HookWidget {
+class const _SpanToggle() extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final selected = useState(0);
-    return Center(
-      child: Container(
-        padding: const EdgeInsets.all(Spacing.xxxs),
-        decoration: BoxDecoration(
-          color: context.c.surfaceContainerHigh,
-          borderRadius: BorderRadius.circular(Spacing.radiusFull),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            for (final entry in [context.s.captureModeOnePage, context.s.captureModeSpread].indexed)
-              InkTapBox(
-                onTap: () => selected.value = entry.$1,
-                radius: Spacing.radiusFull,
-                color: entry.$1 == selected.value ? context.palette.paperFill : Colors.transparent,
-                padding: const EdgeInsets.symmetric(horizontal: Spacing.l, vertical: Spacing.xs),
-                child: Text(
-                  entry.$2,
-                  style: context.t.labelMedium?.copyWith(
-                    fontSize: 14,
-                    color: entry.$1 == selected.value
-                        ? context.palette.paperText
-                        : context.c.onSurfaceVariant,
+    return BlocBuilder<CaptureBloc, CaptureState>(
+      builder: (context, state) {
+        final span = switch (state) {
+          CaptureReady(:final span) || CaptureEmpty(:final span) => span,
+          _ => CaptureSpan.onePage,
+        };
+        return Center(
+          child: Container(
+            padding: const EdgeInsets.all(Spacing.xxxs),
+            decoration: BoxDecoration(
+              color: context.c.surfaceContainerHigh,
+              borderRadius: BorderRadius.circular(Spacing.radiusFull),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                for (final entry in CaptureSpan.values.indexed)
+                  InkTapBox(
+                    onTap: () => context.read<CaptureBloc>().add(CaptureSpanSelected(entry.$2)),
+                    radius: Spacing.radiusFull,
+                    color: entry.$2 == span ? context.palette.paperFill : Colors.transparent,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: Spacing.l,
+                      vertical: Spacing.xs,
+                    ),
+                    child: Text(
+                      switch (entry.$2) {
+                        CaptureSpan.onePage => context.s.captureModeOnePage,
+                        CaptureSpan.spread => context.s.captureModeSpread,
+                      },
+                      style: context.t.labelMedium?.copyWith(
+                        fontSize: 14,
+                        color: entry.$2 == span
+                            ? context.palette.paperText
+                            : context.c.onSurfaceVariant,
+                      ),
+                    ),
                   ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+
+class const _CaptureTray({
+  required final _ContinueCallback _onContinue,
+}) extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<CaptureBloc, CaptureState>(
+      builder: (context, state) => switch (state) {
+        CaptureReady(:final span, :final shots, :final selectedBookId)
+            when span == CaptureSpan.spread && shots.isNotEmpty =>
+          _ShotActions(
+            count: shots.length,
+            onContinue: () => _onContinue(selectedBookId, shots),
+          ),
+        CaptureReady(span: CaptureSpan.spread) || CaptureEmpty(span: CaptureSpan.spread) =>
+          _Hint(text: context.s.captureSpreadHint),
+        _ => _Hint(text: context.s.captureSteadyHint),
+      },
+    );
+  }
+}
+
+class const _Hint({
+  required final String _text,
+}) extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      _text,
+      textAlign: TextAlign.center,
+      style: context.typography.monoLabel.copyWith(color: context.c.onSurfaceVariant),
+    );
+  }
+}
+
+class const _ShotActions({
+  required final int _count,
+  required final VoidCallback _onContinue,
+}) extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Text(
+          context.s.captureSpreadShotsHint,
+          textAlign: TextAlign.center,
+          style: context.typography.monoCaption.copyWith(color: context.c.onSurfaceVariant),
+        ),
+        const SizedBox(height: Spacing.xs),
+        FilledButton(
+          onPressed: _onContinue,
+          child: Text(context.s.captureSpreadContinueButton(_count)),
+        ),
+      ],
+    );
+  }
+}
+
+class const _ShotThumbnail({
+  required final CapturedShot _shot,
+  required final int _index,
+}) extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Semantics(
+      label: context.s.captureSpreadRemoveLabel,
+      child: InkTapBox(
+        onTap: () => context.read<CaptureBloc>().add(CaptureShotDiscarded(_index)),
+        radius: Spacing.radiusM,
+        child: Stack(
+          children: [
+            ClipRRect(
+              borderRadius: BorderRadius.circular(Spacing.radiusM),
+              child: Image.file(
+                File(_shot.imagePath),
+                width: _shotWidth,
+                height: _shotHeight,
+                cacheWidth: _shotCacheWidth,
+                fit: BoxFit.cover,
+              ),
+            ),
+            Positioned(
+              top: Spacing.xxxs,
+              right: Spacing.xxxs,
+              child: Container(
+                width: _removeBadge,
+                height: _removeBadge,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: context.palette.coral.solid,
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  Icons.close,
+                  size: _removeIcon,
+                  color: context.palette.coral.onSolid,
                 ),
               ),
+            ),
           ],
         ),
       ),
@@ -263,7 +414,7 @@ class const _Preview({
             else
               const Center(child: CircularProgressIndicator()),
             const _DetectionOverlay(),
-            const _CaptureModeOverlay(),
+            const _PreviewOverlay(),
           ],
         ),
       ),
@@ -319,30 +470,79 @@ class const _OverlayDot({
   }
 }
 
-class const _CaptureModeOverlay() extends StatelessWidget {
+class const _PreviewOverlay() extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return const Align(
+      alignment: Alignment.bottomCenter,
+      child: Padding(
+        padding: EdgeInsets.all(Spacing.m),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [_CaptureModeToggle(), _ShotStrip()],
+        ),
+      ),
+    );
+  }
+}
+
+class const _CaptureModeToggle() extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<PageDetectionCubit, PageDetectionState>(
       buildWhen: (previous, current) => previous.mode != current.mode,
-      builder: (context, state) => Align(
-        alignment: Alignment.bottomCenter,
-        child: Padding(
-          padding: const EdgeInsets.all(Spacing.m),
-          child: SegmentedToggle(
-            labels: [context.s.captureModeAuto, context.s.captureModeManual],
-            selectedIndex: switch (state.mode) {
-              CaptureMode.auto => 0,
-              CaptureMode.manual => 1,
-            },
-            onChanged: (index) => context.read<PageDetectionCubit>().selectMode(
-              index == 0 ? CaptureMode.auto : CaptureMode.manual,
-            ),
-            trackColor: context.c.surfaceContainerHigh,
-            activeColor: context.palette.paperFill,
-            activeTextColor: context.palette.paperText,
-          ),
+      builder: (context, state) => SegmentedToggle(
+        labels: [context.s.captureModeAuto, context.s.captureModeManual],
+        selectedIndex: switch (state.mode) {
+          CaptureMode.auto => 0,
+          CaptureMode.manual => 1,
+        },
+        onChanged: (index) => context.read<PageDetectionCubit>().selectMode(
+          index == 0 ? CaptureMode.auto : CaptureMode.manual,
         ),
+        trackColor: context.c.surfaceContainerHigh,
+        activeColor: context.palette.paperFill,
+        activeTextColor: context.palette.paperText,
       ),
+    );
+  }
+}
+
+class const _ShotStrip() extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<CaptureBloc, CaptureState>(
+      builder: (context, state) {
+        if (state case CaptureReady(:final span, :final shots)
+            when span == CaptureSpan.spread && shots.isNotEmpty) {
+          return Padding(
+            padding: const EdgeInsets.only(top: Spacing.s),
+            child: SizedBox(
+              height: _shotHeight,
+              child: ReorderableListView.builder(
+                scrollDirection: Axis.horizontal,
+                shrinkWrap: true,
+                padding: EdgeInsets.zero,
+                itemCount: shots.length,
+                onReorderItem: (oldIndex, newIndex) => context.read<CaptureBloc>().add(
+                  CaptureShotMoved(oldIndex, newIndex),
+                ),
+                // * the default proxy paints an opaque card, which would hide the camera
+                proxyDecorator: (child, index, animation) =>
+                    Material(color: Colors.transparent, child: child),
+                itemBuilder: (context, index) => Padding(
+                  key: ValueKey(shots[index].imagePath),
+                  padding: EdgeInsets.only(
+                    right: index == shots.length - 1 ? 0 : Spacing.xs,
+                  ),
+                  child: _ShotThumbnail(shot: shots[index], index: index),
+                ),
+              ),
+            ),
+          );
+        }
+        return const SizedBox.shrink();
+      },
     );
   }
 }

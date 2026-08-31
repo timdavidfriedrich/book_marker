@@ -29,8 +29,8 @@ class const MarkingWordsMerged(
   final int wordIndex,
 ) extends MarkingEvent;
 
-class const MarkingPageNumberChanged(
-  final int? pageNumber,
+class const MarkingPageNumbersChanged(
+  final List<int> pageNumbers,
 ) extends MarkingEvent;
 
 class const MarkingNoteChanged(

@@ -5,11 +5,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:shared/presentation/extensions/context_extensions.dart';
 import 'package:shared/presentation/widgets/book_cover.dart';
+import 'package:shared/presentation/widgets/expandable_text.dart';
 import 'package:shared/presentation/widgets/ink_tap_box.dart';
 import 'package:shared/presentation/widgets/page_pill.dart';
 
 const _coverWidth = 52.0;
 const _coverHeight = 68.0;
+const _quoteMaxLines = 4;
 const _voiceNoteDotSize = 18.0;
 const _voiceNoteIconSize = 12.0;
 
@@ -17,7 +19,7 @@ class const QuoteCard({
   required final AccentColor _accent,
   required final String _quote,
   final String? _thumbnailUrl,
-  final int? _page,
+  final List<int> _pages = const [],
   final bool _pageFilled = false,
   final String? _note,
   final String? _sourceLabel,
@@ -47,9 +49,9 @@ class const QuoteCard({
                 width: _coverWidth,
                 height: _coverHeight,
               ),
-              if (_page case final int page) ...[
+              if (_pages.isNotEmpty) ...[
                 const SizedBox(height: Spacing.xs),
-                PagePill(page: page, accent: _accent, filled: _pageFilled),
+                PagePill(pages: _pages, accent: _accent, filled: _pageFilled),
               ],
             ],
           ),
@@ -58,7 +60,11 @@ class const QuoteCard({
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(_quote, style: context.typography.readingQuote),
+                ExpandableText(
+                  text: _quote,
+                  maxLines: _quoteMaxLines,
+                  style: context.typography.readingQuote,
+                ),
                 if (_note case final String note) ...[
                   const SizedBox(height: Spacing.xs),
                   Text(

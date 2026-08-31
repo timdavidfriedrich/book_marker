@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 import 'package:drift/drift.dart';
-import 'package:shared/domain/entities/highlight_region.dart';
+import 'package:shared/domain/entities/quote_page.dart';
 
 class StringListConverter extends TypeConverter<List<String>, String> {
   const StringListConverter();
@@ -14,17 +14,25 @@ class StringListConverter extends TypeConverter<List<String>, String> {
   String toSql(List<String> value) => jsonEncode(value);
 }
 
-class HighlightListConverter extends TypeConverter<List<HighlightRegion>, String> {
-  const HighlightListConverter();
+class IntListConverter extends TypeConverter<List<int>, String> {
+  const IntListConverter();
 
   @override
-  List<HighlightRegion> fromSql(String fromDb) => (jsonDecode(fromDb) as List<dynamic>)
-      .map(
-        (it) =>
-            HighlightRegionMapper.fromMap((it as Map<dynamic, dynamic>).cast<String, dynamic>()),
-      )
+  List<int> fromSql(String fromDb) =>
+      (jsonDecode(fromDb) as List<dynamic>).map((it) => it as int).toList();
+
+  @override
+  String toSql(List<int> value) => jsonEncode(value);
+}
+
+class QuotePageListConverter extends TypeConverter<List<QuotePage>, String> {
+  const QuotePageListConverter();
+
+  @override
+  List<QuotePage> fromSql(String fromDb) => (jsonDecode(fromDb) as List<dynamic>)
+      .map((it) => QuotePageMapper.fromMap((it as Map<dynamic, dynamic>).cast<String, dynamic>()))
       .toList();
 
   @override
-  String toSql(List<HighlightRegion> value) => jsonEncode(value.map((it) => it.toMap()).toList());
+  String toSql(List<QuotePage> value) => jsonEncode(value.map((it) => it.toMap()).toList());
 }

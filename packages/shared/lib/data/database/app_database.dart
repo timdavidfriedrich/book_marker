@@ -1,7 +1,7 @@
 import 'package:drift/drift.dart';
 import 'package:drift_flutter/drift_flutter.dart';
 import 'package:shared/data/database/converters.dart';
-import 'package:shared/domain/entities/highlight_region.dart';
+import 'package:shared/domain/entities/quote_page.dart';
 
 part 'app_database.g.dart';
 
@@ -12,6 +12,14 @@ const _legacyQuoteThemesTable = "theme_marks";
 const _legacyQuoteIdColumn = "bookmark_id";
 const _legacyVoiceNotePathColumn = "voice_path";
 const _legacyVoiceNoteDurationColumn = "voice_duration_ms";
+// * the single photo of a legacy quote becomes the first page of its page list
+const _legacySinglePageExpression =
+    "json_array(json_object("
+    "'photoPath', photo_path, "
+    "'imageAspectRatio', image_aspect_ratio, "
+    "'highlights', json(highlights)))";
+const _legacyPageNumbersExpression =
+    "case when page_number is null then json_array() else json_array(page_number) end";
 
 @DataClassName("LocalBook")
 class Books extends Table {
@@ -41,7 +49,7 @@ class Quotes extends Table {
 
   TextColumn get bookId => text().references(Books, #id, onDelete: KeyAction.cascade)();
 
-  IntColumn get pageNumber => integer().nullable()();
+  TextColumn get pageNumbers => text().map(const IntListConverter())();
 
   TextColumn get quote => text()();
 
@@ -51,11 +59,7 @@ class Quotes extends Table {
 
   IntColumn get voiceNoteDurationMs => integer().nullable()();
 
-  TextColumn get photoPath => text()();
-
-  RealColumn get imageAspectRatio => real()();
-
-  TextColumn get highlights => text().map(const HighlightListConverter())();
+  TextColumn get pages => text().map(const QuotePageListConverter())();
 
   BoolColumn get isFavorite => boolean().withDefault(const Constant(false))();
 
@@ -130,7 +134,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(driftDatabase(name: _databaseName));
 
   @override
-  int get schemaVersion => 6;
+  int get schemaVersion => 8;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -169,6 +173,19 @@ class AppDatabase extends _$AppDatabase {
       }
       if (from < 5) {
         await migrator.createTable(settingsTable);
+      }
+      if (from < 8) {
+        await migrator.alterTable(
+          TableMigration(
+            quotes,
+            newColumns: [if (from < 7) quotes.pages, quotes.pageNumbers],
+            columnTransformer: {
+              if (from < 7)
+                quotes.pages: const CustomExpression<String>(_legacySinglePageExpression),
+              quotes.pageNumbers: const CustomExpression<String>(_legacyPageNumbersExpression),
+            },
+          ),
+        );
       }
     },
   );

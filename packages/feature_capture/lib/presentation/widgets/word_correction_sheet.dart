@@ -3,7 +3,8 @@ import 'dart:math' as math;
 
 import 'package:core/theme/spacing.dart';
 import 'package:feature_capture/domain/recognized_page.dart';
-import 'package:feature_capture/presentation/extensions/recognized_page_extensions.dart';
+import 'package:feature_capture/domain/recognized_spread.dart';
+import 'package:feature_capture/presentation/extensions/recognized_word_extensions.dart';
 import 'package:feature_capture/presentation/marking/marking_bloc.dart';
 import 'package:feature_capture/presentation/marking/marking_event.dart';
 import 'package:feature_capture/presentation/marking/marking_state.dart';
@@ -46,11 +47,16 @@ class const _WordCorrectionSheet({
   Widget build(BuildContext context) {
     final state = context.read<MarkingBloc>().state;
     if (state is! MarkingReady) return const SizedBox.shrink();
-    final group = state.page.groupAt(_wordIndex);
+    final words = state.words;
+    final group = words.groupAt(_wordIndex);
     if (group == null) return const SizedBox.shrink();
-    final words = state.page.words;
     final first = group.indexes.first;
     final last = group.indexes.last;
+    final page = state.pages[words[first].pageIndex];
+    final samePageIndexes = [
+      for (final index in group.indexes)
+        if (words[index].pageIndex == words[first].pageIndex) index,
+    ];
     final previous = first > 0 ? words[first - 1] : null;
     final next = last + 1 < words.length ? words[last + 1] : null;
     final suggestions = words[first].suggestions;
@@ -114,9 +120,8 @@ class const _WordCorrectionSheet({
               ),
               const SizedBox(height: Spacing.m),
               _WordPreview(
-                imagePath: state.imagePath,
-                bounds: _boundsOf(words, group.indexes),
-                aspectRatio: state.page.aspectRatio,
+                page: page,
+                bounds: _boundsOf(words, samePageIndexes),
                 height: _previewHeight,
               ),
               if (suggestions.isNotEmpty) ...[
@@ -162,8 +167,7 @@ class const _WordCorrectionSheet({
               if (previous case final RecognizedWord word) ...[
                 const SizedBox(height: Spacing.s),
                 _JoinRow(
-                  imagePath: state.imagePath,
-                  aspectRatio: state.page.aspectRatio,
+                  page: state.pages[word.pageIndex],
                   word: word,
                   label: context.s.markingJoinPreviousButton(word.text),
                   onTap: () => merge(first - 1),
@@ -172,8 +176,7 @@ class const _WordCorrectionSheet({
               if (next case final RecognizedWord word) ...[
                 const SizedBox(height: Spacing.s),
                 _JoinRow(
-                  imagePath: state.imagePath,
-                  aspectRatio: state.page.aspectRatio,
+                  page: state.pages[word.pageIndex],
                   word: word,
                   label: context.s.markingJoinNextButton(word.text),
                   onTap: () => merge(last),
@@ -208,8 +211,7 @@ _Bounds _boundsOf(List<RecognizedWord> words, List<int> indexes) {
 }
 
 class const _JoinRow({
-  required final String _imagePath,
-  required final double _aspectRatio,
+  required final SpreadPage _page,
   required final RecognizedWord _word,
   required final String _label,
   required final VoidCallback _onTap,
@@ -221,14 +223,13 @@ class const _JoinRow({
         SizedBox(
           width: _neighbourPreviewWidth,
           child: _WordPreview(
-            imagePath: _imagePath,
+            page: _page,
             bounds: (
               left: _word.left,
               top: _word.top,
               width: _word.width,
               height: _word.height,
             ),
-            aspectRatio: _aspectRatio,
             height: _neighbourPreviewHeight,
           ),
         ),
@@ -245,9 +246,8 @@ class const _JoinRow({
 }
 
 class const _WordPreview({
-  required final String _imagePath,
+  required final SpreadPage _page,
   required final _Bounds _bounds,
-  required final double _aspectRatio,
   required final double _height,
 }) extends StatelessWidget {
   @override
@@ -260,7 +260,7 @@ class const _WordPreview({
         child: LayoutBuilder(
           builder: (context, constraints) {
             final imageHeight = _height * _previewZoom / math.max(_bounds.height, _minWordHeight);
-            final imageWidth = imageHeight * _aspectRatio;
+            final imageWidth = imageHeight * _page.aspectRatio;
             return Stack(
               children: [
                 Positioned(
@@ -268,7 +268,7 @@ class const _WordPreview({
                   top: _height / 2 - (_bounds.top + _bounds.height / 2) * imageHeight,
                   width: imageWidth,
                   height: imageHeight,
-                  child: Image.file(File(_imagePath), fit: BoxFit.fill),
+                  child: Image.file(File(_page.imagePath), fit: BoxFit.fill),
                 ),
               ],
             );

@@ -34,7 +34,6 @@ class CropBloc extends Bloc<CropEvent, CropState> {
     emit(switch (await _pageDetectionRepository.detectInImage(_arguments.imagePath)) {
       Success(:final data) => CropReady(
         imagePath: _arguments.imagePath,
-        bookId: _arguments.bookId,
         aspectRatio: data.aspectRatio,
         quad: data.quad ?? _defaultQuad,
       ),
@@ -51,7 +50,6 @@ class CropBloc extends Bloc<CropEvent, CropState> {
       emit(
         CropReady(
           imagePath: current.imagePath,
-          bookId: current.bookId,
           aspectRatio: current.aspectRatio,
           quad: current.quad.withPointAt(event.corner, point),
         ),

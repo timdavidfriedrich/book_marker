@@ -90,6 +90,7 @@ RecognizedWord _resolved(RecognizedWord word, bool isUncertain, List<String>? su
     width: word.width,
     height: word.height,
     lineIndex: word.lineIndex,
+    pageIndex: word.pageIndex,
     confidence: word.confidence,
     isUncertain: isUncertain,
     joinsWithNext: word.joinsWithNext,

@@ -12,5 +12,7 @@ abstract class QuoteRepository {
 
   Future<AppResult<()>> setNote(String id, String? note);
 
+  Future<AppResult<()>> setPageNumbers(String id, List<int> pageNumbers);
+
   Future<AppResult<()>> deleteQuote(String id);
 }

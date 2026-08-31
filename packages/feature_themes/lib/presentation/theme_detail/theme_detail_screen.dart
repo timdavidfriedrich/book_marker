@@ -133,7 +133,7 @@ class const _Content({
                         accent: item.book.id.accent,
                         quote: "“${item.quote.quote}”",
                         thumbnailUrl: item.book.thumbnailUrl,
-                        page: item.quote.pageNumber,
+                        pages: item.quote.pageNumbers,
                         note: item.quote.note,
                         sourceLabel: item.book.title,
                         isFavorite: item.quote.isFavorite,

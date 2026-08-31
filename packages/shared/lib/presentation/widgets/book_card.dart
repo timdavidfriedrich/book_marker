@@ -2,9 +2,12 @@ import 'package:core/theme/spacing.dart';
 import 'package:core/theme/theme_extensions.dart';
 import 'package:flutter/material.dart';
 import 'package:shared/presentation/extensions/context_extensions.dart';
+import 'package:shared/presentation/extensions/page_number_extensions.dart';
 import 'package:shared/presentation/widgets/book_cover.dart';
 import 'package:shared/presentation/widgets/count_badge.dart';
 import 'package:shared/presentation/widgets/ink_tap_box.dart';
+
+const _featuredQuoteMaxLines = 3;
 
 class const BookCard({
   required final AccentColor _accent,
@@ -13,7 +16,7 @@ class const BookCard({
   required final int _count,
   final String? _thumbnailUrl,
   final String? _featuredQuote,
-  final int? _featuredPage,
+  final List<int> _featuredPages = const [],
   final VoidCallback? _onTap,
   super.key,
 }) extends StatelessWidget {
@@ -75,15 +78,17 @@ class const BookCard({
                       TextSpan(
                         children: [
                           TextSpan(text: quote, style: context.typography.readingQuote),
-                          if (_featuredPage case final int page)
+                          if (_featuredPages.isNotEmpty)
                             TextSpan(
-                              text: "  ${context.s.pageShortLabel(page)}",
+                              text: "  ${context.s.pageShortLabel(_featuredPages.toPageLabel())}",
                               style: context.typography.monoLabel.copyWith(
                                 color: context.c.onSurfaceVariant,
                               ),
                             ),
                         ],
                       ),
+                      maxLines: _featuredQuoteMaxLines,
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ),
                 ],

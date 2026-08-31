@@ -9,7 +9,6 @@ class const CropLoading() extends CropState;
 
 class const CropReady({
   required final String imagePath,
-  required final String bookId,
   required final double aspectRatio,
   required final PageQuad quad,
 }) extends CropState;

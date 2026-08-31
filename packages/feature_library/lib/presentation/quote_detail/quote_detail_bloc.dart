@@ -24,6 +24,7 @@ class QuoteDetailBloc extends Bloc<QuoteDetailEvent, QuoteDetailState> {
     on<QuoteDetailStarted>(_onStarted);
     on<QuoteDetailFavoriteToggled>(_onFavoriteToggled);
     on<QuoteDetailNoteChanged>(_onNoteChanged);
+    on<QuoteDetailPageNumbersChanged>(_onPageNumbersChanged);
     on<QuoteDetailThemesUpdated>(_onThemesUpdated);
     on<QuoteDetailThemeMembershipUpdated>(_onThemeMembershipUpdated);
     on<QuoteDetailThemeToggled>(_onThemeToggled);
@@ -87,6 +88,18 @@ class QuoteDetailBloc extends Bloc<QuoteDetailEvent, QuoteDetailState> {
     final nextNote = (trimmed == null || trimmed.isEmpty) ? null : trimmed;
     if (await _quoteRepository.setNote(quote.id, nextNote) case Success()) {
       _quote = quote.copyWith(note: nextNote);
+      _emitState(emit);
+    }
+  }
+
+  Future<void> _onPageNumbersChanged(
+    QuoteDetailPageNumbersChanged event,
+    Emitter<QuoteDetailState> emit,
+  ) async {
+    final quote = _quote;
+    if (quote == null) return;
+    if (await _quoteRepository.setPageNumbers(quote.id, event.pageNumbers) case Success()) {
+      _quote = quote.copyWith(pageNumbers: event.pageNumbers);
       _emitState(emit);
     }
   }

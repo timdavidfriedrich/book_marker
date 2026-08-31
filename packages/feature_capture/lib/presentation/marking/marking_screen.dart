@@ -5,7 +5,7 @@ import 'package:core/theme/spacing.dart';
 import 'package:core/theme/theme_extensions.dart';
 import 'package:feature_capture/domain/mark_text.dart';
 import 'package:feature_capture/domain/recognized_page.dart';
-import 'package:feature_capture/presentation/extensions/recognized_page_extensions.dart';
+import 'package:feature_capture/presentation/extensions/recognized_word_extensions.dart';
 import 'package:feature_capture/presentation/marking/marking_bloc.dart';
 import 'package:feature_capture/presentation/marking/marking_event.dart';
 import 'package:feature_capture/presentation/marking/marking_state.dart';
@@ -13,7 +13,6 @@ import 'package:feature_capture/presentation/widgets/book_chooser_bar.dart';
 import 'package:feature_capture/presentation/widgets/uncertain_word_chip.dart';
 import 'package:feature_capture/presentation/widgets/word_correction_sheet.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:path_provider/path_provider.dart';
@@ -28,6 +27,8 @@ import 'package:shared/presentation/widgets/book_cover.dart';
 import 'package:shared/presentation/widgets/circle_icon_button.dart';
 import 'package:shared/presentation/widgets/ink_tap_box.dart';
 import 'package:shared/presentation/widgets/name_input_dialog.dart';
+import 'package:shared/presentation/widgets/page_dots.dart';
+import 'package:shared/presentation/widgets/page_number_field.dart';
 import 'package:shared/presentation/widgets/page_pill.dart';
 import 'package:shared/presentation/widgets/paper_card.dart';
 import 'package:shared/presentation/widgets/selectable_chip.dart';
@@ -42,7 +43,6 @@ const _legendSampleHeight = 16.0;
 const _highlightFillOpacity = 0.22;
 const _sheetCollapsedSize = 0.55;
 const _sheetExpandedSize = 0.95;
-const _pageFieldWidth = 56.0;
 const _pickerCoverWidth = 36.0;
 const _pickerCoverHeight = 48.0;
 
@@ -121,7 +121,7 @@ class const _Editor({
               _ModeToggle(index: mode.value, onChanged: (value) => mode.value = value),
             ],
           ),
-          if (_state.page.wordGroups().any((group) => group.number != null)) ...[
+          if (_state.words.wordGroups().any((group) => group.number != null)) ...[
             const SizedBox(height: Spacing.s),
             const _UncertainLegend(),
           ],
@@ -175,8 +175,8 @@ class const _Header({
               onPressed: context.closeScreen,
             ),
             const Spacer(),
-            if (_state.pageNumber case final int page)
-              PagePill(page: page, accent: AccentColor.coral),
+            if (_state.pageNumbers.isNotEmpty)
+              PagePill(pages: _state.pageNumbers, accent: AccentColor.coral),
           ],
         ),
       ],
@@ -256,13 +256,13 @@ class const _ReadingText({
 }) extends HookWidget {
   @override
   Widget build(BuildContext context) {
-    final words = _state.page.words;
+    final words = _state.words;
     if (words.isEmpty) {
       return Center(child: Text(context.s.markingNoTextMessage, textAlign: TextAlign.center));
     }
     final bloc = context.read<MarkingBloc>();
     final layout = useMemoized(() {
-      final groups = _state.page.wordGroups();
+      final groups = words.wordGroups();
       final spans = <InlineSpan>[];
       final ranges = [
         for (var index = 0; index < words.length; index++) <int>[0, 0],
@@ -297,7 +297,7 @@ class const _ReadingText({
         }
       }
       return (spans: spans, ranges: ranges);
-    }, [_state.page]);
+    }, [words]);
 
     final textSpan = useMemoized(
       () => TextSpan(children: layout.spans, style: context.typography.readingBody),
@@ -331,10 +331,38 @@ class const _ReadingText({
 
 class const _PhotoSelectable({
   required final MarkingReady _state,
+}) extends HookWidget {
+  @override
+  Widget build(BuildContext context) {
+    final controller = usePageController();
+    final visiblePage = useState(0);
+    return Column(
+      children: [
+        Expanded(
+          child: PageView.builder(
+            controller: controller,
+            itemCount: _state.pages.length,
+            onPageChanged: (index) => visiblePage.value = index,
+            itemBuilder: (context, index) => _PhotoPage(state: _state, pageIndex: index),
+          ),
+        ),
+        if (_state.pages.length > 1) ...[
+          const SizedBox(height: Spacing.s),
+          PageDots(count: _state.pages.length, index: visiblePage.value),
+        ],
+      ],
+    );
+  }
+}
+
+class const _PhotoPage({
+  required final MarkingReady _state,
+  required final int _pageIndex,
 }) extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final page = _state.page;
+    final page = _state.pages[_pageIndex];
+    final words = _state.words;
     return Center(
       child: AspectRatio(
         aspectRatio: page.aspectRatio,
@@ -343,21 +371,23 @@ class const _PhotoSelectable({
             final size = constraints.biggest;
             return Stack(
               children: [
-                Positioned.fill(child: Image.file(File(_state.imagePath), fit: BoxFit.fill)),
-                for (final group in page.wordGroups())
+                Positioned.fill(child: Image.file(File(page.imagePath), fit: BoxFit.fill)),
+                for (final group in words.wordGroups())
                   if (group.number case final int number)
                     for (var member = 0; member < group.indexes.length; member++)
-                      _UncertainHighlight(
-                        word: page.words[group.indexes[member]],
-                        number: member == 0 ? number : null,
-                        size: size,
-                        onTap: () => showWordCorrectionSheet(
-                          context,
-                          wordIndex: group.indexes.first,
+                      if (words[group.indexes[member]].pageIndex == _pageIndex)
+                        _UncertainHighlight(
+                          word: words[group.indexes[member]],
+                          number: member == 0 ? number : null,
+                          size: size,
+                          onTap: () => showWordCorrectionSheet(
+                            context,
+                            wordIndex: group.indexes.first,
+                          ),
                         ),
-                      ),
                 for (final index in _state.selectedWordIndexes)
-                  if (index < page.words.length) _WordBox(word: page.words[index], size: size),
+                  if (index < words.length && words[index].pageIndex == _pageIndex)
+                    _WordBox(word: words[index], size: size),
               ],
             );
           },
@@ -423,7 +453,7 @@ class const _UncertainHighlight({
 
 int _uncertainSelectionCount(MarkingReady state) {
   return state.selectedWordIndexes
-      .where((index) => index < state.page.words.length && state.page.words[index].isUncertain)
+      .where((index) => index < state.words.length && state.words[index].isUncertain)
       .length;
 }
 
@@ -446,18 +476,13 @@ class const _SaveSheet() extends HookWidget {
   @override
   Widget build(BuildContext context) {
     final initialState = context.read<MarkingBloc>().state;
-    final initialPage = switch (initialState) {
-      MarkingReady(:final pageNumber) => pageNumber?.toString() ?? "",
-      _ => "",
-    };
     final initialQuote = switch (initialState) {
-      MarkingReady(:final selectedWordIndexes, :final page) => joinMarkedWords(
-        page.words,
+      MarkingReady(:final selectedWordIndexes, :final words) => joinMarkedWords(
+        words,
         selectedWordIndexes,
       ),
       _ => "",
     };
-    final pageController = useTextEditingController(text: initialPage);
     final noteController = useTextEditingController();
     final quoteController = useTextEditingController(text: initialQuote);
     final bottomInset = MediaQuery.viewInsetsOf(context).bottom;
@@ -561,9 +586,12 @@ class const _SaveSheet() extends HookWidget {
                   const SizedBox(height: Spacing.s),
                   Row(
                     children: [
-                      _PageField(
-                        controller: pageController,
-                        wasDetected: state.page.detectedPageNumber != null,
+                      PageNumberField(
+                        pages: state.pageNumbers,
+                        wasDetected: state.detectedPageNumbers.isNotEmpty,
+                        onChanged: (pages) => context.read<MarkingBloc>().add(
+                          MarkingPageNumbersChanged(pages),
+                        ),
                       ),
                       const SizedBox(width: Spacing.s),
                       Expanded(
@@ -722,66 +750,6 @@ class const _BookPickerRow({
             color: _selected ? context.palette.teal.solid : context.c.outline,
             size: Spacing.iconM,
           ),
-        ],
-      ),
-    );
-  }
-}
-
-class const _PageField({
-  required final TextEditingController _controller,
-  required final bool _wasDetected,
-}) extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: Spacing.m, vertical: Spacing.s),
-      decoration: BoxDecoration(
-        color: context.c.surfaceContainerHigh,
-        borderRadius: BorderRadius.circular(Spacing.radiusM),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(
-            context.s.markingPageFieldLabel,
-            style: context.typography.monoLabel.copyWith(color: context.c.onSurfaceVariant),
-          ),
-          const SizedBox(width: Spacing.s),
-          SizedBox(
-            width: _pageFieldWidth,
-            child: TextField(
-              controller: _controller,
-              keyboardType: TextInputType.number,
-              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-              style: context.typography.monoLabelStrong.copyWith(
-                fontSize: 18,
-                color: context.c.onSurface,
-              ),
-              decoration: const InputDecoration(
-                isDense: true,
-                filled: false,
-                contentPadding: EdgeInsets.zero,
-                border: InputBorder.none,
-                enabledBorder: InputBorder.none,
-                focusedBorder: InputBorder.none,
-              ),
-              onChanged: (value) =>
-                  context.read<MarkingBloc>().add(MarkingPageNumberChanged(int.tryParse(value))),
-            ),
-          ),
-          if (_wasDetected)
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: Spacing.xs, vertical: Spacing.xxxs),
-              decoration: BoxDecoration(
-                color: context.palette.teal.solid,
-                borderRadius: BorderRadius.circular(Spacing.radiusFull),
-              ),
-              child: Text(
-                context.s.markingPageAutoLabel,
-                style: context.typography.monoBadge.copyWith(color: context.palette.teal.onSolid),
-              ),
-            ),
         ],
       ),
     );

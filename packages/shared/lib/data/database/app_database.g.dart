@@ -214,7 +214,8 @@ class $BooksTable extends Books with TableInfo<$BooksTable, LocalBook> {
     return $BooksTable(attachedDatabase, alias);
   }
 
-  static TypeConverter<List<String>, String> $converterauthors = const StringListConverter();
+  static TypeConverter<List<String>, String> $converterauthors =
+      const StringListConverter();
 }
 
 class LocalBook extends DataClass implements Insertable<LocalBook> {
@@ -329,10 +330,14 @@ class LocalBook extends DataClass implements Insertable<LocalBook> {
       title: data.title.present ? data.title.value : this.title,
       authors: data.authors.present ? data.authors.value : this.authors,
       isbn: data.isbn.present ? data.isbn.value : this.isbn,
-      thumbnailUrl: data.thumbnailUrl.present ? data.thumbnailUrl.value : this.thumbnailUrl,
+      thumbnailUrl: data.thumbnailUrl.present
+          ? data.thumbnailUrl.value
+          : this.thumbnailUrl,
       status: data.status.present ? data.status.value : this.status,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
-      lastUsedAt: data.lastUsedAt.present ? data.lastUsedAt.value : this.lastUsedAt,
+      lastUsedAt: data.lastUsedAt.present
+          ? data.lastUsedAt.value
+          : this.lastUsedAt,
     );
   }
 
@@ -538,17 +543,15 @@ class $QuotesTable extends Quotes with TableInfo<$QuotesTable, LocalQuote> {
       'REFERENCES books (id) ON DELETE CASCADE',
     ),
   );
-  static const VerificationMeta _pageNumberMeta = const VerificationMeta(
-    'pageNumber',
-  );
   @override
-  late final GeneratedColumn<int> pageNumber = GeneratedColumn<int>(
-    'page_number',
-    aliasedName,
-    true,
-    type: DriftSqlType.int,
-    requiredDuringInsert: false,
-  );
+  late final GeneratedColumnWithTypeConverter<List<int>, String> pageNumbers =
+      GeneratedColumn<String>(
+        'page_numbers',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: true,
+      ).withConverter<List<int>>($QuotesTable.$converterpageNumbers);
   static const VerificationMeta _quoteMeta = const VerificationMeta('quote');
   @override
   late final GeneratedColumn<String> quote = GeneratedColumn<String>(
@@ -578,9 +581,8 @@ class $QuotesTable extends Quotes with TableInfo<$QuotesTable, LocalQuote> {
     type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
-  static const VerificationMeta _voiceNoteDurationMsMeta = const VerificationMeta(
-    'voiceNoteDurationMs',
-  );
+  static const VerificationMeta _voiceNoteDurationMsMeta =
+      const VerificationMeta('voiceNoteDurationMs');
   @override
   late final GeneratedColumn<int> voiceNoteDurationMs = GeneratedColumn<int>(
     'voice_note_duration_ms',
@@ -589,37 +591,15 @@ class $QuotesTable extends Quotes with TableInfo<$QuotesTable, LocalQuote> {
     type: DriftSqlType.int,
     requiredDuringInsert: false,
   );
-  static const VerificationMeta _photoPathMeta = const VerificationMeta(
-    'photoPath',
-  );
   @override
-  late final GeneratedColumn<String> photoPath = GeneratedColumn<String>(
-    'photo_path',
-    aliasedName,
-    false,
-    type: DriftSqlType.string,
-    requiredDuringInsert: true,
-  );
-  static const VerificationMeta _imageAspectRatioMeta = const VerificationMeta(
-    'imageAspectRatio',
-  );
-  @override
-  late final GeneratedColumn<double> imageAspectRatio = GeneratedColumn<double>(
-    'image_aspect_ratio',
-    aliasedName,
-    false,
-    type: DriftSqlType.double,
-    requiredDuringInsert: true,
-  );
-  @override
-  late final GeneratedColumnWithTypeConverter<List<HighlightRegion>, String> highlights =
+  late final GeneratedColumnWithTypeConverter<List<QuotePage>, String> pages =
       GeneratedColumn<String>(
-        'highlights',
+        'pages',
         aliasedName,
         false,
         type: DriftSqlType.string,
         requiredDuringInsert: true,
-      ).withConverter<List<HighlightRegion>>($QuotesTable.$converterhighlights);
+      ).withConverter<List<QuotePage>>($QuotesTable.$converterpages);
   static const VerificationMeta _isFavoriteMeta = const VerificationMeta(
     'isFavorite',
   );
@@ -650,14 +630,12 @@ class $QuotesTable extends Quotes with TableInfo<$QuotesTable, LocalQuote> {
   List<GeneratedColumn> get $columns => [
     id,
     bookId,
-    pageNumber,
+    pageNumbers,
     quote,
     note,
     voiceNotePath,
     voiceNoteDurationMs,
-    photoPath,
-    imageAspectRatio,
-    highlights,
+    pages,
     isFavorite,
     createdAt,
   ];
@@ -685,12 +663,6 @@ class $QuotesTable extends Quotes with TableInfo<$QuotesTable, LocalQuote> {
       );
     } else if (isInserting) {
       context.missing(_bookIdMeta);
-    }
-    if (data.containsKey('page_number')) {
-      context.handle(
-        _pageNumberMeta,
-        pageNumber.isAcceptableOrUnknown(data['page_number']!, _pageNumberMeta),
-      );
     }
     if (data.containsKey('quote')) {
       context.handle(
@@ -724,25 +696,6 @@ class $QuotesTable extends Quotes with TableInfo<$QuotesTable, LocalQuote> {
         ),
       );
     }
-    if (data.containsKey('photo_path')) {
-      context.handle(
-        _photoPathMeta,
-        photoPath.isAcceptableOrUnknown(data['photo_path']!, _photoPathMeta),
-      );
-    } else if (isInserting) {
-      context.missing(_photoPathMeta);
-    }
-    if (data.containsKey('image_aspect_ratio')) {
-      context.handle(
-        _imageAspectRatioMeta,
-        imageAspectRatio.isAcceptableOrUnknown(
-          data['image_aspect_ratio']!,
-          _imageAspectRatioMeta,
-        ),
-      );
-    } else if (isInserting) {
-      context.missing(_imageAspectRatioMeta);
-    }
     if (data.containsKey('is_favorite')) {
       context.handle(
         _isFavoriteMeta,
@@ -774,9 +727,11 @@ class $QuotesTable extends Quotes with TableInfo<$QuotesTable, LocalQuote> {
         DriftSqlType.string,
         data['${effectivePrefix}book_id'],
       )!,
-      pageNumber: attachedDatabase.typeMapping.read(
-        DriftSqlType.int,
-        data['${effectivePrefix}page_number'],
+      pageNumbers: $QuotesTable.$converterpageNumbers.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.string,
+          data['${effectivePrefix}page_numbers'],
+        )!,
       ),
       quote: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
@@ -794,18 +749,10 @@ class $QuotesTable extends Quotes with TableInfo<$QuotesTable, LocalQuote> {
         DriftSqlType.int,
         data['${effectivePrefix}voice_note_duration_ms'],
       ),
-      photoPath: attachedDatabase.typeMapping.read(
-        DriftSqlType.string,
-        data['${effectivePrefix}photo_path'],
-      )!,
-      imageAspectRatio: attachedDatabase.typeMapping.read(
-        DriftSqlType.double,
-        data['${effectivePrefix}image_aspect_ratio'],
-      )!,
-      highlights: $QuotesTable.$converterhighlights.fromSql(
+      pages: $QuotesTable.$converterpages.fromSql(
         attachedDatabase.typeMapping.read(
           DriftSqlType.string,
-          data['${effectivePrefix}highlights'],
+          data['${effectivePrefix}pages'],
         )!,
       ),
       isFavorite: attachedDatabase.typeMapping.read(
@@ -824,34 +771,32 @@ class $QuotesTable extends Quotes with TableInfo<$QuotesTable, LocalQuote> {
     return $QuotesTable(attachedDatabase, alias);
   }
 
-  static TypeConverter<List<HighlightRegion>, String> $converterhighlights =
-      const HighlightListConverter();
+  static TypeConverter<List<int>, String> $converterpageNumbers =
+      const IntListConverter();
+  static TypeConverter<List<QuotePage>, String> $converterpages =
+      const QuotePageListConverter();
 }
 
 class LocalQuote extends DataClass implements Insertable<LocalQuote> {
   final String id;
   final String bookId;
-  final int? pageNumber;
+  final List<int> pageNumbers;
   final String quote;
   final String? note;
   final String? voiceNotePath;
   final int? voiceNoteDurationMs;
-  final String photoPath;
-  final double imageAspectRatio;
-  final List<HighlightRegion> highlights;
+  final List<QuotePage> pages;
   final bool isFavorite;
   final DateTime createdAt;
   const LocalQuote({
     required this.id,
     required this.bookId,
-    this.pageNumber,
+    required this.pageNumbers,
     required this.quote,
     this.note,
     this.voiceNotePath,
     this.voiceNoteDurationMs,
-    required this.photoPath,
-    required this.imageAspectRatio,
-    required this.highlights,
+    required this.pages,
     required this.isFavorite,
     required this.createdAt,
   });
@@ -860,8 +805,10 @@ class LocalQuote extends DataClass implements Insertable<LocalQuote> {
     final map = <String, Expression>{};
     map['id'] = Variable<String>(id);
     map['book_id'] = Variable<String>(bookId);
-    if (!nullToAbsent || pageNumber != null) {
-      map['page_number'] = Variable<int>(pageNumber);
+    {
+      map['page_numbers'] = Variable<String>(
+        $QuotesTable.$converterpageNumbers.toSql(pageNumbers),
+      );
     }
     map['quote'] = Variable<String>(quote);
     if (!nullToAbsent || note != null) {
@@ -873,11 +820,9 @@ class LocalQuote extends DataClass implements Insertable<LocalQuote> {
     if (!nullToAbsent || voiceNoteDurationMs != null) {
       map['voice_note_duration_ms'] = Variable<int>(voiceNoteDurationMs);
     }
-    map['photo_path'] = Variable<String>(photoPath);
-    map['image_aspect_ratio'] = Variable<double>(imageAspectRatio);
     {
-      map['highlights'] = Variable<String>(
-        $QuotesTable.$converterhighlights.toSql(highlights),
+      map['pages'] = Variable<String>(
+        $QuotesTable.$converterpages.toSql(pages),
       );
     }
     map['is_favorite'] = Variable<bool>(isFavorite);
@@ -889,7 +834,7 @@ class LocalQuote extends DataClass implements Insertable<LocalQuote> {
     return QuotesCompanion(
       id: Value(id),
       bookId: Value(bookId),
-      pageNumber: pageNumber == null && nullToAbsent ? const Value.absent() : Value(pageNumber),
+      pageNumbers: Value(pageNumbers),
       quote: Value(quote),
       note: note == null && nullToAbsent ? const Value.absent() : Value(note),
       voiceNotePath: voiceNotePath == null && nullToAbsent
@@ -898,9 +843,7 @@ class LocalQuote extends DataClass implements Insertable<LocalQuote> {
       voiceNoteDurationMs: voiceNoteDurationMs == null && nullToAbsent
           ? const Value.absent()
           : Value(voiceNoteDurationMs),
-      photoPath: Value(photoPath),
-      imageAspectRatio: Value(imageAspectRatio),
-      highlights: Value(highlights),
+      pages: Value(pages),
       isFavorite: Value(isFavorite),
       createdAt: Value(createdAt),
     );
@@ -914,18 +857,14 @@ class LocalQuote extends DataClass implements Insertable<LocalQuote> {
     return LocalQuote(
       id: serializer.fromJson<String>(json['id']),
       bookId: serializer.fromJson<String>(json['bookId']),
-      pageNumber: serializer.fromJson<int?>(json['pageNumber']),
+      pageNumbers: serializer.fromJson<List<int>>(json['pageNumbers']),
       quote: serializer.fromJson<String>(json['quote']),
       note: serializer.fromJson<String?>(json['note']),
       voiceNotePath: serializer.fromJson<String?>(json['voiceNotePath']),
       voiceNoteDurationMs: serializer.fromJson<int?>(
         json['voiceNoteDurationMs'],
       ),
-      photoPath: serializer.fromJson<String>(json['photoPath']),
-      imageAspectRatio: serializer.fromJson<double>(json['imageAspectRatio']),
-      highlights: serializer.fromJson<List<HighlightRegion>>(
-        json['highlights'],
-      ),
+      pages: serializer.fromJson<List<QuotePage>>(json['pages']),
       isFavorite: serializer.fromJson<bool>(json['isFavorite']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
     );
@@ -936,14 +875,12 @@ class LocalQuote extends DataClass implements Insertable<LocalQuote> {
     return <String, dynamic>{
       'id': serializer.toJson<String>(id),
       'bookId': serializer.toJson<String>(bookId),
-      'pageNumber': serializer.toJson<int?>(pageNumber),
+      'pageNumbers': serializer.toJson<List<int>>(pageNumbers),
       'quote': serializer.toJson<String>(quote),
       'note': serializer.toJson<String?>(note),
       'voiceNotePath': serializer.toJson<String?>(voiceNotePath),
       'voiceNoteDurationMs': serializer.toJson<int?>(voiceNoteDurationMs),
-      'photoPath': serializer.toJson<String>(photoPath),
-      'imageAspectRatio': serializer.toJson<double>(imageAspectRatio),
-      'highlights': serializer.toJson<List<HighlightRegion>>(highlights),
+      'pages': serializer.toJson<List<QuotePage>>(pages),
       'isFavorite': serializer.toJson<bool>(isFavorite),
       'createdAt': serializer.toJson<DateTime>(createdAt),
     };
@@ -952,29 +889,27 @@ class LocalQuote extends DataClass implements Insertable<LocalQuote> {
   LocalQuote copyWith({
     String? id,
     String? bookId,
-    Value<int?> pageNumber = const Value.absent(),
+    List<int>? pageNumbers,
     String? quote,
     Value<String?> note = const Value.absent(),
     Value<String?> voiceNotePath = const Value.absent(),
     Value<int?> voiceNoteDurationMs = const Value.absent(),
-    String? photoPath,
-    double? imageAspectRatio,
-    List<HighlightRegion>? highlights,
+    List<QuotePage>? pages,
     bool? isFavorite,
     DateTime? createdAt,
   }) => LocalQuote(
     id: id ?? this.id,
     bookId: bookId ?? this.bookId,
-    pageNumber: pageNumber.present ? pageNumber.value : this.pageNumber,
+    pageNumbers: pageNumbers ?? this.pageNumbers,
     quote: quote ?? this.quote,
     note: note.present ? note.value : this.note,
-    voiceNotePath: voiceNotePath.present ? voiceNotePath.value : this.voiceNotePath,
+    voiceNotePath: voiceNotePath.present
+        ? voiceNotePath.value
+        : this.voiceNotePath,
     voiceNoteDurationMs: voiceNoteDurationMs.present
         ? voiceNoteDurationMs.value
         : this.voiceNoteDurationMs,
-    photoPath: photoPath ?? this.photoPath,
-    imageAspectRatio: imageAspectRatio ?? this.imageAspectRatio,
-    highlights: highlights ?? this.highlights,
+    pages: pages ?? this.pages,
     isFavorite: isFavorite ?? this.isFavorite,
     createdAt: createdAt ?? this.createdAt,
   );
@@ -982,19 +917,21 @@ class LocalQuote extends DataClass implements Insertable<LocalQuote> {
     return LocalQuote(
       id: data.id.present ? data.id.value : this.id,
       bookId: data.bookId.present ? data.bookId.value : this.bookId,
-      pageNumber: data.pageNumber.present ? data.pageNumber.value : this.pageNumber,
+      pageNumbers: data.pageNumbers.present
+          ? data.pageNumbers.value
+          : this.pageNumbers,
       quote: data.quote.present ? data.quote.value : this.quote,
       note: data.note.present ? data.note.value : this.note,
-      voiceNotePath: data.voiceNotePath.present ? data.voiceNotePath.value : this.voiceNotePath,
+      voiceNotePath: data.voiceNotePath.present
+          ? data.voiceNotePath.value
+          : this.voiceNotePath,
       voiceNoteDurationMs: data.voiceNoteDurationMs.present
           ? data.voiceNoteDurationMs.value
           : this.voiceNoteDurationMs,
-      photoPath: data.photoPath.present ? data.photoPath.value : this.photoPath,
-      imageAspectRatio: data.imageAspectRatio.present
-          ? data.imageAspectRatio.value
-          : this.imageAspectRatio,
-      highlights: data.highlights.present ? data.highlights.value : this.highlights,
-      isFavorite: data.isFavorite.present ? data.isFavorite.value : this.isFavorite,
+      pages: data.pages.present ? data.pages.value : this.pages,
+      isFavorite: data.isFavorite.present
+          ? data.isFavorite.value
+          : this.isFavorite,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
     );
   }
@@ -1004,14 +941,12 @@ class LocalQuote extends DataClass implements Insertable<LocalQuote> {
     return (StringBuffer('LocalQuote(')
           ..write('id: $id, ')
           ..write('bookId: $bookId, ')
-          ..write('pageNumber: $pageNumber, ')
+          ..write('pageNumbers: $pageNumbers, ')
           ..write('quote: $quote, ')
           ..write('note: $note, ')
           ..write('voiceNotePath: $voiceNotePath, ')
           ..write('voiceNoteDurationMs: $voiceNoteDurationMs, ')
-          ..write('photoPath: $photoPath, ')
-          ..write('imageAspectRatio: $imageAspectRatio, ')
-          ..write('highlights: $highlights, ')
+          ..write('pages: $pages, ')
           ..write('isFavorite: $isFavorite, ')
           ..write('createdAt: $createdAt')
           ..write(')'))
@@ -1022,14 +957,12 @@ class LocalQuote extends DataClass implements Insertable<LocalQuote> {
   int get hashCode => Object.hash(
     id,
     bookId,
-    pageNumber,
+    pageNumbers,
     quote,
     note,
     voiceNotePath,
     voiceNoteDurationMs,
-    photoPath,
-    imageAspectRatio,
-    highlights,
+    pages,
     isFavorite,
     createdAt,
   );
@@ -1039,14 +972,12 @@ class LocalQuote extends DataClass implements Insertable<LocalQuote> {
       (other is LocalQuote &&
           other.id == this.id &&
           other.bookId == this.bookId &&
-          other.pageNumber == this.pageNumber &&
+          other.pageNumbers == this.pageNumbers &&
           other.quote == this.quote &&
           other.note == this.note &&
           other.voiceNotePath == this.voiceNotePath &&
           other.voiceNoteDurationMs == this.voiceNoteDurationMs &&
-          other.photoPath == this.photoPath &&
-          other.imageAspectRatio == this.imageAspectRatio &&
-          other.highlights == this.highlights &&
+          other.pages == this.pages &&
           other.isFavorite == this.isFavorite &&
           other.createdAt == this.createdAt);
 }
@@ -1054,28 +985,24 @@ class LocalQuote extends DataClass implements Insertable<LocalQuote> {
 class QuotesCompanion extends UpdateCompanion<LocalQuote> {
   final Value<String> id;
   final Value<String> bookId;
-  final Value<int?> pageNumber;
+  final Value<List<int>> pageNumbers;
   final Value<String> quote;
   final Value<String?> note;
   final Value<String?> voiceNotePath;
   final Value<int?> voiceNoteDurationMs;
-  final Value<String> photoPath;
-  final Value<double> imageAspectRatio;
-  final Value<List<HighlightRegion>> highlights;
+  final Value<List<QuotePage>> pages;
   final Value<bool> isFavorite;
   final Value<DateTime> createdAt;
   final Value<int> rowid;
   const QuotesCompanion({
     this.id = const Value.absent(),
     this.bookId = const Value.absent(),
-    this.pageNumber = const Value.absent(),
+    this.pageNumbers = const Value.absent(),
     this.quote = const Value.absent(),
     this.note = const Value.absent(),
     this.voiceNotePath = const Value.absent(),
     this.voiceNoteDurationMs = const Value.absent(),
-    this.photoPath = const Value.absent(),
-    this.imageAspectRatio = const Value.absent(),
-    this.highlights = const Value.absent(),
+    this.pages = const Value.absent(),
     this.isFavorite = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.rowid = const Value.absent(),
@@ -1083,35 +1010,30 @@ class QuotesCompanion extends UpdateCompanion<LocalQuote> {
   QuotesCompanion.insert({
     required String id,
     required String bookId,
-    this.pageNumber = const Value.absent(),
+    required List<int> pageNumbers,
     required String quote,
     this.note = const Value.absent(),
     this.voiceNotePath = const Value.absent(),
     this.voiceNoteDurationMs = const Value.absent(),
-    required String photoPath,
-    required double imageAspectRatio,
-    required List<HighlightRegion> highlights,
+    required List<QuotePage> pages,
     this.isFavorite = const Value.absent(),
     required DateTime createdAt,
     this.rowid = const Value.absent(),
   }) : id = Value(id),
        bookId = Value(bookId),
+       pageNumbers = Value(pageNumbers),
        quote = Value(quote),
-       photoPath = Value(photoPath),
-       imageAspectRatio = Value(imageAspectRatio),
-       highlights = Value(highlights),
+       pages = Value(pages),
        createdAt = Value(createdAt);
   static Insertable<LocalQuote> custom({
     Expression<String>? id,
     Expression<String>? bookId,
-    Expression<int>? pageNumber,
+    Expression<String>? pageNumbers,
     Expression<String>? quote,
     Expression<String>? note,
     Expression<String>? voiceNotePath,
     Expression<int>? voiceNoteDurationMs,
-    Expression<String>? photoPath,
-    Expression<double>? imageAspectRatio,
-    Expression<String>? highlights,
+    Expression<String>? pages,
     Expression<bool>? isFavorite,
     Expression<DateTime>? createdAt,
     Expression<int>? rowid,
@@ -1119,14 +1041,13 @@ class QuotesCompanion extends UpdateCompanion<LocalQuote> {
     return RawValuesInsertable({
       if (id != null) 'id': id,
       if (bookId != null) 'book_id': bookId,
-      if (pageNumber != null) 'page_number': pageNumber,
+      if (pageNumbers != null) 'page_numbers': pageNumbers,
       if (quote != null) 'quote': quote,
       if (note != null) 'note': note,
       if (voiceNotePath != null) 'voice_note_path': voiceNotePath,
-      if (voiceNoteDurationMs != null) 'voice_note_duration_ms': voiceNoteDurationMs,
-      if (photoPath != null) 'photo_path': photoPath,
-      if (imageAspectRatio != null) 'image_aspect_ratio': imageAspectRatio,
-      if (highlights != null) 'highlights': highlights,
+      if (voiceNoteDurationMs != null)
+        'voice_note_duration_ms': voiceNoteDurationMs,
+      if (pages != null) 'pages': pages,
       if (isFavorite != null) 'is_favorite': isFavorite,
       if (createdAt != null) 'created_at': createdAt,
       if (rowid != null) 'rowid': rowid,
@@ -1136,14 +1057,12 @@ class QuotesCompanion extends UpdateCompanion<LocalQuote> {
   QuotesCompanion copyWith({
     Value<String>? id,
     Value<String>? bookId,
-    Value<int?>? pageNumber,
+    Value<List<int>>? pageNumbers,
     Value<String>? quote,
     Value<String?>? note,
     Value<String?>? voiceNotePath,
     Value<int?>? voiceNoteDurationMs,
-    Value<String>? photoPath,
-    Value<double>? imageAspectRatio,
-    Value<List<HighlightRegion>>? highlights,
+    Value<List<QuotePage>>? pages,
     Value<bool>? isFavorite,
     Value<DateTime>? createdAt,
     Value<int>? rowid,
@@ -1151,14 +1070,12 @@ class QuotesCompanion extends UpdateCompanion<LocalQuote> {
     return QuotesCompanion(
       id: id ?? this.id,
       bookId: bookId ?? this.bookId,
-      pageNumber: pageNumber ?? this.pageNumber,
+      pageNumbers: pageNumbers ?? this.pageNumbers,
       quote: quote ?? this.quote,
       note: note ?? this.note,
       voiceNotePath: voiceNotePath ?? this.voiceNotePath,
       voiceNoteDurationMs: voiceNoteDurationMs ?? this.voiceNoteDurationMs,
-      photoPath: photoPath ?? this.photoPath,
-      imageAspectRatio: imageAspectRatio ?? this.imageAspectRatio,
-      highlights: highlights ?? this.highlights,
+      pages: pages ?? this.pages,
       isFavorite: isFavorite ?? this.isFavorite,
       createdAt: createdAt ?? this.createdAt,
       rowid: rowid ?? this.rowid,
@@ -1174,8 +1091,10 @@ class QuotesCompanion extends UpdateCompanion<LocalQuote> {
     if (bookId.present) {
       map['book_id'] = Variable<String>(bookId.value);
     }
-    if (pageNumber.present) {
-      map['page_number'] = Variable<int>(pageNumber.value);
+    if (pageNumbers.present) {
+      map['page_numbers'] = Variable<String>(
+        $QuotesTable.$converterpageNumbers.toSql(pageNumbers.value),
+      );
     }
     if (quote.present) {
       map['quote'] = Variable<String>(quote.value);
@@ -1189,15 +1108,9 @@ class QuotesCompanion extends UpdateCompanion<LocalQuote> {
     if (voiceNoteDurationMs.present) {
       map['voice_note_duration_ms'] = Variable<int>(voiceNoteDurationMs.value);
     }
-    if (photoPath.present) {
-      map['photo_path'] = Variable<String>(photoPath.value);
-    }
-    if (imageAspectRatio.present) {
-      map['image_aspect_ratio'] = Variable<double>(imageAspectRatio.value);
-    }
-    if (highlights.present) {
-      map['highlights'] = Variable<String>(
-        $QuotesTable.$converterhighlights.toSql(highlights.value),
+    if (pages.present) {
+      map['pages'] = Variable<String>(
+        $QuotesTable.$converterpages.toSql(pages.value),
       );
     }
     if (isFavorite.present) {
@@ -1217,14 +1130,12 @@ class QuotesCompanion extends UpdateCompanion<LocalQuote> {
     return (StringBuffer('QuotesCompanion(')
           ..write('id: $id, ')
           ..write('bookId: $bookId, ')
-          ..write('pageNumber: $pageNumber, ')
+          ..write('pageNumbers: $pageNumbers, ')
           ..write('quote: $quote, ')
           ..write('note: $note, ')
           ..write('voiceNotePath: $voiceNotePath, ')
           ..write('voiceNoteDurationMs: $voiceNoteDurationMs, ')
-          ..write('photoPath: $photoPath, ')
-          ..write('imageAspectRatio: $imageAspectRatio, ')
-          ..write('highlights: $highlights, ')
+          ..write('pages: $pages, ')
           ..write('isFavorite: $isFavorite, ')
           ..write('createdAt: $createdAt, ')
           ..write('rowid: $rowid')
@@ -1378,7 +1289,9 @@ class LocalTheme extends DataClass implements Insertable<LocalTheme> {
     return ThemesCompanion(
       id: Value(id),
       name: Value(name),
-      accent: accent == null && nullToAbsent ? const Value.absent() : Value(accent),
+      accent: accent == null && nullToAbsent
+          ? const Value.absent()
+          : Value(accent),
       createdAt: Value(createdAt),
     );
   }
@@ -1537,7 +1450,8 @@ class ThemesCompanion extends UpdateCompanion<LocalTheme> {
   }
 }
 
-class $ThemeQuotesTable extends ThemeQuotes with TableInfo<$ThemeQuotesTable, LocalThemeQuote> {
+class $ThemeQuotesTable extends ThemeQuotes
+    with TableInfo<$ThemeQuotesTable, LocalThemeQuote> {
   @override
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
@@ -1664,10 +1578,11 @@ class LocalThemeQuote extends DataClass implements Insertable<LocalThemeQuote> {
     };
   }
 
-  LocalThemeQuote copyWith({String? themeId, String? quoteId}) => LocalThemeQuote(
-    themeId: themeId ?? this.themeId,
-    quoteId: quoteId ?? this.quoteId,
-  );
+  LocalThemeQuote copyWith({String? themeId, String? quoteId}) =>
+      LocalThemeQuote(
+        themeId: themeId ?? this.themeId,
+        quoteId: quoteId ?? this.quoteId,
+      );
   LocalThemeQuote copyWithCompanion(ThemeQuotesCompanion data) {
     return LocalThemeQuote(
       themeId: data.themeId.present ? data.themeId.value : this.themeId,
@@ -1689,7 +1604,9 @@ class LocalThemeQuote extends DataClass implements Insertable<LocalThemeQuote> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      (other is LocalThemeQuote && other.themeId == this.themeId && other.quoteId == this.quoteId);
+      (other is LocalThemeQuote &&
+          other.themeId == this.themeId &&
+          other.quoteId == this.quoteId);
 }
 
 class ThemeQuotesCompanion extends UpdateCompanion<LocalThemeQuote> {
@@ -1902,7 +1819,9 @@ class LocalShelf extends DataClass implements Insertable<LocalShelf> {
     return ShelvesCompanion(
       id: Value(id),
       name: Value(name),
-      accent: accent == null && nullToAbsent ? const Value.absent() : Value(accent),
+      accent: accent == null && nullToAbsent
+          ? const Value.absent()
+          : Value(accent),
       createdAt: Value(createdAt),
     );
   }
@@ -2061,7 +1980,8 @@ class ShelvesCompanion extends UpdateCompanion<LocalShelf> {
   }
 }
 
-class $ShelfBooksTable extends ShelfBooks with TableInfo<$ShelfBooksTable, LocalShelfBook> {
+class $ShelfBooksTable extends ShelfBooks
+    with TableInfo<$ShelfBooksTable, LocalShelfBook> {
   @override
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
@@ -2208,7 +2128,9 @@ class LocalShelfBook extends DataClass implements Insertable<LocalShelfBook> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      (other is LocalShelfBook && other.shelfId == this.shelfId && other.bookId == this.bookId);
+      (other is LocalShelfBook &&
+          other.shelfId == this.shelfId &&
+          other.bookId == this.bookId);
 }
 
 class ShelfBooksCompanion extends UpdateCompanion<LocalShelfBook> {
@@ -2276,7 +2198,8 @@ class ShelfBooksCompanion extends UpdateCompanion<LocalShelfBook> {
   }
 }
 
-class $SettingsTableTable extends SettingsTable with TableInfo<$SettingsTableTable, LocalSettings> {
+class $SettingsTableTable extends SettingsTable
+    with TableInfo<$SettingsTableTable, LocalSettings> {
   @override
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
@@ -2403,7 +2326,9 @@ class LocalSettings extends DataClass implements Insertable<LocalSettings> {
   SettingsTableCompanion toCompanion(bool nullToAbsent) {
     return SettingsTableCompanion(
       id: Value(id),
-      displayName: displayName == null && nullToAbsent ? const Value.absent() : Value(displayName),
+      displayName: displayName == null && nullToAbsent
+          ? const Value.absent()
+          : Value(displayName),
       localePreference: localePreference == null && nullToAbsent
           ? const Value.absent()
           : Value(localePreference),
@@ -2438,12 +2363,16 @@ class LocalSettings extends DataClass implements Insertable<LocalSettings> {
   }) => LocalSettings(
     id: id ?? this.id,
     displayName: displayName.present ? displayName.value : this.displayName,
-    localePreference: localePreference.present ? localePreference.value : this.localePreference,
+    localePreference: localePreference.present
+        ? localePreference.value
+        : this.localePreference,
   );
   LocalSettings copyWithCompanion(SettingsTableCompanion data) {
     return LocalSettings(
       id: data.id.present ? data.id.value : this.id,
-      displayName: data.displayName.present ? data.displayName.value : this.displayName,
+      displayName: data.displayName.present
+          ? data.displayName.value
+          : this.displayName,
       localePreference: data.localePreference.present
           ? data.localePreference.value
           : this.localePreference,
@@ -2621,7 +2550,8 @@ typedef $$BooksTableUpdateCompanionBuilder = BooksCompanion Function({
   Value<int> rowid,
 });
 
-final class $$BooksTableReferences extends BaseReferences<_$AppDatabase, $BooksTable, LocalBook> {
+final class $$BooksTableReferences
+    extends BaseReferences<_$AppDatabase, $BooksTable, LocalBook> {
   $$BooksTableReferences(super.$_db, super.$_table, super.$_typedResult);
 
   static MultiTypedResultKey<$QuotesTable, List<LocalQuote>> _quotesRefsTable(
@@ -2643,9 +2573,8 @@ final class $$BooksTableReferences extends BaseReferences<_$AppDatabase, $BooksT
     );
   }
 
-  static MultiTypedResultKey<$ShelfBooksTable, List<LocalShelfBook>> _shelfBooksRefsTable(
-    _$AppDatabase db,
-  ) => MultiTypedResultKey.fromTable(
+  static MultiTypedResultKey<$ShelfBooksTable, List<LocalShelfBook>>
+  _shelfBooksRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
     db.shelfBooks,
     aliasName: 'books__id__shelf_books__book_id',
   );
@@ -2681,11 +2610,11 @@ class $$BooksTableFilterComposer extends Composer<_$AppDatabase, $BooksTable> {
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnWithTypeConverterFilters<List<String>, List<String>, String> get authors =>
-      $composableBuilder(
-        column: $table.authors,
-        builder: (column) => ColumnWithTypeConverterFilters(column),
-      );
+  ColumnWithTypeConverterFilters<List<String>, List<String>, String>
+  get authors => $composableBuilder(
+    column: $table.authors,
+    builder: (column) => ColumnWithTypeConverterFilters(column),
+  );
 
   ColumnFilters<String> get isbn => $composableBuilder(
     column: $table.isbn,
@@ -2730,7 +2659,8 @@ class $$BooksTableFilterComposer extends Composer<_$AppDatabase, $BooksTable> {
             $table: $db.quotes,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer: $removeJoinBuilderFromRootComposer,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
           ),
     );
     return f(composer);
@@ -2754,14 +2684,16 @@ class $$BooksTableFilterComposer extends Composer<_$AppDatabase, $BooksTable> {
             $table: $db.shelfBooks,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer: $removeJoinBuilderFromRootComposer,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
           ),
     );
     return f(composer);
   }
 }
 
-class $$BooksTableOrderingComposer extends Composer<_$AppDatabase, $BooksTable> {
+class $$BooksTableOrderingComposer
+    extends Composer<_$AppDatabase, $BooksTable> {
   $$BooksTableOrderingComposer({
     required super.$db,
     required super.$table,
@@ -2810,7 +2742,8 @@ class $$BooksTableOrderingComposer extends Composer<_$AppDatabase, $BooksTable> 
   );
 }
 
-class $$BooksTableAnnotationComposer extends Composer<_$AppDatabase, $BooksTable> {
+class $$BooksTableAnnotationComposer
+    extends Composer<_$AppDatabase, $BooksTable> {
   $$BooksTableAnnotationComposer({
     required super.$db,
     required super.$table,
@@ -2864,7 +2797,8 @@ class $$BooksTableAnnotationComposer extends Composer<_$AppDatabase, $BooksTable
             $table: $db.quotes,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer: $removeJoinBuilderFromRootComposer,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
           ),
     );
     return f(composer);
@@ -2888,7 +2822,8 @@ class $$BooksTableAnnotationComposer extends Composer<_$AppDatabase, $BooksTable
             $table: $db.shelfBooks,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer: $removeJoinBuilderFromRootComposer,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
           ),
     );
     return f(composer);
@@ -2915,9 +2850,12 @@ class $$BooksTableTableManager
         TableManagerState(
           db: db,
           table: table,
-          createFilteringComposer: () => $$BooksTableFilterComposer($db: db, $table: table),
-          createOrderingComposer: () => $$BooksTableOrderingComposer($db: db, $table: table),
-          createComputedFieldComposer: () => $$BooksTableAnnotationComposer($db: db, $table: table),
+          createFilteringComposer: () =>
+              $$BooksTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$BooksTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$BooksTableAnnotationComposer($db: db, $table: table),
           updateCompanionCallback:
               ({
                 Value<String> id = const Value.absent(),
@@ -2964,50 +2902,63 @@ class $$BooksTableTableManager
               ),
           withReferenceMapper: (p0) => p0
               .map(
-                (e) => (e.readTable(table), $$BooksTableReferences(db, table, e)),
+                (e) =>
+                    (e.readTable(table), $$BooksTableReferences(db, table, e)),
               )
               .toList(),
-          prefetchHooksCallback: ({quotesRefs = false, shelfBooksRefs = false}) {
-            return PrefetchHooks(
-              db: db,
-              explicitlyWatchedTables: [
-                if (quotesRefs) db.quotes,
-                if (shelfBooksRefs) db.shelfBooks,
-              ],
-              addJoins: null,
-              getPrefetchedDataCallback: (items) async {
-                return [
-                  if (quotesRefs)
-                    await $_getPrefetchedData<LocalBook, $BooksTable, LocalQuote>(
-                      currentTable: table,
-                      referencedTable: $$BooksTableReferences._quotesRefsTable(db),
-                      managerFromTypedResult: (p0) =>
-                          $$BooksTableReferences(db, table, p0).quotesRefs,
-                      referencedItemsForCurrentItem: (item, referencedItems) =>
-                          referencedItems.where(
-                            (e) => e.bookId == item.id,
-                          ),
-                      typedResults: items,
-                    ),
-                  if (shelfBooksRefs)
-                    await $_getPrefetchedData<LocalBook, $BooksTable, LocalShelfBook>(
-                      currentTable: table,
-                      referencedTable: $$BooksTableReferences._shelfBooksRefsTable(db),
-                      managerFromTypedResult: (p0) => $$BooksTableReferences(
-                        db,
-                        table,
-                        p0,
-                      ).shelfBooksRefs,
-                      referencedItemsForCurrentItem: (item, referencedItems) =>
-                          referencedItems.where(
-                            (e) => e.bookId == item.id,
-                          ),
-                      typedResults: items,
-                    ),
-                ];
+          prefetchHooksCallback:
+              ({quotesRefs = false, shelfBooksRefs = false}) {
+                return PrefetchHooks(
+                  db: db,
+                  explicitlyWatchedTables: [
+                    if (quotesRefs) db.quotes,
+                    if (shelfBooksRefs) db.shelfBooks,
+                  ],
+                  addJoins: null,
+                  getPrefetchedDataCallback: (items) async {
+                    return [
+                      if (quotesRefs)
+                        await $_getPrefetchedData<
+                          LocalBook,
+                          $BooksTable,
+                          LocalQuote
+                        >(
+                          currentTable: table,
+                          referencedTable: $$BooksTableReferences
+                              ._quotesRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$BooksTableReferences(db, table, p0).quotesRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.bookId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                      if (shelfBooksRefs)
+                        await $_getPrefetchedData<
+                          LocalBook,
+                          $BooksTable,
+                          LocalShelfBook
+                        >(
+                          currentTable: table,
+                          referencedTable: $$BooksTableReferences
+                              ._shelfBooksRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$BooksTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).shelfBooksRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.bookId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                    ];
+                  },
+                );
               },
-            );
-          },
         ),
       );
 }
@@ -3029,14 +2980,12 @@ typedef $$BooksTableProcessedTableManager =
 typedef $$QuotesTableCreateCompanionBuilder = QuotesCompanion Function({
   required String id,
   required String bookId,
-  Value<int?> pageNumber,
+  required List<int> pageNumbers,
   required String quote,
   Value<String?> note,
   Value<String?> voiceNotePath,
   Value<int?> voiceNoteDurationMs,
-  required String photoPath,
-  required double imageAspectRatio,
-  required List<HighlightRegion> highlights,
+  required List<QuotePage> pages,
   Value<bool> isFavorite,
   required DateTime createdAt,
   Value<int> rowid,
@@ -3044,14 +2993,12 @@ typedef $$QuotesTableCreateCompanionBuilder = QuotesCompanion Function({
 typedef $$QuotesTableUpdateCompanionBuilder = QuotesCompanion Function({
   Value<String> id,
   Value<String> bookId,
-  Value<int?> pageNumber,
+  Value<List<int>> pageNumbers,
   Value<String> quote,
   Value<String?> note,
   Value<String?> voiceNotePath,
   Value<int?> voiceNoteDurationMs,
-  Value<String> photoPath,
-  Value<double> imageAspectRatio,
-  Value<List<HighlightRegion>> highlights,
+  Value<List<QuotePage>> pages,
   Value<bool> isFavorite,
   Value<DateTime> createdAt,
   Value<int> rowid,
@@ -3078,9 +3025,8 @@ final class $$QuotesTableReferences
     );
   }
 
-  static MultiTypedResultKey<$ThemeQuotesTable, List<LocalThemeQuote>> _themeQuotesRefsTable(
-    _$AppDatabase db,
-  ) => MultiTypedResultKey.fromTable(
+  static MultiTypedResultKey<$ThemeQuotesTable, List<LocalThemeQuote>>
+  _themeQuotesRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
     db.themeQuotes,
     aliasName: 'quotes__id__theme_quotes__quote_id',
   );
@@ -3098,7 +3044,8 @@ final class $$QuotesTableReferences
   }
 }
 
-class $$QuotesTableFilterComposer extends Composer<_$AppDatabase, $QuotesTable> {
+class $$QuotesTableFilterComposer
+    extends Composer<_$AppDatabase, $QuotesTable> {
   $$QuotesTableFilterComposer({
     required super.$db,
     required super.$table,
@@ -3111,9 +3058,10 @@ class $$QuotesTableFilterComposer extends Composer<_$AppDatabase, $QuotesTable> 
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<int> get pageNumber => $composableBuilder(
-    column: $table.pageNumber,
-    builder: (column) => ColumnFilters(column),
+  ColumnWithTypeConverterFilters<List<int>, List<int>, String>
+  get pageNumbers => $composableBuilder(
+    column: $table.pageNumbers,
+    builder: (column) => ColumnWithTypeConverterFilters(column),
   );
 
   ColumnFilters<String> get quote => $composableBuilder(
@@ -3136,19 +3084,9 @@ class $$QuotesTableFilterComposer extends Composer<_$AppDatabase, $QuotesTable> 
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<String> get photoPath => $composableBuilder(
-    column: $table.photoPath,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<double> get imageAspectRatio => $composableBuilder(
-    column: $table.imageAspectRatio,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnWithTypeConverterFilters<List<HighlightRegion>, List<HighlightRegion>, String>
-  get highlights => $composableBuilder(
-    column: $table.highlights,
+  ColumnWithTypeConverterFilters<List<QuotePage>, List<QuotePage>, String>
+  get pages => $composableBuilder(
+    column: $table.pages,
     builder: (column) => ColumnWithTypeConverterFilters(column),
   );
 
@@ -3178,7 +3116,8 @@ class $$QuotesTableFilterComposer extends Composer<_$AppDatabase, $QuotesTable> 
             $table: $db.books,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer: $removeJoinBuilderFromRootComposer,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
           ),
     );
     return composer;
@@ -3202,14 +3141,16 @@ class $$QuotesTableFilterComposer extends Composer<_$AppDatabase, $QuotesTable> 
             $table: $db.themeQuotes,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer: $removeJoinBuilderFromRootComposer,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
           ),
     );
     return f(composer);
   }
 }
 
-class $$QuotesTableOrderingComposer extends Composer<_$AppDatabase, $QuotesTable> {
+class $$QuotesTableOrderingComposer
+    extends Composer<_$AppDatabase, $QuotesTable> {
   $$QuotesTableOrderingComposer({
     required super.$db,
     required super.$table,
@@ -3222,8 +3163,8 @@ class $$QuotesTableOrderingComposer extends Composer<_$AppDatabase, $QuotesTable
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<int> get pageNumber => $composableBuilder(
-    column: $table.pageNumber,
+  ColumnOrderings<String> get pageNumbers => $composableBuilder(
+    column: $table.pageNumbers,
     builder: (column) => ColumnOrderings(column),
   );
 
@@ -3247,18 +3188,8 @@ class $$QuotesTableOrderingComposer extends Composer<_$AppDatabase, $QuotesTable
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<String> get photoPath => $composableBuilder(
-    column: $table.photoPath,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<double> get imageAspectRatio => $composableBuilder(
-    column: $table.imageAspectRatio,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<String> get highlights => $composableBuilder(
-    column: $table.highlights,
+  ColumnOrderings<String> get pages => $composableBuilder(
+    column: $table.pages,
     builder: (column) => ColumnOrderings(column),
   );
 
@@ -3288,14 +3219,16 @@ class $$QuotesTableOrderingComposer extends Composer<_$AppDatabase, $QuotesTable
             $table: $db.books,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer: $removeJoinBuilderFromRootComposer,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
           ),
     );
     return composer;
   }
 }
 
-class $$QuotesTableAnnotationComposer extends Composer<_$AppDatabase, $QuotesTable> {
+class $$QuotesTableAnnotationComposer
+    extends Composer<_$AppDatabase, $QuotesTable> {
   $$QuotesTableAnnotationComposer({
     required super.$db,
     required super.$table,
@@ -3306,10 +3239,11 @@ class $$QuotesTableAnnotationComposer extends Composer<_$AppDatabase, $QuotesTab
   GeneratedColumn<String> get id =>
       $composableBuilder(column: $table.id, builder: (column) => column);
 
-  GeneratedColumn<int> get pageNumber => $composableBuilder(
-    column: $table.pageNumber,
-    builder: (column) => column,
-  );
+  GeneratedColumnWithTypeConverter<List<int>, String> get pageNumbers =>
+      $composableBuilder(
+        column: $table.pageNumbers,
+        builder: (column) => column,
+      );
 
   GeneratedColumn<String> get quote =>
       $composableBuilder(column: $table.quote, builder: (column) => column);
@@ -3327,19 +3261,8 @@ class $$QuotesTableAnnotationComposer extends Composer<_$AppDatabase, $QuotesTab
     builder: (column) => column,
   );
 
-  GeneratedColumn<String> get photoPath =>
-      $composableBuilder(column: $table.photoPath, builder: (column) => column);
-
-  GeneratedColumn<double> get imageAspectRatio => $composableBuilder(
-    column: $table.imageAspectRatio,
-    builder: (column) => column,
-  );
-
-  GeneratedColumnWithTypeConverter<List<HighlightRegion>, String> get highlights =>
-      $composableBuilder(
-        column: $table.highlights,
-        builder: (column) => column,
-      );
+  GeneratedColumnWithTypeConverter<List<QuotePage>, String> get pages =>
+      $composableBuilder(column: $table.pages, builder: (column) => column);
 
   GeneratedColumn<bool> get isFavorite => $composableBuilder(
     column: $table.isFavorite,
@@ -3365,7 +3288,8 @@ class $$QuotesTableAnnotationComposer extends Composer<_$AppDatabase, $QuotesTab
             $table: $db.books,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer: $removeJoinBuilderFromRootComposer,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
           ),
     );
     return composer;
@@ -3389,7 +3313,8 @@ class $$QuotesTableAnnotationComposer extends Composer<_$AppDatabase, $QuotesTab
             $table: $db.themeQuotes,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer: $removeJoinBuilderFromRootComposer,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
           ),
     );
     return f(composer);
@@ -3416,36 +3341,34 @@ class $$QuotesTableTableManager
         TableManagerState(
           db: db,
           table: table,
-          createFilteringComposer: () => $$QuotesTableFilterComposer($db: db, $table: table),
-          createOrderingComposer: () => $$QuotesTableOrderingComposer($db: db, $table: table),
+          createFilteringComposer: () =>
+              $$QuotesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$QuotesTableOrderingComposer($db: db, $table: table),
           createComputedFieldComposer: () =>
               $$QuotesTableAnnotationComposer($db: db, $table: table),
           updateCompanionCallback:
               ({
                 Value<String> id = const Value.absent(),
                 Value<String> bookId = const Value.absent(),
-                Value<int?> pageNumber = const Value.absent(),
+                Value<List<int>> pageNumbers = const Value.absent(),
                 Value<String> quote = const Value.absent(),
                 Value<String?> note = const Value.absent(),
                 Value<String?> voiceNotePath = const Value.absent(),
                 Value<int?> voiceNoteDurationMs = const Value.absent(),
-                Value<String> photoPath = const Value.absent(),
-                Value<double> imageAspectRatio = const Value.absent(),
-                Value<List<HighlightRegion>> highlights = const Value.absent(),
+                Value<List<QuotePage>> pages = const Value.absent(),
                 Value<bool> isFavorite = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => QuotesCompanion(
                 id: id,
                 bookId: bookId,
-                pageNumber: pageNumber,
+                pageNumbers: pageNumbers,
                 quote: quote,
                 note: note,
                 voiceNotePath: voiceNotePath,
                 voiceNoteDurationMs: voiceNoteDurationMs,
-                photoPath: photoPath,
-                imageAspectRatio: imageAspectRatio,
-                highlights: highlights,
+                pages: pages,
                 isFavorite: isFavorite,
                 createdAt: createdAt,
                 rowid: rowid,
@@ -3454,35 +3377,32 @@ class $$QuotesTableTableManager
               ({
                 required String id,
                 required String bookId,
-                Value<int?> pageNumber = const Value.absent(),
+                required List<int> pageNumbers,
                 required String quote,
                 Value<String?> note = const Value.absent(),
                 Value<String?> voiceNotePath = const Value.absent(),
                 Value<int?> voiceNoteDurationMs = const Value.absent(),
-                required String photoPath,
-                required double imageAspectRatio,
-                required List<HighlightRegion> highlights,
+                required List<QuotePage> pages,
                 Value<bool> isFavorite = const Value.absent(),
                 required DateTime createdAt,
                 Value<int> rowid = const Value.absent(),
               }) => QuotesCompanion.insert(
                 id: id,
                 bookId: bookId,
-                pageNumber: pageNumber,
+                pageNumbers: pageNumbers,
                 quote: quote,
                 note: note,
                 voiceNotePath: voiceNotePath,
                 voiceNoteDurationMs: voiceNoteDurationMs,
-                photoPath: photoPath,
-                imageAspectRatio: imageAspectRatio,
-                highlights: highlights,
+                pages: pages,
                 isFavorite: isFavorite,
                 createdAt: createdAt,
                 rowid: rowid,
               ),
           withReferenceMapper: (p0) => p0
               .map(
-                (e) => (e.readTable(table), $$QuotesTableReferences(db, table, e)),
+                (e) =>
+                    (e.readTable(table), $$QuotesTableReferences(db, table, e)),
               )
               .toList(),
           prefetchHooksCallback: ({bookId = false, themeQuotesRefs = false}) {
@@ -3512,7 +3432,9 @@ class $$QuotesTableTableManager
                         referencedTable: $$QuotesTableReferences._bookIdTable(
                           db,
                         ),
-                        referencedColumn: $$QuotesTableReferences._bookIdTable(db).id,
+                        referencedColumn: $$QuotesTableReferences
+                            ._bookIdTable(db)
+                            .id,
                       ) as T;
                     }
 
@@ -3521,9 +3443,14 @@ class $$QuotesTableTableManager
               getPrefetchedDataCallback: (items) async {
                 return [
                   if (themeQuotesRefs)
-                    await $_getPrefetchedData<LocalQuote, $QuotesTable, LocalThemeQuote>(
+                    await $_getPrefetchedData<
+                      LocalQuote,
+                      $QuotesTable,
+                      LocalThemeQuote
+                    >(
                       currentTable: table,
-                      referencedTable: $$QuotesTableReferences._themeQuotesRefsTable(db),
+                      referencedTable: $$QuotesTableReferences
+                          ._themeQuotesRefsTable(db),
                       managerFromTypedResult: (p0) => $$QuotesTableReferences(
                         db,
                         table,
@@ -3574,9 +3501,8 @@ final class $$ThemesTableReferences
     extends BaseReferences<_$AppDatabase, $ThemesTable, LocalTheme> {
   $$ThemesTableReferences(super.$_db, super.$_table, super.$_typedResult);
 
-  static MultiTypedResultKey<$ThemeQuotesTable, List<LocalThemeQuote>> _themeQuotesRefsTable(
-    _$AppDatabase db,
-  ) => MultiTypedResultKey.fromTable(
+  static MultiTypedResultKey<$ThemeQuotesTable, List<LocalThemeQuote>>
+  _themeQuotesRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
     db.themeQuotes,
     aliasName: 'themes__id__theme_quotes__theme_id',
   );
@@ -3594,7 +3520,8 @@ final class $$ThemesTableReferences
   }
 }
 
-class $$ThemesTableFilterComposer extends Composer<_$AppDatabase, $ThemesTable> {
+class $$ThemesTableFilterComposer
+    extends Composer<_$AppDatabase, $ThemesTable> {
   $$ThemesTableFilterComposer({
     required super.$db,
     required super.$table,
@@ -3640,14 +3567,16 @@ class $$ThemesTableFilterComposer extends Composer<_$AppDatabase, $ThemesTable> 
             $table: $db.themeQuotes,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer: $removeJoinBuilderFromRootComposer,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
           ),
     );
     return f(composer);
   }
 }
 
-class $$ThemesTableOrderingComposer extends Composer<_$AppDatabase, $ThemesTable> {
+class $$ThemesTableOrderingComposer
+    extends Composer<_$AppDatabase, $ThemesTable> {
   $$ThemesTableOrderingComposer({
     required super.$db,
     required super.$table,
@@ -3676,7 +3605,8 @@ class $$ThemesTableOrderingComposer extends Composer<_$AppDatabase, $ThemesTable
   );
 }
 
-class $$ThemesTableAnnotationComposer extends Composer<_$AppDatabase, $ThemesTable> {
+class $$ThemesTableAnnotationComposer
+    extends Composer<_$AppDatabase, $ThemesTable> {
   $$ThemesTableAnnotationComposer({
     required super.$db,
     required super.$table,
@@ -3714,7 +3644,8 @@ class $$ThemesTableAnnotationComposer extends Composer<_$AppDatabase, $ThemesTab
             $table: $db.themeQuotes,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer: $removeJoinBuilderFromRootComposer,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
           ),
     );
     return f(composer);
@@ -3741,8 +3672,10 @@ class $$ThemesTableTableManager
         TableManagerState(
           db: db,
           table: table,
-          createFilteringComposer: () => $$ThemesTableFilterComposer($db: db, $table: table),
-          createOrderingComposer: () => $$ThemesTableOrderingComposer($db: db, $table: table),
+          createFilteringComposer: () =>
+              $$ThemesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$ThemesTableOrderingComposer($db: db, $table: table),
           createComputedFieldComposer: () =>
               $$ThemesTableAnnotationComposer($db: db, $table: table),
           updateCompanionCallback:
@@ -3775,7 +3708,8 @@ class $$ThemesTableTableManager
               ),
           withReferenceMapper: (p0) => p0
               .map(
-                (e) => (e.readTable(table), $$ThemesTableReferences(db, table, e)),
+                (e) =>
+                    (e.readTable(table), $$ThemesTableReferences(db, table, e)),
               )
               .toList(),
           prefetchHooksCallback: ({themeQuotesRefs = false}) {
@@ -3786,9 +3720,14 @@ class $$ThemesTableTableManager
               getPrefetchedDataCallback: (items) async {
                 return [
                   if (themeQuotesRefs)
-                    await $_getPrefetchedData<LocalTheme, $ThemesTable, LocalThemeQuote>(
+                    await $_getPrefetchedData<
+                      LocalTheme,
+                      $ThemesTable,
+                      LocalThemeQuote
+                    >(
                       currentTable: table,
-                      referencedTable: $$ThemesTableReferences._themeQuotesRefsTable(db),
+                      referencedTable: $$ThemesTableReferences
+                          ._themeQuotesRefsTable(db),
                       managerFromTypedResult: (p0) => $$ThemesTableReferences(
                         db,
                         table,
@@ -3820,16 +3759,18 @@ typedef $$ThemesTableProcessedTableManager =
       LocalTheme,
       PrefetchHooks Function({bool themeQuotesRefs})
     >;
-typedef $$ThemeQuotesTableCreateCompanionBuilder = ThemeQuotesCompanion Function({
-  required String themeId,
-  required String quoteId,
-  Value<int> rowid,
-});
-typedef $$ThemeQuotesTableUpdateCompanionBuilder = ThemeQuotesCompanion Function({
-  Value<String> themeId,
-  Value<String> quoteId,
-  Value<int> rowid,
-});
+typedef $$ThemeQuotesTableCreateCompanionBuilder =
+    ThemeQuotesCompanion Function({
+      required String themeId,
+      required String quoteId,
+      Value<int> rowid,
+    });
+typedef $$ThemeQuotesTableUpdateCompanionBuilder =
+    ThemeQuotesCompanion Function({
+      Value<String> themeId,
+      Value<String> quoteId,
+      Value<int> rowid,
+    });
 
 final class $$ThemeQuotesTableReferences
     extends BaseReferences<_$AppDatabase, $ThemeQuotesTable, LocalThemeQuote> {
@@ -3870,7 +3811,8 @@ final class $$ThemeQuotesTableReferences
   }
 }
 
-class $$ThemeQuotesTableFilterComposer extends Composer<_$AppDatabase, $ThemeQuotesTable> {
+class $$ThemeQuotesTableFilterComposer
+    extends Composer<_$AppDatabase, $ThemeQuotesTable> {
   $$ThemeQuotesTableFilterComposer({
     required super.$db,
     required super.$table,
@@ -3894,7 +3836,8 @@ class $$ThemeQuotesTableFilterComposer extends Composer<_$AppDatabase, $ThemeQuo
             $table: $db.themes,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer: $removeJoinBuilderFromRootComposer,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
           ),
     );
     return composer;
@@ -3916,14 +3859,16 @@ class $$ThemeQuotesTableFilterComposer extends Composer<_$AppDatabase, $ThemeQuo
             $table: $db.quotes,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer: $removeJoinBuilderFromRootComposer,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
           ),
     );
     return composer;
   }
 }
 
-class $$ThemeQuotesTableOrderingComposer extends Composer<_$AppDatabase, $ThemeQuotesTable> {
+class $$ThemeQuotesTableOrderingComposer
+    extends Composer<_$AppDatabase, $ThemeQuotesTable> {
   $$ThemeQuotesTableOrderingComposer({
     required super.$db,
     required super.$table,
@@ -3947,7 +3892,8 @@ class $$ThemeQuotesTableOrderingComposer extends Composer<_$AppDatabase, $ThemeQ
             $table: $db.themes,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer: $removeJoinBuilderFromRootComposer,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
           ),
     );
     return composer;
@@ -3969,14 +3915,16 @@ class $$ThemeQuotesTableOrderingComposer extends Composer<_$AppDatabase, $ThemeQ
             $table: $db.quotes,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer: $removeJoinBuilderFromRootComposer,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
           ),
     );
     return composer;
   }
 }
 
-class $$ThemeQuotesTableAnnotationComposer extends Composer<_$AppDatabase, $ThemeQuotesTable> {
+class $$ThemeQuotesTableAnnotationComposer
+    extends Composer<_$AppDatabase, $ThemeQuotesTable> {
   $$ThemeQuotesTableAnnotationComposer({
     required super.$db,
     required super.$table,
@@ -4000,7 +3948,8 @@ class $$ThemeQuotesTableAnnotationComposer extends Composer<_$AppDatabase, $Them
             $table: $db.themes,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer: $removeJoinBuilderFromRootComposer,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
           ),
     );
     return composer;
@@ -4022,7 +3971,8 @@ class $$ThemeQuotesTableAnnotationComposer extends Composer<_$AppDatabase, $Them
             $table: $db.quotes,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer: $removeJoinBuilderFromRootComposer,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
           ),
     );
     return composer;
@@ -4049,8 +3999,10 @@ class $$ThemeQuotesTableTableManager
         TableManagerState(
           db: db,
           table: table,
-          createFilteringComposer: () => $$ThemeQuotesTableFilterComposer($db: db, $table: table),
-          createOrderingComposer: () => $$ThemeQuotesTableOrderingComposer($db: db, $table: table),
+          createFilteringComposer: () =>
+              $$ThemeQuotesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$ThemeQuotesTableOrderingComposer($db: db, $table: table),
           createComputedFieldComposer: () =>
               $$ThemeQuotesTableAnnotationComposer($db: db, $table: table),
           updateCompanionCallback:
@@ -4105,16 +4057,22 @@ class $$ThemeQuotesTableTableManager
                       state = state.withJoin(
                         currentTable: table,
                         currentColumn: table.themeId,
-                        referencedTable: $$ThemeQuotesTableReferences._themeIdTable(db),
-                        referencedColumn: $$ThemeQuotesTableReferences._themeIdTable(db).id,
+                        referencedTable: $$ThemeQuotesTableReferences
+                            ._themeIdTable(db),
+                        referencedColumn: $$ThemeQuotesTableReferences
+                            ._themeIdTable(db)
+                            .id,
                       ) as T;
                     }
                     if (quoteId) {
                       state = state.withJoin(
                         currentTable: table,
                         currentColumn: table.quoteId,
-                        referencedTable: $$ThemeQuotesTableReferences._quoteIdTable(db),
-                        referencedColumn: $$ThemeQuotesTableReferences._quoteIdTable(db).id,
+                        referencedTable: $$ThemeQuotesTableReferences
+                            ._quoteIdTable(db),
+                        referencedColumn: $$ThemeQuotesTableReferences
+                            ._quoteIdTable(db)
+                            .id,
                       ) as T;
                     }
 
@@ -4162,9 +4120,8 @@ final class $$ShelvesTableReferences
     extends BaseReferences<_$AppDatabase, $ShelvesTable, LocalShelf> {
   $$ShelvesTableReferences(super.$_db, super.$_table, super.$_typedResult);
 
-  static MultiTypedResultKey<$ShelfBooksTable, List<LocalShelfBook>> _shelfBooksRefsTable(
-    _$AppDatabase db,
-  ) => MultiTypedResultKey.fromTable(
+  static MultiTypedResultKey<$ShelfBooksTable, List<LocalShelfBook>>
+  _shelfBooksRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
     db.shelfBooks,
     aliasName: 'shelves__id__shelf_books__shelf_id',
   );
@@ -4182,7 +4139,8 @@ final class $$ShelvesTableReferences
   }
 }
 
-class $$ShelvesTableFilterComposer extends Composer<_$AppDatabase, $ShelvesTable> {
+class $$ShelvesTableFilterComposer
+    extends Composer<_$AppDatabase, $ShelvesTable> {
   $$ShelvesTableFilterComposer({
     required super.$db,
     required super.$table,
@@ -4228,14 +4186,16 @@ class $$ShelvesTableFilterComposer extends Composer<_$AppDatabase, $ShelvesTable
             $table: $db.shelfBooks,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer: $removeJoinBuilderFromRootComposer,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
           ),
     );
     return f(composer);
   }
 }
 
-class $$ShelvesTableOrderingComposer extends Composer<_$AppDatabase, $ShelvesTable> {
+class $$ShelvesTableOrderingComposer
+    extends Composer<_$AppDatabase, $ShelvesTable> {
   $$ShelvesTableOrderingComposer({
     required super.$db,
     required super.$table,
@@ -4264,7 +4224,8 @@ class $$ShelvesTableOrderingComposer extends Composer<_$AppDatabase, $ShelvesTab
   );
 }
 
-class $$ShelvesTableAnnotationComposer extends Composer<_$AppDatabase, $ShelvesTable> {
+class $$ShelvesTableAnnotationComposer
+    extends Composer<_$AppDatabase, $ShelvesTable> {
   $$ShelvesTableAnnotationComposer({
     required super.$db,
     required super.$table,
@@ -4302,7 +4263,8 @@ class $$ShelvesTableAnnotationComposer extends Composer<_$AppDatabase, $ShelvesT
             $table: $db.shelfBooks,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer: $removeJoinBuilderFromRootComposer,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
           ),
     );
     return f(composer);
@@ -4329,8 +4291,10 @@ class $$ShelvesTableTableManager
         TableManagerState(
           db: db,
           table: table,
-          createFilteringComposer: () => $$ShelvesTableFilterComposer($db: db, $table: table),
-          createOrderingComposer: () => $$ShelvesTableOrderingComposer($db: db, $table: table),
+          createFilteringComposer: () =>
+              $$ShelvesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$ShelvesTableOrderingComposer($db: db, $table: table),
           createComputedFieldComposer: () =>
               $$ShelvesTableAnnotationComposer($db: db, $table: table),
           updateCompanionCallback:
@@ -4377,9 +4341,14 @@ class $$ShelvesTableTableManager
               getPrefetchedDataCallback: (items) async {
                 return [
                   if (shelfBooksRefs)
-                    await $_getPrefetchedData<LocalShelf, $ShelvesTable, LocalShelfBook>(
+                    await $_getPrefetchedData<
+                      LocalShelf,
+                      $ShelvesTable,
+                      LocalShelfBook
+                    >(
                       currentTable: table,
-                      referencedTable: $$ShelvesTableReferences._shelfBooksRefsTable(db),
+                      referencedTable: $$ShelvesTableReferences
+                          ._shelfBooksRefsTable(db),
                       managerFromTypedResult: (p0) => $$ShelvesTableReferences(
                         db,
                         table,
@@ -4461,7 +4430,8 @@ final class $$ShelfBooksTableReferences
   }
 }
 
-class $$ShelfBooksTableFilterComposer extends Composer<_$AppDatabase, $ShelfBooksTable> {
+class $$ShelfBooksTableFilterComposer
+    extends Composer<_$AppDatabase, $ShelfBooksTable> {
   $$ShelfBooksTableFilterComposer({
     required super.$db,
     required super.$table,
@@ -4485,7 +4455,8 @@ class $$ShelfBooksTableFilterComposer extends Composer<_$AppDatabase, $ShelfBook
             $table: $db.shelves,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer: $removeJoinBuilderFromRootComposer,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
           ),
     );
     return composer;
@@ -4507,14 +4478,16 @@ class $$ShelfBooksTableFilterComposer extends Composer<_$AppDatabase, $ShelfBook
             $table: $db.books,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer: $removeJoinBuilderFromRootComposer,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
           ),
     );
     return composer;
   }
 }
 
-class $$ShelfBooksTableOrderingComposer extends Composer<_$AppDatabase, $ShelfBooksTable> {
+class $$ShelfBooksTableOrderingComposer
+    extends Composer<_$AppDatabase, $ShelfBooksTable> {
   $$ShelfBooksTableOrderingComposer({
     required super.$db,
     required super.$table,
@@ -4538,7 +4511,8 @@ class $$ShelfBooksTableOrderingComposer extends Composer<_$AppDatabase, $ShelfBo
             $table: $db.shelves,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer: $removeJoinBuilderFromRootComposer,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
           ),
     );
     return composer;
@@ -4560,14 +4534,16 @@ class $$ShelfBooksTableOrderingComposer extends Composer<_$AppDatabase, $ShelfBo
             $table: $db.books,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer: $removeJoinBuilderFromRootComposer,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
           ),
     );
     return composer;
   }
 }
 
-class $$ShelfBooksTableAnnotationComposer extends Composer<_$AppDatabase, $ShelfBooksTable> {
+class $$ShelfBooksTableAnnotationComposer
+    extends Composer<_$AppDatabase, $ShelfBooksTable> {
   $$ShelfBooksTableAnnotationComposer({
     required super.$db,
     required super.$table,
@@ -4591,7 +4567,8 @@ class $$ShelfBooksTableAnnotationComposer extends Composer<_$AppDatabase, $Shelf
             $table: $db.shelves,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer: $removeJoinBuilderFromRootComposer,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
           ),
     );
     return composer;
@@ -4613,7 +4590,8 @@ class $$ShelfBooksTableAnnotationComposer extends Composer<_$AppDatabase, $Shelf
             $table: $db.books,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer: $removeJoinBuilderFromRootComposer,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
           ),
     );
     return composer;
@@ -4640,8 +4618,10 @@ class $$ShelfBooksTableTableManager
         TableManagerState(
           db: db,
           table: table,
-          createFilteringComposer: () => $$ShelfBooksTableFilterComposer($db: db, $table: table),
-          createOrderingComposer: () => $$ShelfBooksTableOrderingComposer($db: db, $table: table),
+          createFilteringComposer: () =>
+              $$ShelfBooksTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$ShelfBooksTableOrderingComposer($db: db, $table: table),
           createComputedFieldComposer: () =>
               $$ShelfBooksTableAnnotationComposer($db: db, $table: table),
           updateCompanionCallback:
@@ -4696,16 +4676,22 @@ class $$ShelfBooksTableTableManager
                       state = state.withJoin(
                         currentTable: table,
                         currentColumn: table.shelfId,
-                        referencedTable: $$ShelfBooksTableReferences._shelfIdTable(db),
-                        referencedColumn: $$ShelfBooksTableReferences._shelfIdTable(db).id,
+                        referencedTable: $$ShelfBooksTableReferences
+                            ._shelfIdTable(db),
+                        referencedColumn: $$ShelfBooksTableReferences
+                            ._shelfIdTable(db)
+                            .id,
                       ) as T;
                     }
                     if (bookId) {
                       state = state.withJoin(
                         currentTable: table,
                         currentColumn: table.bookId,
-                        referencedTable: $$ShelfBooksTableReferences._bookIdTable(db),
-                        referencedColumn: $$ShelfBooksTableReferences._bookIdTable(db).id,
+                        referencedTable: $$ShelfBooksTableReferences
+                            ._bookIdTable(db),
+                        referencedColumn: $$ShelfBooksTableReferences
+                            ._bookIdTable(db)
+                            .id,
                       ) as T;
                     }
 
@@ -4734,18 +4720,21 @@ typedef $$ShelfBooksTableProcessedTableManager =
       LocalShelfBook,
       PrefetchHooks Function({bool shelfId, bool bookId})
     >;
-typedef $$SettingsTableTableCreateCompanionBuilder = SettingsTableCompanion Function({
-  Value<int> id,
-  Value<String?> displayName,
-  Value<String?> localePreference,
-});
-typedef $$SettingsTableTableUpdateCompanionBuilder = SettingsTableCompanion Function({
-  Value<int> id,
-  Value<String?> displayName,
-  Value<String?> localePreference,
-});
+typedef $$SettingsTableTableCreateCompanionBuilder =
+    SettingsTableCompanion Function({
+      Value<int> id,
+      Value<String?> displayName,
+      Value<String?> localePreference,
+    });
+typedef $$SettingsTableTableUpdateCompanionBuilder =
+    SettingsTableCompanion Function({
+      Value<int> id,
+      Value<String?> displayName,
+      Value<String?> localePreference,
+    });
 
-class $$SettingsTableTableFilterComposer extends Composer<_$AppDatabase, $SettingsTableTable> {
+class $$SettingsTableTableFilterComposer
+    extends Composer<_$AppDatabase, $SettingsTableTable> {
   $$SettingsTableTableFilterComposer({
     required super.$db,
     required super.$table,
@@ -4769,7 +4758,8 @@ class $$SettingsTableTableFilterComposer extends Composer<_$AppDatabase, $Settin
   );
 }
 
-class $$SettingsTableTableOrderingComposer extends Composer<_$AppDatabase, $SettingsTableTable> {
+class $$SettingsTableTableOrderingComposer
+    extends Composer<_$AppDatabase, $SettingsTableTable> {
   $$SettingsTableTableOrderingComposer({
     required super.$db,
     required super.$table,
@@ -4793,7 +4783,8 @@ class $$SettingsTableTableOrderingComposer extends Composer<_$AppDatabase, $Sett
   );
 }
 
-class $$SettingsTableTableAnnotationComposer extends Composer<_$AppDatabase, $SettingsTableTable> {
+class $$SettingsTableTableAnnotationComposer
+    extends Composer<_$AppDatabase, $SettingsTableTable> {
   $$SettingsTableTableAnnotationComposer({
     required super.$db,
     required super.$table,
@@ -4801,7 +4792,8 @@ class $$SettingsTableTableAnnotationComposer extends Composer<_$AppDatabase, $Se
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  GeneratedColumn<int> get id => $composableBuilder(column: $table.id, builder: (column) => column);
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
 
   GeneratedColumn<String> get displayName => $composableBuilder(
     column: $table.displayName,
@@ -4837,7 +4829,8 @@ class $$SettingsTableTableTableManager
         TableManagerState(
           db: db,
           table: table,
-          createFilteringComposer: () => $$SettingsTableTableFilterComposer($db: db, $table: table),
+          createFilteringComposer: () =>
+              $$SettingsTableTableFilterComposer($db: db, $table: table),
           createOrderingComposer: () =>
               $$SettingsTableTableOrderingComposer($db: db, $table: table),
           createComputedFieldComposer: () =>
@@ -4862,8 +4855,9 @@ class $$SettingsTableTableTableManager
                 displayName: displayName,
                 localePreference: localePreference,
               ),
-          withReferenceMapper: (p0) =>
-              p0.map((e) => (e.readTable(table), BaseReferences(db, table, e))).toList(),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
           prefetchHooksCallback: null,
         ),
       );
@@ -4890,12 +4884,16 @@ typedef $$SettingsTableTableProcessedTableManager =
 class $AppDatabaseManager {
   final _$AppDatabase _db;
   $AppDatabaseManager(this._db);
-  $$BooksTableTableManager get books => $$BooksTableTableManager(_db, _db.books);
-  $$QuotesTableTableManager get quotes => $$QuotesTableTableManager(_db, _db.quotes);
-  $$ThemesTableTableManager get themes => $$ThemesTableTableManager(_db, _db.themes);
+  $$BooksTableTableManager get books =>
+      $$BooksTableTableManager(_db, _db.books);
+  $$QuotesTableTableManager get quotes =>
+      $$QuotesTableTableManager(_db, _db.quotes);
+  $$ThemesTableTableManager get themes =>
+      $$ThemesTableTableManager(_db, _db.themes);
   $$ThemeQuotesTableTableManager get themeQuotes =>
       $$ThemeQuotesTableTableManager(_db, _db.themeQuotes);
-  $$ShelvesTableTableManager get shelves => $$ShelvesTableTableManager(_db, _db.shelves);
+  $$ShelvesTableTableManager get shelves =>
+      $$ShelvesTableTableManager(_db, _db.shelves);
   $$ShelfBooksTableTableManager get shelfBooks =>
       $$ShelfBooksTableTableManager(_db, _db.shelfBooks);
   $$SettingsTableTableTableManager get settingsTable =>

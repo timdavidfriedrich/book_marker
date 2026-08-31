@@ -305,8 +305,8 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
-  String quoteSourceLabel(String title, int page) {
-    return '$title, S.$page';
+  String quoteSourceLabel(String title, String pages) {
+    return '$title, S.$pages';
   }
 
   @override
@@ -336,8 +336,8 @@ class AppLocalizationsDe extends AppLocalizations {
   String get profileYouLabel => 'du';
 
   @override
-  String pageShortLabel(int page) {
-    return 'S.$page';
+  String pageShortLabel(String pages) {
+    return 'S.$pages';
   }
 
   @override
@@ -477,10 +477,13 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
-  String get markingPageFieldLabel => 'Seite';
+  String get pageFieldLabel => 'Seite';
 
   @override
-  String get markingPageAutoLabel => 'auto';
+  String get pageFieldHint => '42–43';
+
+  @override
+  String get pageAutoLabel => 'auto';
 
   @override
   String get markingNoteHint => 'Notiz hinzufügen';
@@ -529,8 +532,8 @@ class AppLocalizationsDe extends AppLocalizations {
   String get markingNewThemeChip => '+ neu';
 
   @override
-  String quoteDetailPhotoMeta(int page, String date) {
-    return 'Seite $page, aufgenommen $date';
+  String quoteDetailPhotoMeta(String pages, String date) {
+    return 'S.$pages, aufgenommen $date';
   }
 
   @override
@@ -803,4 +806,39 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get settingsLicensesLabel => 'Open-Source-Lizenzen';
+
+  @override
+  String get captureSpreadHint => 'fotografiere jede Seite, über die das Zitat läuft';
+
+  @override
+  String get captureSpreadShotsHint => 'tippen zum Entfernen · halten zum Sortieren';
+
+  @override
+  String captureSpreadContinueButton(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Weiter mit $count Seiten',
+      one: 'Weiter mit 1 Seite',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get captureSpreadRemoveLabel => 'Seite entfernen';
+
+  @override
+  String get quoteDetailNoPhotoMessage => 'Zu diesem Zitat wurde kein Foto gespeichert.';
+
+  @override
+  String get showMore => 'mehr anzeigen';
+
+  @override
+  String get showLess => 'weniger anzeigen';
+
+  @override
+  String get quoteDetailSourceLabel => 'Quelle';
+
+  @override
+  String get quoteDetailNotesLabel => 'meine Gedanken';
 }

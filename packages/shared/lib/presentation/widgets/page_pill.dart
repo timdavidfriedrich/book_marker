@@ -2,9 +2,10 @@ import 'package:core/theme/spacing.dart';
 import 'package:core/theme/theme_extensions.dart';
 import 'package:flutter/material.dart';
 import 'package:shared/presentation/extensions/context_extensions.dart';
+import 'package:shared/presentation/extensions/page_number_extensions.dart';
 
 class const PagePill({
-  required final int _page,
+  required final List<int> _pages,
   final AccentColor _accent = AccentColor.sand,
   final bool _filled = false,
   super.key,
@@ -21,7 +22,7 @@ class const PagePill({
         borderRadius: BorderRadius.circular(Spacing.radiusS),
       ),
       child: Text(
-        context.s.pageShortLabel(_page),
+        context.s.pageShortLabel(_pages.toPageLabel()),
         style: context.typography.monoBadge.copyWith(color: foreground),
       ),
     );

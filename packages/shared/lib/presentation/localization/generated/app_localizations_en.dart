@@ -304,8 +304,8 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String quoteSourceLabel(String title, int page) {
-    return '$title, p.$page';
+  String quoteSourceLabel(String title, String pages) {
+    return '$title, p.$pages';
   }
 
   @override
@@ -335,8 +335,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get profileYouLabel => 'you';
 
   @override
-  String pageShortLabel(int page) {
-    return 'p.$page';
+  String pageShortLabel(String pages) {
+    return 'p.$pages';
   }
 
   @override
@@ -476,10 +476,13 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get markingPageFieldLabel => 'page';
+  String get pageFieldLabel => 'page';
 
   @override
-  String get markingPageAutoLabel => 'auto';
+  String get pageFieldHint => '42–43';
+
+  @override
+  String get pageAutoLabel => 'auto';
 
   @override
   String get markingNoteHint => 'add a note';
@@ -527,8 +530,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get markingNewThemeChip => '+ new';
 
   @override
-  String quoteDetailPhotoMeta(int page, String date) {
-    return 'page $page, shot $date';
+  String quoteDetailPhotoMeta(String pages, String date) {
+    return 'p.$pages, shot $date';
   }
 
   @override
@@ -800,4 +803,39 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settingsLicensesLabel => 'Open-source licenses';
+
+  @override
+  String get captureSpreadHint => 'photograph every page the quote runs across';
+
+  @override
+  String get captureSpreadShotsHint => 'tap to remove · hold to reorder';
+
+  @override
+  String captureSpreadContinueButton(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Continue with $count pages',
+      one: 'Continue with 1 page',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get captureSpreadRemoveLabel => 'Remove page';
+
+  @override
+  String get quoteDetailNoPhotoMessage => 'No photo was saved with this quote.';
+
+  @override
+  String get showMore => 'show more';
+
+  @override
+  String get showLess => 'show less';
+
+  @override
+  String get quoteDetailSourceLabel => 'source';
+
+  @override
+  String get quoteDetailNotesLabel => 'my thoughts';
 }

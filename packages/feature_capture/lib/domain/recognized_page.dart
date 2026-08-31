@@ -20,6 +20,7 @@ class const RecognizedWord({
   required final double width,
   required final double height,
   required final int lineIndex,
+  required final int pageIndex,
   required final double? confidence,
   required final bool isUncertain,
   required final bool joinsWithNext,

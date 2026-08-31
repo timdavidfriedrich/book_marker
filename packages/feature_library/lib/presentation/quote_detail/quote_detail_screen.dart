@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:audioplayers/audioplayers.dart';
 import 'package:core/theme/spacing.dart';
 import 'package:feature_library/presentation/quote_detail/quote_detail_bloc.dart';
@@ -9,19 +11,30 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:shared/domain/entities/book.dart';
 import 'package:shared/domain/entities/quote.dart';
+import 'package:shared/domain/entities/quote_page.dart';
 import 'package:shared/domain/entities/quote_theme.dart';
 import 'package:shared/presentation/extensions/app_error_extensions.dart';
 import 'package:shared/presentation/extensions/context_extensions.dart';
+import 'package:shared/presentation/extensions/page_number_extensions.dart';
 import 'package:shared/presentation/navigation/navigation_extensions.dart';
 import 'package:shared/presentation/widgets/circle_icon_button.dart';
 import 'package:shared/presentation/widgets/confirm_dialog.dart';
+import 'package:shared/presentation/widgets/expandable_text.dart';
 import 'package:shared/presentation/widgets/highlight_image.dart';
 import 'package:shared/presentation/widgets/ink_tap_box.dart';
 import 'package:shared/presentation/widgets/name_input_dialog.dart';
+import 'package:shared/presentation/widgets/page_dots.dart';
+import 'package:shared/presentation/widgets/page_number_field.dart';
 import 'package:shared/presentation/widgets/paper_card.dart';
 import 'package:shared/presentation/widgets/selectable_chip.dart';
 import 'package:shared/presentation/widgets/sheet_action_tile.dart';
 import 'package:shared/presentation/widgets/sheet_content.dart';
+
+const _quoteMaxLines = 8;
+const _sourceImageHeight = 320.0;
+const _sourceThumbnailWidth = 44.0;
+const _sourceThumbnailHeight = 60.0;
+const _sourceThumbnailCacheWidth = 132;
 
 class const QuoteDetailScreen({
   super.key,
@@ -61,36 +74,180 @@ class const _Content({
   required final Book? _book,
   required final List<QuoteTheme> _themes,
   required final Set<String> _selectedThemeIds,
+}) extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return ListView(
+      padding: const EdgeInsets.fromLTRB(Spacing.l, Spacing.s, Spacing.l, Spacing.l),
+      children: [
+        _Header(quote: _quote, book: _book),
+        const SizedBox(height: Spacing.m),
+        _CitationCard(quote: _quote),
+        const SizedBox(height: Spacing.m),
+        _NoteCard(quote: _quote),
+        const SizedBox(height: Spacing.m),
+        if (_quote.voiceNotePath case final String path) ...[
+          _VoiceNotePlayer(path: path, durationMs: _quote.voiceNoteDurationMs ?? 0),
+          const SizedBox(height: Spacing.m),
+        ],
+        Align(
+          alignment: Alignment.centerLeft,
+          child: PageNumberField(
+            pages: _quote.pageNumbers,
+            onChanged: (pages) => context.read<QuoteDetailBloc>().add(
+              QuoteDetailPageNumbersChanged(pages),
+            ),
+          ),
+        ),
+        const SizedBox(height: Spacing.m),
+        _ThemeChips(themes: _themes, selected: _selectedThemeIds),
+        const SizedBox(height: Spacing.m),
+        _SourceCard(quote: _quote),
+        const SizedBox(height: Spacing.m),
+        _Actions(quote: _quote, book: _book),
+      ],
+    );
+  }
+}
+
+class const _CitationCard({
+  required final Quote _quote,
+}) extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return PaperCard(
+      padding: const EdgeInsets.all(Spacing.l),
+      child: ExpandableText(
+        text: '“${_quote.quote}”',
+        maxLines: _quoteMaxLines,
+        style: context.typography.readingQuoteItalic.copyWith(
+          color: context.palette.paperText,
+        ),
+      ),
+    );
+  }
+}
+
+class const _SourceCard({
+  required final Quote _quote,
 }) extends HookWidget {
   @override
   Widget build(BuildContext context) {
-    final mode = useState(1);
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: Spacing.l),
+    final expanded = useState(false);
+    final pages = _quote.pages;
+    return Container(
+      padding: const EdgeInsets.all(Spacing.m),
+      decoration: BoxDecoration(
+        color: context.c.surfaceContainerHigh,
+        borderRadius: BorderRadius.circular(Spacing.radiusL),
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const SizedBox(height: Spacing.s),
-          _Header(quote: _quote, book: _book),
-          const SizedBox(height: Spacing.m),
-          _ModeToggle(index: mode.value, onChanged: (value) => mode.value = value),
-          const SizedBox(height: Spacing.m),
-          Expanded(
-            child: mode.value == 1 ? _PhotoView(quote: _quote) : _TextView(quote: _quote),
+          InkTapBox(
+            onTap: pages.isEmpty ? null : () => expanded.value = !expanded.value,
+            radius: Spacing.radiusS,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        context.s.quoteDetailSourceLabel,
+                        style: context.typography.monoLabel.copyWith(
+                          color: context.c.onSurfaceVariant,
+                        ),
+                      ),
+                    ),
+                    if (pages.isNotEmpty)
+                      Icon(
+                        expanded.value ? Icons.expand_less : Icons.expand_more,
+                        size: Spacing.iconM,
+                        color: context.c.onSurfaceVariant,
+                      ),
+                  ],
+                ),
+                if (pages.isEmpty) ...[
+                  const SizedBox(height: Spacing.s),
+                  Text(
+                    context.s.quoteDetailNoPhotoMessage,
+                    style: context.t.bodyMedium?.copyWith(color: context.c.onSurfaceVariant),
+                  ),
+                ] else if (!expanded.value) ...[
+                  const SizedBox(height: Spacing.s),
+                  _SourceThumbnails(pages: pages),
+                ],
+              ],
+            ),
           ),
-          const SizedBox(height: Spacing.m),
-          if (_quote.voiceNotePath case final String path) ...[
-            _VoiceNotePlayer(path: path, durationMs: _quote.voiceNoteDurationMs ?? 0),
+          if (pages.isNotEmpty && expanded.value) ...[
             const SizedBox(height: Spacing.m),
+            _SourcePages(pages: pages),
           ],
-          _NoteCard(quote: _quote),
-          const SizedBox(height: Spacing.m),
-          _ThemeChips(themes: _themes, selected: _selectedThemeIds),
-          const SizedBox(height: Spacing.m),
-          _Actions(quote: _quote, book: _book),
-          const SizedBox(height: Spacing.s),
         ],
       ),
+    );
+  }
+}
+
+class const _SourceThumbnails({
+  required final List<QuotePage> _pages,
+}) extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: _sourceThumbnailHeight,
+      child: ListView.separated(
+        scrollDirection: Axis.horizontal,
+        padding: EdgeInsets.zero,
+        itemCount: _pages.length,
+        separatorBuilder: (context, index) => const SizedBox(width: Spacing.xs),
+        itemBuilder: (context, index) => ClipRRect(
+          borderRadius: BorderRadius.circular(Spacing.radiusM),
+          child: Image.file(
+            File(_pages[index].photoPath),
+            width: _sourceThumbnailWidth,
+            height: _sourceThumbnailHeight,
+            cacheWidth: _sourceThumbnailCacheWidth,
+            fit: BoxFit.cover,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class const _SourcePages({
+  required final List<QuotePage> _pages,
+}) extends HookWidget {
+  @override
+  Widget build(BuildContext context) {
+    final controller = usePageController();
+    final visiblePage = useState(0);
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        SizedBox(
+          height: _sourceImageHeight,
+          child: PageView.builder(
+            controller: controller,
+            itemCount: _pages.length,
+            onPageChanged: (index) => visiblePage.value = index,
+            itemBuilder: (context, index) => Center(
+              child: HighlightImage(
+                imagePath: _pages[index].photoPath,
+                aspectRatio: _pages[index].imageAspectRatio,
+                highlights: _pages[index].highlights,
+              ),
+            ),
+          ),
+        ),
+        if (_pages.length > 1) ...[
+          const SizedBox(height: Spacing.s),
+          PageDots(count: _pages.length, index: visiblePage.value),
+        ],
+      ],
     );
   }
 }
@@ -102,10 +259,10 @@ class const _Header({
   @override
   Widget build(BuildContext context) {
     final date = MaterialLocalizations.of(context).formatMediumDate(_quote.createdAt.toLocal());
-    final page = _quote.pageNumber;
-    final meta = page == null
+    final pages = _quote.pageNumbers;
+    final meta = pages.isEmpty
         ? context.s.quoteDetailShotMeta(date)
-        : context.s.quoteDetailPhotoMeta(page, date);
+        : context.s.quoteDetailPhotoMeta(pages.toPageLabel(), date);
     return Row(
       children: [
         CircleIconButton(
@@ -136,87 +293,6 @@ class const _Header({
   }
 }
 
-class const _ModeToggle({
-  required final int _index,
-  required final ValueChanged<int> _onChanged,
-}) extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Align(
-      alignment: Alignment.centerLeft,
-      child: Container(
-        padding: const EdgeInsets.all(Spacing.xxxs),
-        decoration: BoxDecoration(
-          color: context.c.surfaceContainerHigh,
-          borderRadius: BorderRadius.circular(Spacing.radiusFull),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            for (final entry in [context.s.markingModeText, context.s.markingModePhoto].indexed)
-              InkTapBox(
-                onTap: () => _onChanged(entry.$1),
-                radius: Spacing.radiusFull,
-                color: entry.$1 == _index ? context.palette.amber.solid : Colors.transparent,
-                padding: const EdgeInsets.symmetric(horizontal: Spacing.m, vertical: Spacing.xs),
-                child: Text(
-                  entry.$2,
-                  style: context.t.labelMedium?.copyWith(
-                    fontSize: 14,
-                    color: entry.$1 == _index
-                        ? context.palette.amber.onSolid
-                        : context.c.onSurfaceVariant,
-                  ),
-                ),
-              ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class const _PhotoView({
-  required final Quote _quote,
-}) extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return PaperCard(
-      padding: const EdgeInsets.all(Spacing.m),
-      child: Center(
-        child: SingleChildScrollView(
-          child: HighlightImage(
-            imagePath: _quote.photoPath,
-            aspectRatio: _quote.imageAspectRatio,
-            highlights: _quote.highlights,
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class const _TextView({
-  required final Quote _quote,
-}) extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return PaperCard(
-      padding: const EdgeInsets.all(Spacing.l),
-      child: SingleChildScrollView(
-        child: Text.rich(
-          TextSpan(
-            text: _quote.quote,
-            style: context.typography.readingBody.copyWith(
-              background: Paint()..color = context.palette.amber.solid,
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
 class const _NoteCard({
   required final Quote _quote,
 }) extends HookWidget {
@@ -233,16 +309,16 @@ class const _NoteCard({
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            '“${_quote.quote}”',
-            style: context.typography.readingQuoteItalic.copyWith(color: context.c.onSurface),
+            context.s.quoteDetailNotesLabel,
+            style: context.typography.monoLabel.copyWith(color: context.c.onSurfaceVariant),
           ),
           const SizedBox(height: Spacing.xs),
           TextField(
             controller: controller,
             minLines: 1,
-            maxLines: 4,
+            maxLines: 6,
             textCapitalization: TextCapitalization.sentences,
-            style: context.t.bodyMedium?.copyWith(color: context.c.onSurface),
+            style: context.t.bodyLarge?.copyWith(color: context.c.onSurface),
             onChanged: (value) =>
                 context.read<QuoteDetailBloc>().add(QuoteDetailNoteChanged(value)),
             decoration: InputDecoration(
@@ -296,10 +372,10 @@ class const _Actions({
 }
 
 Future<void> _shareQuote(BuildContext context, Quote quote, Book? book) async {
-  final page = quote.pageNumber;
+  final pages = quote.pageNumbers;
   final source = book == null
       ? context.s.libraryUnknownBook
-      : (page == null ? book.title : context.s.quoteSourceLabel(book.title, page));
+      : (pages.isEmpty ? book.title : context.s.quoteSourceLabel(book.title, pages.toPageLabel()));
   await Share.share(context.s.quoteShareBody(quote.quote, source));
 }
 

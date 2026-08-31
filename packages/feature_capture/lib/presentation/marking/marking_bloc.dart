@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:core/error/app_error.dart';
 import 'package:core/error/app_result.dart';
 import 'package:feature_capture/domain/mark_text.dart';
-import 'package:feature_capture/domain/recognize_captured_page_use_case.dart';
+import 'package:feature_capture/domain/recognize_captured_spread_use_case.dart';
 import 'package:feature_capture/domain/recognized_page.dart';
 import 'package:feature_capture/domain/save_quote_use_case.dart';
 import 'package:feature_capture/presentation/marking/marking_event.dart';
@@ -13,6 +13,7 @@ import 'package:injectable/injectable.dart';
 import 'package:shared/domain/entities/book.dart';
 import 'package:shared/domain/entities/highlight_region.dart';
 import 'package:shared/domain/entities/quote.dart';
+import 'package:shared/domain/entities/quote_page.dart';
 import 'package:shared/domain/entities/quote_theme.dart';
 import 'package:shared/domain/repositories/book_repository.dart';
 import 'package:shared/domain/repositories/theme_repository.dart';
@@ -24,7 +25,7 @@ const _uuid = Uuid();
 @injectable
 class MarkingBloc extends Bloc<MarkingEvent, MarkingState> {
   MarkingBloc(
-    this._recognizeCapturedPageUseCase,
+    this._recognizeCapturedSpreadUseCase,
     this._saveQuoteUseCase,
     this._bookRepository,
     this._themeRepository,
@@ -36,7 +37,7 @@ class MarkingBloc extends Bloc<MarkingEvent, MarkingState> {
     on<MarkingWordsSelected>(_onWordsSelected);
     on<MarkingWordCorrected>(_onWordCorrected);
     on<MarkingWordsMerged>(_onWordsMerged);
-    on<MarkingPageNumberChanged>(_onPageNumberChanged);
+    on<MarkingPageNumbersChanged>(_onPageNumbersChanged);
     on<MarkingNoteChanged>(_onNoteChanged);
     on<MarkingQuoteEdited>(_onQuoteEdited);
     on<MarkingVoiceNoteRecorded>(_onVoiceNoteRecorded);
@@ -48,7 +49,7 @@ class MarkingBloc extends Bloc<MarkingEvent, MarkingState> {
     on<MarkingSaveRequested>(_onSaveRequested);
   }
 
-  final RecognizeCapturedPageUseCase _recognizeCapturedPageUseCase;
+  final RecognizeCapturedSpreadUseCase _recognizeCapturedSpreadUseCase;
   final SaveQuoteUseCase _saveQuoteUseCase;
   final BookRepository _bookRepository;
   final ThemeRepository _themeRepository;
@@ -78,13 +79,10 @@ class MarkingBloc extends Bloc<MarkingEvent, MarkingState> {
       bookThumbnailUrl = data.thumbnailUrl;
       bookAuthors = data.authors;
     }
-    emit(switch (await _recognizeCapturedPageUseCase(
-      imagePath: _arguments.imagePath,
-      pageQuad: _arguments.pageQuad,
-    )) {
+    emit(switch (await _recognizeCapturedSpreadUseCase(_arguments.shots)) {
       Success(:final data) => MarkingReady(
-        page: data.page,
-        imagePath: data.imagePath,
+        pages: data.pages,
+        words: data.words,
         bookId: _bookId,
         books: _books,
         bookTitle: bookTitle,
@@ -92,7 +90,8 @@ class MarkingBloc extends Bloc<MarkingEvent, MarkingState> {
         bookAuthors: bookAuthors,
         selectedWordIndexes: const {},
         quoteOverride: null,
-        pageNumber: data.page.detectedPageNumber,
+        detectedPageNumbers: data.detectedPageNumbers,
+        pageNumbers: data.detectedPageNumbers,
         note: null,
         voiceNotePath: null,
         voiceNoteDurationMs: null,
@@ -149,7 +148,7 @@ class MarkingBloc extends Bloc<MarkingEvent, MarkingState> {
       emit(
         _ready(
           current,
-          selectedWordIndexes: _withJoinedNeighbours(event.wordIndexes, current.page.words),
+          selectedWordIndexes: _withJoinedNeighbours(event.wordIndexes, current.words),
           keepQuote: false,
         ),
       );
@@ -171,8 +170,8 @@ class MarkingBloc extends Bloc<MarkingEvent, MarkingState> {
     final text = event.text.trim();
     if (text.isEmpty) return;
     if (state case final MarkingReady current
-        when event.wordIndex >= 0 && event.wordIndex < current.page.words.length) {
-      final source = current.page.words;
+        when event.wordIndex >= 0 && event.wordIndex < current.words.length) {
+      final source = current.words;
       final indexes = <int>[event.wordIndex];
       while (source[indexes.last].joinsWithNext && indexes.last + 1 < source.length) {
         indexes.add(indexes.last + 1);
@@ -185,7 +184,7 @@ class MarkingBloc extends Bloc<MarkingEvent, MarkingState> {
       emit(
         _ready(
           current,
-          page: _pageWith(current, words),
+          words: words,
           selectedWordIndexes: _remapSelection(
             current.selectedWordIndexes,
             event.wordIndex,
@@ -216,6 +215,7 @@ class MarkingBloc extends Bloc<MarkingEvent, MarkingState> {
       width: right - left,
       height: bottom - top,
       lineIndex: first.lineIndex,
+      pageIndex: first.pageIndex,
       confidence: first.confidence,
       isUncertain: false,
       joinsWithNext: false,
@@ -224,16 +224,16 @@ class MarkingBloc extends Bloc<MarkingEvent, MarkingState> {
 
   void _onWordsMerged(MarkingWordsMerged event, Emitter<MarkingState> emit) {
     if (state case final MarkingReady current
-        when event.wordIndex >= 0 && event.wordIndex + 1 < current.page.words.length) {
-      final words = applyJoins(current.page.words, {event.wordIndex});
+        when event.wordIndex >= 0 && event.wordIndex + 1 < current.words.length) {
+      final words = applyJoins(current.words, {event.wordIndex});
       emit(
         _ready(
           current,
-          page: _pageWith(current, words),
+          words: words,
           selectedWordIndexes: _remapSelection(
             current.selectedWordIndexes,
             event.wordIndex,
-            current.page.words.length - words.length,
+            current.words.length - words.length,
           ),
         ),
       );
@@ -253,18 +253,9 @@ class MarkingBloc extends Bloc<MarkingEvent, MarkingState> {
     };
   }
 
-  RecognizedPage _pageWith(MarkingReady current, List<RecognizedWord> words) {
-    return RecognizedPage(
-      lines: current.page.lines,
-      words: words,
-      detectedPageNumber: current.page.detectedPageNumber,
-      aspectRatio: current.page.aspectRatio,
-    );
-  }
-
-  void _onPageNumberChanged(MarkingPageNumberChanged event, Emitter<MarkingState> emit) {
+  void _onPageNumbersChanged(MarkingPageNumbersChanged event, Emitter<MarkingState> emit) {
     if (state case final MarkingReady current) {
-      emit(_ready(current, pageNumber: event.pageNumber, keepPageNumber: false));
+      emit(_ready(current, pageNumbers: event.pageNumbers));
     }
   }
 
@@ -323,12 +314,11 @@ class MarkingBloc extends Bloc<MarkingEvent, MarkingState> {
 
   MarkingReady _ready(
     MarkingReady current, {
-    RecognizedPage? page,
+    List<RecognizedWord>? words,
     Set<int>? selectedWordIndexes,
     String? quoteOverride,
     bool keepQuote = true,
-    int? pageNumber,
-    bool keepPageNumber = true,
+    List<int>? pageNumbers,
     String? note,
     bool keepNote = true,
     String? voiceNotePath,
@@ -340,8 +330,8 @@ class MarkingBloc extends Bloc<MarkingEvent, MarkingState> {
   }) {
     final book = _selectedBook();
     return MarkingReady(
-      page: page ?? current.page,
-      imagePath: current.imagePath,
+      pages: current.pages,
+      words: words ?? current.words,
       bookId: _bookId,
       books: _books,
       bookTitle: book?.title ?? current.bookTitle,
@@ -349,7 +339,8 @@ class MarkingBloc extends Bloc<MarkingEvent, MarkingState> {
       bookAuthors: book?.authors ?? current.bookAuthors,
       selectedWordIndexes: selectedWordIndexes ?? current.selectedWordIndexes,
       quoteOverride: keepQuote ? current.quoteOverride : quoteOverride,
-      pageNumber: keepPageNumber ? current.pageNumber : pageNumber,
+      detectedPageNumbers: current.detectedPageNumbers,
+      pageNumbers: pageNumbers ?? current.pageNumbers,
       note: keepNote ? current.note : note,
       voiceNotePath: keepVoiceNote ? current.voiceNotePath : voiceNotePath,
       voiceNoteDurationMs: keepVoiceNote ? current.voiceNoteDurationMs : voiceNoteDurationMs,
@@ -370,36 +361,50 @@ class MarkingBloc extends Bloc<MarkingEvent, MarkingState> {
 
   Quote _buildQuote(MarkingReady state) {
     final orderedIndexes = state.selectedWordIndexes.toList()..sort();
-    final selectedWords = orderedIndexes.map((index) => state.page.words[index]).toList();
     final trimmedNote = state.note?.trim();
     final override = state.quoteOverride?.trim();
     final quote = (override != null && override.isNotEmpty)
         ? override
-        : joinMarkedWords(state.page.words, orderedIndexes);
+        : joinMarkedWords(state.words, orderedIndexes);
     return Quote(
       id: _uuid.v4(),
       bookId: _bookId,
-      pageNumber: state.pageNumber,
+      pageNumbers: state.pageNumbers,
       quote: quote,
       note: (trimmedNote == null || trimmedNote.isEmpty) ? null : trimmedNote,
       voiceNotePath: state.voiceNotePath,
       voiceNoteDurationMs: state.voiceNoteDurationMs,
-      photoPath: state.imagePath,
-      imageAspectRatio: state.page.aspectRatio,
-      highlights: selectedWords
-          .map(
-            (word) => HighlightRegion(
+      pages: _quotePages(state, orderedIndexes),
+      isFavorite: state.isFavorite,
+      createdAt: DateTime.now().toUtc(),
+    );
+  }
+
+  List<QuotePage> _quotePages(MarkingReady state, List<int> orderedIndexes) {
+    final selected = [for (final index in orderedIndexes) state.words[index]];
+    final pages = <QuotePage>[];
+    for (final (index, page) in state.pages.indexed) {
+      final highlights = [
+        for (final word in selected)
+          if (word.pageIndex == index)
+            HighlightRegion(
               text: word.text,
               left: word.left,
               top: word.top,
               width: word.width,
               height: word.height,
             ),
-          )
-          .toList(),
-      isFavorite: state.isFavorite,
-      createdAt: DateTime.now().toUtc(),
-    );
+      ];
+      if (highlights.isEmpty) continue;
+      pages.add(
+        QuotePage(
+          photoPath: page.imagePath,
+          imageAspectRatio: page.aspectRatio,
+          highlights: highlights,
+        ),
+      );
+    }
+    return pages;
   }
 
   @override

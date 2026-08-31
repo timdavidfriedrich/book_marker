@@ -15,7 +15,7 @@ class QuoteMapper extends ClassMapperBase<Quote> {
   static QuoteMapper ensureInitialized() {
     if (_instance == null) {
       MapperContainer.globals.use(_instance = QuoteMapper._());
-      HighlightRegionMapper.ensureInitialized();
+      QuotePageMapper.ensureInitialized();
     }
     return _instance!;
   }
@@ -27,10 +27,10 @@ class QuoteMapper extends ClassMapperBase<Quote> {
   static const Field<Quote, String> _f$id = Field('id', _$id);
   static String _$bookId(Quote v) => v.bookId;
   static const Field<Quote, String> _f$bookId = Field('bookId', _$bookId);
-  static int? _$pageNumber(Quote v) => v.pageNumber;
-  static const Field<Quote, int> _f$pageNumber = Field(
-    'pageNumber',
-    _$pageNumber,
+  static List<int> _$pageNumbers(Quote v) => v.pageNumbers;
+  static const Field<Quote, List<int>> _f$pageNumbers = Field(
+    'pageNumbers',
+    _$pageNumbers,
   );
   static String _$quote(Quote v) => v.quote;
   static const Field<Quote, String> _f$quote = Field('quote', _$quote);
@@ -46,21 +46,8 @@ class QuoteMapper extends ClassMapperBase<Quote> {
     'voiceNoteDurationMs',
     _$voiceNoteDurationMs,
   );
-  static String _$photoPath(Quote v) => v.photoPath;
-  static const Field<Quote, String> _f$photoPath = Field(
-    'photoPath',
-    _$photoPath,
-  );
-  static double _$imageAspectRatio(Quote v) => v.imageAspectRatio;
-  static const Field<Quote, double> _f$imageAspectRatio = Field(
-    'imageAspectRatio',
-    _$imageAspectRatio,
-  );
-  static List<HighlightRegion> _$highlights(Quote v) => v.highlights;
-  static const Field<Quote, List<HighlightRegion>> _f$highlights = Field(
-    'highlights',
-    _$highlights,
-  );
+  static List<QuotePage> _$pages(Quote v) => v.pages;
+  static const Field<Quote, List<QuotePage>> _f$pages = Field('pages', _$pages);
   static bool _$isFavorite(Quote v) => v.isFavorite;
   static const Field<Quote, bool> _f$isFavorite = Field(
     'isFavorite',
@@ -76,14 +63,12 @@ class QuoteMapper extends ClassMapperBase<Quote> {
   final MappableFields<Quote> fields = const {
     #id: _f$id,
     #bookId: _f$bookId,
-    #pageNumber: _f$pageNumber,
+    #pageNumbers: _f$pageNumbers,
     #quote: _f$quote,
     #note: _f$note,
     #voiceNotePath: _f$voiceNotePath,
     #voiceNoteDurationMs: _f$voiceNoteDurationMs,
-    #photoPath: _f$photoPath,
-    #imageAspectRatio: _f$imageAspectRatio,
-    #highlights: _f$highlights,
+    #pages: _f$pages,
     #isFavorite: _f$isFavorite,
     #createdAt: _f$createdAt,
   };
@@ -92,14 +77,12 @@ class QuoteMapper extends ClassMapperBase<Quote> {
     return Quote(
       id: data.dec(_f$id),
       bookId: data.dec(_f$bookId),
-      pageNumber: data.dec(_f$pageNumber),
+      pageNumbers: data.dec(_f$pageNumbers),
       quote: data.dec(_f$quote),
       note: data.dec(_f$note),
       voiceNotePath: data.dec(_f$voiceNotePath),
       voiceNoteDurationMs: data.dec(_f$voiceNoteDurationMs),
-      photoPath: data.dec(_f$photoPath),
-      imageAspectRatio: data.dec(_f$imageAspectRatio),
-      highlights: data.dec(_f$highlights),
+      pages: data.dec(_f$pages),
       isFavorite: data.dec(_f$isFavorite),
       createdAt: data.dec(_f$createdAt),
     );
@@ -151,23 +134,18 @@ extension QuoteValueCopy<$R, $Out> on ObjectCopyWith<$R, Quote, $Out> {
 
 abstract class QuoteCopyWith<$R, $In extends Quote, $Out>
     implements ClassCopyWith<$R, $In, $Out> {
-  ListCopyWith<
-    $R,
-    HighlightRegion,
-    HighlightRegionCopyWith<$R, HighlightRegion, HighlightRegion>
-  >
-  get highlights;
+  ListCopyWith<$R, int, ObjectCopyWith<$R, int, int>> get pageNumbers;
+  ListCopyWith<$R, QuotePage, QuotePageCopyWith<$R, QuotePage, QuotePage>>
+  get pages;
   $R call({
     String? id,
     String? bookId,
-    int? pageNumber,
+    List<int>? pageNumbers,
     String? quote,
     String? note,
     String? voiceNotePath,
     int? voiceNoteDurationMs,
-    String? photoPath,
-    double? imageAspectRatio,
-    List<HighlightRegion>? highlights,
+    List<QuotePage>? pages,
     bool? isFavorite,
     DateTime? createdAt,
   });
@@ -181,43 +159,42 @@ class _QuoteCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, Quote, $Out>
   @override
   late final ClassMapperBase<Quote> $mapper = QuoteMapper.ensureInitialized();
   @override
-  ListCopyWith<
-    $R,
-    HighlightRegion,
-    HighlightRegionCopyWith<$R, HighlightRegion, HighlightRegion>
-  >
-  get highlights => ListCopyWith(
-    $value.highlights,
+  ListCopyWith<$R, int, ObjectCopyWith<$R, int, int>> get pageNumbers =>
+      ListCopyWith(
+        $value.pageNumbers,
+        (v, t) => ObjectCopyWith(v, $identity, t),
+        (v) => call(pageNumbers: v),
+      );
+  @override
+  ListCopyWith<$R, QuotePage, QuotePageCopyWith<$R, QuotePage, QuotePage>>
+  get pages => ListCopyWith(
+    $value.pages,
     (v, t) => v.copyWith.$chain(t),
-    (v) => call(highlights: v),
+    (v) => call(pages: v),
   );
   @override
   $R call({
     String? id,
     String? bookId,
-    Object? pageNumber = $none,
+    List<int>? pageNumbers,
     String? quote,
     Object? note = $none,
     Object? voiceNotePath = $none,
     Object? voiceNoteDurationMs = $none,
-    String? photoPath,
-    double? imageAspectRatio,
-    List<HighlightRegion>? highlights,
+    List<QuotePage>? pages,
     bool? isFavorite,
     DateTime? createdAt,
   }) => $apply(
     FieldCopyWithData({
       if (id != null) #id: id,
       if (bookId != null) #bookId: bookId,
-      if (pageNumber != $none) #pageNumber: pageNumber,
+      if (pageNumbers != null) #pageNumbers: pageNumbers,
       if (quote != null) #quote: quote,
       if (note != $none) #note: note,
       if (voiceNotePath != $none) #voiceNotePath: voiceNotePath,
       if (voiceNoteDurationMs != $none)
         #voiceNoteDurationMs: voiceNoteDurationMs,
-      if (photoPath != null) #photoPath: photoPath,
-      if (imageAspectRatio != null) #imageAspectRatio: imageAspectRatio,
-      if (highlights != null) #highlights: highlights,
+      if (pages != null) #pages: pages,
       if (isFavorite != null) #isFavorite: isFavorite,
       if (createdAt != null) #createdAt: createdAt,
     }),
@@ -226,7 +203,7 @@ class _QuoteCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, Quote, $Out>
   Quote $make(CopyWithData data) => Quote(
     id: data.get(#id, or: $value.id),
     bookId: data.get(#bookId, or: $value.bookId),
-    pageNumber: data.get(#pageNumber, or: $value.pageNumber),
+    pageNumbers: data.get(#pageNumbers, or: $value.pageNumbers),
     quote: data.get(#quote, or: $value.quote),
     note: data.get(#note, or: $value.note),
     voiceNotePath: data.get(#voiceNotePath, or: $value.voiceNotePath),
@@ -234,9 +211,7 @@ class _QuoteCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, Quote, $Out>
       #voiceNoteDurationMs,
       or: $value.voiceNoteDurationMs,
     ),
-    photoPath: data.get(#photoPath, or: $value.photoPath),
-    imageAspectRatio: data.get(#imageAspectRatio, or: $value.imageAspectRatio),
-    highlights: data.get(#highlights, or: $value.highlights),
+    pages: data.get(#pages, or: $value.pages),
     isFavorite: data.get(#isFavorite, or: $value.isFavorite),
     createdAt: data.get(#createdAt, or: $value.createdAt),
   );

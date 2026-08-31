@@ -5,6 +5,7 @@ import 'package:shared/data/data_sources/image_storage_data_source.dart';
 import 'package:shared/data/data_sources/quote_local_data_source.dart';
 import 'package:shared/data/mappers/quote_mappers.dart';
 import 'package:shared/domain/entities/quote.dart';
+import 'package:shared/domain/entities/quote_page.dart';
 import 'package:shared/domain/repositories/quote_repository.dart';
 
 @Injectable(as: QuoteRepository)
@@ -37,12 +38,15 @@ class const QuoteRepositoryImpl(
   @override
   Future<AppResult<()>> saveQuote(Quote quote) async {
     try {
-      final storedPath = await _imageStorageDataSource.persistImage(
-        quote.photoPath,
-        quote.id,
-      );
-      final storedQuote = quote.copyWith(photoPath: storedPath);
-      await _localDataSource.insertQuote(storedQuote.toLocalQuote());
+      final storedPages = <QuotePage>[];
+      for (final (index, page) in quote.pages.indexed) {
+        final storedPath = await _imageStorageDataSource.persistImage(
+          page.photoPath,
+          "${quote.id}_$index",
+        );
+        storedPages.add(page.copyWith(photoPath: storedPath));
+      }
+      await _localDataSource.insertQuote(quote.copyWith(pages: storedPages).toLocalQuote());
       return const Success(());
     } on Object {
       return const Failure(UnexpectedError());
@@ -70,12 +74,22 @@ class const QuoteRepositoryImpl(
   }
 
   @override
+  Future<AppResult<()>> setPageNumbers(String id, List<int> pageNumbers) async {
+    try {
+      await _localDataSource.setPageNumbers(id, pageNumbers);
+      return const Success(());
+    } on Object {
+      return const Failure(UnexpectedError());
+    }
+  }
+
+  @override
   Future<AppResult<()>> deleteQuote(String id) async {
     try {
       final localQuote = await _localDataSource.readQuote(id);
       await _localDataSource.deleteQuote(id);
-      if (localQuote != null) {
-        await _imageStorageDataSource.deleteImage(localQuote.photoPath);
+      for (final page in localQuote?.pages ?? const <QuotePage>[]) {
+        await _imageStorageDataSource.deleteImage(page.photoPath);
       }
       return const Success(());
     } on Object {

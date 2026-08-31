@@ -6,14 +6,12 @@ extension LocalQuoteMappers on LocalQuote {
     return Quote(
       id: id,
       bookId: bookId,
-      pageNumber: pageNumber,
+      pageNumbers: pageNumbers,
       quote: quote,
       note: note,
       voiceNotePath: voiceNotePath,
       voiceNoteDurationMs: voiceNoteDurationMs,
-      photoPath: photoPath,
-      imageAspectRatio: imageAspectRatio,
-      highlights: highlights,
+      pages: pages,
       isFavorite: isFavorite,
       createdAt: createdAt,
     );
@@ -25,14 +23,12 @@ extension QuoteMappers on Quote {
     return LocalQuote(
       id: id,
       bookId: bookId,
-      pageNumber: pageNumber,
+      pageNumbers: pageNumbers,
       quote: quote,
       note: note,
       voiceNotePath: voiceNotePath,
       voiceNoteDurationMs: voiceNoteDurationMs,
-      photoPath: photoPath,
-      imageAspectRatio: imageAspectRatio,
-      highlights: highlights,
+      pages: pages,
       isFavorite: isFavorite,
       createdAt: createdAt,
     );

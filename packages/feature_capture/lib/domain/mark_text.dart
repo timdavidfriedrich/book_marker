@@ -109,6 +109,14 @@ List<RecognizedWord> markWrappedWords(List<RecognizedWord> words) {
   return marked;
 }
 
+List<RecognizedWord> markWrappedPageBreak(List<RecognizedWord> words, int index) {
+  if (index < 0 || index + 1 >= words.length) return words;
+  final word = words[index];
+  final stem = lineBreakStem(word.text, words[index + 1].text);
+  if (stem == null) return words;
+  return [...words.sublist(0, index), _withStem(word, stem), ...words.sublist(index + 1)];
+}
+
 bool _mergesWithLast(List<RecognizedWord> merged, RecognizedWord word, double limit) {
   if (merged.isEmpty) return false;
   final previous = merged.last;
@@ -166,6 +174,7 @@ RecognizedWord _joined(RecognizedWord first, RecognizedWord second) {
     width: right - left,
     height: bottom - top,
     lineIndex: first.lineIndex,
+    pageIndex: first.pageIndex,
     confidence: confidence,
     isUncertain: first.isUncertain || second.isUncertain,
     joinsWithNext: second.joinsWithNext,
@@ -180,9 +189,11 @@ RecognizedWord _withStem(RecognizedWord word, String stem) {
     width: word.width,
     height: word.height,
     lineIndex: word.lineIndex,
+    pageIndex: word.pageIndex,
     confidence: word.confidence,
     isUncertain: word.isUncertain,
     joinsWithNext: true,
+    suggestions: word.suggestions,
   );
 }
 

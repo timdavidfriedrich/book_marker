@@ -136,12 +136,10 @@ class const SampleDataSeeder(
     return LocalQuote(
       id: id,
       bookId: bookId,
-      pageNumber: page,
+      pageNumbers: [page],
       quote: quote,
       note: note,
-      photoPath: "",
-      imageAspectRatio: 0.72,
-      highlights: const [],
+      pages: const [],
       isFavorite: isFavorite,
       createdAt: createdAt,
     );

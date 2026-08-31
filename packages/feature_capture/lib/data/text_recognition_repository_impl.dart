@@ -107,6 +107,7 @@ class const TextRecognitionRepositoryImpl(
       width: (box.width / imageSize.width).clamp(0.0, 1.0),
       height: (box.height / imageSize.height).clamp(0.0, 1.0),
       lineIndex: lineIndex,
+      pageIndex: 0,
       confidence: element.confidence,
       isUncertain: false,
       joinsWithNext: false,

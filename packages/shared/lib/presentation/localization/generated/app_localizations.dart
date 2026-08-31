@@ -540,8 +540,8 @@ abstract class AppLocalizations {
   /// No description provided for @quoteSourceLabel.
   ///
   /// In en, this message translates to:
-  /// **'{title}, p.{page}'**
-  String quoteSourceLabel(String title, int page);
+  /// **'{title}, p.{pages}'**
+  String quoteSourceLabel(String title, String pages);
 
   /// No description provided for @librarySearchCount.
   ///
@@ -570,8 +570,8 @@ abstract class AppLocalizations {
   /// No description provided for @pageShortLabel.
   ///
   /// In en, this message translates to:
-  /// **'p.{page}'**
-  String pageShortLabel(int page);
+  /// **'p.{pages}'**
+  String pageShortLabel(String pages);
 
   /// No description provided for @quoteVoiceNoteLabel.
   ///
@@ -795,17 +795,23 @@ abstract class AppLocalizations {
   /// **'Save to {book}'**
   String markingSaveSheetTitle(String book);
 
-  /// No description provided for @markingPageFieldLabel.
+  /// No description provided for @pageFieldLabel.
   ///
   /// In en, this message translates to:
   /// **'page'**
-  String get markingPageFieldLabel;
+  String get pageFieldLabel;
 
-  /// No description provided for @markingPageAutoLabel.
+  /// No description provided for @pageFieldHint.
+  ///
+  /// In en, this message translates to:
+  /// **'42–43'**
+  String get pageFieldHint;
+
+  /// No description provided for @pageAutoLabel.
   ///
   /// In en, this message translates to:
   /// **'auto'**
-  String get markingPageAutoLabel;
+  String get pageAutoLabel;
 
   /// No description provided for @markingNoteHint.
   ///
@@ -876,8 +882,8 @@ abstract class AppLocalizations {
   /// No description provided for @quoteDetailPhotoMeta.
   ///
   /// In en, this message translates to:
-  /// **'page {page}, shot {date}'**
-  String quoteDetailPhotoMeta(int page, String date);
+  /// **'p.{pages}, shot {date}'**
+  String quoteDetailPhotoMeta(String pages, String date);
 
   /// No description provided for @quoteDetailShotMeta.
   ///
@@ -1220,6 +1226,60 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Open-source licenses'**
   String get settingsLicensesLabel;
+
+  /// No description provided for @captureSpreadHint.
+  ///
+  /// In en, this message translates to:
+  /// **'photograph every page the quote runs across'**
+  String get captureSpreadHint;
+
+  /// No description provided for @captureSpreadShotsHint.
+  ///
+  /// In en, this message translates to:
+  /// **'tap to remove · hold to reorder'**
+  String get captureSpreadShotsHint;
+
+  /// No description provided for @captureSpreadContinueButton.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{Continue with 1 page} other{Continue with {count} pages}}'**
+  String captureSpreadContinueButton(int count);
+
+  /// No description provided for @captureSpreadRemoveLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove page'**
+  String get captureSpreadRemoveLabel;
+
+  /// No description provided for @quoteDetailNoPhotoMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'No photo was saved with this quote.'**
+  String get quoteDetailNoPhotoMessage;
+
+  /// No description provided for @showMore.
+  ///
+  /// In en, this message translates to:
+  /// **'show more'**
+  String get showMore;
+
+  /// No description provided for @showLess.
+  ///
+  /// In en, this message translates to:
+  /// **'show less'**
+  String get showLess;
+
+  /// No description provided for @quoteDetailSourceLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'source'**
+  String get quoteDetailSourceLabel;
+
+  /// No description provided for @quoteDetailNotesLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'my thoughts'**
+  String get quoteDetailNotesLabel;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

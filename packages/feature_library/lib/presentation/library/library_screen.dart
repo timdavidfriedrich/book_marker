@@ -10,6 +10,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:shared/presentation/extensions/accent_extensions.dart';
 import 'package:shared/presentation/extensions/app_error_extensions.dart';
 import 'package:shared/presentation/extensions/context_extensions.dart';
+import 'package:shared/presentation/extensions/page_number_extensions.dart';
 import 'package:shared/presentation/navigation/navigation_extensions.dart';
 import 'package:shared/presentation/widgets/book_card.dart';
 import 'package:shared/presentation/widgets/book_cover.dart';
@@ -240,7 +241,7 @@ class const _BookList({
                   count: summary.quoteCount,
                   thumbnailUrl: book.thumbnailUrl,
                   featuredQuote: featured == null ? null : "“${featured.quote}”",
-                  featuredPage: featured?.pageNumber,
+                  featuredPages: featured?.pageNumbers ?? const [],
                   onTap: () => context.pushBookDetail(book.id),
                 );
               },
@@ -420,10 +421,10 @@ class const _SearchResults({
               final result = _state.results[index];
               final book = result.book;
               final accent = book.id.accent;
-              final page = result.quote.pageNumber;
-              final source = page == null
+              final pages = result.quote.pageNumbers;
+              final source = pages.isEmpty
                   ? book.title
-                  : context.s.quoteSourceLabel(book.title, page);
+                  : context.s.quoteSourceLabel(book.title, pages.toPageLabel());
               return QuoteCard(
                 accent: accent,
                 quote: "“${result.quote.quote}”",

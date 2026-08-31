@@ -137,7 +137,7 @@ class const _Content({
                   accent: accent,
                   quote: "“${quote.quote}”",
                   thumbnailUrl: book.thumbnailUrl,
-                  page: quote.pageNumber,
+                  pages: quote.pageNumbers,
                   note: quote.note,
                   isFavorite: quote.isFavorite,
                   hasVoiceNote: quote.voiceNotePath != null,

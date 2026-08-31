@@ -1,7 +1,6 @@
-import 'package:shared/domain/entities/page_quad.dart';
+import 'package:shared/domain/entities/captured_shot.dart';
 
 class const MarkingArguments({
-  required final String imagePath,
+  required final List<CapturedShot> shots,
   required final String bookId,
-  required final PageQuad? pageQuad,
 });

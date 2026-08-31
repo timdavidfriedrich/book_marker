@@ -1,0 +1,1 @@
+enum CaptureSpan { onePage, spread }

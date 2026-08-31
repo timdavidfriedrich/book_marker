@@ -13,7 +13,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared/domain/entities/page_quad.dart';
 import 'package:shared/presentation/extensions/app_error_extensions.dart';
 import 'package:shared/presentation/extensions/context_extensions.dart';
-import 'package:shared/presentation/navigation/marking_arguments.dart';
 import 'package:shared/presentation/navigation/navigation_extensions.dart';
 import 'package:shared/presentation/widgets/circle_icon_button.dart';
 
@@ -98,13 +97,7 @@ class const _Editor({
           ),
           const SizedBox(height: Spacing.m),
           FilledButton(
-            onPressed: () => context.pushMarking(
-              MarkingArguments(
-                imagePath: _state.imagePath,
-                bookId: _state.bookId,
-                pageQuad: _state.quad,
-              ),
-            ),
+            onPressed: () => context.closeScreenWithResult(_state.quad),
             child: Text(context.s.cropContinueButton),
           ),
           const SizedBox(height: Spacing.s),
