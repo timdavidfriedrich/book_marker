@@ -83,7 +83,10 @@ class const QuoteCard({
                       const Spacer(),
                     if (_hasVoiceNote) ...[
                       const SizedBox(width: Spacing.s),
-                      _VoiceNoteTag(duration: _voiceNoteDuration ?? Duration.zero, path: _voiceNotePath),
+                      _VoiceNoteTag(
+                        duration: _voiceNoteDuration ?? Duration.zero,
+                        path: _voiceNotePath,
+                      ),
                     ],
                     if (_isFavorite) ...[
                       const SizedBox(width: Spacing.s),

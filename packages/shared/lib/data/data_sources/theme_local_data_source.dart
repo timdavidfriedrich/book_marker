@@ -52,7 +52,8 @@ class const ThemeLocalDataSourceImpl(
       (_database.delete(_database.themes)..where((table) => table.id.equals(id))).go();
 
   @override
-  Stream<List<LocalThemeQuote>> watchThemeQuotes() => _database.select(_database.themeQuotes).watch();
+  Stream<List<LocalThemeQuote>> watchThemeQuotes() =>
+      _database.select(_database.themeQuotes).watch();
 
   @override
   Future<void> addQuote(String themeId, String quoteId) => _database
@@ -60,8 +61,7 @@ class const ThemeLocalDataSourceImpl(
       .insertOnConflictUpdate(LocalThemeQuote(themeId: themeId, quoteId: quoteId));
 
   @override
-  Future<void> removeQuote(String themeId, String quoteId) =>
-      (_database.delete(_database.themeQuotes)
-            ..where((table) => table.themeId.equals(themeId) & table.quoteId.equals(quoteId)))
-          .go();
+  Future<void> removeQuote(String themeId, String quoteId) => (_database.delete(
+    _database.themeQuotes,
+  )..where((table) => table.themeId.equals(themeId) & table.quoteId.equals(quoteId))).go();
 }

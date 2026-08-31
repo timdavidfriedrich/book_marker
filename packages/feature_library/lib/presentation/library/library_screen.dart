@@ -13,14 +13,29 @@ import 'package:shared/presentation/extensions/context_extensions.dart';
 import 'package:shared/presentation/navigation/navigation_extensions.dart';
 import 'package:shared/presentation/widgets/book_card.dart';
 import 'package:shared/presentation/widgets/book_cover.dart';
-import 'package:shared/presentation/widgets/circle_icon_button.dart';
 import 'package:shared/presentation/widgets/count_badge.dart';
+import 'package:shared/presentation/widgets/floating_header.dart';
 import 'package:shared/presentation/widgets/ink_tap_box.dart';
 import 'package:shared/presentation/widgets/name_input_dialog.dart';
+import 'package:shared/presentation/widgets/pinned_header.dart';
 import 'package:shared/presentation/widgets/profile_avatar.dart';
 import 'package:shared/presentation/widgets/quote_card.dart';
 import 'package:shared/presentation/widgets/segmented_toggle.dart';
 import 'package:shared/presentation/widgets/selectable_chip.dart';
+
+const _searchFieldHeight = 56.0;
+const _toggleHeight = 40.0;
+const _chipHeight = 32.0;
+const _avatarHeight = 44.0;
+const _titleBarHeight = _avatarHeight + Spacing.m + Spacing.s;
+const _headerHeight = _searchFieldHeight + Spacing.m + _toggleHeight + Spacing.xs;
+const _searchHeaderHeight = _searchFieldHeight + Spacing.xs;
+const _chipsHeight = Spacing.xs + _chipHeight + Spacing.m;
+const _shelfPreviewOffset = 22.0;
+const _shelfPreviewLimit = 3;
+const _shelfPreviewWidth = 84.0;
+const _shelfPreviewHeight = 64.0;
+const _newShelfIconSize = 44.0;
 
 class const LibraryScreen({
   super.key,
@@ -49,31 +64,78 @@ class const _Loaded({
 }) extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: Spacing.l),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          const SizedBox(height: Spacing.m),
-          if (!_state.isSearching) ...[
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Expanded(
-                  child: Text(context.s.libraryTitle, style: context.t.displaySmall),
+    final isSearching = _state.isSearching;
+    return CustomScrollView(
+      slivers: [
+        if (!isSearching)
+          PinnedHeader(
+            height: _titleBarHeight,
+            child: ColoredBox(
+              color: context.c.surface,
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(Spacing.l, Spacing.m, Spacing.l, Spacing.s),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Expanded(
+                      child: Text(
+                        context.s.libraryTitle,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: context.t.displaySmall,
+                      ),
+                    ),
+                    ProfileAvatar(onTap: () => context.pushSettings()),
+                  ],
                 ),
-                ProfileAvatar(onTap: () => context.pushSettings()),
-              ],
+              ),
             ),
-            const SizedBox(height: Spacing.m),
+          ),
+        FloatingHeader(
+          height: isSearching ? _searchHeaderHeight : _headerHeight,
+          child: _Header(state: _state, controller: _controller),
+        ),
+        if (isSearching)
+          _SearchResults(state: _state)
+        else if (_state.view == LibraryView.books)
+          _BookList(state: _state)
+        else
+          _ShelvesList(state: _state),
+      ],
+    );
+  }
+}
+
+class const _Header({
+  required final LibraryLoaded _state,
+  required final TextEditingController _controller,
+}) extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final isBooks = _state.view == LibraryView.books;
+    return ColoredBox(
+      color: context.c.surface,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: Spacing.l),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            SizedBox(
+              height: _searchFieldHeight,
+              child: _SearchField(controller: _controller, showClear: _state.isSearching),
+            ),
+            if (!_state.isSearching) ...[
+              const SizedBox(height: Spacing.m),
+              SegmentedToggle(
+                labels: [context.s.libraryTabBooks, context.s.libraryTabShelves],
+                selectedIndex: isBooks ? 0 : 1,
+                onChanged: (index) => context.read<LibraryBloc>().add(
+                  LibraryViewChanged(index == 0 ? LibraryView.books : LibraryView.shelves),
+                ),
+              ),
+            ],
           ],
-          _SearchField(controller: _controller, showClear: _state.isSearching),
-          const SizedBox(height: Spacing.m),
-          if (_state.isSearching)
-            Expanded(child: _SearchResults(state: _state))
-          else
-            Expanded(child: _BooksArea(state: _state)),
-        ],
+        ),
       ),
     );
   }
@@ -109,116 +171,85 @@ class const _SearchField({
   }
 }
 
-class const _BooksArea({
-  required final LibraryLoaded _state,
-}) extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    final isBooks = _state.view == LibraryView.books;
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        Row(
-          children: [
-            SegmentedToggle(
-              labels: [context.s.libraryTabBooks, context.s.libraryTabShelves],
-              selectedIndex: isBooks ? 0 : 1,
-              onChanged: (index) => context.read<LibraryBloc>().add(
-                LibraryViewChanged(index == 0 ? LibraryView.books : LibraryView.shelves),
-              ),
-            ),
-            const Spacer(),
-            if (isBooks)
-              _FavoriteButton(
-                onTap: () => context.read<LibraryBloc>().add(
-                  const LibrarySearchScopeChanged(LibrarySearchScope.favorites),
-                ),
-              )
-            else
-              SelectableChip(
-                label: context.s.libraryAddShelfLabel,
-                selected: false,
-                onTap: () => _promptNewShelf(context),
-              ),
-          ],
-        ),
-        const SizedBox(height: Spacing.m),
-        if (isBooks)
-          Expanded(child: _BookList(state: _state))
-        else
-          Expanded(child: _ShelvesList(state: _state)),
-      ],
-    );
-  }
-}
-
 class const _BookList({
   required final LibraryLoaded _state,
 }) extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: Row(
-            children: [
-              for (final (index, filter) in LibraryFilter.values.indexed) ...[
-                if (index > 0) const SizedBox(width: Spacing.xs),
-                SelectableChip(
-                  label: _filterLabel(context, filter, _state),
-                  selected: _state.filter == filter,
-                  onTap: () =>
-                      context.read<LibraryBloc>().add(LibraryFilterChanged(filter)),
-                ),
-              ],
-            ],
-          ),
-        ),
-        const SizedBox(height: Spacing.m),
-        Expanded(
-          child: _state.books.isEmpty
-              ? Center(
-                  child: Padding(
-                    padding: const EdgeInsets.all(Spacing.l),
-                    child: Text(
-                      context.s.libraryEmptyMessage,
-                      textAlign: TextAlign.center,
-                      style: context.typography.readingBody.copyWith(
-                        color: context.c.onSurfaceVariant,
-                      ),
+    return SliverMainAxisGroup(
+      slivers: [
+        PinnedHeader(
+          height: _chipsHeight,
+          child: ColoredBox(
+            color: context.c.surface,
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              padding: const EdgeInsets.fromLTRB(Spacing.l, Spacing.xs, Spacing.l, Spacing.m),
+              child: Row(
+                children: [
+                  for (final (index, filter) in LibraryFilter.values.indexed) ...[
+                    if (index > 0) const SizedBox(width: Spacing.xs),
+                    SelectableChip(
+                      label: _filterLabel(context, filter, _state),
+                      selected: _state.filter == filter,
+                      onTap: () => context.read<LibraryBloc>().add(LibraryFilterChanged(filter)),
+                    ),
+                  ],
+                  const SizedBox(width: Spacing.xs),
+                  SelectableChip(
+                    label: context.s.librarySearchScopeFavorites,
+                    selected: false,
+                    onTap: () => context.read<LibraryBloc>().add(
+                      const LibrarySearchScopeChanged(LibrarySearchScope.favorites),
                     ),
                   ),
-                )
-              : ListView.separated(
-                  padding: const EdgeInsets.only(bottom: Spacing.xxl),
-                  itemCount: _state.books.length,
-                  separatorBuilder: (context, index) => const SizedBox(height: Spacing.m),
-                  itemBuilder: (context, index) {
-                    final summary = _state.books[index];
-                    final book = summary.book;
-                    final featured = summary.featuredQuote;
-                    final statusLabel = book.status.toSummaryLabel(context);
-                    return BookCard(
-                      accent: book.id.accent,
-                      title: book.title,
-                      meta: statusLabel == null
-                          ? context.s.libraryBookMeta(summary.quoteCount, summary.favoriteCount)
-                          : context.s.libraryBookMetaWithStatus(
-                              summary.quoteCount,
-                              summary.favoriteCount,
-                              statusLabel,
-                            ),
-                      count: summary.quoteCount,
-                      thumbnailUrl: book.thumbnailUrl,
-                      featuredQuote: featured == null ? null : "“${featured.quote}”",
-                      featuredPage: featured?.pageNumber,
-                      onTap: () => context.pushBookDetail(book.id),
-                    );
-                  },
-                ),
+                ],
+              ),
+            ),
+          ),
         ),
+        if (_state.books.isEmpty)
+          SliverFillRemaining(
+            hasScrollBody: false,
+            child: Padding(
+              padding: const EdgeInsets.all(Spacing.l),
+              child: Text(
+                context.s.libraryEmptyMessage,
+                textAlign: TextAlign.center,
+                style: context.typography.readingBody.copyWith(color: context.c.onSurfaceVariant),
+              ),
+            ),
+          )
+        else
+          SliverPadding(
+            padding: const EdgeInsets.fromLTRB(Spacing.l, 0, Spacing.l, Spacing.xxl),
+            sliver: SliverList.separated(
+              itemCount: _state.books.length,
+              separatorBuilder: (context, index) => const SizedBox(height: Spacing.m),
+              itemBuilder: (context, index) {
+                final summary = _state.books[index];
+                final book = summary.book;
+                final featured = summary.featuredQuote;
+                final statusLabel = book.status.toSummaryLabel(context);
+                return BookCard(
+                  accent: book.id.accent,
+                  title: book.title,
+                  meta: statusLabel == null
+                      ? context.s.libraryBookMeta(summary.quoteCount, summary.favoriteCount)
+                      : context.s.libraryBookMetaWithStatus(
+                          summary.quoteCount,
+                          summary.favoriteCount,
+                          statusLabel,
+                        ),
+                  count: summary.quoteCount,
+                  thumbnailUrl: book.thumbnailUrl,
+                  featuredQuote: featured == null ? null : "“${featured.quote}”",
+                  featuredPage: featured?.pageNumber,
+                  onTap: () => context.pushBookDetail(book.id),
+                );
+              },
+            ),
+          ),
       ],
     );
   }
@@ -229,22 +260,18 @@ class const _ShelvesList({
 }) extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    if (_state.shelves.isEmpty) {
-      return Align(
-        alignment: Alignment.topCenter,
-        child: _NewShelfTile(onTap: () => _promptNewShelf(context)),
-      );
-    }
-    return ListView.separated(
-      padding: const EdgeInsets.only(bottom: Spacing.xxl),
-      itemCount: _state.shelves.length + 1,
-      separatorBuilder: (context, index) => const SizedBox(height: Spacing.m),
-      itemBuilder: (context, index) {
-        if (index == _state.shelves.length) {
-          return _NewShelfTile(onTap: () => _promptNewShelf(context));
-        }
-        return _ShelfCard(summary: _state.shelves[index]);
-      },
+    return SliverPadding(
+      padding: const EdgeInsets.fromLTRB(Spacing.l, 0, Spacing.l, Spacing.xxl),
+      sliver: SliverList.separated(
+        itemCount: _state.shelves.length + 1,
+        separatorBuilder: (context, index) => const SizedBox(height: Spacing.m),
+        itemBuilder: (context, index) {
+          if (index == _state.shelves.length) {
+            return _NewShelfTile(onTap: () => _promptNewShelf(context));
+          }
+          return _ShelfCard(summary: _state.shelves[index]);
+        },
+      ),
     );
   }
 }
@@ -264,13 +291,14 @@ class const _ShelfCard({
       child: Row(
         children: [
           SizedBox(
-            width: 84,
-            height: 64,
+            width: _shelfPreviewWidth,
+            height: _shelfPreviewHeight,
             child: Stack(
               children: [
-                for (final entry in _summary.previewBooks.take(3).toList().asMap().entries)
+                for (final entry
+                    in _summary.previewBooks.take(_shelfPreviewLimit).toList().asMap().entries)
                   Positioned(
-                    left: entry.key * 22.0,
+                    left: entry.key * _shelfPreviewOffset,
                     child: BookCover(
                       accent: entry.value.id.accent,
                       url: entry.value.thumbnailUrl,
@@ -322,8 +350,8 @@ class const _NewShelfTile({
       child: Row(
         children: [
           Container(
-            width: 44,
-            height: 44,
+            width: _newShelfIconSize,
+            height: _newShelfIconSize,
             alignment: Alignment.center,
             decoration: BoxDecoration(
               color: context.c.surfaceContainerLowest,
@@ -355,51 +383,41 @@ class const _SearchResults({
   @override
   Widget build(BuildContext context) {
     final bookCount = _state.results.map((result) => result.book.id).toSet().length;
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        Row(
-          children: [
-            SelectableChip(
-              label: context.s.librarySearchScopeAll,
-              selected: _state.searchScope == LibrarySearchScope.allBooks,
-              selectedColor: context.c.inverseSurface,
-              selectedTextColor: context.c.onInverseSurface,
-              onTap: () => context.read<LibraryBloc>().add(
-                const LibrarySearchScopeChanged(LibrarySearchScope.allBooks),
-              ),
+    return SliverMainAxisGroup(
+      slivers: [
+        SliverToBoxAdapter(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(Spacing.l, Spacing.m, Spacing.l, Spacing.m),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    for (final (index, scope) in LibrarySearchScope.values.indexed) ...[
+                      if (index > 0) const SizedBox(width: Spacing.xs),
+                      SelectableChip(
+                        label: _scopeLabel(context, scope),
+                        selected: _state.searchScope == scope,
+                        selectedColor: context.c.inverseSurface,
+                        selectedTextColor: context.c.onInverseSurface,
+                        onTap: () =>
+                            context.read<LibraryBloc>().add(LibrarySearchScopeChanged(scope)),
+                      ),
+                    ],
+                  ],
+                ),
+                const SizedBox(height: Spacing.m),
+                Text(
+                  context.s.librarySearchCount(_state.results.length, bookCount),
+                  style: context.typography.monoLabel.copyWith(color: context.c.onSurfaceVariant),
+                ),
+              ],
             ),
-            const SizedBox(width: Spacing.xs),
-            SelectableChip(
-              label: context.s.librarySearchScopeFavorites,
-              selected: _state.searchScope == LibrarySearchScope.favorites,
-              selectedColor: context.c.inverseSurface,
-              selectedTextColor: context.c.onInverseSurface,
-              onTap: () => context.read<LibraryBloc>().add(
-                const LibrarySearchScopeChanged(LibrarySearchScope.favorites),
-              ),
-            ),
-            const SizedBox(width: Spacing.xs),
-            SelectableChip(
-              label: context.s.librarySearchScopeNotes,
-              selected: _state.searchScope == LibrarySearchScope.myNotes,
-              selectedColor: context.c.inverseSurface,
-              selectedTextColor: context.c.onInverseSurface,
-              onTap: () => context.read<LibraryBloc>().add(
-                const LibrarySearchScopeChanged(LibrarySearchScope.myNotes),
-              ),
-            ),
-          ],
+          ),
         ),
-        const SizedBox(height: Spacing.m),
-        Text(
-          context.s.librarySearchCount(_state.results.length, bookCount),
-          style: context.typography.monoLabel.copyWith(color: context.c.onSurfaceVariant),
-        ),
-        const SizedBox(height: Spacing.m),
-        Expanded(
-          child: ListView.separated(
-            padding: const EdgeInsets.only(bottom: Spacing.xxl),
+        SliverPadding(
+          padding: const EdgeInsets.fromLTRB(Spacing.l, 0, Spacing.l, Spacing.xxl),
+          sliver: SliverList.separated(
             itemCount: _state.results.length,
             separatorBuilder: (context, index) => const SizedBox(height: Spacing.m),
             itemBuilder: (context, index) {
@@ -422,21 +440,6 @@ class const _SearchResults({
           ),
         ),
       ],
-    );
-  }
-}
-
-class const _FavoriteButton({
-  required final VoidCallback _onTap,
-}) extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return CircleIconButton(
-      icon: Icons.star_rounded,
-      tooltip: context.s.librarySearchScopeFavorites,
-      backgroundColor: context.palette.amber.fill,
-      foregroundColor: context.palette.amber.solid,
-      onPressed: _onTap,
     );
   }
 }
@@ -471,5 +474,13 @@ String _filterLabel(BuildContext context, LibraryFilter filter, LibraryLoaded st
     LibraryFilter.reading => context.s.libraryFilterReading(state.readingCount),
     LibraryFilter.paused => context.s.libraryFilterPaused(state.pausedCount),
     LibraryFilter.finished => context.s.libraryFilterFinished(state.finishedCount),
+  };
+}
+
+String _scopeLabel(BuildContext context, LibrarySearchScope scope) {
+  return switch (scope) {
+    LibrarySearchScope.allBooks => context.s.librarySearchScopeAll,
+    LibrarySearchScope.favorites => context.s.librarySearchScopeFavorites,
+    LibrarySearchScope.myNotes => context.s.librarySearchScopeNotes,
   };
 }

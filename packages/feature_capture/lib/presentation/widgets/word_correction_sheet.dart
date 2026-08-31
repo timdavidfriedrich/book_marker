@@ -76,7 +76,7 @@ class const _WordCorrectionSheet({
           borderRadius: const BorderRadius.vertical(top: Radius.circular(Spacing.radiusXxl)),
         ),
         child: SingleChildScrollView(
-          padding: const EdgeInsets.fromLTRB(Spacing.l, Spacing.s, Spacing.l, Spacing.l),
+          padding: const EdgeInsets.fromLTRB(Spacing.s, Spacing.s, Spacing.s, Spacing.s),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,

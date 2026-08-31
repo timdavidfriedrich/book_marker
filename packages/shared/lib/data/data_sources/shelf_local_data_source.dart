@@ -60,8 +60,7 @@ class const ShelfLocalDataSourceImpl(
       .insertOnConflictUpdate(LocalShelfBook(shelfId: shelfId, bookId: bookId));
 
   @override
-  Future<void> removeBook(String shelfId, String bookId) =>
-      (_database.delete(_database.shelfBooks)
-            ..where((table) => table.shelfId.equals(shelfId) & table.bookId.equals(bookId)))
-          .go();
+  Future<void> removeBook(String shelfId, String bookId) => (_database.delete(
+    _database.shelfBooks,
+  )..where((table) => table.shelfId.equals(shelfId) & table.bookId.equals(bookId))).go();
 }

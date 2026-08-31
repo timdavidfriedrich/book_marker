@@ -17,8 +17,7 @@ class const ThemeDetailThemesUpdated(final AppResult<List<QuoteTheme>> result)
 class const ThemeDetailMembershipUpdated(final AppResult<Map<String, Set<String>>> result)
     extends ThemeDetailEvent;
 
-class const ThemeDetailQuotesUpdated(final AppResult<List<Quote>> result)
-    extends ThemeDetailEvent;
+class const ThemeDetailQuotesUpdated(final AppResult<List<Quote>> result) extends ThemeDetailEvent;
 
 class const ThemeDetailBooksUpdated(final AppResult<List<Book>> result) extends ThemeDetailEvent;
 

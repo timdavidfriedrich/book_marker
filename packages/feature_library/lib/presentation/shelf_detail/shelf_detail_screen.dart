@@ -13,12 +13,15 @@ import 'package:shared/presentation/widgets/accent_picker.dart';
 import 'package:shared/presentation/widgets/book_card.dart';
 import 'package:shared/presentation/widgets/book_cover.dart';
 import 'package:shared/presentation/widgets/circle_icon_button.dart';
+import 'package:shared/presentation/widgets/collapsing_header.dart';
 import 'package:shared/presentation/widgets/confirm_dialog.dart';
 import 'package:shared/presentation/widgets/ink_tap_box.dart';
 import 'package:shared/presentation/widgets/name_input_dialog.dart';
 import 'package:shared/presentation/widgets/sheet_action_tile.dart';
+import 'package:shared/presentation/widgets/sheet_content.dart';
 
 const _accentDotSize = 88.0;
+const _headerHeight = 184.0;
 
 enum _ShelfMenuAction { rename, color, delete }
 
@@ -53,101 +56,53 @@ class const _Content({
   @override
   Widget build(BuildContext context) {
     final accent = _state.shelf.accent ?? _state.shelf.id.accent;
-    final swatch = context.palette.resolve(accent);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Container(
-          decoration: BoxDecoration(
-            color: swatch.fill,
-            borderRadius: const BorderRadius.vertical(bottom: Radius.circular(Spacing.radiusXxl)),
-          ),
-          child: SafeArea(
-            bottom: false,
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(Spacing.l, Spacing.s, Spacing.l, Spacing.l),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      CircleIconButton(
-                        icon: Icons.arrow_back,
-                        tooltip: context.s.back,
-                        backgroundColor: context.c.surfaceContainerLowest,
-                        onPressed: context.closeScreen,
-                      ),
-                      CircleIconButton(
-                        icon: Icons.more_horiz,
-                        backgroundColor: context.c.surfaceContainerLowest,
-                        onPressed: () => _showShelfMenu(context, _state),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: Spacing.m),
-                  Row(
-                    children: [
-                      Container(
-                        width: _accentDotSize,
-                        height: _accentDotSize,
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(color: swatch.solid, shape: BoxShape.circle),
-                        child: Icon(Icons.collections_bookmark, color: swatch.onSolid, size: Spacing.iconL),
-                      ),
-                      const SizedBox(width: Spacing.l),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              _state.shelf.name,
-                              style: context.t.headlineMedium?.copyWith(color: swatch.onFill),
-                            ),
-                            const SizedBox(height: Spacing.xs),
-                            Text(
-                              context.s.shelfDetailStats(_state.bookCount, _state.quoteCount),
-                              style: context.typography.monoLabel.copyWith(color: swatch.onFillVariant),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-        const SizedBox(height: Spacing.m),
         Expanded(
-          child: _state.books.isEmpty
-              ? Center(
+          child: CustomScrollView(
+            slivers: [
+              CollapsingHeader(
+                expandedHeight: _headerHeight,
+                backgroundColor: context.palette.resolve(accent).fill,
+                expanded: _Header(state: _state, accent: accent),
+                collapsed: _CollapsedHeader(state: _state, accent: accent),
+              ),
+              if (_state.books.isEmpty)
+                SliverFillRemaining(
+                  hasScrollBody: false,
                   child: Padding(
                     padding: const EdgeInsets.all(Spacing.l),
                     child: Text(
                       context.s.shelfDetailEmpty,
                       textAlign: TextAlign.center,
-                      style: context.typography.readingBody.copyWith(color: context.c.onSurfaceVariant),
+                      style: context.typography.readingBody.copyWith(
+                        color: context.c.onSurfaceVariant,
+                      ),
                     ),
                   ),
                 )
-              : ListView.separated(
-                  padding: const EdgeInsets.fromLTRB(Spacing.l, 0, Spacing.l, Spacing.l),
-                  itemCount: _state.books.length,
-                  separatorBuilder: (context, index) => const SizedBox(height: Spacing.m),
-                  itemBuilder: (context, index) {
-                    final item = _state.books[index];
-                    return BookCard(
-                      accent: item.book.id.accent,
-                      title: item.book.title,
-                      meta: context.s.libraryQuotesCount(item.quoteCount),
-                      count: item.quoteCount,
-                      thumbnailUrl: item.book.thumbnailUrl,
-                      onTap: () => context.pushBookDetail(item.book.id),
-                    );
-                  },
+              else
+                SliverPadding(
+                  padding: const EdgeInsets.fromLTRB(Spacing.l, Spacing.m, Spacing.l, Spacing.l),
+                  sliver: SliverList.separated(
+                    itemCount: _state.books.length,
+                    separatorBuilder: (context, index) => const SizedBox(height: Spacing.m),
+                    itemBuilder: (context, index) {
+                      final item = _state.books[index];
+                      return BookCard(
+                        accent: item.book.id.accent,
+                        title: item.book.title,
+                        meta: context.s.libraryQuotesCount(item.quoteCount),
+                        count: item.quoteCount,
+                        thumbnailUrl: item.book.thumbnailUrl,
+                        onTap: () => context.pushBookDetail(item.book.id),
+                      );
+                    },
+                  ),
                 ),
+            ],
+          ),
         ),
         SafeArea(
           top: false,
@@ -168,6 +123,116 @@ class const _Content({
           ),
         ),
       ],
+    );
+  }
+}
+
+class const _Header({
+  required final ShelfDetailLoaded _state,
+  required final AccentColor _accent,
+}) extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final swatch = context.palette.resolve(_accent);
+    return SafeArea(
+      bottom: false,
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(Spacing.l, Spacing.s, Spacing.l, Spacing.l),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                CircleIconButton(
+                  icon: Icons.arrow_back,
+                  tooltip: context.s.back,
+                  backgroundColor: context.c.surfaceContainerLowest,
+                  onPressed: context.closeScreen,
+                ),
+                CircleIconButton(
+                  icon: Icons.more_horiz,
+                  backgroundColor: context.c.surfaceContainerLowest,
+                  onPressed: () => _showShelfMenu(context, _state),
+                ),
+              ],
+            ),
+            const SizedBox(height: Spacing.m),
+            Row(
+              children: [
+                Container(
+                  width: _accentDotSize,
+                  height: _accentDotSize,
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(color: swatch.solid, shape: BoxShape.circle),
+                  child: Icon(
+                    Icons.collections_bookmark,
+                    color: swatch.onSolid,
+                    size: Spacing.iconL,
+                  ),
+                ),
+                const SizedBox(width: Spacing.l),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        _state.shelf.name,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: context.t.headlineMedium?.copyWith(color: swatch.onFill),
+                      ),
+                      const SizedBox(height: Spacing.xs),
+                      Text(
+                        context.s.shelfDetailStats(_state.bookCount, _state.quoteCount),
+                        style: context.typography.monoLabel.copyWith(color: swatch.onFillVariant),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class const _CollapsedHeader({
+  required final ShelfDetailLoaded _state,
+  required final AccentColor _accent,
+}) extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final swatch = context.palette.resolve(_accent);
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: Spacing.l, vertical: Spacing.xs),
+      child: Row(
+        children: [
+          CircleIconButton(
+            icon: Icons.arrow_back,
+            tooltip: context.s.back,
+            backgroundColor: context.c.surfaceContainerLowest,
+            onPressed: context.closeScreen,
+          ),
+          const SizedBox(width: Spacing.s),
+          Expanded(
+            child: Text(
+              _state.shelf.name,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: context.t.titleLarge?.copyWith(color: swatch.onFill),
+            ),
+          ),
+          const SizedBox(width: Spacing.s),
+          CircleIconButton(
+            icon: Icons.more_horiz,
+            backgroundColor: context.c.surfaceContainerLowest,
+            onPressed: () => _showShelfMenu(context, _state),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -203,29 +268,27 @@ Future<void> _showShelfMenu(BuildContext context, ShelfDetailLoaded state) async
   }
 }
 
-Future<void> _showAccentSheet(BuildContext context, ShelfDetailBloc bloc, AccentColor? current) async {
+Future<void> _showAccentSheet(
+  BuildContext context,
+  ShelfDetailBloc bloc,
+  AccentColor? current,
+) async {
   await showModalBottomSheet<void>(
     context: context,
     useRootNavigator: true,
-    builder: (sheetContext) => SafeArea(
-      child: Padding(
-        padding: const EdgeInsets.all(Spacing.l),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(sheetContext.s.accentPickerTitle, style: sheetContext.t.titleMedium),
-            const SizedBox(height: Spacing.m),
-            AccentPicker(
-              selected: current,
-              onSelected: (accent) {
-                bloc.add(ShelfDetailAccentChanged(accent));
-                Navigator.of(sheetContext).pop();
-              },
-            ),
-          ],
+    builder: (sheetContext) => SheetContent(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(sheetContext.s.accentPickerTitle, style: sheetContext.t.titleMedium),
+        const SizedBox(height: Spacing.m),
+        AccentPicker(
+          selected: current,
+          onSelected: (accent) {
+            bloc.add(ShelfDetailAccentChanged(accent));
+            Navigator.of(sheetContext).pop();
+          },
         ),
-      ),
+      ],
     ),
   );
 }
@@ -233,32 +296,25 @@ Future<void> _showAccentSheet(BuildContext context, ShelfDetailBloc bloc, Accent
 class const _ShelfMenu() extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Padding(
-        padding: const EdgeInsets.all(Spacing.l),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            SheetActionTile(
-              icon: Icons.drive_file_rename_outline,
-              label: context.s.commonRename,
-              onTap: () => Navigator.of(context).pop(_ShelfMenuAction.rename),
-            ),
-            SheetActionTile(
-              icon: Icons.palette_outlined,
-              label: context.s.commonChangeColor,
-              onTap: () => Navigator.of(context).pop(_ShelfMenuAction.color),
-            ),
-            SheetActionTile(
-              icon: Icons.delete_outline,
-              label: context.s.commonDelete,
-              destructive: true,
-              onTap: () => Navigator.of(context).pop(_ShelfMenuAction.delete),
-            ),
-          ],
+    return SheetContent(
+      children: [
+        SheetActionTile(
+          icon: Icons.drive_file_rename_outline,
+          label: context.s.commonRename,
+          onTap: () => Navigator.of(context).pop(_ShelfMenuAction.rename),
         ),
-      ),
+        SheetActionTile(
+          icon: Icons.palette_outlined,
+          label: context.s.commonChangeColor,
+          onTap: () => Navigator.of(context).pop(_ShelfMenuAction.color),
+        ),
+        SheetActionTile(
+          icon: Icons.delete_outline,
+          label: context.s.commonDelete,
+          destructive: true,
+          onTap: () => Navigator.of(context).pop(_ShelfMenuAction.delete),
+        ),
+      ],
     );
   }
 }
@@ -291,7 +347,7 @@ class const _AddBooksSheet() extends StatelessWidget {
             if (state is! ShelfDetailLoaded) return const SizedBox.shrink();
             return ListView(
               controller: scrollController,
-              padding: const EdgeInsets.fromLTRB(Spacing.l, Spacing.m, Spacing.l, Spacing.xxl),
+              padding: const EdgeInsets.fromLTRB(Spacing.s, Spacing.s, Spacing.s, Spacing.l),
               children: [
                 Center(
                   child: Container(
@@ -337,7 +393,13 @@ class const _AddBookRow({
       onTap: () => context.read<ShelfDetailBloc>().add(ShelfDetailBookToggled(_item.book.id)),
       child: Row(
         children: [
-          BookCover(accent: accent, url: _item.book.thumbnailUrl, width: 40, height: 52, radius: Spacing.radiusS),
+          BookCover(
+            accent: accent,
+            url: _item.book.thumbnailUrl,
+            width: 40,
+            height: 52,
+            radius: Spacing.radiusS,
+          ),
           const SizedBox(width: Spacing.s),
           Expanded(
             child: Text(

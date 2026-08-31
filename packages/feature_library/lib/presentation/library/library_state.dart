@@ -48,8 +48,7 @@ class const LibraryLoaded({
   required final List<LibraryQuoteResult> results,
   required final List<LibraryShelfSummary> shelves,
 }) extends LibraryState {
-  bool get isSearching =>
-      query.trim().isNotEmpty || searchScope != LibrarySearchScope.allBooks;
+  bool get isSearching => query.trim().isNotEmpty || searchScope != LibrarySearchScope.allBooks;
 }
 
 class const LibraryFailure({

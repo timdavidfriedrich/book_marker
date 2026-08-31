@@ -28,19 +28,23 @@ class const SegmentedToggle({
         borderRadius: BorderRadius.circular(Spacing.radiusFull),
       ),
       child: Row(
-        mainAxisSize: MainAxisSize.min,
         children: [
           for (var index = 0; index < _labels.length; index++)
-            InkTapBox(
-              onTap: () => _onChanged(index),
-              color: index == _selectedIndex ? activeColor : Colors.transparent,
-              radius: Spacing.radiusFull,
-              padding: const EdgeInsets.symmetric(horizontal: Spacing.m, vertical: Spacing.xs),
-              child: Text(
-                _labels[index],
-                style: context.t.labelMedium?.copyWith(
-                  color: index == _selectedIndex ? activeTextColor : inactiveTextColor,
-                  fontSize: 14,
+            Expanded(
+              child: InkTapBox(
+                onTap: () => _onChanged(index),
+                color: index == _selectedIndex ? activeColor : Colors.transparent,
+                radius: Spacing.radiusFull,
+                padding: const EdgeInsets.symmetric(horizontal: Spacing.m, vertical: Spacing.xs),
+                child: Text(
+                  _labels[index],
+                  textAlign: TextAlign.center,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: context.t.labelMedium?.copyWith(
+                    color: index == _selectedIndex ? activeTextColor : inactiveTextColor,
+                    fontSize: 14,
+                  ),
                 ),
               ),
             ),

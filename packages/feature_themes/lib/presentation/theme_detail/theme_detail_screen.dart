@@ -12,16 +12,22 @@ import 'package:shared/presentation/navigation/navigation_extensions.dart';
 import 'package:shared/presentation/widgets/accent_picker.dart';
 import 'package:shared/presentation/widgets/book_cover.dart';
 import 'package:shared/presentation/widgets/circle_icon_button.dart';
+import 'package:shared/presentation/widgets/collapsing_header.dart';
 import 'package:shared/presentation/widgets/confirm_dialog.dart';
 import 'package:shared/presentation/widgets/ink_tap_box.dart';
 import 'package:shared/presentation/widgets/name_input_dialog.dart';
+import 'package:shared/presentation/widgets/pinned_header.dart';
 import 'package:shared/presentation/widgets/quote_card.dart';
 import 'package:shared/presentation/widgets/selectable_chip.dart';
 import 'package:shared/presentation/widgets/sheet_action_tile.dart';
+import 'package:shared/presentation/widgets/sheet_content.dart';
 
 enum _ThemeMenuAction { rename, color, delete }
 
 const _accentDotSize = 88.0;
+const _headerHeight = 196.0;
+const _chipHeight = 32.0;
+const _chipsHeight = Spacing.m + _chipHeight + Spacing.m;
 
 class const ThemeDetailScreen({
   super.key,
@@ -57,69 +63,90 @@ class const _Content({
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        _Header(state: _state, accent: accent),
-        const SizedBox(height: Spacing.m),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: Spacing.l),
-          child: Row(
-            children: [
-              SelectableChip(
-                label: context.s.bookDetailAllFilter(_state.totalCount),
-                selected: _state.filter == ThemeDetailFilter.all,
-                selectedColor: context.c.inverseSurface,
-                selectedTextColor: context.c.onInverseSurface,
-                onTap: () => context
-                    .read<ThemeDetailBloc>()
-                    .add(const ThemeDetailFilterChanged(ThemeDetailFilter.all)),
-              ),
-              const SizedBox(width: Spacing.xs),
-              SelectableChip(
-                label: context.s.bookDetailFavoritesFilter,
-                selected: _state.filter == ThemeDetailFilter.favorites,
-                selectedColor: context.c.inverseSurface,
-                selectedTextColor: context.c.onInverseSurface,
-                onTap: () => context
-                    .read<ThemeDetailBloc>()
-                    .add(const ThemeDetailFilterChanged(ThemeDetailFilter.favorites)),
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(height: Spacing.m),
         Expanded(
-          child: _state.quotes.isEmpty
-              ? Center(
+          child: CustomScrollView(
+            slivers: [
+              CollapsingHeader(
+                expandedHeight: _headerHeight,
+                backgroundColor: context.palette.resolve(accent).fill,
+                expanded: _Header(state: _state, accent: accent),
+                collapsed: _CollapsedHeader(state: _state, accent: accent),
+              ),
+              PinnedHeader(
+                height: _chipsHeight,
+                child: ColoredBox(
+                  color: context.c.surface,
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(Spacing.l, Spacing.m, Spacing.l, Spacing.m),
+                    child: Row(
+                      children: [
+                        SelectableChip(
+                          label: context.s.bookDetailAllFilter(_state.totalCount),
+                          selected: _state.filter == ThemeDetailFilter.all,
+                          selectedColor: context.c.inverseSurface,
+                          selectedTextColor: context.c.onInverseSurface,
+                          onTap: () => context.read<ThemeDetailBloc>().add(
+                            const ThemeDetailFilterChanged(ThemeDetailFilter.all),
+                          ),
+                        ),
+                        const SizedBox(width: Spacing.xs),
+                        SelectableChip(
+                          label: context.s.bookDetailFavoritesFilter,
+                          selected: _state.filter == ThemeDetailFilter.favorites,
+                          selectedColor: context.c.inverseSurface,
+                          selectedTextColor: context.c.onInverseSurface,
+                          onTap: () => context.read<ThemeDetailBloc>().add(
+                            const ThemeDetailFilterChanged(ThemeDetailFilter.favorites),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+              if (_state.quotes.isEmpty)
+                SliverFillRemaining(
+                  hasScrollBody: false,
                   child: Padding(
                     padding: const EdgeInsets.all(Spacing.l),
                     child: Text(
                       context.s.themeDetailEmpty,
                       textAlign: TextAlign.center,
-                      style: context.typography.readingBody.copyWith(color: context.c.onSurfaceVariant),
+                      style: context.typography.readingBody.copyWith(
+                        color: context.c.onSurfaceVariant,
+                      ),
                     ),
                   ),
                 )
-              : ListView.separated(
+              else
+                SliverPadding(
                   padding: const EdgeInsets.fromLTRB(Spacing.l, 0, Spacing.l, Spacing.l),
-                  itemCount: _state.quotes.length,
-                  separatorBuilder: (context, index) => const SizedBox(height: Spacing.m),
-                  itemBuilder: (context, index) {
-                    final item = _state.quotes[index];
-                    final voiceNoteMs = item.quote.voiceNoteDurationMs;
-                    return QuoteCard(
-                      accent: item.book.id.accent,
-                      quote: "“${item.quote.quote}”",
-                      thumbnailUrl: item.book.thumbnailUrl,
-                      page: item.quote.pageNumber,
-                      note: item.quote.note,
-                      sourceLabel: item.book.title,
-                      isFavorite: item.quote.isFavorite,
-                      hasVoiceNote: item.quote.voiceNotePath != null,
-                      voiceNoteDuration: voiceNoteMs == null ? null : Duration(milliseconds: voiceNoteMs),
-                      voiceNotePath: item.quote.voiceNotePath,
-                      onTap: () => context.pushQuoteDetail(item.quote.id),
-                    );
-                  },
+                  sliver: SliverList.separated(
+                    itemCount: _state.quotes.length,
+                    separatorBuilder: (context, index) => const SizedBox(height: Spacing.m),
+                    itemBuilder: (context, index) {
+                      final item = _state.quotes[index];
+                      final voiceNoteMs = item.quote.voiceNoteDurationMs;
+                      return QuoteCard(
+                        accent: item.book.id.accent,
+                        quote: "“${item.quote.quote}”",
+                        thumbnailUrl: item.book.thumbnailUrl,
+                        page: item.quote.pageNumber,
+                        note: item.quote.note,
+                        sourceLabel: item.book.title,
+                        isFavorite: item.quote.isFavorite,
+                        hasVoiceNote: item.quote.voiceNotePath != null,
+                        voiceNoteDuration: voiceNoteMs == null
+                            ? null
+                            : Duration(milliseconds: voiceNoteMs),
+                        voiceNotePath: item.quote.voiceNotePath,
+                        onTap: () => context.pushQuoteDetail(item.quote.id),
+                      );
+                    },
+                  ),
                 ),
+            ],
+          ),
         ),
         _BottomBar(state: _state),
       ],
@@ -134,69 +161,103 @@ class const _Header({
   @override
   Widget build(BuildContext context) {
     final swatch = context.palette.resolve(_accent);
-    return Container(
-      decoration: BoxDecoration(
-        color: swatch.fill,
-        borderRadius: const BorderRadius.vertical(bottom: Radius.circular(Spacing.radiusXxl)),
-      ),
-      child: SafeArea(
-        bottom: false,
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(Spacing.l, Spacing.s, Spacing.l, Spacing.l),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  CircleIconButton(
-                    icon: Icons.arrow_back,
-                    tooltip: context.s.back,
-                    backgroundColor: context.c.surfaceContainerLowest,
-                    onPressed: context.closeScreen,
-                  ),
-                  CircleIconButton(
-                    icon: Icons.more_horiz,
-                    backgroundColor: context.c.surfaceContainerLowest,
-                    onPressed: () => _showThemeMenu(context, _state),
-                  ),
-                ],
-              ),
-              const SizedBox(height: Spacing.m),
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Container(
-                    width: _accentDotSize,
-                    height: _accentDotSize,
-                    decoration: BoxDecoration(color: swatch.solid, shape: BoxShape.circle),
-                  ),
-                  const SizedBox(width: Spacing.l),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          _state.theme.name,
-                          style: context.t.headlineMedium?.copyWith(color: swatch.onFill),
+    return SafeArea(
+      bottom: false,
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(Spacing.l, Spacing.s, Spacing.l, Spacing.l),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                CircleIconButton(
+                  icon: Icons.arrow_back,
+                  tooltip: context.s.back,
+                  backgroundColor: context.c.surfaceContainerLowest,
+                  onPressed: context.closeScreen,
+                ),
+                CircleIconButton(
+                  icon: Icons.more_horiz,
+                  backgroundColor: context.c.surfaceContainerLowest,
+                  onPressed: () => _showThemeMenu(context, _state),
+                ),
+              ],
+            ),
+            const SizedBox(height: Spacing.m),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Container(
+                  width: _accentDotSize,
+                  height: _accentDotSize,
+                  decoration: BoxDecoration(color: swatch.solid, shape: BoxShape.circle),
+                ),
+                const SizedBox(width: Spacing.l),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        _state.theme.name,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: context.t.headlineMedium?.copyWith(color: swatch.onFill),
+                      ),
+                      const SizedBox(height: Spacing.xs),
+                      Text(
+                        context.s.themeDetailStats(
+                          _state.totalCount,
+                          _state.bookCount,
+                          _state.favoriteCount,
                         ),
-                        const SizedBox(height: Spacing.xs),
-                        Text(
-                          context.s.themeDetailStats(
-                            _state.totalCount,
-                            _state.bookCount,
-                            _state.favoriteCount,
-                          ),
-                          style: context.typography.monoLabel.copyWith(color: swatch.onFillVariant),
-                        ),
-                      ],
-                    ),
+                        style: context.typography.monoLabel.copyWith(color: swatch.onFillVariant),
+                      ),
+                    ],
                   ),
-                ],
-              ),
-            ],
-          ),
+                ),
+              ],
+            ),
+          ],
         ),
+      ),
+    );
+  }
+}
+
+class const _CollapsedHeader({
+  required final ThemeDetailLoaded _state,
+  required final AccentColor _accent,
+}) extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final swatch = context.palette.resolve(_accent);
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: Spacing.l, vertical: Spacing.xs),
+      child: Row(
+        children: [
+          CircleIconButton(
+            icon: Icons.arrow_back,
+            tooltip: context.s.back,
+            backgroundColor: context.c.surfaceContainerLowest,
+            onPressed: context.closeScreen,
+          ),
+          const SizedBox(width: Spacing.s),
+          Expanded(
+            child: Text(
+              _state.theme.name,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: context.t.titleLarge?.copyWith(color: swatch.onFill),
+            ),
+          ),
+          const SizedBox(width: Spacing.s),
+          CircleIconButton(
+            icon: Icons.more_horiz,
+            backgroundColor: context.c.surfaceContainerLowest,
+            onPressed: () => _showThemeMenu(context, _state),
+          ),
+        ],
       ),
     );
   }
@@ -226,14 +287,6 @@ class const _BottomBar({
                   ),
                 ),
               ),
-            ),
-            const SizedBox(width: Spacing.s),
-            CircleIconButton(
-              icon: Icons.north_east,
-              size: 56,
-              backgroundColor: context.c.inverseSurface,
-              foregroundColor: context.c.onInverseSurface,
-              onPressed: () => _showAddQuotes(context, _state),
             ),
           ],
         ),
@@ -273,29 +326,27 @@ Future<void> _showThemeMenu(BuildContext context, ThemeDetailLoaded state) async
   }
 }
 
-Future<void> _showAccentSheet(BuildContext context, ThemeDetailBloc bloc, AccentColor? current) async {
+Future<void> _showAccentSheet(
+  BuildContext context,
+  ThemeDetailBloc bloc,
+  AccentColor? current,
+) async {
   await showModalBottomSheet<void>(
     context: context,
     useRootNavigator: true,
-    builder: (sheetContext) => SafeArea(
-      child: Padding(
-        padding: const EdgeInsets.all(Spacing.l),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(sheetContext.s.accentPickerTitle, style: sheetContext.t.titleMedium),
-            const SizedBox(height: Spacing.m),
-            AccentPicker(
-              selected: current,
-              onSelected: (accent) {
-                bloc.add(ThemeDetailAccentChanged(accent));
-                Navigator.of(sheetContext).pop();
-              },
-            ),
-          ],
+    builder: (sheetContext) => SheetContent(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(sheetContext.s.accentPickerTitle, style: sheetContext.t.titleMedium),
+        const SizedBox(height: Spacing.m),
+        AccentPicker(
+          selected: current,
+          onSelected: (accent) {
+            bloc.add(ThemeDetailAccentChanged(accent));
+            Navigator.of(sheetContext).pop();
+          },
         ),
-      ),
+      ],
     ),
   );
 }
@@ -303,32 +354,25 @@ Future<void> _showAccentSheet(BuildContext context, ThemeDetailBloc bloc, Accent
 class const _ThemeMenu() extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Padding(
-        padding: const EdgeInsets.all(Spacing.l),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            SheetActionTile(
-              icon: Icons.drive_file_rename_outline,
-              label: context.s.commonRename,
-              onTap: () => Navigator.of(context).pop(_ThemeMenuAction.rename),
-            ),
-            SheetActionTile(
-              icon: Icons.palette_outlined,
-              label: context.s.commonChangeColor,
-              onTap: () => Navigator.of(context).pop(_ThemeMenuAction.color),
-            ),
-            SheetActionTile(
-              icon: Icons.delete_outline,
-              label: context.s.commonDelete,
-              destructive: true,
-              onTap: () => Navigator.of(context).pop(_ThemeMenuAction.delete),
-            ),
-          ],
+    return SheetContent(
+      children: [
+        SheetActionTile(
+          icon: Icons.drive_file_rename_outline,
+          label: context.s.commonRename,
+          onTap: () => Navigator.of(context).pop(_ThemeMenuAction.rename),
         ),
-      ),
+        SheetActionTile(
+          icon: Icons.palette_outlined,
+          label: context.s.commonChangeColor,
+          onTap: () => Navigator.of(context).pop(_ThemeMenuAction.color),
+        ),
+        SheetActionTile(
+          icon: Icons.delete_outline,
+          label: context.s.commonDelete,
+          destructive: true,
+          onTap: () => Navigator.of(context).pop(_ThemeMenuAction.delete),
+        ),
+      ],
     );
   }
 }
@@ -361,7 +405,7 @@ class const _AddQuotesSheet() extends StatelessWidget {
             if (state is! ThemeDetailLoaded) return const SizedBox.shrink();
             return ListView(
               controller: scrollController,
-              padding: const EdgeInsets.fromLTRB(Spacing.l, Spacing.m, Spacing.l, Spacing.xxl),
+              padding: const EdgeInsets.fromLTRB(Spacing.s, Spacing.s, Spacing.s, Spacing.l),
               children: [
                 Center(
                   child: Container(
@@ -400,14 +444,22 @@ class const _AddQuoteRow({
   @override
   Widget build(BuildContext context) {
     return InkTapBox(
-      color: _selected ? context.palette.resolve(_item.book.id.accent).fill : context.c.surfaceContainerHigh,
+      color: _selected
+          ? context.palette.resolve(_item.book.id.accent).fill
+          : context.c.surfaceContainerHigh,
       radius: Spacing.radiusL,
       padding: const EdgeInsets.all(Spacing.s),
       onTap: () => context.read<ThemeDetailBloc>().add(ThemeDetailQuoteToggled(_item.quote.id)),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          BookCover(accent: _item.book.id.accent, url: _item.book.thumbnailUrl, width: 40, height: 52, radius: Spacing.radiusS),
+          BookCover(
+            accent: _item.book.id.accent,
+            url: _item.book.thumbnailUrl,
+            width: 40,
+            height: 52,
+            radius: Spacing.radiusS,
+          ),
           const SizedBox(width: Spacing.s),
           Expanded(
             child: Column(

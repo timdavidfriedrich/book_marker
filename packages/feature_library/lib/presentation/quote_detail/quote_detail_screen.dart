@@ -9,6 +9,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:shared/domain/entities/book.dart';
 import 'package:shared/domain/entities/quote.dart';
+import 'package:shared/domain/entities/quote_theme.dart';
 import 'package:shared/presentation/extensions/app_error_extensions.dart';
 import 'package:shared/presentation/extensions/context_extensions.dart';
 import 'package:shared/presentation/navigation/navigation_extensions.dart';
@@ -16,8 +17,11 @@ import 'package:shared/presentation/widgets/circle_icon_button.dart';
 import 'package:shared/presentation/widgets/confirm_dialog.dart';
 import 'package:shared/presentation/widgets/highlight_image.dart';
 import 'package:shared/presentation/widgets/ink_tap_box.dart';
+import 'package:shared/presentation/widgets/name_input_dialog.dart';
 import 'package:shared/presentation/widgets/paper_card.dart';
+import 'package:shared/presentation/widgets/selectable_chip.dart';
 import 'package:shared/presentation/widgets/sheet_action_tile.dart';
+import 'package:shared/presentation/widgets/sheet_content.dart';
 
 class const QuoteDetailScreen({
   super.key,
@@ -37,10 +41,13 @@ class const QuoteDetailScreen({
                 child: Text(error.toMessage(context), textAlign: TextAlign.center),
               ),
             ),
-            QuoteDetailLoaded(:final quote, :final book) => _Content(
-              quote: quote,
-              book: book,
-            ),
+            QuoteDetailLoaded(:final quote, :final book, :final themes, :final selectedThemeIds) =>
+              _Content(
+                quote: quote,
+                book: book,
+                themes: themes,
+                selectedThemeIds: selectedThemeIds,
+              ),
             QuoteDetailDeleted() => const SizedBox.shrink(),
           },
         ),
@@ -52,6 +59,8 @@ class const QuoteDetailScreen({
 class const _Content({
   required final Quote _quote,
   required final Book? _book,
+  required final List<QuoteTheme> _themes,
+  required final Set<String> _selectedThemeIds,
 }) extends HookWidget {
   @override
   Widget build(BuildContext context) {
@@ -67,9 +76,7 @@ class const _Content({
           _ModeToggle(index: mode.value, onChanged: (value) => mode.value = value),
           const SizedBox(height: Spacing.m),
           Expanded(
-            child: mode.value == 1
-                ? _PhotoView(quote: _quote)
-                : _TextView(quote: _quote),
+            child: mode.value == 1 ? _PhotoView(quote: _quote) : _TextView(quote: _quote),
           ),
           const SizedBox(height: Spacing.m),
           if (_quote.voiceNotePath case final String path) ...[
@@ -77,6 +84,8 @@ class const _Content({
             const SizedBox(height: Spacing.m),
           ],
           _NoteCard(quote: _quote),
+          const SizedBox(height: Spacing.m),
+          _ThemeChips(themes: _themes, selected: _selectedThemeIds),
           const SizedBox(height: Spacing.m),
           _Actions(quote: _quote, book: _book),
           const SizedBox(height: Spacing.s),
@@ -115,7 +124,10 @@ class const _Header({
                 overflow: TextOverflow.ellipsis,
                 style: context.t.titleLarge,
               ),
-              Text(meta, style: context.typography.monoLabel.copyWith(color: context.c.onSurfaceVariant)),
+              Text(
+                meta,
+                style: context.typography.monoLabel.copyWith(color: context.c.onSurfaceVariant),
+              ),
             ],
           ),
         ),
@@ -262,8 +274,7 @@ class const _Actions({
           icon: _quote.isFavorite ? Icons.star_rounded : Icons.star_outline_rounded,
           label: context.s.quoteDetailFavoriteLabel,
           highlighted: _quote.isFavorite,
-          onTap: () =>
-              context.read<QuoteDetailBloc>().add(const QuoteDetailFavoriteToggled()),
+          onTap: () => context.read<QuoteDetailBloc>().add(const QuoteDetailFavoriteToggled()),
         ),
         const SizedBox(width: Spacing.xl),
         _ActionButton(
@@ -313,23 +324,59 @@ Future<void> _showQuoteMenu(BuildContext context) async {
 class const _QuoteMenu() extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Padding(
-        padding: const EdgeInsets.all(Spacing.l),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            SheetActionTile(
-              icon: Icons.delete_outline,
-              label: context.s.quoteDeleteAction,
-              destructive: true,
-              onTap: () => Navigator.of(context).pop(true),
-            ),
-          ],
+    return SheetContent(
+      children: [
+        SheetActionTile(
+          icon: Icons.delete_outline,
+          label: context.s.quoteDeleteAction,
+          destructive: true,
+          onTap: () => Navigator.of(context).pop(true),
         ),
+      ],
+    );
+  }
+}
+
+class const _ThemeChips({
+  required final List<QuoteTheme> _themes,
+  required final Set<String> _selected,
+}) extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Align(
+      alignment: Alignment.centerLeft,
+      child: Wrap(
+        spacing: Spacing.xs,
+        runSpacing: Spacing.xs,
+        children: [
+          for (final theme in _themes)
+            SelectableChip(
+              label: theme.name,
+              selected: _selected.contains(theme.id),
+              selectedColor: context.palette.teal.solid,
+              selectedTextColor: context.palette.teal.onSolid,
+              onTap: () => context.read<QuoteDetailBloc>().add(QuoteDetailThemeToggled(theme.id)),
+            ),
+          SelectableChip(
+            label: context.s.markingNewThemeChip,
+            selected: false,
+            onTap: () => _promptNewTheme(context),
+          ),
+        ],
       ),
     );
+  }
+}
+
+Future<void> _promptNewTheme(BuildContext context) async {
+  final bloc = context.read<QuoteDetailBloc>();
+  final name = await showNameInputDialog(
+    context,
+    title: context.s.themesNewThemeTitle,
+    hint: context.s.themesNewThemeHint,
+  );
+  if (name != null && name.trim().isNotEmpty) {
+    bloc.add(QuoteDetailThemeCreateRequested(name));
   }
 }
 
@@ -380,7 +427,10 @@ class const _VoiceNotePlayer({
     final label = "${duration.inMinutes}:${(duration.inSeconds % 60).toString().padLeft(2, "0")}";
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: Spacing.m, vertical: Spacing.xs),
-      decoration: BoxDecoration(color: coral.solid, borderRadius: BorderRadius.circular(Spacing.radiusFull)),
+      decoration: BoxDecoration(
+        color: coral.solid,
+        borderRadius: BorderRadius.circular(Spacing.radiusFull),
+      ),
       child: Row(
         children: [
           IconButton(

@@ -19,10 +19,12 @@ class HighlightListConverter extends TypeConverter<List<HighlightRegion>, String
 
   @override
   List<HighlightRegion> fromSql(String fromDb) => (jsonDecode(fromDb) as List<dynamic>)
-      .map((it) => HighlightRegionMapper.fromMap((it as Map<dynamic, dynamic>).cast<String, dynamic>()))
+      .map(
+        (it) =>
+            HighlightRegionMapper.fromMap((it as Map<dynamic, dynamic>).cast<String, dynamic>()),
+      )
       .toList();
 
   @override
-  String toSql(List<HighlightRegion> value) =>
-      jsonEncode(value.map((it) => it.toMap()).toList());
+  String toSql(List<HighlightRegion> value) => jsonEncode(value.map((it) => it.toMap()).toList());
 }

@@ -159,11 +159,14 @@ class NavigationRouter {
               opaque: false,
               barrierColor: _sheetBarrier,
               barrierDismissible: true,
-              transitionsBuilder: (context, animation, secondaryAnimation, child) => SlideTransition(
-                position: Tween(begin: const Offset(0, 1), end: Offset.zero)
-                    .animate(CurvedAnimation(parent: animation, curve: Curves.easeOutCubic)),
-                child: child,
-              ),
+              transitionsBuilder: (context, animation, secondaryAnimation, child) =>
+                  SlideTransition(
+                    position: Tween(
+                      begin: const Offset(0, 1),
+                      end: Offset.zero,
+                    ).animate(CurvedAnimation(parent: animation, curve: Curves.easeOutCubic)),
+                    child: child,
+                  ),
               child: BlocProvider(
                 create: (_) => sl<AddBookBloc>()..add(const AddBookStarted()),
                 child: const AddBookScreen(),

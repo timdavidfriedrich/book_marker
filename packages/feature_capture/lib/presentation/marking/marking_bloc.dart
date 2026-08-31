@@ -254,7 +254,12 @@ class MarkingBloc extends Bloc<MarkingEvent, MarkingState> {
   void _onVoiceNoteRecorded(MarkingVoiceNoteRecorded event, Emitter<MarkingState> emit) {
     if (state case final MarkingReady current) {
       emit(
-        _ready(current, voiceNotePath: event.path, voiceNoteDurationMs: event.durationMs, keepVoiceNote: false),
+        _ready(
+          current,
+          voiceNotePath: event.path,
+          voiceNoteDurationMs: event.durationMs,
+          keepVoiceNote: false,
+        ),
       );
     }
   }

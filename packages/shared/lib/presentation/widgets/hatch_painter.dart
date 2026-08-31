@@ -4,7 +4,11 @@ const _defaultGap = 9.0;
 const _defaultStroke = 5.0;
 
 class HatchPainter extends CustomPainter {
-  const HatchPainter({required this.color, this.gap = _defaultGap, this.strokeWidth = _defaultStroke});
+  const HatchPainter({
+    required this.color,
+    this.gap = _defaultGap,
+    this.strokeWidth = _defaultStroke,
+  });
 
   final Color color;
   final double gap;

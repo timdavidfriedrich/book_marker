@@ -13,10 +13,19 @@ import 'package:shared/presentation/extensions/context_extensions.dart';
 import 'package:shared/presentation/navigation/navigation_extensions.dart';
 import 'package:shared/presentation/widgets/book_cover.dart';
 import 'package:shared/presentation/widgets/circle_icon_button.dart';
+import 'package:shared/presentation/widgets/collapsing_header.dart';
 import 'package:shared/presentation/widgets/confirm_dialog.dart';
+import 'package:shared/presentation/widgets/pinned_header.dart';
 import 'package:shared/presentation/widgets/quote_card.dart';
 import 'package:shared/presentation/widgets/selectable_chip.dart';
 import 'package:shared/presentation/widgets/sheet_action_tile.dart';
+import 'package:shared/presentation/widgets/sheet_content.dart';
+
+const _headerHeight = 224.0;
+const _chipHeight = 32.0;
+const _chipsHeight = Spacing.m + _chipHeight + Spacing.m;
+const _coverWidth = 96.0;
+const _coverHeight = 128.0;
 
 class const BookDetailScreen({
   super.key,
@@ -50,83 +59,95 @@ class const _Content({
   Widget build(BuildContext context) {
     final book = _state.book;
     final accent = book.id.accent;
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        _Header(book: book, accent: accent, state: _state),
-        const SizedBox(height: Spacing.m),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: Spacing.l),
-          child: Row(
-            children: [
-              SelectableChip(
-                label: context.s.bookDetailAllFilter(_state.totalCount),
-                selected: _state.filter == BookDetailFilter.all,
-                selectedColor: context.c.inverseSurface,
-                selectedTextColor: context.c.onInverseSurface,
-                onTap: () => context
-                    .read<BookDetailBloc>()
-                    .add(const BookDetailFilterChanged(BookDetailFilter.all)),
-              ),
-              const SizedBox(width: Spacing.xs),
-              SelectableChip(
-                label: context.s.bookDetailFavoritesFilter,
-                selected: _state.filter == BookDetailFilter.favorites,
-                selectedColor: context.c.inverseSurface,
-                selectedTextColor: context.c.onInverseSurface,
-                onTap: () => context
-                    .read<BookDetailBloc>()
-                    .add(const BookDetailFilterChanged(BookDetailFilter.favorites)),
-              ),
-              const SizedBox(width: Spacing.xs),
-              SelectableChip(
-                label: context.s.bookDetailVoiceNoteFilter,
-                selected: _state.filter == BookDetailFilter.withVoiceNote,
-                selectedColor: context.c.inverseSurface,
-                selectedTextColor: context.c.onInverseSurface,
-                onTap: () => context
-                    .read<BookDetailBloc>()
-                    .add(const BookDetailFilterChanged(BookDetailFilter.withVoiceNote)),
-              ),
-            ],
-          ),
+    return CustomScrollView(
+      slivers: [
+        CollapsingHeader(
+          expandedHeight: _headerHeight,
+          backgroundColor: context.palette.resolve(accent).fill,
+          expanded: _Header(book: book, accent: accent, state: _state),
+          collapsed: _CollapsedHeader(book: book, accent: accent),
         ),
-        const SizedBox(height: Spacing.m),
-        Expanded(
-          child: _state.quotes.isEmpty
-              ? Center(
-                  child: Padding(
-                    padding: const EdgeInsets.all(Spacing.l),
-                    child: Text(
-                      context.s.bookDetailEmptyMessage,
-                      textAlign: TextAlign.center,
-                      style: context.typography.readingBody
-                          .copyWith(color: context.c.onSurfaceVariant),
+        PinnedHeader(
+          height: _chipsHeight,
+          child: ColoredBox(
+            color: context.c.surface,
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              padding: const EdgeInsets.fromLTRB(Spacing.l, Spacing.m, Spacing.l, Spacing.m),
+              child: Row(
+                children: [
+                  SelectableChip(
+                    label: context.s.bookDetailAllFilter(_state.totalCount),
+                    selected: _state.filter == BookDetailFilter.all,
+                    selectedColor: context.c.inverseSurface,
+                    selectedTextColor: context.c.onInverseSurface,
+                    onTap: () => context.read<BookDetailBloc>().add(
+                      const BookDetailFilterChanged(BookDetailFilter.all),
                     ),
                   ),
-                )
-              : ListView.separated(
-                  padding: const EdgeInsets.fromLTRB(Spacing.l, 0, Spacing.l, Spacing.xxl),
-                  itemCount: _state.quotes.length,
-                  separatorBuilder: (context, index) => const SizedBox(height: Spacing.m),
-                  itemBuilder: (context, index) {
-                    final quote = _state.quotes[index];
-                    final voiceNoteMs = quote.voiceNoteDurationMs;
-                    return QuoteCard(
-                      accent: accent,
-                      quote: "“${quote.quote}”",
-                      thumbnailUrl: book.thumbnailUrl,
-                      page: quote.pageNumber,
-                      note: quote.note,
-                      isFavorite: quote.isFavorite,
-                      hasVoiceNote: quote.voiceNotePath != null,
-                      voiceNoteDuration: voiceNoteMs == null ? null : Duration(milliseconds: voiceNoteMs),
-                      voiceNotePath: quote.voiceNotePath,
-                      onTap: () => context.pushQuoteDetail(quote.id),
-                    );
-                  },
-                ),
+                  const SizedBox(width: Spacing.xs),
+                  SelectableChip(
+                    label: context.s.bookDetailFavoritesFilter,
+                    selected: _state.filter == BookDetailFilter.favorites,
+                    selectedColor: context.c.inverseSurface,
+                    selectedTextColor: context.c.onInverseSurface,
+                    onTap: () => context.read<BookDetailBloc>().add(
+                      const BookDetailFilterChanged(BookDetailFilter.favorites),
+                    ),
+                  ),
+                  const SizedBox(width: Spacing.xs),
+                  SelectableChip(
+                    label: context.s.bookDetailVoiceNoteFilter,
+                    selected: _state.filter == BookDetailFilter.withVoiceNote,
+                    selectedColor: context.c.inverseSurface,
+                    selectedTextColor: context.c.onInverseSurface,
+                    onTap: () => context.read<BookDetailBloc>().add(
+                      const BookDetailFilterChanged(BookDetailFilter.withVoiceNote),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
         ),
+        if (_state.quotes.isEmpty)
+          SliverFillRemaining(
+            hasScrollBody: false,
+            child: Padding(
+              padding: const EdgeInsets.all(Spacing.l),
+              child: Text(
+                context.s.bookDetailEmptyMessage,
+                textAlign: TextAlign.center,
+                style: context.typography.readingBody.copyWith(color: context.c.onSurfaceVariant),
+              ),
+            ),
+          )
+        else
+          SliverPadding(
+            padding: const EdgeInsets.fromLTRB(Spacing.l, 0, Spacing.l, Spacing.xxl),
+            sliver: SliverList.separated(
+              itemCount: _state.quotes.length,
+              separatorBuilder: (context, index) => const SizedBox(height: Spacing.m),
+              itemBuilder: (context, index) {
+                final quote = _state.quotes[index];
+                final voiceNoteMs = quote.voiceNoteDurationMs;
+                return QuoteCard(
+                  accent: accent,
+                  quote: "“${quote.quote}”",
+                  thumbnailUrl: book.thumbnailUrl,
+                  page: quote.pageNumber,
+                  note: quote.note,
+                  isFavorite: quote.isFavorite,
+                  hasVoiceNote: quote.voiceNotePath != null,
+                  voiceNoteDuration: voiceNoteMs == null
+                      ? null
+                      : Duration(milliseconds: voiceNoteMs),
+                  voiceNotePath: quote.voiceNotePath,
+                  onTap: () => context.pushQuoteDetail(quote.id),
+                );
+              },
+            ),
+          ),
       ],
     );
   }
@@ -141,65 +162,123 @@ class const _Header({
   Widget build(BuildContext context) {
     final swatch = context.palette.resolve(_accent);
     final authors = _book.authors.isEmpty ? context.s.bookAuthorsUnknown : _book.authors.join(", ");
-    return Container(
-      decoration: BoxDecoration(
-        color: swatch.fill,
-        borderRadius: const BorderRadius.vertical(bottom: Radius.circular(Spacing.radiusXxl)),
-      ),
-      child: SafeArea(
-        bottom: false,
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(Spacing.l, Spacing.s, Spacing.l, Spacing.l),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  CircleIconButton(
-                    icon: Icons.arrow_back,
-                    tooltip: context.s.back,
-                    backgroundColor: context.c.surfaceContainerLowest,
-                    onPressed: context.closeScreen,
-                  ),
-                  CircleIconButton(
-                    icon: Icons.more_horiz,
-                    backgroundColor: context.c.surfaceContainerLowest,
-                    onPressed: () => _showBookMenu(context, _book.status),
-                  ),
-                ],
-              ),
-              const SizedBox(height: Spacing.m),
-              Row(
+    return SafeArea(
+      bottom: false,
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(Spacing.l, Spacing.s, Spacing.l, Spacing.l),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                CircleIconButton(
+                  icon: Icons.arrow_back,
+                  tooltip: context.s.back,
+                  backgroundColor: context.c.surfaceContainerLowest,
+                  onPressed: context.closeScreen,
+                ),
+                CircleIconButton(
+                  icon: Icons.more_horiz,
+                  backgroundColor: context.c.surfaceContainerLowest,
+                  onPressed: () => _showBookMenu(context, _book.status),
+                ),
+              ],
+            ),
+            const SizedBox(height: Spacing.m),
+            SizedBox(
+              height: _coverHeight,
+              child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  BookCover(accent: _accent, url: _book.thumbnailUrl, width: 96, height: 128, radius: Spacing.radiusL),
+                  BookCover(
+                    accent: _accent,
+                    url: _book.thumbnailUrl,
+                    width: _coverWidth,
+                    height: _coverHeight,
+                    radius: Spacing.radiusL,
+                  ),
                   const SizedBox(width: Spacing.l),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(_book.title, style: context.t.headlineMedium?.copyWith(color: swatch.onFill)),
+                        Text(
+                          _book.title,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: context.t.headlineMedium?.copyWith(color: swatch.onFill),
+                        ),
                         const SizedBox(height: Spacing.xs),
-                        Text(authors, style: context.typography.monoLabel.copyWith(color: swatch.onFillVariant)),
-                        const SizedBox(height: Spacing.m),
-                        Wrap(
-                          spacing: Spacing.xs,
-                          runSpacing: Spacing.xs,
-                          children: [
-                            _StatChip(label: context.s.bookDetailQuotesStat(_state.totalCount)),
-                            _StatChip(label: context.s.bookDetailFavoritesStat(_state.favoriteCount)),
-                            _StatChip(label: _book.status.toLabel(context)),
-                          ],
+                        Text(
+                          authors,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: context.typography.monoLabel.copyWith(
+                            color: swatch.onFillVariant,
+                          ),
+                        ),
+                        const Spacer(),
+                        SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          child: Row(
+                            children: [
+                              _StatChip(label: context.s.bookDetailQuotesStat(_state.totalCount)),
+                              const SizedBox(width: Spacing.xs),
+                              _StatChip(
+                                label: context.s.bookDetailFavoritesStat(_state.favoriteCount),
+                              ),
+                              const SizedBox(width: Spacing.xs),
+                              _StatChip(label: _book.status.toLabel(context)),
+                            ],
+                          ),
                         ),
                       ],
                     ),
                   ),
                 ],
               ),
-            ],
-          ),
+            ),
+          ],
         ),
+      ),
+    );
+  }
+}
+
+class const _CollapsedHeader({
+  required final Book _book,
+  required final AccentColor _accent,
+}) extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final swatch = context.palette.resolve(_accent);
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: Spacing.l, vertical: Spacing.xs),
+      child: Row(
+        children: [
+          CircleIconButton(
+            icon: Icons.arrow_back,
+            tooltip: context.s.back,
+            backgroundColor: context.c.surfaceContainerLowest,
+            onPressed: context.closeScreen,
+          ),
+          const SizedBox(width: Spacing.s),
+          Expanded(
+            child: Text(
+              _book.title,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: context.t.titleLarge?.copyWith(color: swatch.onFill),
+            ),
+          ),
+          const SizedBox(width: Spacing.s),
+          CircleIconButton(
+            icon: Icons.more_horiz,
+            backgroundColor: context.c.surfaceContainerLowest,
+            onPressed: () => _showBookMenu(context, _book.status),
+          ),
+        ],
       ),
     );
   }
@@ -226,7 +305,10 @@ Future<void> _showBookMenu(BuildContext context, BookStatus status) async {
   final deleteRequested = await showModalBottomSheet<bool>(
     context: context,
     useRootNavigator: true,
-    builder: (_) => BlocProvider.value(value: bloc, child: _BookMenu(status: status)),
+    builder: (_) => BlocProvider.value(
+      value: bloc,
+      child: _BookMenu(status: status),
+    ),
   );
   if (deleteRequested != true || !context.mounted) return;
   final confirmed = await showConfirmDialog(
@@ -244,32 +326,25 @@ class const _BookMenu({
 }) extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Padding(
-        padding: const EdgeInsets.all(Spacing.l),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            for (final status in BookStatus.values)
-              if (status != _status)
-                SheetActionTile(
-                  icon: status.toIcon(),
-                  label: status.toActionLabel(context),
-                  onTap: () {
-                    context.read<BookDetailBloc>().add(BookDetailStatusChanged(status));
-                    Navigator.of(context).pop();
-                  },
-                ),
+    return SheetContent(
+      children: [
+        for (final status in BookStatus.values)
+          if (status != _status)
             SheetActionTile(
-              icon: Icons.delete_outline,
-              label: context.s.bookDeleteAction,
-              destructive: true,
-              onTap: () => Navigator.of(context).pop(true),
+              icon: status.toIcon(),
+              label: status.toActionLabel(context),
+              onTap: () {
+                context.read<BookDetailBloc>().add(BookDetailStatusChanged(status));
+                Navigator.of(context).pop();
+              },
             ),
-          ],
+        SheetActionTile(
+          icon: Icons.delete_outline,
+          label: context.s.bookDeleteAction,
+          destructive: true,
+          onTap: () => Navigator.of(context).pop(true),
         ),
-      ),
+      ],
     );
   }
 }

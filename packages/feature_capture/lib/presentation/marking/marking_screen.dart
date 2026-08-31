@@ -472,10 +472,10 @@ class const _SaveSheet() extends HookWidget {
             return ListView(
               controller: scrollController,
               padding: EdgeInsets.fromLTRB(
-                Spacing.l,
                 Spacing.s,
-                Spacing.l,
-                Spacing.l + MediaQuery.viewInsetsOf(context).bottom,
+                Spacing.s,
+                Spacing.s,
+                Spacing.s + MediaQuery.viewInsetsOf(context).bottom,
               ),
               children: [
                 Center(
@@ -552,7 +552,10 @@ class const _SaveSheet() extends HookWidget {
                 const SizedBox(height: Spacing.s),
                 _NoteField(controller: noteController),
                 const SizedBox(height: Spacing.m),
-                _VoiceNoteRecorder(voiceNotePath: state.voiceNotePath, voiceNoteDurationMs: state.voiceNoteDurationMs),
+                _VoiceNoteRecorder(
+                  voiceNotePath: state.voiceNotePath,
+                  voiceNoteDurationMs: state.voiceNoteDurationMs,
+                ),
                 const SizedBox(height: Spacing.m),
                 _ThemeChips(themes: state.availableThemes, selected: state.selectedThemeIds),
                 const SizedBox(height: Spacing.m),

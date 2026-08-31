@@ -101,7 +101,8 @@ class BookDetailBloc extends Bloc<BookDetailEvent, BookDetailState> {
     final visible = switch (_filter) {
       BookDetailFilter.all => _quotes,
       BookDetailFilter.favorites => _quotes.where((quote) => quote.isFavorite).toList(),
-      BookDetailFilter.withVoiceNote => _quotes.where((quote) => quote.voiceNotePath != null).toList(),
+      BookDetailFilter.withVoiceNote =>
+        _quotes.where((quote) => quote.voiceNotePath != null).toList(),
     };
     emit(
       BookDetailLoaded(

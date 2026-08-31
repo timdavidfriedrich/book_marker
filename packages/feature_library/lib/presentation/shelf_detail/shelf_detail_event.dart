@@ -17,8 +17,7 @@ class const ShelfDetailMembershipUpdated(final AppResult<Map<String, Set<String>
 
 class const ShelfDetailBooksUpdated(final AppResult<List<Book>> result) extends ShelfDetailEvent;
 
-class const ShelfDetailQuotesUpdated(final AppResult<List<Quote>> result)
-    extends ShelfDetailEvent;
+class const ShelfDetailQuotesUpdated(final AppResult<List<Quote>> result) extends ShelfDetailEvent;
 
 class const ShelfDetailBookToggled(final String bookId) extends ShelfDetailEvent;
 

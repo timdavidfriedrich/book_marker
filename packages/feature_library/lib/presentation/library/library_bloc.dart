@@ -168,8 +168,7 @@ class LibraryBloc extends Bloc<LibraryEvent, LibraryState> {
       LibraryFilter.all => summaries,
       LibraryFilter.reading =>
         summaries.where((it) => it.book.status == BookStatus.reading).toList(),
-      LibraryFilter.paused =>
-        summaries.where((it) => it.book.status == BookStatus.paused).toList(),
+      LibraryFilter.paused => summaries.where((it) => it.book.status == BookStatus.paused).toList(),
       LibraryFilter.finished =>
         summaries.where((it) => it.book.status == BookStatus.finished).toList(),
     };

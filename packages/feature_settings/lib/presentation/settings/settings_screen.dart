@@ -13,8 +13,7 @@ import 'package:shared/presentation/widgets/circle_icon_button.dart';
 import 'package:shared/presentation/widgets/ink_tap_box.dart';
 import 'package:shared/presentation/widgets/paper_card.dart';
 import 'package:shared/presentation/widgets/profile_avatar.dart';
-import 'package:shared/presentation/widgets/section_label.dart';
-import 'package:shared/presentation/widgets/selectable_chip.dart';
+import 'package:shared/presentation/widgets/segmented_toggle.dart';
 
 const _avatarSize = 64.0;
 
@@ -86,8 +85,14 @@ class const _Content({
                     ),
                     const SizedBox(height: Spacing.xxs),
                     Text(
-                      context.s.settingsStats(_state.bookCount, _state.quoteCount, _state.themeCount),
-                      style: context.typography.monoLabel.copyWith(color: context.c.onSurfaceVariant),
+                      context.s.settingsStats(
+                        _state.bookCount,
+                        _state.quoteCount,
+                        _state.themeCount,
+                      ),
+                      style: context.typography.monoLabel.copyWith(
+                        color: context.c.onSurfaceVariant,
+                      ),
                     ),
                   ],
                 ),
@@ -96,24 +101,19 @@ class const _Content({
           ),
         ),
         const SizedBox(height: Spacing.xl),
-        SectionLabel(text: context.s.settingsLanguageLabel, dotColor: context.palette.teal.solid),
+        Text(context.s.settingsLanguageLabel, style: context.t.headlineSmall),
         const SizedBox(height: Spacing.s),
-        Wrap(
-          spacing: Spacing.xs,
-          runSpacing: Spacing.xs,
-          children: [
-            for (final preference in LocalePreference.values)
-              SelectableChip(
-                label: _localeLabel(context, preference),
-                selected: _state.localePreference == preference,
-                selectedColor: context.c.inverseSurface,
-                selectedTextColor: context.c.onInverseSurface,
-                onTap: () => context.read<SettingsBloc>().add(SettingsLocaleChanged(preference)),
-              ),
+        SegmentedToggle(
+          labels: [
+            for (final preference in LocalePreference.values) _localeLabel(context, preference),
           ],
+          selectedIndex: LocalePreference.values.indexOf(_state.localePreference),
+          onChanged: (index) => context.read<SettingsBloc>().add(
+            SettingsLocaleChanged(LocalePreference.values[index]),
+          ),
         ),
         const SizedBox(height: Spacing.xl),
-        SectionLabel(text: context.s.settingsAboutLabel, dotColor: context.palette.coral.solid),
+        Text(context.s.settingsAboutLabel, style: context.t.headlineSmall),
         const SizedBox(height: Spacing.s),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: Spacing.xs),
