@@ -93,10 +93,15 @@ const _typography = AppTypography(
     fontStyle: FontStyle.italic,
     color: _paperText,
   ),
-  monoLabel: TextStyle(fontFamily: _mono, fontSize: 13, height: 1.35),
-  monoLabelStrong: TextStyle(fontFamily: _mono, fontSize: 13, height: 1.35, fontWeight: FontWeight.w500),
-  monoCaption: TextStyle(fontFamily: _mono, fontSize: 11.5, height: 1.3),
-  monoBadge: TextStyle(fontFamily: _mono, fontSize: 12.5, fontWeight: FontWeight.w500),
+  monoLabel: TextStyle(fontFamily: _serif, fontSize: 13, height: 1.35),
+  monoLabelStrong: TextStyle(
+    fontFamily: _serif,
+    fontSize: 13,
+    height: 1.35,
+    fontWeight: FontWeight.w500,
+  ),
+  monoCaption: TextStyle(fontFamily: _serif, fontSize: 11.5, height: 1.3),
+  monoBadge: TextStyle(fontFamily: _serif, fontSize: 12.5, fontWeight: FontWeight.w500),
 );
 
 const _statusLight = StatusColors(success: _tealSolid, warning: _amberSolid);
@@ -216,7 +221,10 @@ abstract final class AppTheme {
           borderRadius: BorderRadius.all(Radius.circular(Spacing.radiusM)),
         ),
       ),
-      dividerTheme: const DividerThemeData(color: _outlineVariant, thickness: Spacing.borderWidthThin),
+      dividerTheme: const DividerThemeData(
+        color: _outlineVariant,
+        thickness: Spacing.borderWidthThin,
+      ),
       textSelectionTheme: TextSelectionThemeData(
         selectionColor: _amberSolid.withValues(alpha: 0.4),
         cursorColor: colorScheme.primary,
@@ -304,21 +312,96 @@ abstract final class AppTheme {
 
   static TextTheme _textTheme(Color onSurface) {
     const base = TextTheme(
-      displayLarge: TextStyle(fontFamily: _display, fontWeight: FontWeight.w800, fontSize: 57, height: 1.05),
-      displayMedium: TextStyle(fontFamily: _display, fontWeight: FontWeight.w800, fontSize: 45, height: 1.05),
-      displaySmall: TextStyle(fontFamily: _display, fontWeight: FontWeight.w800, fontSize: 34, height: 1.05),
-      headlineLarge: TextStyle(fontFamily: _display, fontWeight: FontWeight.w700, fontSize: 30, height: 1.1),
-      headlineMedium: TextStyle(fontFamily: _display, fontWeight: FontWeight.w700, fontSize: 26, height: 1.1),
-      headlineSmall: TextStyle(fontFamily: _display, fontWeight: FontWeight.w700, fontSize: 22, height: 1.15),
-      titleLarge: TextStyle(fontFamily: _display, fontWeight: FontWeight.w700, fontSize: 20, height: 1.2),
-      titleMedium: TextStyle(fontFamily: _display, fontWeight: FontWeight.w600, fontSize: 16, height: 1.25),
-      titleSmall: TextStyle(fontFamily: _display, fontWeight: FontWeight.w600, fontSize: 14, height: 1.25),
-      bodyLarge: TextStyle(fontFamily: _sans, fontWeight: FontWeight.w400, fontSize: 16, height: 1.4),
-      bodyMedium: TextStyle(fontFamily: _sans, fontWeight: FontWeight.w400, fontSize: 14, height: 1.4),
-      bodySmall: TextStyle(fontFamily: _sans, fontWeight: FontWeight.w400, fontSize: 12.5, height: 1.4),
-      labelLarge: TextStyle(fontFamily: _display, fontWeight: FontWeight.w700, fontSize: 15, height: 1.1),
-      labelMedium: TextStyle(fontFamily: _sans, fontWeight: FontWeight.w500, fontSize: 13, height: 1.1),
-      labelSmall: TextStyle(fontFamily: _sans, fontWeight: FontWeight.w500, fontSize: 11, height: 1.1),
+      displayLarge: TextStyle(
+        fontFamily: _display,
+        fontWeight: FontWeight.w800,
+        fontSize: 57,
+        height: 1.05,
+      ),
+      displayMedium: TextStyle(
+        fontFamily: _display,
+        fontWeight: FontWeight.w800,
+        fontSize: 45,
+        height: 1.05,
+      ),
+      displaySmall: TextStyle(
+        fontFamily: _display,
+        fontWeight: FontWeight.w800,
+        fontSize: 34,
+        height: 1.05,
+      ),
+      headlineLarge: TextStyle(
+        fontFamily: _display,
+        fontWeight: FontWeight.w700,
+        fontSize: 30,
+        height: 1.1,
+      ),
+      headlineMedium: TextStyle(
+        fontFamily: _display,
+        fontWeight: FontWeight.w700,
+        fontSize: 26,
+        height: 1.1,
+      ),
+      headlineSmall: TextStyle(
+        fontFamily: _display,
+        fontWeight: FontWeight.w700,
+        fontSize: 22,
+        height: 1.15,
+      ),
+      titleLarge: TextStyle(
+        fontFamily: _display,
+        fontWeight: FontWeight.w700,
+        fontSize: 20,
+        height: 1.2,
+      ),
+      titleMedium: TextStyle(
+        fontFamily: _display,
+        fontWeight: FontWeight.w600,
+        fontSize: 16,
+        height: 1.25,
+      ),
+      titleSmall: TextStyle(
+        fontFamily: _display,
+        fontWeight: FontWeight.w600,
+        fontSize: 14,
+        height: 1.25,
+      ),
+      bodyLarge: TextStyle(
+        fontFamily: _sans,
+        fontWeight: FontWeight.w400,
+        fontSize: 16,
+        height: 1.4,
+      ),
+      bodyMedium: TextStyle(
+        fontFamily: _sans,
+        fontWeight: FontWeight.w400,
+        fontSize: 14,
+        height: 1.4,
+      ),
+      bodySmall: TextStyle(
+        fontFamily: _sans,
+        fontWeight: FontWeight.w400,
+        fontSize: 12.5,
+        height: 1.4,
+      ),
+      labelLarge: TextStyle(
+        fontFamily: _display,
+        fontWeight: FontWeight.w700,
+        fontSize: 15,
+        height: 1.1,
+      ),
+      labelMedium: TextStyle(
+        fontFamily: _sans,
+        fontWeight: FontWeight.w500,
+        fontSize: 13,
+        height: 1.1,
+      ),
+      labelSmall: TextStyle(
+        fontFamily: _sans,
+        fontWeight: FontWeight.w500,
+        fontSize: 11,
+        height: 1.1,
+      ),
     );
     return base.apply(bodyColor: onSurface, displayColor: onSurface);
   }

@@ -10,7 +10,7 @@ class const SheetContent({
   Widget build(BuildContext context) {
     return SafeArea(
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(Spacing.s, Spacing.xs, Spacing.s, Spacing.s),
+        padding: const EdgeInsets.fromLTRB(Spacing.l, Spacing.xs, Spacing.l, Spacing.s),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: _crossAxisAlignment,

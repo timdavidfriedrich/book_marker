@@ -405,7 +405,7 @@ class const _AddQuotesSheet() extends StatelessWidget {
             if (state is! ThemeDetailLoaded) return const SizedBox.shrink();
             return ListView(
               controller: scrollController,
-              padding: const EdgeInsets.fromLTRB(Spacing.s, Spacing.s, Spacing.s, Spacing.l),
+              padding: const EdgeInsets.fromLTRB(Spacing.l, Spacing.s, Spacing.l, Spacing.l),
               children: [
                 Center(
                   child: Container(
