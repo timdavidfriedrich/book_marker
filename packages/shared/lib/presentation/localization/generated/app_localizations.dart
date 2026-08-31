@@ -210,7 +210,7 @@ abstract class AppLocalizations {
   /// No description provided for @libraryEmptyMessage.
   ///
   /// In en, this message translates to:
-  /// **'No marks yet. Take a photo of a book page to get started.'**
+  /// **'No quotes yet. Take a photo of a book page to get started.'**
   String get libraryEmptyMessage;
 
   /// No description provided for @libraryUnknownBook.
@@ -372,13 +372,13 @@ abstract class AppLocalizations {
   /// No description provided for @markingSaveButton.
   ///
   /// In en, this message translates to:
-  /// **'Save mark'**
+  /// **'Save quote'**
   String get markingSaveButton;
 
   /// No description provided for @markingSavedMessage.
   ///
   /// In en, this message translates to:
-  /// **'Mark saved.'**
+  /// **'Quote saved.'**
   String get markingSavedMessage;
 
   /// No description provided for @markingSelectPrompt.
@@ -387,46 +387,46 @@ abstract class AppLocalizations {
   /// **'Select at least one line to save.'**
   String get markingSelectPrompt;
 
-  /// No description provided for @bookmarkDetailTitle.
+  /// No description provided for @quoteDetailTitle.
   ///
   /// In en, this message translates to:
-  /// **'Mark'**
-  String get bookmarkDetailTitle;
+  /// **'Quote'**
+  String get quoteDetailTitle;
 
-  /// No description provided for @bookmarkDetailQuoteLabel.
+  /// No description provided for @quoteDetailQuoteLabel.
   ///
   /// In en, this message translates to:
-  /// **'Marked text'**
-  String get bookmarkDetailQuoteLabel;
+  /// **'Quote'**
+  String get quoteDetailQuoteLabel;
 
-  /// No description provided for @bookmarkDetailPageLabel.
+  /// No description provided for @quoteDetailPageLabel.
   ///
   /// In en, this message translates to:
   /// **'Page {page}'**
-  String bookmarkDetailPageLabel(int page);
+  String quoteDetailPageLabel(int page);
 
-  /// No description provided for @bookmarkDetailNoPage.
+  /// No description provided for @quoteDetailNoPage.
   ///
   /// In en, this message translates to:
   /// **'No page number'**
-  String get bookmarkDetailNoPage;
+  String get quoteDetailNoPage;
 
-  /// No description provided for @bookmarkDetailFavoriteAdd.
+  /// No description provided for @quoteDetailFavoriteAdd.
   ///
   /// In en, this message translates to:
   /// **'Add to favorites'**
-  String get bookmarkDetailFavoriteAdd;
+  String get quoteDetailFavoriteAdd;
 
-  /// No description provided for @bookmarkDetailFavoriteRemove.
+  /// No description provided for @quoteDetailFavoriteRemove.
   ///
   /// In en, this message translates to:
   /// **'Remove from favorites'**
-  String get bookmarkDetailFavoriteRemove;
+  String get quoteDetailFavoriteRemove;
 
   /// No description provided for @librarySearchHint.
   ///
   /// In en, this message translates to:
-  /// **'Search books and marks…'**
+  /// **'Search books and quotes…'**
   String get librarySearchHint;
 
   /// No description provided for @libraryTabBooks.
@@ -459,29 +459,41 @@ abstract class AppLocalizations {
   /// **'reading {count}'**
   String libraryFilterReading(int count);
 
+  /// No description provided for @libraryFilterPaused.
+  ///
+  /// In en, this message translates to:
+  /// **'paused {count}'**
+  String libraryFilterPaused(int count);
+
   /// No description provided for @libraryFilterFinished.
   ///
   /// In en, this message translates to:
   /// **'finished {count}'**
   String libraryFilterFinished(int count);
 
-  /// No description provided for @libraryMarksCount.
+  /// No description provided for @libraryQuotesCount.
   ///
   /// In en, this message translates to:
-  /// **'{count} marks'**
-  String libraryMarksCount(int count);
+  /// **'{count, plural, =1{1 quote} other{{count} quotes}}'**
+  String libraryQuotesCount(int count);
 
-  /// No description provided for @libraryStarredCount.
+  /// No description provided for @libraryFavoritesCount.
   ///
   /// In en, this message translates to:
-  /// **'{count} starred'**
-  String libraryStarredCount(int count);
+  /// **'{count, plural, =1{1 favorite} other{{count} favorites}}'**
+  String libraryFavoritesCount(int count);
 
   /// No description provided for @libraryStatusReading.
   ///
   /// In en, this message translates to:
   /// **'reading'**
   String get libraryStatusReading;
+
+  /// No description provided for @libraryStatusPaused.
+  ///
+  /// In en, this message translates to:
+  /// **'paused'**
+  String get libraryStatusPaused;
 
   /// No description provided for @libraryShelvesPlaceholder.
   ///
@@ -495,11 +507,11 @@ abstract class AppLocalizations {
   /// **'all books'**
   String get librarySearchScopeAll;
 
-  /// No description provided for @librarySearchScopeStarred.
+  /// No description provided for @librarySearchScopeFavorites.
   ///
   /// In en, this message translates to:
-  /// **'starred'**
-  String get librarySearchScopeStarred;
+  /// **'favorites'**
+  String get librarySearchScopeFavorites;
 
   /// No description provided for @librarySearchScopeNotes.
   ///
@@ -507,11 +519,35 @@ abstract class AppLocalizations {
   /// **'my notes'**
   String get librarySearchScopeNotes;
 
+  /// No description provided for @libraryBookMeta.
+  ///
+  /// In en, this message translates to:
+  /// **'{quotes, plural, =1{1 quote} other{{quotes} quotes}}, {favorites, plural, =1{1 favorite} other{{favorites} favorites}}'**
+  String libraryBookMeta(int quotes, int favorites);
+
+  /// No description provided for @libraryBookMetaWithStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'{quotes, plural, =1{1 quote} other{{quotes} quotes}}, {favorites, plural, =1{1 favorite} other{{favorites} favorites}},\n{status}'**
+  String libraryBookMetaWithStatus(int quotes, int favorites, String status);
+
+  /// No description provided for @libraryShelfMeta.
+  ///
+  /// In en, this message translates to:
+  /// **'{books, plural, =1{1 book} other{{books} books}}, {quotes, plural, =1{1 quote} other{{quotes} quotes}}'**
+  String libraryShelfMeta(int books, int quotes);
+
+  /// No description provided for @quoteSourceLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'{title}, p.{page}'**
+  String quoteSourceLabel(String title, int page);
+
   /// No description provided for @librarySearchCount.
   ///
   /// In en, this message translates to:
-  /// **'{marks} marks in {books} books'**
-  String librarySearchCount(int marks, int books);
+  /// **'{quotes, plural, =1{1 quote} other{{quotes} quotes}} in {books, plural, =1{1 book} other{{books} books}}'**
+  String librarySearchCount(int quotes, int books);
 
   /// No description provided for @navLibraryLabel.
   ///
@@ -537,11 +573,11 @@ abstract class AppLocalizations {
   /// **'p.{page}'**
   String pageShortLabel(int page);
 
-  /// No description provided for @markVoiceLabel.
+  /// No description provided for @quoteVoiceNoteLabel.
   ///
   /// In en, this message translates to:
-  /// **'voice {duration}'**
-  String markVoiceLabel(String duration);
+  /// **'voice note {duration}'**
+  String quoteVoiceNoteLabel(String duration);
 
   /// No description provided for @comingSoonMessage.
   ///
@@ -558,13 +594,13 @@ abstract class AppLocalizations {
   /// No description provided for @themesSubtitlePlaceholder.
   ///
   /// In en, this message translates to:
-  /// **'Gather marks across your books'**
+  /// **'Gather quotes across your books'**
   String get themesSubtitlePlaceholder;
 
   /// No description provided for @themesPlaceholderMessage.
   ///
   /// In en, this message translates to:
-  /// **'Themes gather marks from across your books. They arrive in the next update.'**
+  /// **'Themes gather quotes from across your books. They arrive in the next update.'**
   String get themesPlaceholderMessage;
 
   /// No description provided for @bookDetailAllFilter.
@@ -573,34 +609,34 @@ abstract class AppLocalizations {
   /// **'all {count}'**
   String bookDetailAllFilter(int count);
 
-  /// No description provided for @bookDetailStarredFilter.
+  /// No description provided for @bookDetailFavoritesFilter.
   ///
   /// In en, this message translates to:
-  /// **'starred'**
-  String get bookDetailStarredFilter;
+  /// **'favorites'**
+  String get bookDetailFavoritesFilter;
 
-  /// No description provided for @bookDetailVoiceFilter.
+  /// No description provided for @bookDetailVoiceNoteFilter.
   ///
   /// In en, this message translates to:
-  /// **'with voice'**
-  String get bookDetailVoiceFilter;
+  /// **'with voice note'**
+  String get bookDetailVoiceNoteFilter;
 
-  /// No description provided for @bookDetailMarksStat.
+  /// No description provided for @bookDetailQuotesStat.
   ///
   /// In en, this message translates to:
-  /// **'{count} marks'**
-  String bookDetailMarksStat(int count);
+  /// **'{count, plural, =1{1 quote} other{{count} quotes}}'**
+  String bookDetailQuotesStat(int count);
 
-  /// No description provided for @bookDetailStarredStat.
+  /// No description provided for @bookDetailFavoritesStat.
   ///
   /// In en, this message translates to:
-  /// **'{count} starred'**
-  String bookDetailStarredStat(int count);
+  /// **'{count, plural, =1{1 favorite} other{{count} favorites}}'**
+  String bookDetailFavoritesStat(int count);
 
   /// No description provided for @bookDetailEmptyMessage.
   ///
   /// In en, this message translates to:
-  /// **'No marks in this book yet.'**
+  /// **'No quotes in this book yet.'**
   String get bookDetailEmptyMessage;
 
   /// No description provided for @captureSteadyHint.
@@ -774,14 +810,14 @@ abstract class AppLocalizations {
   /// No description provided for @markingNoteHint.
   ///
   /// In en, this message translates to:
-  /// **'what did this land on?'**
+  /// **'add a note'**
   String get markingNoteHint;
 
-  /// No description provided for @markingVoiceHint.
+  /// No description provided for @markingVoiceNoteHint.
   ///
   /// In en, this message translates to:
-  /// **'hold to say it out loud'**
-  String get markingVoiceHint;
+  /// **'voice note'**
+  String get markingVoiceNoteHint;
 
   /// No description provided for @markingDoneButton.
   ///
@@ -837,53 +873,53 @@ abstract class AppLocalizations {
   /// **'+ new'**
   String get markingNewThemeChip;
 
-  /// No description provided for @bookmarkDetailPhotoMeta.
+  /// No description provided for @quoteDetailPhotoMeta.
   ///
   /// In en, this message translates to:
   /// **'page {page}, shot {date}'**
-  String bookmarkDetailPhotoMeta(int page, String date);
+  String quoteDetailPhotoMeta(int page, String date);
 
-  /// No description provided for @bookmarkDetailShotMeta.
+  /// No description provided for @quoteDetailShotMeta.
   ///
   /// In en, this message translates to:
   /// **'shot {date}'**
-  String bookmarkDetailShotMeta(String date);
+  String quoteDetailShotMeta(String date);
 
-  /// No description provided for @bookmarkDetailNotePlaceholder.
+  /// No description provided for @quoteDetailNotePlaceholder.
   ///
   /// In en, this message translates to:
   /// **'Add a note — coming soon.'**
-  String get bookmarkDetailNotePlaceholder;
+  String get quoteDetailNotePlaceholder;
 
-  /// No description provided for @bookmarkDetailStarredLabel.
+  /// No description provided for @quoteDetailFavoriteLabel.
   ///
   /// In en, this message translates to:
-  /// **'starred'**
-  String get bookmarkDetailStarredLabel;
+  /// **'favorite'**
+  String get quoteDetailFavoriteLabel;
 
-  /// No description provided for @bookmarkDetailShareLabel.
+  /// No description provided for @quoteDetailShareLabel.
   ///
   /// In en, this message translates to:
   /// **'share'**
-  String get bookmarkDetailShareLabel;
+  String get quoteDetailShareLabel;
 
-  /// No description provided for @markShareBody.
+  /// No description provided for @quoteShareBody.
   ///
   /// In en, this message translates to:
   /// **'“{quote}”\n\n— {source}'**
-  String markShareBody(String quote, String source);
+  String quoteShareBody(String quote, String source);
 
-  /// No description provided for @bookmarkDetailMoreLabel.
+  /// No description provided for @quoteDetailMoreLabel.
   ///
   /// In en, this message translates to:
   /// **'more'**
-  String get bookmarkDetailMoreLabel;
+  String get quoteDetailMoreLabel;
 
-  /// No description provided for @bookmarkDetailNoteHint.
+  /// No description provided for @quoteDetailNoteHint.
   ///
   /// In en, this message translates to:
   /// **'Add a note…'**
-  String get bookmarkDetailNoteHint;
+  String get quoteDetailNoteHint;
 
   /// No description provided for @libraryStatusFinished.
   ///
@@ -894,7 +930,7 @@ abstract class AppLocalizations {
   /// No description provided for @libraryFinishedFooter.
   ///
   /// In en, this message translates to:
-  /// **'{count} finished books'**
+  /// **'{count, plural, =1{1 finished book} other{{count} finished books}}'**
   String libraryFinishedFooter(int count);
 
   /// No description provided for @libraryShowFinished.
@@ -915,11 +951,23 @@ abstract class AppLocalizations {
   /// **'Mark as reading'**
   String get bookDetailMarkReading;
 
+  /// No description provided for @bookDetailMarkPaused.
+  ///
+  /// In en, this message translates to:
+  /// **'Mark as paused'**
+  String get bookDetailMarkPaused;
+
   /// No description provided for @themesBooksCount.
   ///
   /// In en, this message translates to:
-  /// **'{count} books'**
+  /// **'{count, plural, =1{1 book} other{{count} books}}'**
   String themesBooksCount(int count);
+
+  /// No description provided for @themesThemeMeta.
+  ///
+  /// In en, this message translates to:
+  /// **'{quotes, plural, =1{1 quote} other{{quotes} quotes}}, {books, plural, =1{1 book} other{{books} books}}'**
+  String themesThemeMeta(int quotes, int books);
 
   /// No description provided for @themesNewThemeLabel.
   ///
@@ -942,26 +990,26 @@ abstract class AppLocalizations {
   /// No description provided for @themeDetailStats.
   ///
   /// In en, this message translates to:
-  /// **'{marks} marks in {books} books,\n{starred} starred'**
-  String themeDetailStats(int marks, int books, int starred);
+  /// **'{quotes, plural, =1{1 quote} other{{quotes} quotes}} in {books, plural, =1{1 book} other{{books} books}}, {favorites, plural, =1{1 favorite} other{{favorites} favorites}}'**
+  String themeDetailStats(int quotes, int books, int favorites);
 
-  /// No description provided for @themeDetailAddMarks.
+  /// No description provided for @themeDetailAddQuotes.
   ///
   /// In en, this message translates to:
-  /// **'Add marks to this theme'**
-  String get themeDetailAddMarks;
+  /// **'Add quotes to this theme'**
+  String get themeDetailAddQuotes;
 
   /// No description provided for @themeDetailEmpty.
   ///
   /// In en, this message translates to:
-  /// **'No marks in this theme yet.'**
+  /// **'No quotes in this theme yet.'**
   String get themeDetailEmpty;
 
-  /// No description provided for @themeAddMarksTitle.
+  /// No description provided for @themeAddQuotesTitle.
   ///
   /// In en, this message translates to:
-  /// **'Add marks'**
-  String get themeAddMarksTitle;
+  /// **'Add quotes'**
+  String get themeAddQuotesTitle;
 
   /// No description provided for @themeRenameTitle.
   ///
@@ -978,7 +1026,7 @@ abstract class AppLocalizations {
   /// No description provided for @themeDeleteMessage.
   ///
   /// In en, this message translates to:
-  /// **'The theme is removed. Your marks and books stay.'**
+  /// **'The theme is removed. Your quotes and books stay.'**
   String get themeDeleteMessage;
 
   /// No description provided for @shelfRenameTitle.
@@ -1014,26 +1062,26 @@ abstract class AppLocalizations {
   /// No description provided for @bookDeleteMessage.
   ///
   /// In en, this message translates to:
-  /// **'This deletes the book and all its marks. This can\'t be undone.'**
+  /// **'This deletes the book and all its quotes. This can\'t be undone.'**
   String get bookDeleteMessage;
 
-  /// No description provided for @markDeleteAction.
+  /// No description provided for @quoteDeleteAction.
   ///
   /// In en, this message translates to:
-  /// **'Delete mark'**
-  String get markDeleteAction;
+  /// **'Delete quote'**
+  String get quoteDeleteAction;
 
-  /// No description provided for @markDeleteTitle.
+  /// No description provided for @quoteDeleteTitle.
   ///
   /// In en, this message translates to:
-  /// **'Delete mark?'**
-  String get markDeleteTitle;
+  /// **'Delete quote?'**
+  String get quoteDeleteTitle;
 
-  /// No description provided for @markDeleteMessage.
+  /// No description provided for @quoteDeleteMessage.
   ///
   /// In en, this message translates to:
-  /// **'This deletes the mark. This can\'t be undone.'**
-  String get markDeleteMessage;
+  /// **'This deletes the quote. This can\'t be undone.'**
+  String get quoteDeleteMessage;
 
   /// No description provided for @libraryNewShelfLabel.
   ///
@@ -1056,8 +1104,8 @@ abstract class AppLocalizations {
   /// No description provided for @shelfDetailStats.
   ///
   /// In en, this message translates to:
-  /// **'{books} books, {marks} marks'**
-  String shelfDetailStats(int books, int marks);
+  /// **'{books, plural, =1{1 book} other{{books} books}}, {quotes, plural, =1{1 quote} other{{quotes} quotes}}'**
+  String shelfDetailStats(int books, int quotes);
 
   /// No description provided for @shelfDetailAddBooks.
   ///
@@ -1092,8 +1140,8 @@ abstract class AppLocalizations {
   /// No description provided for @settingsStats.
   ///
   /// In en, this message translates to:
-  /// **'{books} books\n{marks} marks\n{themes} themes'**
-  String settingsStats(int books, int marks, int themes);
+  /// **'{books, plural, =1{1 book} other{{books} books}}, {quotes, plural, =1{1 quote} other{{quotes} quotes}}, {themes, plural, =1{1 theme} other{{themes} themes}}'**
+  String settingsStats(int books, int quotes, int themes);
 
   /// No description provided for @settingsLanguageLabel.
   ///

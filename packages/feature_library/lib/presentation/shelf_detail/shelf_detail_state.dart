@@ -4,7 +4,7 @@ import 'package:shared/domain/entities/shelf.dart';
 
 class const ShelfBookItem({
   required final Book book,
-  required final int markCount,
+  required final int quoteCount,
 });
 
 sealed class ShelfDetailState {
@@ -19,7 +19,7 @@ class const ShelfDetailLoaded({
   required final List<ShelfBookItem> allBooks,
   required final Set<String> memberIds,
   required final int bookCount,
-  required final int markCount,
+  required final int quoteCount,
 }) extends ShelfDetailState;
 
 class const ShelfDetailFailure({

@@ -7,6 +7,7 @@ const _isbn10Type = "ISBN_10";
 const _insecureScheme = "http://";
 const _secureScheme = "https://";
 const _statusReading = "reading";
+const _statusPaused = "paused";
 const _statusFinished = "finished";
 
 extension LocalBookMappers on LocalBook {
@@ -57,6 +58,7 @@ extension RemoteBookMappers on RemoteBook {
 
 extension BookStatusValueMappers on String {
   BookStatus toBookStatus() => switch (this) {
+    _statusPaused => BookStatus.paused,
     _statusFinished => BookStatus.finished,
     _ => BookStatus.reading,
   };
@@ -65,6 +67,7 @@ extension BookStatusValueMappers on String {
 extension BookStatusMappers on BookStatus {
   String get value => switch (this) {
     BookStatus.reading => _statusReading,
+    BookStatus.paused => _statusPaused,
     BookStatus.finished => _statusFinished,
   };
 }

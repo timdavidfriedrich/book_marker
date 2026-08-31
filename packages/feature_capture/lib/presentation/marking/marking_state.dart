@@ -1,6 +1,6 @@
 import 'package:core/error/app_error.dart';
 import 'package:feature_capture/domain/recognized_page.dart';
-import 'package:shared/domain/entities/mark_theme.dart';
+import 'package:shared/domain/entities/quote_theme.dart';
 
 sealed class MarkingState {
   const MarkingState();
@@ -17,11 +17,11 @@ class const MarkingReady({
   required final String? quoteOverride,
   required final int? pageNumber,
   required final String? note,
-  required final String? voicePath,
-  required final int? voiceDurationMs,
-  required final List<MarkTheme> availableThemes,
+  required final String? voiceNotePath,
+  required final int? voiceNoteDurationMs,
+  required final List<QuoteTheme> availableThemes,
   required final Set<String> selectedThemeIds,
-  required final bool isStarred,
+  required final bool isFavorite,
   required final bool isSaving,
   required final AppError? saveError,
 }) extends MarkingState;

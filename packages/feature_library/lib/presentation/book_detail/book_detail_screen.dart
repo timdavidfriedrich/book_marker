@@ -3,6 +3,7 @@ import 'package:core/theme/theme_extensions.dart';
 import 'package:feature_library/presentation/book_detail/book_detail_bloc.dart';
 import 'package:feature_library/presentation/book_detail/book_detail_event.dart';
 import 'package:feature_library/presentation/book_detail/book_detail_state.dart';
+import 'package:feature_library/presentation/extensions/book_status_extensions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared/domain/entities/book.dart';
@@ -13,7 +14,7 @@ import 'package:shared/presentation/navigation/navigation_extensions.dart';
 import 'package:shared/presentation/widgets/book_cover.dart';
 import 'package:shared/presentation/widgets/circle_icon_button.dart';
 import 'package:shared/presentation/widgets/confirm_dialog.dart';
-import 'package:shared/presentation/widgets/mark_card.dart';
+import 'package:shared/presentation/widgets/quote_card.dart';
 import 'package:shared/presentation/widgets/selectable_chip.dart';
 import 'package:shared/presentation/widgets/sheet_action_tile.dart';
 
@@ -69,30 +70,30 @@ class const _Content({
               ),
               const SizedBox(width: Spacing.xs),
               SelectableChip(
-                label: context.s.bookDetailStarredFilter,
-                selected: _state.filter == BookDetailFilter.starred,
+                label: context.s.bookDetailFavoritesFilter,
+                selected: _state.filter == BookDetailFilter.favorites,
                 selectedColor: context.c.inverseSurface,
                 selectedTextColor: context.c.onInverseSurface,
                 onTap: () => context
                     .read<BookDetailBloc>()
-                    .add(const BookDetailFilterChanged(BookDetailFilter.starred)),
+                    .add(const BookDetailFilterChanged(BookDetailFilter.favorites)),
               ),
               const SizedBox(width: Spacing.xs),
               SelectableChip(
-                label: context.s.bookDetailVoiceFilter,
-                selected: _state.filter == BookDetailFilter.withVoice,
+                label: context.s.bookDetailVoiceNoteFilter,
+                selected: _state.filter == BookDetailFilter.withVoiceNote,
                 selectedColor: context.c.inverseSurface,
                 selectedTextColor: context.c.onInverseSurface,
                 onTap: () => context
                     .read<BookDetailBloc>()
-                    .add(const BookDetailFilterChanged(BookDetailFilter.withVoice)),
+                    .add(const BookDetailFilterChanged(BookDetailFilter.withVoiceNote)),
               ),
             ],
           ),
         ),
         const SizedBox(height: Spacing.m),
         Expanded(
-          child: _state.marks.isEmpty
+          child: _state.quotes.isEmpty
               ? Center(
                   child: Padding(
                     padding: const EdgeInsets.all(Spacing.l),
@@ -106,22 +107,22 @@ class const _Content({
                 )
               : ListView.separated(
                   padding: const EdgeInsets.fromLTRB(Spacing.l, 0, Spacing.l, Spacing.xxl),
-                  itemCount: _state.marks.length,
+                  itemCount: _state.quotes.length,
                   separatorBuilder: (context, index) => const SizedBox(height: Spacing.m),
                   itemBuilder: (context, index) {
-                    final mark = _state.marks[index];
-                    final voiceMs = mark.voiceDurationMs;
-                    return MarkCard(
+                    final quote = _state.quotes[index];
+                    final voiceNoteMs = quote.voiceNoteDurationMs;
+                    return QuoteCard(
                       accent: accent,
-                      quote: "“${mark.quote}”",
+                      quote: "“${quote.quote}”",
                       thumbnailUrl: book.thumbnailUrl,
-                      page: mark.pageNumber,
-                      note: mark.note,
-                      isStarred: mark.isFavorite,
-                      hasVoice: mark.voicePath != null,
-                      voiceDuration: voiceMs == null ? null : Duration(milliseconds: voiceMs),
-                      voicePath: mark.voicePath,
-                      onTap: () => context.pushBookmarkDetail(mark.id),
+                      page: quote.pageNumber,
+                      note: quote.note,
+                      isFavorite: quote.isFavorite,
+                      hasVoiceNote: quote.voiceNotePath != null,
+                      voiceNoteDuration: voiceNoteMs == null ? null : Duration(milliseconds: voiceNoteMs),
+                      voiceNotePath: quote.voiceNotePath,
+                      onTap: () => context.pushQuoteDetail(quote.id),
                     );
                   },
                 ),
@@ -186,13 +187,9 @@ class const _Header({
                           spacing: Spacing.xs,
                           runSpacing: Spacing.xs,
                           children: [
-                            _StatChip(label: context.s.bookDetailMarksStat(_state.totalCount)),
-                            _StatChip(label: context.s.bookDetailStarredStat(_state.starredCount)),
-                            _StatChip(
-                              label: _book.status == BookStatus.finished
-                                  ? context.s.libraryStatusFinished
-                                  : context.s.libraryStatusReading,
-                            ),
+                            _StatChip(label: context.s.bookDetailQuotesStat(_state.totalCount)),
+                            _StatChip(label: context.s.bookDetailFavoritesStat(_state.favoriteCount)),
+                            _StatChip(label: _book.status.toLabel(context)),
                           ],
                         ),
                       ],
@@ -247,7 +244,6 @@ class const _BookMenu({
 }) extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final toFinished = _status == BookStatus.reading;
     return SafeArea(
       child: Padding(
         padding: const EdgeInsets.all(Spacing.l),
@@ -255,14 +251,16 @@ class const _BookMenu({
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            SheetActionTile(
-              icon: toFinished ? Icons.check_circle_outline : Icons.menu_book_outlined,
-              label: toFinished ? context.s.bookDetailMarkFinished : context.s.bookDetailMarkReading,
-              onTap: () {
-                context.read<BookDetailBloc>().add(const BookDetailStatusToggled());
-                Navigator.of(context).pop();
-              },
-            ),
+            for (final status in BookStatus.values)
+              if (status != _status)
+                SheetActionTile(
+                  icon: status.toIcon(),
+                  label: status.toActionLabel(context),
+                  onTap: () {
+                    context.read<BookDetailBloc>().add(BookDetailStatusChanged(status));
+                    Navigator.of(context).pop();
+                  },
+                ),
             SheetActionTile(
               icon: Icons.delete_outline,
               label: context.s.bookDeleteAction,

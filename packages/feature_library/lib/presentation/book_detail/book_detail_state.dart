@@ -1,8 +1,8 @@
 import 'package:core/error/app_error.dart';
 import 'package:shared/domain/entities/book.dart';
-import 'package:shared/domain/entities/bookmark.dart';
+import 'package:shared/domain/entities/quote.dart';
 
-enum BookDetailFilter { all, starred, withVoice }
+enum BookDetailFilter { all, favorites, withVoiceNote }
 
 sealed class BookDetailState {
   const BookDetailState();
@@ -12,9 +12,9 @@ class const BookDetailLoading() extends BookDetailState;
 
 class const BookDetailLoaded({
   required final Book book,
-  required final List<Bookmark> marks,
+  required final List<Quote> quotes,
   required final int totalCount,
-  required final int starredCount,
+  required final int favoriteCount,
   required final BookDetailFilter filter,
 }) extends BookDetailState;
 

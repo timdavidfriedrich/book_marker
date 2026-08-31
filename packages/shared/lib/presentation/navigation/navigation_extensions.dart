@@ -15,8 +15,8 @@ extension NavigationExtension on BuildContext {
   void goLibrary() => go(NavigationRoute.library.path);
   void pushBookDetail(String bookId) =>
       push(NavigationRoute.libraryBook.path.replaceFirst(":$parameterId", bookId));
-  void pushBookmarkDetail(String bookmarkId) =>
-      push(NavigationRoute.libraryMark.path.replaceFirst(":$parameterId", bookmarkId));
+  void pushQuoteDetail(String quoteId) =>
+      push(NavigationRoute.libraryQuote.path.replaceFirst(":$parameterId", quoteId));
   void pushThemeDetail(String themeId) =>
       push(NavigationRoute.themeDetail.path.replaceFirst(":$parameterId", themeId));
   void pushShelfDetail(String shelfId) =>

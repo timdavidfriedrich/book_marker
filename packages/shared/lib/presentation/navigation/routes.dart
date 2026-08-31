@@ -3,7 +3,7 @@ const parameterId = "id";
 enum NavigationRoute {
   library("/library"),
   libraryBook("/library/book/:$parameterId"),
-  libraryMark("/library/mark/:$parameterId"),
+  libraryQuote("/library/quote/:$parameterId"),
   libraryShelf("/library/shelf/:$parameterId"),
   themes("/themes"),
   themeDetail("/themes/:$parameterId"),
@@ -11,7 +11,7 @@ enum NavigationRoute {
   addBook("/capture/add-book"),
   barcodeScanner("/capture/scan"),
   crop("/capture/crop"),
-  marking("/capture/mark"),
+  marking("/capture/quote"),
   settings("/settings");
 
   const NavigationRoute(this.path);

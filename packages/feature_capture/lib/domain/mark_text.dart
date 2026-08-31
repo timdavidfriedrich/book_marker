@@ -22,7 +22,7 @@ String? lineBreakStem(String text, String continuation) {
   if (head.isEmpty || !_letterPattern.hasMatch(head[0])) return null;
   final letters = head.replaceAll(_nonLetterPattern, "").toLowerCase();
   if (_ellipsisFollowers.contains(letters)) return null;
-  // * an uppercase continuation marks a compound whose hyphen belongs to the word
+  // * an uppercase continuation quotes a compound whose hyphen belongs to the word
   if (head[0].toUpperCase() == head[0]) return text;
   return text.substring(0, text.length - 1);
 }

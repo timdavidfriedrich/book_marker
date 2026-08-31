@@ -7,43 +7,43 @@ import 'package:feature_themes/presentation/theme_detail/theme_detail_state.dart
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
 import 'package:shared/domain/entities/book.dart';
-import 'package:shared/domain/entities/bookmark.dart';
-import 'package:shared/domain/entities/mark_theme.dart';
+import 'package:shared/domain/entities/quote.dart';
+import 'package:shared/domain/entities/quote_theme.dart';
 import 'package:shared/domain/repositories/book_repository.dart';
-import 'package:shared/domain/repositories/bookmark_repository.dart';
+import 'package:shared/domain/repositories/quote_repository.dart';
 import 'package:shared/domain/repositories/theme_repository.dart';
 
 @injectable
 class ThemeDetailBloc extends Bloc<ThemeDetailEvent, ThemeDetailState> {
   ThemeDetailBloc(
     this._themeRepository,
-    this._bookmarkRepository,
+    this._quoteRepository,
     this._bookRepository,
     @factoryParam this._themeId,
   ) : super(const ThemeDetailLoading()) {
     on<ThemeDetailStarted>(_onStarted);
     on<ThemeDetailThemesUpdated>(_onThemesUpdated);
     on<ThemeDetailMembershipUpdated>(_onMembershipUpdated);
-    on<ThemeDetailBookmarksUpdated>(_onBookmarksUpdated);
+    on<ThemeDetailQuotesUpdated>(_onQuotesUpdated);
     on<ThemeDetailBooksUpdated>(_onBooksUpdated);
     on<ThemeDetailFilterChanged>(_onFilterChanged);
-    on<ThemeDetailMarkToggled>(_onMarkToggled);
+    on<ThemeDetailQuoteToggled>(_onQuoteToggled);
     on<ThemeDetailRenameRequested>(_onRenameRequested);
     on<ThemeDetailAccentChanged>(_onAccentChanged);
     on<ThemeDetailDeleteRequested>(_onDeleteRequested);
   }
 
   final ThemeRepository _themeRepository;
-  final BookmarkRepository _bookmarkRepository;
+  final QuoteRepository _quoteRepository;
   final BookRepository _bookRepository;
   final String _themeId;
-  StreamSubscription<AppResult<List<MarkTheme>>>? _themeSubscription;
+  StreamSubscription<AppResult<List<QuoteTheme>>>? _themeSubscription;
   StreamSubscription<AppResult<Map<String, Set<String>>>>? _membershipSubscription;
-  StreamSubscription<AppResult<List<Bookmark>>>? _bookmarkSubscription;
+  StreamSubscription<AppResult<List<Quote>>>? _quoteSubscription;
   StreamSubscription<AppResult<List<Book>>>? _bookSubscription;
-  MarkTheme? _theme;
+  QuoteTheme? _theme;
   Set<String> _memberIds = const {};
-  List<Bookmark> _bookmarks = const [];
+  List<Quote> _quotes = const [];
   Map<String, Book> _booksById = const {};
   ThemeDetailFilter _filter = ThemeDetailFilter.all;
   AppError? _error;
@@ -51,7 +51,7 @@ class ThemeDetailBloc extends Bloc<ThemeDetailEvent, ThemeDetailState> {
   Future<void> _onStarted(ThemeDetailStarted event, Emitter<ThemeDetailState> emit) async {
     await _themeSubscription?.cancel();
     await _membershipSubscription?.cancel();
-    await _bookmarkSubscription?.cancel();
+    await _quoteSubscription?.cancel();
     await _bookSubscription?.cancel();
     _themeSubscription = _themeRepository.watchThemes().listen(
       (result) => add(ThemeDetailThemesUpdated(result)),
@@ -59,8 +59,8 @@ class ThemeDetailBloc extends Bloc<ThemeDetailEvent, ThemeDetailState> {
     _membershipSubscription = _themeRepository.watchThemeMembership().listen(
       (result) => add(ThemeDetailMembershipUpdated(result)),
     );
-    _bookmarkSubscription = _bookmarkRepository.watchBookmarks().listen(
-      (result) => add(ThemeDetailBookmarksUpdated(result)),
+    _quoteSubscription = _quoteRepository.watchQuotes().listen(
+      (result) => add(ThemeDetailQuotesUpdated(result)),
     );
     _bookSubscription = _bookRepository.watchBooks().listen(
       (result) => add(ThemeDetailBooksUpdated(result)),
@@ -73,7 +73,7 @@ class ThemeDetailBloc extends Bloc<ThemeDetailEvent, ThemeDetailState> {
         _error = error;
       case Success(:final data):
         _error = null;
-        MarkTheme? found;
+        QuoteTheme? found;
         for (final theme in data) {
           if (theme.id == _themeId) {
             found = theme;
@@ -92,9 +92,9 @@ class ThemeDetailBloc extends Bloc<ThemeDetailEvent, ThemeDetailState> {
     }
   }
 
-  void _onBookmarksUpdated(ThemeDetailBookmarksUpdated event, Emitter<ThemeDetailState> emit) {
+  void _onQuotesUpdated(ThemeDetailQuotesUpdated event, Emitter<ThemeDetailState> emit) {
     if (event.result case Success(:final data)) {
-      _bookmarks = data;
+      _quotes = data;
       _emitState(emit);
     }
   }
@@ -111,14 +111,14 @@ class ThemeDetailBloc extends Bloc<ThemeDetailEvent, ThemeDetailState> {
     _emitState(emit);
   }
 
-  Future<void> _onMarkToggled(
-    ThemeDetailMarkToggled event,
+  Future<void> _onQuoteToggled(
+    ThemeDetailQuoteToggled event,
     Emitter<ThemeDetailState> emit,
   ) async {
-    if (_memberIds.contains(event.bookmarkId)) {
-      await _themeRepository.removeMarkFromTheme(themeId: _themeId, bookmarkId: event.bookmarkId);
+    if (_memberIds.contains(event.quoteId)) {
+      await _themeRepository.removeQuoteFromTheme(themeId: _themeId, quoteId: event.quoteId);
     } else {
-      await _themeRepository.addMarkToTheme(themeId: _themeId, bookmarkId: event.bookmarkId);
+      await _themeRepository.addQuoteToTheme(themeId: _themeId, quoteId: event.quoteId);
     }
   }
 
@@ -155,24 +155,24 @@ class ThemeDetailBloc extends Bloc<ThemeDetailEvent, ThemeDetailState> {
     }
     final theme = _theme;
     if (theme == null) return;
-    final allMarks = <ThemeMarkItem>[];
-    for (final mark in _bookmarks) {
-      final book = _booksById[mark.bookId];
-      if (book != null) allMarks.add(ThemeMarkItem(mark: mark, book: book));
+    final allQuotes = <ThemeQuoteItem>[];
+    for (final quote in _quotes) {
+      final book = _booksById[quote.bookId];
+      if (book != null) allQuotes.add(ThemeQuoteItem(quote: quote, book: book));
     }
-    final memberItems = allMarks.where((item) => _memberIds.contains(item.mark.id)).toList();
+    final memberItems = allQuotes.where((item) => _memberIds.contains(item.quote.id)).toList();
     final visible = switch (_filter) {
       ThemeDetailFilter.all => memberItems,
-      ThemeDetailFilter.starred => memberItems.where((item) => item.mark.isFavorite).toList(),
+      ThemeDetailFilter.favorites => memberItems.where((item) => item.quote.isFavorite).toList(),
     };
     emit(
       ThemeDetailLoaded(
         theme: theme,
-        marks: visible,
-        allMarks: allMarks,
+        quotes: visible,
+        allQuotes: allQuotes,
         memberIds: _memberIds,
         totalCount: memberItems.length,
-        starredCount: memberItems.where((item) => item.mark.isFavorite).length,
+        favoriteCount: memberItems.where((item) => item.quote.isFavorite).length,
         bookCount: memberItems.map((item) => item.book.id).toSet().length,
         filter: _filter,
       ),
@@ -183,7 +183,7 @@ class ThemeDetailBloc extends Bloc<ThemeDetailEvent, ThemeDetailState> {
   Future<void> close() async {
     await _themeSubscription?.cancel();
     await _membershipSubscription?.cancel();
-    await _bookmarkSubscription?.cancel();
+    await _quoteSubscription?.cancel();
     await _bookSubscription?.cancel();
     return super.close();
   }

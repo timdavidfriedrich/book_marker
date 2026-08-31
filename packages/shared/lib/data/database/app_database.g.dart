@@ -517,12 +517,11 @@ class BooksCompanion extends UpdateCompanion<LocalBook> {
   }
 }
 
-class $BookmarksTable extends Bookmarks
-    with TableInfo<$BookmarksTable, LocalBookmark> {
+class $QuotesTable extends Quotes with TableInfo<$QuotesTable, LocalQuote> {
   @override
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
-  $BookmarksTable(this.attachedDatabase, [this._alias]);
+  $QuotesTable(this.attachedDatabase, [this._alias]);
   static const VerificationMeta _idMeta = const VerificationMeta('id');
   @override
   late final GeneratedColumn<String> id = GeneratedColumn<String>(
@@ -573,23 +572,22 @@ class $BookmarksTable extends Bookmarks
     type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
-  static const VerificationMeta _voicePathMeta = const VerificationMeta(
-    'voicePath',
+  static const VerificationMeta _voiceNotePathMeta = const VerificationMeta(
+    'voiceNotePath',
   );
   @override
-  late final GeneratedColumn<String> voicePath = GeneratedColumn<String>(
-    'voice_path',
+  late final GeneratedColumn<String> voiceNotePath = GeneratedColumn<String>(
+    'voice_note_path',
     aliasedName,
     true,
     type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
-  static const VerificationMeta _voiceDurationMsMeta = const VerificationMeta(
-    'voiceDurationMs',
-  );
+  static const VerificationMeta _voiceNoteDurationMsMeta =
+      const VerificationMeta('voiceNoteDurationMs');
   @override
-  late final GeneratedColumn<int> voiceDurationMs = GeneratedColumn<int>(
-    'voice_duration_ms',
+  late final GeneratedColumn<int> voiceNoteDurationMs = GeneratedColumn<int>(
+    'voice_note_duration_ms',
     aliasedName,
     true,
     type: DriftSqlType.int,
@@ -625,7 +623,7 @@ class $BookmarksTable extends Bookmarks
     false,
     type: DriftSqlType.string,
     requiredDuringInsert: true,
-  ).withConverter<List<HighlightRegion>>($BookmarksTable.$converterhighlights);
+  ).withConverter<List<HighlightRegion>>($QuotesTable.$converterhighlights);
   static const VerificationMeta _isFavoriteMeta = const VerificationMeta(
     'isFavorite',
   );
@@ -659,8 +657,8 @@ class $BookmarksTable extends Bookmarks
     pageNumber,
     quote,
     note,
-    voicePath,
-    voiceDurationMs,
+    voiceNotePath,
+    voiceNoteDurationMs,
     photoPath,
     imageAspectRatio,
     highlights,
@@ -671,10 +669,10 @@ class $BookmarksTable extends Bookmarks
   String get aliasedName => _alias ?? actualTableName;
   @override
   String get actualTableName => $name;
-  static const String $name = 'bookmarks';
+  static const String $name = 'quotes';
   @override
   VerificationContext validateIntegrity(
-    Insertable<LocalBookmark> instance, {
+    Insertable<LocalQuote> instance, {
     bool isInserting = false,
   }) {
     final context = VerificationContext();
@@ -712,18 +710,21 @@ class $BookmarksTable extends Bookmarks
         note.isAcceptableOrUnknown(data['note']!, _noteMeta),
       );
     }
-    if (data.containsKey('voice_path')) {
+    if (data.containsKey('voice_note_path')) {
       context.handle(
-        _voicePathMeta,
-        voicePath.isAcceptableOrUnknown(data['voice_path']!, _voicePathMeta),
+        _voiceNotePathMeta,
+        voiceNotePath.isAcceptableOrUnknown(
+          data['voice_note_path']!,
+          _voiceNotePathMeta,
+        ),
       );
     }
-    if (data.containsKey('voice_duration_ms')) {
+    if (data.containsKey('voice_note_duration_ms')) {
       context.handle(
-        _voiceDurationMsMeta,
-        voiceDurationMs.isAcceptableOrUnknown(
-          data['voice_duration_ms']!,
-          _voiceDurationMsMeta,
+        _voiceNoteDurationMsMeta,
+        voiceNoteDurationMs.isAcceptableOrUnknown(
+          data['voice_note_duration_ms']!,
+          _voiceNoteDurationMsMeta,
         ),
       );
     }
@@ -766,9 +767,9 @@ class $BookmarksTable extends Bookmarks
   @override
   Set<GeneratedColumn> get $primaryKey => {id};
   @override
-  LocalBookmark map(Map<String, dynamic> data, {String? tablePrefix}) {
+  LocalQuote map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
-    return LocalBookmark(
+    return LocalQuote(
       id: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}id'],
@@ -789,13 +790,13 @@ class $BookmarksTable extends Bookmarks
         DriftSqlType.string,
         data['${effectivePrefix}note'],
       ),
-      voicePath: attachedDatabase.typeMapping.read(
+      voiceNotePath: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
-        data['${effectivePrefix}voice_path'],
+        data['${effectivePrefix}voice_note_path'],
       ),
-      voiceDurationMs: attachedDatabase.typeMapping.read(
+      voiceNoteDurationMs: attachedDatabase.typeMapping.read(
         DriftSqlType.int,
-        data['${effectivePrefix}voice_duration_ms'],
+        data['${effectivePrefix}voice_note_duration_ms'],
       ),
       photoPath: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
@@ -805,7 +806,7 @@ class $BookmarksTable extends Bookmarks
         DriftSqlType.double,
         data['${effectivePrefix}image_aspect_ratio'],
       )!,
-      highlights: $BookmarksTable.$converterhighlights.fromSql(
+      highlights: $QuotesTable.$converterhighlights.fromSql(
         attachedDatabase.typeMapping.read(
           DriftSqlType.string,
           data['${effectivePrefix}highlights'],
@@ -823,35 +824,35 @@ class $BookmarksTable extends Bookmarks
   }
 
   @override
-  $BookmarksTable createAlias(String alias) {
-    return $BookmarksTable(attachedDatabase, alias);
+  $QuotesTable createAlias(String alias) {
+    return $QuotesTable(attachedDatabase, alias);
   }
 
   static TypeConverter<List<HighlightRegion>, String> $converterhighlights =
       const HighlightListConverter();
 }
 
-class LocalBookmark extends DataClass implements Insertable<LocalBookmark> {
+class LocalQuote extends DataClass implements Insertable<LocalQuote> {
   final String id;
   final String bookId;
   final int? pageNumber;
   final String quote;
   final String? note;
-  final String? voicePath;
-  final int? voiceDurationMs;
+  final String? voiceNotePath;
+  final int? voiceNoteDurationMs;
   final String photoPath;
   final double imageAspectRatio;
   final List<HighlightRegion> highlights;
   final bool isFavorite;
   final DateTime createdAt;
-  const LocalBookmark({
+  const LocalQuote({
     required this.id,
     required this.bookId,
     this.pageNumber,
     required this.quote,
     this.note,
-    this.voicePath,
-    this.voiceDurationMs,
+    this.voiceNotePath,
+    this.voiceNoteDurationMs,
     required this.photoPath,
     required this.imageAspectRatio,
     required this.highlights,
@@ -870,17 +871,17 @@ class LocalBookmark extends DataClass implements Insertable<LocalBookmark> {
     if (!nullToAbsent || note != null) {
       map['note'] = Variable<String>(note);
     }
-    if (!nullToAbsent || voicePath != null) {
-      map['voice_path'] = Variable<String>(voicePath);
+    if (!nullToAbsent || voiceNotePath != null) {
+      map['voice_note_path'] = Variable<String>(voiceNotePath);
     }
-    if (!nullToAbsent || voiceDurationMs != null) {
-      map['voice_duration_ms'] = Variable<int>(voiceDurationMs);
+    if (!nullToAbsent || voiceNoteDurationMs != null) {
+      map['voice_note_duration_ms'] = Variable<int>(voiceNoteDurationMs);
     }
     map['photo_path'] = Variable<String>(photoPath);
     map['image_aspect_ratio'] = Variable<double>(imageAspectRatio);
     {
       map['highlights'] = Variable<String>(
-        $BookmarksTable.$converterhighlights.toSql(highlights),
+        $QuotesTable.$converterhighlights.toSql(highlights),
       );
     }
     map['is_favorite'] = Variable<bool>(isFavorite);
@@ -888,8 +889,8 @@ class LocalBookmark extends DataClass implements Insertable<LocalBookmark> {
     return map;
   }
 
-  BookmarksCompanion toCompanion(bool nullToAbsent) {
-    return BookmarksCompanion(
+  QuotesCompanion toCompanion(bool nullToAbsent) {
+    return QuotesCompanion(
       id: Value(id),
       bookId: Value(bookId),
       pageNumber: pageNumber == null && nullToAbsent
@@ -897,12 +898,12 @@ class LocalBookmark extends DataClass implements Insertable<LocalBookmark> {
           : Value(pageNumber),
       quote: Value(quote),
       note: note == null && nullToAbsent ? const Value.absent() : Value(note),
-      voicePath: voicePath == null && nullToAbsent
+      voiceNotePath: voiceNotePath == null && nullToAbsent
           ? const Value.absent()
-          : Value(voicePath),
-      voiceDurationMs: voiceDurationMs == null && nullToAbsent
+          : Value(voiceNotePath),
+      voiceNoteDurationMs: voiceNoteDurationMs == null && nullToAbsent
           ? const Value.absent()
-          : Value(voiceDurationMs),
+          : Value(voiceNoteDurationMs),
       photoPath: Value(photoPath),
       imageAspectRatio: Value(imageAspectRatio),
       highlights: Value(highlights),
@@ -911,19 +912,21 @@ class LocalBookmark extends DataClass implements Insertable<LocalBookmark> {
     );
   }
 
-  factory LocalBookmark.fromJson(
+  factory LocalQuote.fromJson(
     Map<String, dynamic> json, {
     ValueSerializer? serializer,
   }) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
-    return LocalBookmark(
+    return LocalQuote(
       id: serializer.fromJson<String>(json['id']),
       bookId: serializer.fromJson<String>(json['bookId']),
       pageNumber: serializer.fromJson<int?>(json['pageNumber']),
       quote: serializer.fromJson<String>(json['quote']),
       note: serializer.fromJson<String?>(json['note']),
-      voicePath: serializer.fromJson<String?>(json['voicePath']),
-      voiceDurationMs: serializer.fromJson<int?>(json['voiceDurationMs']),
+      voiceNotePath: serializer.fromJson<String?>(json['voiceNotePath']),
+      voiceNoteDurationMs: serializer.fromJson<int?>(
+        json['voiceNoteDurationMs'],
+      ),
       photoPath: serializer.fromJson<String>(json['photoPath']),
       imageAspectRatio: serializer.fromJson<double>(json['imageAspectRatio']),
       highlights: serializer.fromJson<List<HighlightRegion>>(
@@ -942,8 +945,8 @@ class LocalBookmark extends DataClass implements Insertable<LocalBookmark> {
       'pageNumber': serializer.toJson<int?>(pageNumber),
       'quote': serializer.toJson<String>(quote),
       'note': serializer.toJson<String?>(note),
-      'voicePath': serializer.toJson<String?>(voicePath),
-      'voiceDurationMs': serializer.toJson<int?>(voiceDurationMs),
+      'voiceNotePath': serializer.toJson<String?>(voiceNotePath),
+      'voiceNoteDurationMs': serializer.toJson<int?>(voiceNoteDurationMs),
       'photoPath': serializer.toJson<String>(photoPath),
       'imageAspectRatio': serializer.toJson<double>(imageAspectRatio),
       'highlights': serializer.toJson<List<HighlightRegion>>(highlights),
@@ -952,37 +955,39 @@ class LocalBookmark extends DataClass implements Insertable<LocalBookmark> {
     };
   }
 
-  LocalBookmark copyWith({
+  LocalQuote copyWith({
     String? id,
     String? bookId,
     Value<int?> pageNumber = const Value.absent(),
     String? quote,
     Value<String?> note = const Value.absent(),
-    Value<String?> voicePath = const Value.absent(),
-    Value<int?> voiceDurationMs = const Value.absent(),
+    Value<String?> voiceNotePath = const Value.absent(),
+    Value<int?> voiceNoteDurationMs = const Value.absent(),
     String? photoPath,
     double? imageAspectRatio,
     List<HighlightRegion>? highlights,
     bool? isFavorite,
     DateTime? createdAt,
-  }) => LocalBookmark(
+  }) => LocalQuote(
     id: id ?? this.id,
     bookId: bookId ?? this.bookId,
     pageNumber: pageNumber.present ? pageNumber.value : this.pageNumber,
     quote: quote ?? this.quote,
     note: note.present ? note.value : this.note,
-    voicePath: voicePath.present ? voicePath.value : this.voicePath,
-    voiceDurationMs: voiceDurationMs.present
-        ? voiceDurationMs.value
-        : this.voiceDurationMs,
+    voiceNotePath: voiceNotePath.present
+        ? voiceNotePath.value
+        : this.voiceNotePath,
+    voiceNoteDurationMs: voiceNoteDurationMs.present
+        ? voiceNoteDurationMs.value
+        : this.voiceNoteDurationMs,
     photoPath: photoPath ?? this.photoPath,
     imageAspectRatio: imageAspectRatio ?? this.imageAspectRatio,
     highlights: highlights ?? this.highlights,
     isFavorite: isFavorite ?? this.isFavorite,
     createdAt: createdAt ?? this.createdAt,
   );
-  LocalBookmark copyWithCompanion(BookmarksCompanion data) {
-    return LocalBookmark(
+  LocalQuote copyWithCompanion(QuotesCompanion data) {
+    return LocalQuote(
       id: data.id.present ? data.id.value : this.id,
       bookId: data.bookId.present ? data.bookId.value : this.bookId,
       pageNumber: data.pageNumber.present
@@ -990,10 +995,12 @@ class LocalBookmark extends DataClass implements Insertable<LocalBookmark> {
           : this.pageNumber,
       quote: data.quote.present ? data.quote.value : this.quote,
       note: data.note.present ? data.note.value : this.note,
-      voicePath: data.voicePath.present ? data.voicePath.value : this.voicePath,
-      voiceDurationMs: data.voiceDurationMs.present
-          ? data.voiceDurationMs.value
-          : this.voiceDurationMs,
+      voiceNotePath: data.voiceNotePath.present
+          ? data.voiceNotePath.value
+          : this.voiceNotePath,
+      voiceNoteDurationMs: data.voiceNoteDurationMs.present
+          ? data.voiceNoteDurationMs.value
+          : this.voiceNoteDurationMs,
       photoPath: data.photoPath.present ? data.photoPath.value : this.photoPath,
       imageAspectRatio: data.imageAspectRatio.present
           ? data.imageAspectRatio.value
@@ -1010,14 +1017,14 @@ class LocalBookmark extends DataClass implements Insertable<LocalBookmark> {
 
   @override
   String toString() {
-    return (StringBuffer('LocalBookmark(')
+    return (StringBuffer('LocalQuote(')
           ..write('id: $id, ')
           ..write('bookId: $bookId, ')
           ..write('pageNumber: $pageNumber, ')
           ..write('quote: $quote, ')
           ..write('note: $note, ')
-          ..write('voicePath: $voicePath, ')
-          ..write('voiceDurationMs: $voiceDurationMs, ')
+          ..write('voiceNotePath: $voiceNotePath, ')
+          ..write('voiceNoteDurationMs: $voiceNoteDurationMs, ')
           ..write('photoPath: $photoPath, ')
           ..write('imageAspectRatio: $imageAspectRatio, ')
           ..write('highlights: $highlights, ')
@@ -1034,8 +1041,8 @@ class LocalBookmark extends DataClass implements Insertable<LocalBookmark> {
     pageNumber,
     quote,
     note,
-    voicePath,
-    voiceDurationMs,
+    voiceNotePath,
+    voiceNoteDurationMs,
     photoPath,
     imageAspectRatio,
     highlights,
@@ -1045,14 +1052,14 @@ class LocalBookmark extends DataClass implements Insertable<LocalBookmark> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      (other is LocalBookmark &&
+      (other is LocalQuote &&
           other.id == this.id &&
           other.bookId == this.bookId &&
           other.pageNumber == this.pageNumber &&
           other.quote == this.quote &&
           other.note == this.note &&
-          other.voicePath == this.voicePath &&
-          other.voiceDurationMs == this.voiceDurationMs &&
+          other.voiceNotePath == this.voiceNotePath &&
+          other.voiceNoteDurationMs == this.voiceNoteDurationMs &&
           other.photoPath == this.photoPath &&
           other.imageAspectRatio == this.imageAspectRatio &&
           other.highlights == this.highlights &&
@@ -1060,28 +1067,28 @@ class LocalBookmark extends DataClass implements Insertable<LocalBookmark> {
           other.createdAt == this.createdAt);
 }
 
-class BookmarksCompanion extends UpdateCompanion<LocalBookmark> {
+class QuotesCompanion extends UpdateCompanion<LocalQuote> {
   final Value<String> id;
   final Value<String> bookId;
   final Value<int?> pageNumber;
   final Value<String> quote;
   final Value<String?> note;
-  final Value<String?> voicePath;
-  final Value<int?> voiceDurationMs;
+  final Value<String?> voiceNotePath;
+  final Value<int?> voiceNoteDurationMs;
   final Value<String> photoPath;
   final Value<double> imageAspectRatio;
   final Value<List<HighlightRegion>> highlights;
   final Value<bool> isFavorite;
   final Value<DateTime> createdAt;
   final Value<int> rowid;
-  const BookmarksCompanion({
+  const QuotesCompanion({
     this.id = const Value.absent(),
     this.bookId = const Value.absent(),
     this.pageNumber = const Value.absent(),
     this.quote = const Value.absent(),
     this.note = const Value.absent(),
-    this.voicePath = const Value.absent(),
-    this.voiceDurationMs = const Value.absent(),
+    this.voiceNotePath = const Value.absent(),
+    this.voiceNoteDurationMs = const Value.absent(),
     this.photoPath = const Value.absent(),
     this.imageAspectRatio = const Value.absent(),
     this.highlights = const Value.absent(),
@@ -1089,14 +1096,14 @@ class BookmarksCompanion extends UpdateCompanion<LocalBookmark> {
     this.createdAt = const Value.absent(),
     this.rowid = const Value.absent(),
   });
-  BookmarksCompanion.insert({
+  QuotesCompanion.insert({
     required String id,
     required String bookId,
     this.pageNumber = const Value.absent(),
     required String quote,
     this.note = const Value.absent(),
-    this.voicePath = const Value.absent(),
-    this.voiceDurationMs = const Value.absent(),
+    this.voiceNotePath = const Value.absent(),
+    this.voiceNoteDurationMs = const Value.absent(),
     required String photoPath,
     required double imageAspectRatio,
     required List<HighlightRegion> highlights,
@@ -1110,14 +1117,14 @@ class BookmarksCompanion extends UpdateCompanion<LocalBookmark> {
        imageAspectRatio = Value(imageAspectRatio),
        highlights = Value(highlights),
        createdAt = Value(createdAt);
-  static Insertable<LocalBookmark> custom({
+  static Insertable<LocalQuote> custom({
     Expression<String>? id,
     Expression<String>? bookId,
     Expression<int>? pageNumber,
     Expression<String>? quote,
     Expression<String>? note,
-    Expression<String>? voicePath,
-    Expression<int>? voiceDurationMs,
+    Expression<String>? voiceNotePath,
+    Expression<int>? voiceNoteDurationMs,
     Expression<String>? photoPath,
     Expression<double>? imageAspectRatio,
     Expression<String>? highlights,
@@ -1131,8 +1138,9 @@ class BookmarksCompanion extends UpdateCompanion<LocalBookmark> {
       if (pageNumber != null) 'page_number': pageNumber,
       if (quote != null) 'quote': quote,
       if (note != null) 'note': note,
-      if (voicePath != null) 'voice_path': voicePath,
-      if (voiceDurationMs != null) 'voice_duration_ms': voiceDurationMs,
+      if (voiceNotePath != null) 'voice_note_path': voiceNotePath,
+      if (voiceNoteDurationMs != null)
+        'voice_note_duration_ms': voiceNoteDurationMs,
       if (photoPath != null) 'photo_path': photoPath,
       if (imageAspectRatio != null) 'image_aspect_ratio': imageAspectRatio,
       if (highlights != null) 'highlights': highlights,
@@ -1142,14 +1150,14 @@ class BookmarksCompanion extends UpdateCompanion<LocalBookmark> {
     });
   }
 
-  BookmarksCompanion copyWith({
+  QuotesCompanion copyWith({
     Value<String>? id,
     Value<String>? bookId,
     Value<int?>? pageNumber,
     Value<String>? quote,
     Value<String?>? note,
-    Value<String?>? voicePath,
-    Value<int?>? voiceDurationMs,
+    Value<String?>? voiceNotePath,
+    Value<int?>? voiceNoteDurationMs,
     Value<String>? photoPath,
     Value<double>? imageAspectRatio,
     Value<List<HighlightRegion>>? highlights,
@@ -1157,14 +1165,14 @@ class BookmarksCompanion extends UpdateCompanion<LocalBookmark> {
     Value<DateTime>? createdAt,
     Value<int>? rowid,
   }) {
-    return BookmarksCompanion(
+    return QuotesCompanion(
       id: id ?? this.id,
       bookId: bookId ?? this.bookId,
       pageNumber: pageNumber ?? this.pageNumber,
       quote: quote ?? this.quote,
       note: note ?? this.note,
-      voicePath: voicePath ?? this.voicePath,
-      voiceDurationMs: voiceDurationMs ?? this.voiceDurationMs,
+      voiceNotePath: voiceNotePath ?? this.voiceNotePath,
+      voiceNoteDurationMs: voiceNoteDurationMs ?? this.voiceNoteDurationMs,
       photoPath: photoPath ?? this.photoPath,
       imageAspectRatio: imageAspectRatio ?? this.imageAspectRatio,
       highlights: highlights ?? this.highlights,
@@ -1192,11 +1200,11 @@ class BookmarksCompanion extends UpdateCompanion<LocalBookmark> {
     if (note.present) {
       map['note'] = Variable<String>(note.value);
     }
-    if (voicePath.present) {
-      map['voice_path'] = Variable<String>(voicePath.value);
+    if (voiceNotePath.present) {
+      map['voice_note_path'] = Variable<String>(voiceNotePath.value);
     }
-    if (voiceDurationMs.present) {
-      map['voice_duration_ms'] = Variable<int>(voiceDurationMs.value);
+    if (voiceNoteDurationMs.present) {
+      map['voice_note_duration_ms'] = Variable<int>(voiceNoteDurationMs.value);
     }
     if (photoPath.present) {
       map['photo_path'] = Variable<String>(photoPath.value);
@@ -1206,7 +1214,7 @@ class BookmarksCompanion extends UpdateCompanion<LocalBookmark> {
     }
     if (highlights.present) {
       map['highlights'] = Variable<String>(
-        $BookmarksTable.$converterhighlights.toSql(highlights.value),
+        $QuotesTable.$converterhighlights.toSql(highlights.value),
       );
     }
     if (isFavorite.present) {
@@ -1223,14 +1231,14 @@ class BookmarksCompanion extends UpdateCompanion<LocalBookmark> {
 
   @override
   String toString() {
-    return (StringBuffer('BookmarksCompanion(')
+    return (StringBuffer('QuotesCompanion(')
           ..write('id: $id, ')
           ..write('bookId: $bookId, ')
           ..write('pageNumber: $pageNumber, ')
           ..write('quote: $quote, ')
           ..write('note: $note, ')
-          ..write('voicePath: $voicePath, ')
-          ..write('voiceDurationMs: $voiceDurationMs, ')
+          ..write('voiceNotePath: $voiceNotePath, ')
+          ..write('voiceNoteDurationMs: $voiceNoteDurationMs, ')
           ..write('photoPath: $photoPath, ')
           ..write('imageAspectRatio: $imageAspectRatio, ')
           ..write('highlights: $highlights, ')
@@ -1548,12 +1556,12 @@ class ThemesCompanion extends UpdateCompanion<LocalTheme> {
   }
 }
 
-class $ThemeMarksTable extends ThemeMarks
-    with TableInfo<$ThemeMarksTable, LocalThemeMark> {
+class $ThemeQuotesTable extends ThemeQuotes
+    with TableInfo<$ThemeQuotesTable, LocalThemeQuote> {
   @override
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
-  $ThemeMarksTable(this.attachedDatabase, [this._alias]);
+  $ThemeQuotesTable(this.attachedDatabase, [this._alias]);
   static const VerificationMeta _themeIdMeta = const VerificationMeta(
     'themeId',
   );
@@ -1568,30 +1576,30 @@ class $ThemeMarksTable extends ThemeMarks
       'REFERENCES themes (id) ON DELETE CASCADE',
     ),
   );
-  static const VerificationMeta _bookmarkIdMeta = const VerificationMeta(
-    'bookmarkId',
+  static const VerificationMeta _quoteIdMeta = const VerificationMeta(
+    'quoteId',
   );
   @override
-  late final GeneratedColumn<String> bookmarkId = GeneratedColumn<String>(
-    'bookmark_id',
+  late final GeneratedColumn<String> quoteId = GeneratedColumn<String>(
+    'quote_id',
     aliasedName,
     false,
     type: DriftSqlType.string,
     requiredDuringInsert: true,
     defaultConstraints: GeneratedColumn.constraintIsAlways(
-      'REFERENCES bookmarks (id) ON DELETE CASCADE',
+      'REFERENCES quotes (id) ON DELETE CASCADE',
     ),
   );
   @override
-  List<GeneratedColumn> get $columns => [themeId, bookmarkId];
+  List<GeneratedColumn> get $columns => [themeId, quoteId];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
   String get actualTableName => $name;
-  static const String $name = 'theme_marks';
+  static const String $name = 'theme_quotes';
   @override
   VerificationContext validateIntegrity(
-    Insertable<LocalThemeMark> instance, {
+    Insertable<LocalThemeQuote> instance, {
     bool isInserting = false,
   }) {
     final context = VerificationContext();
@@ -1604,67 +1612,67 @@ class $ThemeMarksTable extends ThemeMarks
     } else if (isInserting) {
       context.missing(_themeIdMeta);
     }
-    if (data.containsKey('bookmark_id')) {
+    if (data.containsKey('quote_id')) {
       context.handle(
-        _bookmarkIdMeta,
-        bookmarkId.isAcceptableOrUnknown(data['bookmark_id']!, _bookmarkIdMeta),
+        _quoteIdMeta,
+        quoteId.isAcceptableOrUnknown(data['quote_id']!, _quoteIdMeta),
       );
     } else if (isInserting) {
-      context.missing(_bookmarkIdMeta);
+      context.missing(_quoteIdMeta);
     }
     return context;
   }
 
   @override
-  Set<GeneratedColumn> get $primaryKey => {themeId, bookmarkId};
+  Set<GeneratedColumn> get $primaryKey => {themeId, quoteId};
   @override
-  LocalThemeMark map(Map<String, dynamic> data, {String? tablePrefix}) {
+  LocalThemeQuote map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
-    return LocalThemeMark(
+    return LocalThemeQuote(
       themeId: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}theme_id'],
       )!,
-      bookmarkId: attachedDatabase.typeMapping.read(
+      quoteId: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
-        data['${effectivePrefix}bookmark_id'],
+        data['${effectivePrefix}quote_id'],
       )!,
     );
   }
 
   @override
-  $ThemeMarksTable createAlias(String alias) {
-    return $ThemeMarksTable(attachedDatabase, alias);
+  $ThemeQuotesTable createAlias(String alias) {
+    return $ThemeQuotesTable(attachedDatabase, alias);
   }
 }
 
-class LocalThemeMark extends DataClass implements Insertable<LocalThemeMark> {
+class LocalThemeQuote extends DataClass implements Insertable<LocalThemeQuote> {
   final String themeId;
-  final String bookmarkId;
-  const LocalThemeMark({required this.themeId, required this.bookmarkId});
+  final String quoteId;
+  const LocalThemeQuote({required this.themeId, required this.quoteId});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     map['theme_id'] = Variable<String>(themeId);
-    map['bookmark_id'] = Variable<String>(bookmarkId);
+    map['quote_id'] = Variable<String>(quoteId);
     return map;
   }
 
-  ThemeMarksCompanion toCompanion(bool nullToAbsent) {
-    return ThemeMarksCompanion(
+  ThemeQuotesCompanion toCompanion(bool nullToAbsent) {
+    return ThemeQuotesCompanion(
       themeId: Value(themeId),
-      bookmarkId: Value(bookmarkId),
+      quoteId: Value(quoteId),
     );
   }
 
-  factory LocalThemeMark.fromJson(
+  factory LocalThemeQuote.fromJson(
     Map<String, dynamic> json, {
     ValueSerializer? serializer,
   }) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
-    return LocalThemeMark(
+    return LocalThemeQuote(
       themeId: serializer.fromJson<String>(json['themeId']),
-      bookmarkId: serializer.fromJson<String>(json['bookmarkId']),
+      quoteId: serializer.fromJson<String>(json['quoteId']),
     );
   }
   @override
@@ -1672,78 +1680,76 @@ class LocalThemeMark extends DataClass implements Insertable<LocalThemeMark> {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
       'themeId': serializer.toJson<String>(themeId),
-      'bookmarkId': serializer.toJson<String>(bookmarkId),
+      'quoteId': serializer.toJson<String>(quoteId),
     };
   }
 
-  LocalThemeMark copyWith({String? themeId, String? bookmarkId}) =>
-      LocalThemeMark(
+  LocalThemeQuote copyWith({String? themeId, String? quoteId}) =>
+      LocalThemeQuote(
         themeId: themeId ?? this.themeId,
-        bookmarkId: bookmarkId ?? this.bookmarkId,
+        quoteId: quoteId ?? this.quoteId,
       );
-  LocalThemeMark copyWithCompanion(ThemeMarksCompanion data) {
-    return LocalThemeMark(
+  LocalThemeQuote copyWithCompanion(ThemeQuotesCompanion data) {
+    return LocalThemeQuote(
       themeId: data.themeId.present ? data.themeId.value : this.themeId,
-      bookmarkId: data.bookmarkId.present
-          ? data.bookmarkId.value
-          : this.bookmarkId,
+      quoteId: data.quoteId.present ? data.quoteId.value : this.quoteId,
     );
   }
 
   @override
   String toString() {
-    return (StringBuffer('LocalThemeMark(')
+    return (StringBuffer('LocalThemeQuote(')
           ..write('themeId: $themeId, ')
-          ..write('bookmarkId: $bookmarkId')
+          ..write('quoteId: $quoteId')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(themeId, bookmarkId);
+  int get hashCode => Object.hash(themeId, quoteId);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      (other is LocalThemeMark &&
+      (other is LocalThemeQuote &&
           other.themeId == this.themeId &&
-          other.bookmarkId == this.bookmarkId);
+          other.quoteId == this.quoteId);
 }
 
-class ThemeMarksCompanion extends UpdateCompanion<LocalThemeMark> {
+class ThemeQuotesCompanion extends UpdateCompanion<LocalThemeQuote> {
   final Value<String> themeId;
-  final Value<String> bookmarkId;
+  final Value<String> quoteId;
   final Value<int> rowid;
-  const ThemeMarksCompanion({
+  const ThemeQuotesCompanion({
     this.themeId = const Value.absent(),
-    this.bookmarkId = const Value.absent(),
+    this.quoteId = const Value.absent(),
     this.rowid = const Value.absent(),
   });
-  ThemeMarksCompanion.insert({
+  ThemeQuotesCompanion.insert({
     required String themeId,
-    required String bookmarkId,
+    required String quoteId,
     this.rowid = const Value.absent(),
   }) : themeId = Value(themeId),
-       bookmarkId = Value(bookmarkId);
-  static Insertable<LocalThemeMark> custom({
+       quoteId = Value(quoteId);
+  static Insertable<LocalThemeQuote> custom({
     Expression<String>? themeId,
-    Expression<String>? bookmarkId,
+    Expression<String>? quoteId,
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
       if (themeId != null) 'theme_id': themeId,
-      if (bookmarkId != null) 'bookmark_id': bookmarkId,
+      if (quoteId != null) 'quote_id': quoteId,
       if (rowid != null) 'rowid': rowid,
     });
   }
 
-  ThemeMarksCompanion copyWith({
+  ThemeQuotesCompanion copyWith({
     Value<String>? themeId,
-    Value<String>? bookmarkId,
+    Value<String>? quoteId,
     Value<int>? rowid,
   }) {
-    return ThemeMarksCompanion(
+    return ThemeQuotesCompanion(
       themeId: themeId ?? this.themeId,
-      bookmarkId: bookmarkId ?? this.bookmarkId,
+      quoteId: quoteId ?? this.quoteId,
       rowid: rowid ?? this.rowid,
     );
   }
@@ -1754,8 +1760,8 @@ class ThemeMarksCompanion extends UpdateCompanion<LocalThemeMark> {
     if (themeId.present) {
       map['theme_id'] = Variable<String>(themeId.value);
     }
-    if (bookmarkId.present) {
-      map['bookmark_id'] = Variable<String>(bookmarkId.value);
+    if (quoteId.present) {
+      map['quote_id'] = Variable<String>(quoteId.value);
     }
     if (rowid.present) {
       map['rowid'] = Variable<int>(rowid.value);
@@ -1765,9 +1771,9 @@ class ThemeMarksCompanion extends UpdateCompanion<LocalThemeMark> {
 
   @override
   String toString() {
-    return (StringBuffer('ThemeMarksCompanion(')
+    return (StringBuffer('ThemeQuotesCompanion(')
           ..write('themeId: $themeId, ')
-          ..write('bookmarkId: $bookmarkId, ')
+          ..write('quoteId: $quoteId, ')
           ..write('rowid: $rowid')
           ..write(')'))
         .toString();
@@ -2568,9 +2574,9 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
   late final $BooksTable books = $BooksTable(this);
-  late final $BookmarksTable bookmarks = $BookmarksTable(this);
+  late final $QuotesTable quotes = $QuotesTable(this);
   late final $ThemesTable themes = $ThemesTable(this);
-  late final $ThemeMarksTable themeMarks = $ThemeMarksTable(this);
+  late final $ThemeQuotesTable themeQuotes = $ThemeQuotesTable(this);
   late final $ShelvesTable shelves = $ShelvesTable(this);
   late final $ShelfBooksTable shelfBooks = $ShelfBooksTable(this);
   late final $SettingsTableTable settingsTable = $SettingsTableTable(this);
@@ -2580,9 +2586,9 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   @override
   List<DatabaseSchemaEntity> get allSchemaEntities => [
     books,
-    bookmarks,
+    quotes,
     themes,
-    themeMarks,
+    themeQuotes,
     shelves,
     shelfBooks,
     settingsTable,
@@ -2594,21 +2600,21 @@ abstract class _$AppDatabase extends GeneratedDatabase {
         'books',
         limitUpdateKind: UpdateKind.delete,
       ),
-      result: [TableUpdate('bookmarks', kind: UpdateKind.delete)],
+      result: [TableUpdate('quotes', kind: UpdateKind.delete)],
     ),
     WritePropagation(
       on: TableUpdateQuery.onTableName(
         'themes',
         limitUpdateKind: UpdateKind.delete,
       ),
-      result: [TableUpdate('theme_marks', kind: UpdateKind.delete)],
+      result: [TableUpdate('theme_quotes', kind: UpdateKind.delete)],
     ),
     WritePropagation(
       on: TableUpdateQuery.onTableName(
-        'bookmarks',
+        'quotes',
         limitUpdateKind: UpdateKind.delete,
       ),
-      result: [TableUpdate('theme_marks', kind: UpdateKind.delete)],
+      result: [TableUpdate('theme_quotes', kind: UpdateKind.delete)],
     ),
     WritePropagation(
       on: TableUpdateQuery.onTableName(
@@ -2654,19 +2660,20 @@ final class $$BooksTableReferences
     extends BaseReferences<_$AppDatabase, $BooksTable, LocalBook> {
   $$BooksTableReferences(super.$_db, super.$_table, super.$_typedResult);
 
-  static MultiTypedResultKey<$BookmarksTable, List<LocalBookmark>>
-  _bookmarksRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
-    db.bookmarks,
-    aliasName: 'books__id__bookmarks__book_id',
+  static MultiTypedResultKey<$QuotesTable, List<LocalQuote>> _quotesRefsTable(
+    _$AppDatabase db,
+  ) => MultiTypedResultKey.fromTable(
+    db.quotes,
+    aliasName: 'books__id__quotes__book_id',
   );
 
-  $$BookmarksTableProcessedTableManager get bookmarksRefs {
-    final manager = $$BookmarksTableTableManager(
+  $$QuotesTableProcessedTableManager get quotesRefs {
+    final manager = $$QuotesTableTableManager(
       $_db,
-      $_db.bookmarks,
+      $_db.quotes,
     ).filter((f) => f.bookId.id.sqlEquals($_itemColumn<String>('id')!));
 
-    final cache = $_typedResult.readTableOrNull(_bookmarksRefsTable($_db));
+    final cache = $_typedResult.readTableOrNull(_quotesRefsTable($_db));
     return ProcessedTableManager(
       manager.$state.copyWith(prefetchedData: cache),
     );
@@ -2740,22 +2747,22 @@ class $$BooksTableFilterComposer extends Composer<_$AppDatabase, $BooksTable> {
     builder: (column) => ColumnFilters(column),
   );
 
-  Expression<bool> bookmarksRefs(
-    Expression<bool> Function($$BookmarksTableFilterComposer f) f,
+  Expression<bool> quotesRefs(
+    Expression<bool> Function($$QuotesTableFilterComposer f) f,
   ) {
-    final $$BookmarksTableFilterComposer composer = $composerBuilder(
+    final $$QuotesTableFilterComposer composer = $composerBuilder(
       composer: this,
       getCurrentColumn: (t) => t.id,
-      referencedTable: $db.bookmarks,
+      referencedTable: $db.quotes,
       getReferencedColumn: (t) => t.bookId,
       builder:
           (
             joinBuilder, {
             $addJoinBuilderToRootComposer,
             $removeJoinBuilderFromRootComposer,
-          }) => $$BookmarksTableFilterComposer(
+          }) => $$QuotesTableFilterComposer(
             $db: $db,
-            $table: $db.bookmarks,
+            $table: $db.quotes,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -2878,22 +2885,22 @@ class $$BooksTableAnnotationComposer
     builder: (column) => column,
   );
 
-  Expression<T> bookmarksRefs<T extends Object>(
-    Expression<T> Function($$BookmarksTableAnnotationComposer a) f,
+  Expression<T> quotesRefs<T extends Object>(
+    Expression<T> Function($$QuotesTableAnnotationComposer a) f,
   ) {
-    final $$BookmarksTableAnnotationComposer composer = $composerBuilder(
+    final $$QuotesTableAnnotationComposer composer = $composerBuilder(
       composer: this,
       getCurrentColumn: (t) => t.id,
-      referencedTable: $db.bookmarks,
+      referencedTable: $db.quotes,
       getReferencedColumn: (t) => t.bookId,
       builder:
           (
             joinBuilder, {
             $addJoinBuilderToRootComposer,
             $removeJoinBuilderFromRootComposer,
-          }) => $$BookmarksTableAnnotationComposer(
+          }) => $$QuotesTableAnnotationComposer(
             $db: $db,
-            $table: $db.bookmarks,
+            $table: $db.quotes,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -2942,7 +2949,7 @@ class $$BooksTableTableManager
           $$BooksTableUpdateCompanionBuilder,
           (LocalBook, $$BooksTableReferences),
           LocalBook,
-          PrefetchHooks Function({bool bookmarksRefs, bool shelfBooksRefs})
+          PrefetchHooks Function({bool quotesRefs, bool shelfBooksRefs})
         > {
   $$BooksTableTableManager(_$AppDatabase db, $BooksTable table)
     : super(
@@ -3006,31 +3013,27 @@ class $$BooksTableTableManager
               )
               .toList(),
           prefetchHooksCallback:
-              ({bookmarksRefs = false, shelfBooksRefs = false}) {
+              ({quotesRefs = false, shelfBooksRefs = false}) {
                 return PrefetchHooks(
                   db: db,
                   explicitlyWatchedTables: [
-                    if (bookmarksRefs) db.bookmarks,
+                    if (quotesRefs) db.quotes,
                     if (shelfBooksRefs) db.shelfBooks,
                   ],
                   addJoins: null,
                   getPrefetchedDataCallback: (items) async {
                     return [
-                      if (bookmarksRefs)
+                      if (quotesRefs)
                         await $_getPrefetchedData<
                           LocalBook,
                           $BooksTable,
-                          LocalBookmark
+                          LocalQuote
                         >(
                           currentTable: table,
                           referencedTable: $$BooksTableReferences
-                              ._bookmarksRefsTable(db),
+                              ._quotesRefsTable(db),
                           managerFromTypedResult: (p0) =>
-                              $$BooksTableReferences(
-                                db,
-                                table,
-                                p0,
-                              ).bookmarksRefs,
+                              $$BooksTableReferences(db, table, p0).quotesRefs,
                           referencedItemsForCurrentItem:
                               (item, referencedItems) => referencedItems.where(
                                 (e) => e.bookId == item.id,
@@ -3078,16 +3081,16 @@ typedef $$BooksTableProcessedTableManager =
       $$BooksTableUpdateCompanionBuilder,
       (LocalBook, $$BooksTableReferences),
       LocalBook,
-      PrefetchHooks Function({bool bookmarksRefs, bool shelfBooksRefs})
+      PrefetchHooks Function({bool quotesRefs, bool shelfBooksRefs})
     >;
-typedef $$BookmarksTableCreateCompanionBuilder = BookmarksCompanion Function({
+typedef $$QuotesTableCreateCompanionBuilder = QuotesCompanion Function({
   required String id,
   required String bookId,
   Value<int?> pageNumber,
   required String quote,
   Value<String?> note,
-  Value<String?> voicePath,
-  Value<int?> voiceDurationMs,
+  Value<String?> voiceNotePath,
+  Value<int?> voiceNoteDurationMs,
   required String photoPath,
   required double imageAspectRatio,
   required List<HighlightRegion> highlights,
@@ -3095,14 +3098,14 @@ typedef $$BookmarksTableCreateCompanionBuilder = BookmarksCompanion Function({
   required DateTime createdAt,
   Value<int> rowid,
 });
-typedef $$BookmarksTableUpdateCompanionBuilder = BookmarksCompanion Function({
+typedef $$QuotesTableUpdateCompanionBuilder = QuotesCompanion Function({
   Value<String> id,
   Value<String> bookId,
   Value<int?> pageNumber,
   Value<String> quote,
   Value<String?> note,
-  Value<String?> voicePath,
-  Value<int?> voiceDurationMs,
+  Value<String?> voiceNotePath,
+  Value<int?> voiceNoteDurationMs,
   Value<String> photoPath,
   Value<double> imageAspectRatio,
   Value<List<HighlightRegion>> highlights,
@@ -3111,12 +3114,12 @@ typedef $$BookmarksTableUpdateCompanionBuilder = BookmarksCompanion Function({
   Value<int> rowid,
 });
 
-final class $$BookmarksTableReferences
-    extends BaseReferences<_$AppDatabase, $BookmarksTable, LocalBookmark> {
-  $$BookmarksTableReferences(super.$_db, super.$_table, super.$_typedResult);
+final class $$QuotesTableReferences
+    extends BaseReferences<_$AppDatabase, $QuotesTable, LocalQuote> {
+  $$QuotesTableReferences(super.$_db, super.$_table, super.$_typedResult);
 
   static $BooksTable _bookIdTable(_$AppDatabase db) =>
-      db.books.createAlias('bookmarks__book_id__books__id');
+      db.books.createAlias('quotes__book_id__books__id');
 
   $$BooksTableProcessedTableManager get bookId {
     final $_column = $_itemColumn<String>('book_id')!;
@@ -3132,28 +3135,28 @@ final class $$BookmarksTableReferences
     );
   }
 
-  static MultiTypedResultKey<$ThemeMarksTable, List<LocalThemeMark>>
-  _themeMarksRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
-    db.themeMarks,
-    aliasName: 'bookmarks__id__theme_marks__bookmark_id',
+  static MultiTypedResultKey<$ThemeQuotesTable, List<LocalThemeQuote>>
+  _themeQuotesRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.themeQuotes,
+    aliasName: 'quotes__id__theme_quotes__quote_id',
   );
 
-  $$ThemeMarksTableProcessedTableManager get themeMarksRefs {
-    final manager = $$ThemeMarksTableTableManager(
+  $$ThemeQuotesTableProcessedTableManager get themeQuotesRefs {
+    final manager = $$ThemeQuotesTableTableManager(
       $_db,
-      $_db.themeMarks,
-    ).filter((f) => f.bookmarkId.id.sqlEquals($_itemColumn<String>('id')!));
+      $_db.themeQuotes,
+    ).filter((f) => f.quoteId.id.sqlEquals($_itemColumn<String>('id')!));
 
-    final cache = $_typedResult.readTableOrNull(_themeMarksRefsTable($_db));
+    final cache = $_typedResult.readTableOrNull(_themeQuotesRefsTable($_db));
     return ProcessedTableManager(
       manager.$state.copyWith(prefetchedData: cache),
     );
   }
 }
 
-class $$BookmarksTableFilterComposer
-    extends Composer<_$AppDatabase, $BookmarksTable> {
-  $$BookmarksTableFilterComposer({
+class $$QuotesTableFilterComposer
+    extends Composer<_$AppDatabase, $QuotesTable> {
+  $$QuotesTableFilterComposer({
     required super.$db,
     required super.$table,
     super.joinBuilder,
@@ -3180,13 +3183,13 @@ class $$BookmarksTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<String> get voicePath => $composableBuilder(
-    column: $table.voicePath,
+  ColumnFilters<String> get voiceNotePath => $composableBuilder(
+    column: $table.voiceNotePath,
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<int> get voiceDurationMs => $composableBuilder(
-    column: $table.voiceDurationMs,
+  ColumnFilters<int> get voiceNoteDurationMs => $composableBuilder(
+    column: $table.voiceNoteDurationMs,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -3243,22 +3246,22 @@ class $$BookmarksTableFilterComposer
     return composer;
   }
 
-  Expression<bool> themeMarksRefs(
-    Expression<bool> Function($$ThemeMarksTableFilterComposer f) f,
+  Expression<bool> themeQuotesRefs(
+    Expression<bool> Function($$ThemeQuotesTableFilterComposer f) f,
   ) {
-    final $$ThemeMarksTableFilterComposer composer = $composerBuilder(
+    final $$ThemeQuotesTableFilterComposer composer = $composerBuilder(
       composer: this,
       getCurrentColumn: (t) => t.id,
-      referencedTable: $db.themeMarks,
-      getReferencedColumn: (t) => t.bookmarkId,
+      referencedTable: $db.themeQuotes,
+      getReferencedColumn: (t) => t.quoteId,
       builder:
           (
             joinBuilder, {
             $addJoinBuilderToRootComposer,
             $removeJoinBuilderFromRootComposer,
-          }) => $$ThemeMarksTableFilterComposer(
+          }) => $$ThemeQuotesTableFilterComposer(
             $db: $db,
-            $table: $db.themeMarks,
+            $table: $db.themeQuotes,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -3269,9 +3272,9 @@ class $$BookmarksTableFilterComposer
   }
 }
 
-class $$BookmarksTableOrderingComposer
-    extends Composer<_$AppDatabase, $BookmarksTable> {
-  $$BookmarksTableOrderingComposer({
+class $$QuotesTableOrderingComposer
+    extends Composer<_$AppDatabase, $QuotesTable> {
+  $$QuotesTableOrderingComposer({
     required super.$db,
     required super.$table,
     super.joinBuilder,
@@ -3298,13 +3301,13 @@ class $$BookmarksTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<String> get voicePath => $composableBuilder(
-    column: $table.voicePath,
+  ColumnOrderings<String> get voiceNotePath => $composableBuilder(
+    column: $table.voiceNotePath,
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<int> get voiceDurationMs => $composableBuilder(
-    column: $table.voiceDurationMs,
+  ColumnOrderings<int> get voiceNoteDurationMs => $composableBuilder(
+    column: $table.voiceNoteDurationMs,
     builder: (column) => ColumnOrderings(column),
   );
 
@@ -3357,9 +3360,9 @@ class $$BookmarksTableOrderingComposer
   }
 }
 
-class $$BookmarksTableAnnotationComposer
-    extends Composer<_$AppDatabase, $BookmarksTable> {
-  $$BookmarksTableAnnotationComposer({
+class $$QuotesTableAnnotationComposer
+    extends Composer<_$AppDatabase, $QuotesTable> {
+  $$QuotesTableAnnotationComposer({
     required super.$db,
     required super.$table,
     super.joinBuilder,
@@ -3380,11 +3383,13 @@ class $$BookmarksTableAnnotationComposer
   GeneratedColumn<String> get note =>
       $composableBuilder(column: $table.note, builder: (column) => column);
 
-  GeneratedColumn<String> get voicePath =>
-      $composableBuilder(column: $table.voicePath, builder: (column) => column);
+  GeneratedColumn<String> get voiceNotePath => $composableBuilder(
+    column: $table.voiceNotePath,
+    builder: (column) => column,
+  );
 
-  GeneratedColumn<int> get voiceDurationMs => $composableBuilder(
-    column: $table.voiceDurationMs,
+  GeneratedColumn<int> get voiceNoteDurationMs => $composableBuilder(
+    column: $table.voiceNoteDurationMs,
     builder: (column) => column,
   );
 
@@ -3433,22 +3438,22 @@ class $$BookmarksTableAnnotationComposer
     return composer;
   }
 
-  Expression<T> themeMarksRefs<T extends Object>(
-    Expression<T> Function($$ThemeMarksTableAnnotationComposer a) f,
+  Expression<T> themeQuotesRefs<T extends Object>(
+    Expression<T> Function($$ThemeQuotesTableAnnotationComposer a) f,
   ) {
-    final $$ThemeMarksTableAnnotationComposer composer = $composerBuilder(
+    final $$ThemeQuotesTableAnnotationComposer composer = $composerBuilder(
       composer: this,
       getCurrentColumn: (t) => t.id,
-      referencedTable: $db.themeMarks,
-      getReferencedColumn: (t) => t.bookmarkId,
+      referencedTable: $db.themeQuotes,
+      getReferencedColumn: (t) => t.quoteId,
       builder:
           (
             joinBuilder, {
             $addJoinBuilderToRootComposer,
             $removeJoinBuilderFromRootComposer,
-          }) => $$ThemeMarksTableAnnotationComposer(
+          }) => $$ThemeQuotesTableAnnotationComposer(
             $db: $db,
-            $table: $db.themeMarks,
+            $table: $db.themeQuotes,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -3459,32 +3464,32 @@ class $$BookmarksTableAnnotationComposer
   }
 }
 
-class $$BookmarksTableTableManager
+class $$QuotesTableTableManager
     extends
         RootTableManager<
           _$AppDatabase,
-          $BookmarksTable,
-          LocalBookmark,
-          $$BookmarksTableFilterComposer,
-          $$BookmarksTableOrderingComposer,
-          $$BookmarksTableAnnotationComposer,
-          $$BookmarksTableCreateCompanionBuilder,
-          $$BookmarksTableUpdateCompanionBuilder,
-          (LocalBookmark, $$BookmarksTableReferences),
-          LocalBookmark,
-          PrefetchHooks Function({bool bookId, bool themeMarksRefs})
+          $QuotesTable,
+          LocalQuote,
+          $$QuotesTableFilterComposer,
+          $$QuotesTableOrderingComposer,
+          $$QuotesTableAnnotationComposer,
+          $$QuotesTableCreateCompanionBuilder,
+          $$QuotesTableUpdateCompanionBuilder,
+          (LocalQuote, $$QuotesTableReferences),
+          LocalQuote,
+          PrefetchHooks Function({bool bookId, bool themeQuotesRefs})
         > {
-  $$BookmarksTableTableManager(_$AppDatabase db, $BookmarksTable table)
+  $$QuotesTableTableManager(_$AppDatabase db, $QuotesTable table)
     : super(
         TableManagerState(
           db: db,
           table: table,
           createFilteringComposer: () =>
-              $$BookmarksTableFilterComposer($db: db, $table: table),
+              $$QuotesTableFilterComposer($db: db, $table: table),
           createOrderingComposer: () =>
-              $$BookmarksTableOrderingComposer($db: db, $table: table),
+              $$QuotesTableOrderingComposer($db: db, $table: table),
           createComputedFieldComposer: () =>
-              $$BookmarksTableAnnotationComposer($db: db, $table: table),
+              $$QuotesTableAnnotationComposer($db: db, $table: table),
           updateCompanionCallback:
               ({
                 Value<String> id = const Value.absent(),
@@ -3492,22 +3497,22 @@ class $$BookmarksTableTableManager
                 Value<int?> pageNumber = const Value.absent(),
                 Value<String> quote = const Value.absent(),
                 Value<String?> note = const Value.absent(),
-                Value<String?> voicePath = const Value.absent(),
-                Value<int?> voiceDurationMs = const Value.absent(),
+                Value<String?> voiceNotePath = const Value.absent(),
+                Value<int?> voiceNoteDurationMs = const Value.absent(),
                 Value<String> photoPath = const Value.absent(),
                 Value<double> imageAspectRatio = const Value.absent(),
                 Value<List<HighlightRegion>> highlights = const Value.absent(),
                 Value<bool> isFavorite = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
-              }) => BookmarksCompanion(
+              }) => QuotesCompanion(
                 id: id,
                 bookId: bookId,
                 pageNumber: pageNumber,
                 quote: quote,
                 note: note,
-                voicePath: voicePath,
-                voiceDurationMs: voiceDurationMs,
+                voiceNotePath: voiceNotePath,
+                voiceNoteDurationMs: voiceNoteDurationMs,
                 photoPath: photoPath,
                 imageAspectRatio: imageAspectRatio,
                 highlights: highlights,
@@ -3522,22 +3527,22 @@ class $$BookmarksTableTableManager
                 Value<int?> pageNumber = const Value.absent(),
                 required String quote,
                 Value<String?> note = const Value.absent(),
-                Value<String?> voicePath = const Value.absent(),
-                Value<int?> voiceDurationMs = const Value.absent(),
+                Value<String?> voiceNotePath = const Value.absent(),
+                Value<int?> voiceNoteDurationMs = const Value.absent(),
                 required String photoPath,
                 required double imageAspectRatio,
                 required List<HighlightRegion> highlights,
                 Value<bool> isFavorite = const Value.absent(),
                 required DateTime createdAt,
                 Value<int> rowid = const Value.absent(),
-              }) => BookmarksCompanion.insert(
+              }) => QuotesCompanion.insert(
                 id: id,
                 bookId: bookId,
                 pageNumber: pageNumber,
                 quote: quote,
                 note: note,
-                voicePath: voicePath,
-                voiceDurationMs: voiceDurationMs,
+                voiceNotePath: voiceNotePath,
+                voiceNoteDurationMs: voiceNoteDurationMs,
                 photoPath: photoPath,
                 imageAspectRatio: imageAspectRatio,
                 highlights: highlights,
@@ -3547,16 +3552,14 @@ class $$BookmarksTableTableManager
               ),
           withReferenceMapper: (p0) => p0
               .map(
-                (e) => (
-                  e.readTable(table),
-                  $$BookmarksTableReferences(db, table, e),
-                ),
+                (e) =>
+                    (e.readTable(table), $$QuotesTableReferences(db, table, e)),
               )
               .toList(),
-          prefetchHooksCallback: ({bookId = false, themeMarksRefs = false}) {
+          prefetchHooksCallback: ({bookId = false, themeQuotesRefs = false}) {
             return PrefetchHooks(
               db: db,
-              explicitlyWatchedTables: [if (themeMarksRefs) db.themeMarks],
+              explicitlyWatchedTables: [if (themeQuotesRefs) db.themeQuotes],
               addJoins:
                   <
                     T extends TableManagerState<
@@ -3577,9 +3580,10 @@ class $$BookmarksTableTableManager
                       state = state.withJoin(
                         currentTable: table,
                         currentColumn: table.bookId,
-                        referencedTable: $$BookmarksTableReferences
-                            ._bookIdTable(db),
-                        referencedColumn: $$BookmarksTableReferences
+                        referencedTable: $$QuotesTableReferences._bookIdTable(
+                          db,
+                        ),
+                        referencedColumn: $$QuotesTableReferences
                             ._bookIdTable(db)
                             .id,
                       ) as T;
@@ -3589,23 +3593,22 @@ class $$BookmarksTableTableManager
                   },
               getPrefetchedDataCallback: (items) async {
                 return [
-                  if (themeMarksRefs)
+                  if (themeQuotesRefs)
                     await $_getPrefetchedData<
-                      LocalBookmark,
-                      $BookmarksTable,
-                      LocalThemeMark
+                      LocalQuote,
+                      $QuotesTable,
+                      LocalThemeQuote
                     >(
                       currentTable: table,
-                      referencedTable: $$BookmarksTableReferences
-                          ._themeMarksRefsTable(db),
-                      managerFromTypedResult: (p0) =>
-                          $$BookmarksTableReferences(
-                            db,
-                            table,
-                            p0,
-                          ).themeMarksRefs,
+                      referencedTable: $$QuotesTableReferences
+                          ._themeQuotesRefsTable(db),
+                      managerFromTypedResult: (p0) => $$QuotesTableReferences(
+                        db,
+                        table,
+                        p0,
+                      ).themeQuotesRefs,
                       referencedItemsForCurrentItem: (item, referencedItems) =>
-                          referencedItems.where((e) => e.bookmarkId == item.id),
+                          referencedItems.where((e) => e.quoteId == item.id),
                       typedResults: items,
                     ),
                 ];
@@ -3616,19 +3619,19 @@ class $$BookmarksTableTableManager
       );
 }
 
-typedef $$BookmarksTableProcessedTableManager =
+typedef $$QuotesTableProcessedTableManager =
     ProcessedTableManager<
       _$AppDatabase,
-      $BookmarksTable,
-      LocalBookmark,
-      $$BookmarksTableFilterComposer,
-      $$BookmarksTableOrderingComposer,
-      $$BookmarksTableAnnotationComposer,
-      $$BookmarksTableCreateCompanionBuilder,
-      $$BookmarksTableUpdateCompanionBuilder,
-      (LocalBookmark, $$BookmarksTableReferences),
-      LocalBookmark,
-      PrefetchHooks Function({bool bookId, bool themeMarksRefs})
+      $QuotesTable,
+      LocalQuote,
+      $$QuotesTableFilterComposer,
+      $$QuotesTableOrderingComposer,
+      $$QuotesTableAnnotationComposer,
+      $$QuotesTableCreateCompanionBuilder,
+      $$QuotesTableUpdateCompanionBuilder,
+      (LocalQuote, $$QuotesTableReferences),
+      LocalQuote,
+      PrefetchHooks Function({bool bookId, bool themeQuotesRefs})
     >;
 typedef $$ThemesTableCreateCompanionBuilder = ThemesCompanion Function({
   required String id,
@@ -3649,19 +3652,19 @@ final class $$ThemesTableReferences
     extends BaseReferences<_$AppDatabase, $ThemesTable, LocalTheme> {
   $$ThemesTableReferences(super.$_db, super.$_table, super.$_typedResult);
 
-  static MultiTypedResultKey<$ThemeMarksTable, List<LocalThemeMark>>
-  _themeMarksRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
-    db.themeMarks,
-    aliasName: 'themes__id__theme_marks__theme_id',
+  static MultiTypedResultKey<$ThemeQuotesTable, List<LocalThemeQuote>>
+  _themeQuotesRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.themeQuotes,
+    aliasName: 'themes__id__theme_quotes__theme_id',
   );
 
-  $$ThemeMarksTableProcessedTableManager get themeMarksRefs {
-    final manager = $$ThemeMarksTableTableManager(
+  $$ThemeQuotesTableProcessedTableManager get themeQuotesRefs {
+    final manager = $$ThemeQuotesTableTableManager(
       $_db,
-      $_db.themeMarks,
+      $_db.themeQuotes,
     ).filter((f) => f.themeId.id.sqlEquals($_itemColumn<String>('id')!));
 
-    final cache = $_typedResult.readTableOrNull(_themeMarksRefsTable($_db));
+    final cache = $_typedResult.readTableOrNull(_themeQuotesRefsTable($_db));
     return ProcessedTableManager(
       manager.$state.copyWith(prefetchedData: cache),
     );
@@ -3697,22 +3700,22 @@ class $$ThemesTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
-  Expression<bool> themeMarksRefs(
-    Expression<bool> Function($$ThemeMarksTableFilterComposer f) f,
+  Expression<bool> themeQuotesRefs(
+    Expression<bool> Function($$ThemeQuotesTableFilterComposer f) f,
   ) {
-    final $$ThemeMarksTableFilterComposer composer = $composerBuilder(
+    final $$ThemeQuotesTableFilterComposer composer = $composerBuilder(
       composer: this,
       getCurrentColumn: (t) => t.id,
-      referencedTable: $db.themeMarks,
+      referencedTable: $db.themeQuotes,
       getReferencedColumn: (t) => t.themeId,
       builder:
           (
             joinBuilder, {
             $addJoinBuilderToRootComposer,
             $removeJoinBuilderFromRootComposer,
-          }) => $$ThemeMarksTableFilterComposer(
+          }) => $$ThemeQuotesTableFilterComposer(
             $db: $db,
-            $table: $db.themeMarks,
+            $table: $db.themeQuotes,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -3774,22 +3777,22 @@ class $$ThemesTableAnnotationComposer
   GeneratedColumn<DateTime> get createdAt =>
       $composableBuilder(column: $table.createdAt, builder: (column) => column);
 
-  Expression<T> themeMarksRefs<T extends Object>(
-    Expression<T> Function($$ThemeMarksTableAnnotationComposer a) f,
+  Expression<T> themeQuotesRefs<T extends Object>(
+    Expression<T> Function($$ThemeQuotesTableAnnotationComposer a) f,
   ) {
-    final $$ThemeMarksTableAnnotationComposer composer = $composerBuilder(
+    final $$ThemeQuotesTableAnnotationComposer composer = $composerBuilder(
       composer: this,
       getCurrentColumn: (t) => t.id,
-      referencedTable: $db.themeMarks,
+      referencedTable: $db.themeQuotes,
       getReferencedColumn: (t) => t.themeId,
       builder:
           (
             joinBuilder, {
             $addJoinBuilderToRootComposer,
             $removeJoinBuilderFromRootComposer,
-          }) => $$ThemeMarksTableAnnotationComposer(
+          }) => $$ThemeQuotesTableAnnotationComposer(
             $db: $db,
-            $table: $db.themeMarks,
+            $table: $db.themeQuotes,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -3813,7 +3816,7 @@ class $$ThemesTableTableManager
           $$ThemesTableUpdateCompanionBuilder,
           (LocalTheme, $$ThemesTableReferences),
           LocalTheme,
-          PrefetchHooks Function({bool themeMarksRefs})
+          PrefetchHooks Function({bool themeQuotesRefs})
         > {
   $$ThemesTableTableManager(_$AppDatabase db, $ThemesTable table)
     : super(
@@ -3860,24 +3863,27 @@ class $$ThemesTableTableManager
                     (e.readTable(table), $$ThemesTableReferences(db, table, e)),
               )
               .toList(),
-          prefetchHooksCallback: ({themeMarksRefs = false}) {
+          prefetchHooksCallback: ({themeQuotesRefs = false}) {
             return PrefetchHooks(
               db: db,
-              explicitlyWatchedTables: [if (themeMarksRefs) db.themeMarks],
+              explicitlyWatchedTables: [if (themeQuotesRefs) db.themeQuotes],
               addJoins: null,
               getPrefetchedDataCallback: (items) async {
                 return [
-                  if (themeMarksRefs)
+                  if (themeQuotesRefs)
                     await $_getPrefetchedData<
                       LocalTheme,
                       $ThemesTable,
-                      LocalThemeMark
+                      LocalThemeQuote
                     >(
                       currentTable: table,
                       referencedTable: $$ThemesTableReferences
-                          ._themeMarksRefsTable(db),
-                      managerFromTypedResult: (p0) =>
-                          $$ThemesTableReferences(db, table, p0).themeMarksRefs,
+                          ._themeQuotesRefsTable(db),
+                      managerFromTypedResult: (p0) => $$ThemesTableReferences(
+                        db,
+                        table,
+                        p0,
+                      ).themeQuotesRefs,
                       referencedItemsForCurrentItem: (item, referencedItems) =>
                           referencedItems.where((e) => e.themeId == item.id),
                       typedResults: items,
@@ -3902,25 +3908,27 @@ typedef $$ThemesTableProcessedTableManager =
       $$ThemesTableUpdateCompanionBuilder,
       (LocalTheme, $$ThemesTableReferences),
       LocalTheme,
-      PrefetchHooks Function({bool themeMarksRefs})
+      PrefetchHooks Function({bool themeQuotesRefs})
     >;
-typedef $$ThemeMarksTableCreateCompanionBuilder = ThemeMarksCompanion Function({
-  required String themeId,
-  required String bookmarkId,
-  Value<int> rowid,
-});
-typedef $$ThemeMarksTableUpdateCompanionBuilder = ThemeMarksCompanion Function({
-  Value<String> themeId,
-  Value<String> bookmarkId,
-  Value<int> rowid,
-});
+typedef $$ThemeQuotesTableCreateCompanionBuilder =
+    ThemeQuotesCompanion Function({
+      required String themeId,
+      required String quoteId,
+      Value<int> rowid,
+    });
+typedef $$ThemeQuotesTableUpdateCompanionBuilder =
+    ThemeQuotesCompanion Function({
+      Value<String> themeId,
+      Value<String> quoteId,
+      Value<int> rowid,
+    });
 
-final class $$ThemeMarksTableReferences
-    extends BaseReferences<_$AppDatabase, $ThemeMarksTable, LocalThemeMark> {
-  $$ThemeMarksTableReferences(super.$_db, super.$_table, super.$_typedResult);
+final class $$ThemeQuotesTableReferences
+    extends BaseReferences<_$AppDatabase, $ThemeQuotesTable, LocalThemeQuote> {
+  $$ThemeQuotesTableReferences(super.$_db, super.$_table, super.$_typedResult);
 
   static $ThemesTable _themeIdTable(_$AppDatabase db) =>
-      db.themes.createAlias('theme_marks__theme_id__themes__id');
+      db.themes.createAlias('theme_quotes__theme_id__themes__id');
 
   $$ThemesTableProcessedTableManager get themeId {
     final $_column = $_itemColumn<String>('theme_id')!;
@@ -3936,17 +3944,17 @@ final class $$ThemeMarksTableReferences
     );
   }
 
-  static $BookmarksTable _bookmarkIdTable(_$AppDatabase db) =>
-      db.bookmarks.createAlias('theme_marks__bookmark_id__bookmarks__id');
+  static $QuotesTable _quoteIdTable(_$AppDatabase db) =>
+      db.quotes.createAlias('theme_quotes__quote_id__quotes__id');
 
-  $$BookmarksTableProcessedTableManager get bookmarkId {
-    final $_column = $_itemColumn<String>('bookmark_id')!;
+  $$QuotesTableProcessedTableManager get quoteId {
+    final $_column = $_itemColumn<String>('quote_id')!;
 
-    final manager = $$BookmarksTableTableManager(
+    final manager = $$QuotesTableTableManager(
       $_db,
-      $_db.bookmarks,
+      $_db.quotes,
     ).filter((f) => f.id.sqlEquals($_column));
-    final item = $_typedResult.readTableOrNull(_bookmarkIdTable($_db));
+    final item = $_typedResult.readTableOrNull(_quoteIdTable($_db));
     if (item == null) return manager;
     return ProcessedTableManager(
       manager.$state.copyWith(prefetchedData: [item]),
@@ -3954,9 +3962,9 @@ final class $$ThemeMarksTableReferences
   }
 }
 
-class $$ThemeMarksTableFilterComposer
-    extends Composer<_$AppDatabase, $ThemeMarksTable> {
-  $$ThemeMarksTableFilterComposer({
+class $$ThemeQuotesTableFilterComposer
+    extends Composer<_$AppDatabase, $ThemeQuotesTable> {
+  $$ThemeQuotesTableFilterComposer({
     required super.$db,
     required super.$table,
     super.joinBuilder,
@@ -3986,20 +3994,20 @@ class $$ThemeMarksTableFilterComposer
     return composer;
   }
 
-  $$BookmarksTableFilterComposer get bookmarkId {
-    final $$BookmarksTableFilterComposer composer = $composerBuilder(
+  $$QuotesTableFilterComposer get quoteId {
+    final $$QuotesTableFilterComposer composer = $composerBuilder(
       composer: this,
-      getCurrentColumn: (t) => t.bookmarkId,
-      referencedTable: $db.bookmarks,
+      getCurrentColumn: (t) => t.quoteId,
+      referencedTable: $db.quotes,
       getReferencedColumn: (t) => t.id,
       builder:
           (
             joinBuilder, {
             $addJoinBuilderToRootComposer,
             $removeJoinBuilderFromRootComposer,
-          }) => $$BookmarksTableFilterComposer(
+          }) => $$QuotesTableFilterComposer(
             $db: $db,
-            $table: $db.bookmarks,
+            $table: $db.quotes,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -4010,9 +4018,9 @@ class $$ThemeMarksTableFilterComposer
   }
 }
 
-class $$ThemeMarksTableOrderingComposer
-    extends Composer<_$AppDatabase, $ThemeMarksTable> {
-  $$ThemeMarksTableOrderingComposer({
+class $$ThemeQuotesTableOrderingComposer
+    extends Composer<_$AppDatabase, $ThemeQuotesTable> {
+  $$ThemeQuotesTableOrderingComposer({
     required super.$db,
     required super.$table,
     super.joinBuilder,
@@ -4042,20 +4050,20 @@ class $$ThemeMarksTableOrderingComposer
     return composer;
   }
 
-  $$BookmarksTableOrderingComposer get bookmarkId {
-    final $$BookmarksTableOrderingComposer composer = $composerBuilder(
+  $$QuotesTableOrderingComposer get quoteId {
+    final $$QuotesTableOrderingComposer composer = $composerBuilder(
       composer: this,
-      getCurrentColumn: (t) => t.bookmarkId,
-      referencedTable: $db.bookmarks,
+      getCurrentColumn: (t) => t.quoteId,
+      referencedTable: $db.quotes,
       getReferencedColumn: (t) => t.id,
       builder:
           (
             joinBuilder, {
             $addJoinBuilderToRootComposer,
             $removeJoinBuilderFromRootComposer,
-          }) => $$BookmarksTableOrderingComposer(
+          }) => $$QuotesTableOrderingComposer(
             $db: $db,
-            $table: $db.bookmarks,
+            $table: $db.quotes,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -4066,9 +4074,9 @@ class $$ThemeMarksTableOrderingComposer
   }
 }
 
-class $$ThemeMarksTableAnnotationComposer
-    extends Composer<_$AppDatabase, $ThemeMarksTable> {
-  $$ThemeMarksTableAnnotationComposer({
+class $$ThemeQuotesTableAnnotationComposer
+    extends Composer<_$AppDatabase, $ThemeQuotesTable> {
+  $$ThemeQuotesTableAnnotationComposer({
     required super.$db,
     required super.$table,
     super.joinBuilder,
@@ -4098,20 +4106,20 @@ class $$ThemeMarksTableAnnotationComposer
     return composer;
   }
 
-  $$BookmarksTableAnnotationComposer get bookmarkId {
-    final $$BookmarksTableAnnotationComposer composer = $composerBuilder(
+  $$QuotesTableAnnotationComposer get quoteId {
+    final $$QuotesTableAnnotationComposer composer = $composerBuilder(
       composer: this,
-      getCurrentColumn: (t) => t.bookmarkId,
-      referencedTable: $db.bookmarks,
+      getCurrentColumn: (t) => t.quoteId,
+      referencedTable: $db.quotes,
       getReferencedColumn: (t) => t.id,
       builder:
           (
             joinBuilder, {
             $addJoinBuilderToRootComposer,
             $removeJoinBuilderFromRootComposer,
-          }) => $$BookmarksTableAnnotationComposer(
+          }) => $$QuotesTableAnnotationComposer(
             $db: $db,
-            $table: $db.bookmarks,
+            $table: $db.quotes,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -4122,61 +4130,61 @@ class $$ThemeMarksTableAnnotationComposer
   }
 }
 
-class $$ThemeMarksTableTableManager
+class $$ThemeQuotesTableTableManager
     extends
         RootTableManager<
           _$AppDatabase,
-          $ThemeMarksTable,
-          LocalThemeMark,
-          $$ThemeMarksTableFilterComposer,
-          $$ThemeMarksTableOrderingComposer,
-          $$ThemeMarksTableAnnotationComposer,
-          $$ThemeMarksTableCreateCompanionBuilder,
-          $$ThemeMarksTableUpdateCompanionBuilder,
-          (LocalThemeMark, $$ThemeMarksTableReferences),
-          LocalThemeMark,
-          PrefetchHooks Function({bool themeId, bool bookmarkId})
+          $ThemeQuotesTable,
+          LocalThemeQuote,
+          $$ThemeQuotesTableFilterComposer,
+          $$ThemeQuotesTableOrderingComposer,
+          $$ThemeQuotesTableAnnotationComposer,
+          $$ThemeQuotesTableCreateCompanionBuilder,
+          $$ThemeQuotesTableUpdateCompanionBuilder,
+          (LocalThemeQuote, $$ThemeQuotesTableReferences),
+          LocalThemeQuote,
+          PrefetchHooks Function({bool themeId, bool quoteId})
         > {
-  $$ThemeMarksTableTableManager(_$AppDatabase db, $ThemeMarksTable table)
+  $$ThemeQuotesTableTableManager(_$AppDatabase db, $ThemeQuotesTable table)
     : super(
         TableManagerState(
           db: db,
           table: table,
           createFilteringComposer: () =>
-              $$ThemeMarksTableFilterComposer($db: db, $table: table),
+              $$ThemeQuotesTableFilterComposer($db: db, $table: table),
           createOrderingComposer: () =>
-              $$ThemeMarksTableOrderingComposer($db: db, $table: table),
+              $$ThemeQuotesTableOrderingComposer($db: db, $table: table),
           createComputedFieldComposer: () =>
-              $$ThemeMarksTableAnnotationComposer($db: db, $table: table),
+              $$ThemeQuotesTableAnnotationComposer($db: db, $table: table),
           updateCompanionCallback:
               ({
                 Value<String> themeId = const Value.absent(),
-                Value<String> bookmarkId = const Value.absent(),
+                Value<String> quoteId = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
-              }) => ThemeMarksCompanion(
+              }) => ThemeQuotesCompanion(
                 themeId: themeId,
-                bookmarkId: bookmarkId,
+                quoteId: quoteId,
                 rowid: rowid,
               ),
           createCompanionCallback:
               ({
                 required String themeId,
-                required String bookmarkId,
+                required String quoteId,
                 Value<int> rowid = const Value.absent(),
-              }) => ThemeMarksCompanion.insert(
+              }) => ThemeQuotesCompanion.insert(
                 themeId: themeId,
-                bookmarkId: bookmarkId,
+                quoteId: quoteId,
                 rowid: rowid,
               ),
           withReferenceMapper: (p0) => p0
               .map(
                 (e) => (
                   e.readTable(table),
-                  $$ThemeMarksTableReferences(db, table, e),
+                  $$ThemeQuotesTableReferences(db, table, e),
                 ),
               )
               .toList(),
-          prefetchHooksCallback: ({themeId = false, bookmarkId = false}) {
+          prefetchHooksCallback: ({themeId = false, quoteId = false}) {
             return PrefetchHooks(
               db: db,
               explicitlyWatchedTables: [],
@@ -4200,21 +4208,21 @@ class $$ThemeMarksTableTableManager
                       state = state.withJoin(
                         currentTable: table,
                         currentColumn: table.themeId,
-                        referencedTable: $$ThemeMarksTableReferences
+                        referencedTable: $$ThemeQuotesTableReferences
                             ._themeIdTable(db),
-                        referencedColumn: $$ThemeMarksTableReferences
+                        referencedColumn: $$ThemeQuotesTableReferences
                             ._themeIdTable(db)
                             .id,
                       ) as T;
                     }
-                    if (bookmarkId) {
+                    if (quoteId) {
                       state = state.withJoin(
                         currentTable: table,
-                        currentColumn: table.bookmarkId,
-                        referencedTable: $$ThemeMarksTableReferences
-                            ._bookmarkIdTable(db),
-                        referencedColumn: $$ThemeMarksTableReferences
-                            ._bookmarkIdTable(db)
+                        currentColumn: table.quoteId,
+                        referencedTable: $$ThemeQuotesTableReferences
+                            ._quoteIdTable(db),
+                        referencedColumn: $$ThemeQuotesTableReferences
+                            ._quoteIdTable(db)
                             .id,
                       ) as T;
                     }
@@ -4230,19 +4238,19 @@ class $$ThemeMarksTableTableManager
       );
 }
 
-typedef $$ThemeMarksTableProcessedTableManager =
+typedef $$ThemeQuotesTableProcessedTableManager =
     ProcessedTableManager<
       _$AppDatabase,
-      $ThemeMarksTable,
-      LocalThemeMark,
-      $$ThemeMarksTableFilterComposer,
-      $$ThemeMarksTableOrderingComposer,
-      $$ThemeMarksTableAnnotationComposer,
-      $$ThemeMarksTableCreateCompanionBuilder,
-      $$ThemeMarksTableUpdateCompanionBuilder,
-      (LocalThemeMark, $$ThemeMarksTableReferences),
-      LocalThemeMark,
-      PrefetchHooks Function({bool themeId, bool bookmarkId})
+      $ThemeQuotesTable,
+      LocalThemeQuote,
+      $$ThemeQuotesTableFilterComposer,
+      $$ThemeQuotesTableOrderingComposer,
+      $$ThemeQuotesTableAnnotationComposer,
+      $$ThemeQuotesTableCreateCompanionBuilder,
+      $$ThemeQuotesTableUpdateCompanionBuilder,
+      (LocalThemeQuote, $$ThemeQuotesTableReferences),
+      LocalThemeQuote,
+      PrefetchHooks Function({bool themeId, bool quoteId})
     >;
 typedef $$ShelvesTableCreateCompanionBuilder = ShelvesCompanion Function({
   required String id,
@@ -5029,12 +5037,12 @@ class $AppDatabaseManager {
   $AppDatabaseManager(this._db);
   $$BooksTableTableManager get books =>
       $$BooksTableTableManager(_db, _db.books);
-  $$BookmarksTableTableManager get bookmarks =>
-      $$BookmarksTableTableManager(_db, _db.bookmarks);
+  $$QuotesTableTableManager get quotes =>
+      $$QuotesTableTableManager(_db, _db.quotes);
   $$ThemesTableTableManager get themes =>
       $$ThemesTableTableManager(_db, _db.themes);
-  $$ThemeMarksTableTableManager get themeMarks =>
-      $$ThemeMarksTableTableManager(_db, _db.themeMarks);
+  $$ThemeQuotesTableTableManager get themeQuotes =>
+      $$ThemeQuotesTableTableManager(_db, _db.themeQuotes);
   $$ShelvesTableTableManager get shelves =>
       $$ShelvesTableTableManager(_db, _db.shelves);
   $$ShelfBooksTableTableManager get shelfBooks =>

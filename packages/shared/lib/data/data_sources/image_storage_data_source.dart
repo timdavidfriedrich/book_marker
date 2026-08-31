@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:injectable/injectable.dart';
 import 'package:path_provider/path_provider.dart';
 
-const _imagesFolder = "bookmark_photos";
+const _imagesFolder = "quote_photos";
 
 abstract class ImageStorageDataSource {
   Future<String> persistImage(String sourcePath, String id);

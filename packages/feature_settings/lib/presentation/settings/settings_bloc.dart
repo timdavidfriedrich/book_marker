@@ -6,11 +6,11 @@ import 'package:feature_settings/presentation/settings/settings_state.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
 import 'package:shared/domain/entities/book.dart';
-import 'package:shared/domain/entities/bookmark.dart';
-import 'package:shared/domain/entities/mark_theme.dart';
+import 'package:shared/domain/entities/quote.dart';
+import 'package:shared/domain/entities/quote_theme.dart';
 import 'package:shared/domain/entities/user_settings.dart';
 import 'package:shared/domain/repositories/book_repository.dart';
-import 'package:shared/domain/repositories/bookmark_repository.dart';
+import 'package:shared/domain/repositories/quote_repository.dart';
 import 'package:shared/domain/repositories/settings_repository.dart';
 import 'package:shared/domain/repositories/theme_repository.dart';
 
@@ -19,13 +19,13 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
   SettingsBloc(
     this._settingsRepository,
     this._bookRepository,
-    this._bookmarkRepository,
+    this._quoteRepository,
     this._themeRepository,
   ) : super(const SettingsLoading()) {
     on<SettingsStarted>(_onStarted);
     on<SettingsSettingsUpdated>(_onSettingsUpdated);
     on<SettingsBooksUpdated>(_onBooksUpdated);
-    on<SettingsBookmarksUpdated>(_onBookmarksUpdated);
+    on<SettingsQuotesUpdated>(_onQuotesUpdated);
     on<SettingsThemesUpdated>(_onThemesUpdated);
     on<SettingsNameChanged>(_onNameChanged);
     on<SettingsLocaleChanged>(_onLocaleChanged);
@@ -33,24 +33,24 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
 
   final SettingsRepository _settingsRepository;
   final BookRepository _bookRepository;
-  final BookmarkRepository _bookmarkRepository;
+  final QuoteRepository _quoteRepository;
   final ThemeRepository _themeRepository;
   StreamSubscription<AppResult<UserSettings>>? _settingsSubscription;
   StreamSubscription<AppResult<List<Book>>>? _bookSubscription;
-  StreamSubscription<AppResult<List<Bookmark>>>? _bookmarkSubscription;
-  StreamSubscription<AppResult<List<MarkTheme>>>? _themeSubscription;
+  StreamSubscription<AppResult<List<Quote>>>? _quoteSubscription;
+  StreamSubscription<AppResult<List<QuoteTheme>>>? _themeSubscription;
   UserSettings _settings = const UserSettings(
     displayName: null,
     localePreference: LocalePreference.system,
   );
   int _bookCount = 0;
-  int _markCount = 0;
+  int _quoteCount = 0;
   int _themeCount = 0;
 
   Future<void> _onStarted(SettingsStarted event, Emitter<SettingsState> emit) async {
     await _settingsSubscription?.cancel();
     await _bookSubscription?.cancel();
-    await _bookmarkSubscription?.cancel();
+    await _quoteSubscription?.cancel();
     await _themeSubscription?.cancel();
     _settingsSubscription = _settingsRepository.watchSettings().listen(
       (result) => add(SettingsSettingsUpdated(result)),
@@ -58,8 +58,8 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
     _bookSubscription = _bookRepository.watchBooks().listen(
       (result) => add(SettingsBooksUpdated(result)),
     );
-    _bookmarkSubscription = _bookmarkRepository.watchBookmarks().listen(
-      (result) => add(SettingsBookmarksUpdated(result)),
+    _quoteSubscription = _quoteRepository.watchQuotes().listen(
+      (result) => add(SettingsQuotesUpdated(result)),
     );
     _themeSubscription = _themeRepository.watchThemes().listen(
       (result) => add(SettingsThemesUpdated(result)),
@@ -80,9 +80,9 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
     }
   }
 
-  void _onBookmarksUpdated(SettingsBookmarksUpdated event, Emitter<SettingsState> emit) {
+  void _onQuotesUpdated(SettingsQuotesUpdated event, Emitter<SettingsState> emit) {
     if (event.result case Success(:final data)) {
-      _markCount = data.length;
+      _quoteCount = data.length;
       _emitState(emit);
     }
   }
@@ -109,7 +109,7 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
         displayName: _settings.displayName,
         localePreference: _settings.localePreference,
         bookCount: _bookCount,
-        markCount: _markCount,
+        quoteCount: _quoteCount,
         themeCount: _themeCount,
       ),
     );
@@ -119,7 +119,7 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
   Future<void> close() async {
     await _settingsSubscription?.cancel();
     await _bookSubscription?.cancel();
-    await _bookmarkSubscription?.cancel();
+    await _quoteSubscription?.cancel();
     await _themeSubscription?.cancel();
     return super.close();
   }

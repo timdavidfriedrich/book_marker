@@ -5,14 +5,14 @@ import 'package:core/error/app_result.dart';
 import 'package:feature_capture/domain/mark_text.dart';
 import 'package:feature_capture/domain/recognize_captured_page_use_case.dart';
 import 'package:feature_capture/domain/recognized_page.dart';
-import 'package:feature_capture/domain/save_bookmark_use_case.dart';
+import 'package:feature_capture/domain/save_quote_use_case.dart';
 import 'package:feature_capture/presentation/marking/marking_event.dart';
 import 'package:feature_capture/presentation/marking/marking_state.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
-import 'package:shared/domain/entities/bookmark.dart';
 import 'package:shared/domain/entities/highlight_region.dart';
-import 'package:shared/domain/entities/mark_theme.dart';
+import 'package:shared/domain/entities/quote.dart';
+import 'package:shared/domain/entities/quote_theme.dart';
 import 'package:shared/domain/repositories/book_repository.dart';
 import 'package:shared/domain/repositories/theme_repository.dart';
 import 'package:shared/presentation/navigation/marking_arguments.dart';
@@ -24,7 +24,7 @@ const _uuid = Uuid();
 class MarkingBloc extends Bloc<MarkingEvent, MarkingState> {
   MarkingBloc(
     this._recognizeCapturedPageUseCase,
-    this._saveBookmarkUseCase,
+    this._saveQuoteUseCase,
     this._bookRepository,
     this._themeRepository,
     @factoryParam this._arguments,
@@ -36,22 +36,22 @@ class MarkingBloc extends Bloc<MarkingEvent, MarkingState> {
     on<MarkingPageNumberChanged>(_onPageNumberChanged);
     on<MarkingNoteChanged>(_onNoteChanged);
     on<MarkingQuoteEdited>(_onQuoteEdited);
-    on<MarkingVoiceRecorded>(_onVoiceRecorded);
-    on<MarkingVoiceCleared>(_onVoiceCleared);
+    on<MarkingVoiceNoteRecorded>(_onVoiceNoteRecorded);
+    on<MarkingVoiceNoteCleared>(_onVoiceNoteCleared);
     on<MarkingThemesUpdated>(_onThemesUpdated);
     on<MarkingThemeToggled>(_onThemeToggled);
     on<MarkingThemeCreateRequested>(_onThemeCreateRequested);
-    on<MarkingStarToggled>(_onStarToggled);
+    on<MarkingFavoriteToggled>(_onFavoriteToggled);
     on<MarkingSaveRequested>(_onSaveRequested);
   }
 
   final RecognizeCapturedPageUseCase _recognizeCapturedPageUseCase;
-  final SaveBookmarkUseCase _saveBookmarkUseCase;
+  final SaveQuoteUseCase _saveQuoteUseCase;
   final BookRepository _bookRepository;
   final ThemeRepository _themeRepository;
   final MarkingArguments _arguments;
-  StreamSubscription<AppResult<List<MarkTheme>>>? _themeSubscription;
-  List<MarkTheme> _themes = const [];
+  StreamSubscription<AppResult<List<QuoteTheme>>>? _themeSubscription;
+  List<QuoteTheme> _themes = const [];
   final Set<String> _selectedThemeIds = {};
 
   Future<void> _onStarted(MarkingStarted event, Emitter<MarkingState> emit) async {
@@ -79,11 +79,11 @@ class MarkingBloc extends Bloc<MarkingEvent, MarkingState> {
         quoteOverride: null,
         pageNumber: data.page.detectedPageNumber,
         note: null,
-        voicePath: null,
-        voiceDurationMs: null,
+        voiceNotePath: null,
+        voiceNoteDurationMs: null,
         availableThemes: _themes,
         selectedThemeIds: Set<String>.from(_selectedThemeIds),
-        isStarred: false,
+        isFavorite: false,
         isSaving: false,
         saveError: null,
       ),
@@ -251,34 +251,34 @@ class MarkingBloc extends Bloc<MarkingEvent, MarkingState> {
     }
   }
 
-  void _onVoiceRecorded(MarkingVoiceRecorded event, Emitter<MarkingState> emit) {
+  void _onVoiceNoteRecorded(MarkingVoiceNoteRecorded event, Emitter<MarkingState> emit) {
     if (state case final MarkingReady current) {
       emit(
-        _ready(current, voicePath: event.path, voiceDurationMs: event.durationMs, keepVoice: false),
+        _ready(current, voiceNotePath: event.path, voiceNoteDurationMs: event.durationMs, keepVoiceNote: false),
       );
     }
   }
 
-  void _onVoiceCleared(MarkingVoiceCleared event, Emitter<MarkingState> emit) {
+  void _onVoiceNoteCleared(MarkingVoiceNoteCleared event, Emitter<MarkingState> emit) {
     if (state case final MarkingReady current) {
-      emit(_ready(current, keepVoice: false));
+      emit(_ready(current, keepVoiceNote: false));
     }
   }
 
-  void _onStarToggled(MarkingStarToggled event, Emitter<MarkingState> emit) {
+  void _onFavoriteToggled(MarkingFavoriteToggled event, Emitter<MarkingState> emit) {
     if (state case final MarkingReady current) {
-      emit(_ready(current, isStarred: !current.isStarred));
+      emit(_ready(current, isFavorite: !current.isFavorite));
     }
   }
 
   Future<void> _onSaveRequested(MarkingSaveRequested event, Emitter<MarkingState> emit) async {
     if (state case final MarkingReady current when current.selectedWordIndexes.isNotEmpty) {
       emit(_ready(current, isSaving: true));
-      final bookmark = _buildBookmark(current);
-      switch (await _saveBookmarkUseCase(bookmark)) {
+      final quote = _buildQuote(current);
+      switch (await _saveQuoteUseCase(quote)) {
         case Success():
           for (final themeId in _selectedThemeIds) {
-            await _themeRepository.addMarkToTheme(themeId: themeId, bookmarkId: bookmark.id);
+            await _themeRepository.addQuoteToTheme(themeId: themeId, quoteId: quote.id);
           }
           emit(const MarkingSaved());
         case Failure(:final error):
@@ -297,10 +297,10 @@ class MarkingBloc extends Bloc<MarkingEvent, MarkingState> {
     bool keepPageNumber = true,
     String? note,
     bool keepNote = true,
-    String? voicePath,
-    int? voiceDurationMs,
-    bool keepVoice = true,
-    bool? isStarred,
+    String? voiceNotePath,
+    int? voiceNoteDurationMs,
+    bool keepVoiceNote = true,
+    bool? isFavorite,
     bool isSaving = false,
     AppError? saveError,
   }) {
@@ -313,17 +313,17 @@ class MarkingBloc extends Bloc<MarkingEvent, MarkingState> {
       quoteOverride: keepQuote ? current.quoteOverride : quoteOverride,
       pageNumber: keepPageNumber ? current.pageNumber : pageNumber,
       note: keepNote ? current.note : note,
-      voicePath: keepVoice ? current.voicePath : voicePath,
-      voiceDurationMs: keepVoice ? current.voiceDurationMs : voiceDurationMs,
+      voiceNotePath: keepVoiceNote ? current.voiceNotePath : voiceNotePath,
+      voiceNoteDurationMs: keepVoiceNote ? current.voiceNoteDurationMs : voiceNoteDurationMs,
       availableThemes: _themes,
       selectedThemeIds: Set<String>.from(_selectedThemeIds),
-      isStarred: isStarred ?? current.isStarred,
+      isFavorite: isFavorite ?? current.isFavorite,
       isSaving: isSaving,
       saveError: saveError,
     );
   }
 
-  Bookmark _buildBookmark(MarkingReady state) {
+  Quote _buildQuote(MarkingReady state) {
     final orderedIndexes = state.selectedWordIndexes.toList()..sort();
     final selectedWords = orderedIndexes.map((index) => state.page.words[index]).toList();
     final trimmedNote = state.note?.trim();
@@ -331,14 +331,14 @@ class MarkingBloc extends Bloc<MarkingEvent, MarkingState> {
     final quote = (override != null && override.isNotEmpty)
         ? override
         : joinMarkedWords(state.page.words, orderedIndexes);
-    return Bookmark(
+    return Quote(
       id: _uuid.v4(),
       bookId: _arguments.bookId,
       pageNumber: state.pageNumber,
       quote: quote,
       note: (trimmedNote == null || trimmedNote.isEmpty) ? null : trimmedNote,
-      voicePath: state.voicePath,
-      voiceDurationMs: state.voiceDurationMs,
+      voiceNotePath: state.voiceNotePath,
+      voiceNoteDurationMs: state.voiceNoteDurationMs,
       photoPath: state.imagePath,
       imageAspectRatio: state.page.aspectRatio,
       highlights: selectedWords
@@ -352,7 +352,7 @@ class MarkingBloc extends Bloc<MarkingEvent, MarkingState> {
             ),
           )
           .toList(),
-      isFavorite: state.isStarred,
+      isFavorite: state.isFavorite,
       createdAt: DateTime.now().toUtc(),
     );
   }

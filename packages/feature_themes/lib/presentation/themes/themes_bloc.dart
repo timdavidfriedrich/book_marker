@@ -6,43 +6,43 @@ import 'package:feature_themes/presentation/themes/themes_event.dart';
 import 'package:feature_themes/presentation/themes/themes_state.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
-import 'package:shared/domain/entities/bookmark.dart';
-import 'package:shared/domain/entities/mark_theme.dart';
-import 'package:shared/domain/repositories/bookmark_repository.dart';
+import 'package:shared/domain/entities/quote.dart';
+import 'package:shared/domain/entities/quote_theme.dart';
+import 'package:shared/domain/repositories/quote_repository.dart';
 import 'package:shared/domain/repositories/theme_repository.dart';
 
 @injectable
 class ThemesBloc extends Bloc<ThemesEvent, ThemesState> {
-  ThemesBloc(this._themeRepository, this._bookmarkRepository) : super(const ThemesLoading()) {
+  ThemesBloc(this._themeRepository, this._quoteRepository) : super(const ThemesLoading()) {
     on<ThemesStarted>(_onStarted);
     on<ThemesThemesUpdated>(_onThemesUpdated);
     on<ThemesMembershipUpdated>(_onMembershipUpdated);
-    on<ThemesBookmarksUpdated>(_onBookmarksUpdated);
+    on<ThemesQuotesUpdated>(_onQuotesUpdated);
     on<ThemesCreateRequested>(_onCreateRequested);
   }
 
   final ThemeRepository _themeRepository;
-  final BookmarkRepository _bookmarkRepository;
-  StreamSubscription<AppResult<List<MarkTheme>>>? _themeSubscription;
+  final QuoteRepository _quoteRepository;
+  StreamSubscription<AppResult<List<QuoteTheme>>>? _themeSubscription;
   StreamSubscription<AppResult<Map<String, Set<String>>>>? _membershipSubscription;
-  StreamSubscription<AppResult<List<Bookmark>>>? _bookmarkSubscription;
-  List<MarkTheme>? _themes;
+  StreamSubscription<AppResult<List<Quote>>>? _quoteSubscription;
+  List<QuoteTheme>? _themes;
   Map<String, Set<String>> _membership = const {};
-  List<Bookmark> _bookmarks = const [];
+  List<Quote> _quotes = const [];
   AppError? _error;
 
   Future<void> _onStarted(ThemesStarted event, Emitter<ThemesState> emit) async {
     await _themeSubscription?.cancel();
     await _membershipSubscription?.cancel();
-    await _bookmarkSubscription?.cancel();
+    await _quoteSubscription?.cancel();
     _themeSubscription = _themeRepository.watchThemes().listen(
       (result) => add(ThemesThemesUpdated(result)),
     );
     _membershipSubscription = _themeRepository.watchThemeMembership().listen(
       (result) => add(ThemesMembershipUpdated(result)),
     );
-    _bookmarkSubscription = _bookmarkRepository.watchBookmarks().listen(
-      (result) => add(ThemesBookmarksUpdated(result)),
+    _quoteSubscription = _quoteRepository.watchQuotes().listen(
+      (result) => add(ThemesQuotesUpdated(result)),
     );
   }
 
@@ -64,9 +64,9 @@ class ThemesBloc extends Bloc<ThemesEvent, ThemesState> {
     }
   }
 
-  void _onBookmarksUpdated(ThemesBookmarksUpdated event, Emitter<ThemesState> emit) {
+  void _onQuotesUpdated(ThemesQuotesUpdated event, Emitter<ThemesState> emit) {
     if (event.result case Success(:final data)) {
-      _bookmarks = data;
+      _quotes = data;
       _emitState(emit);
     }
   }
@@ -84,15 +84,15 @@ class ThemesBloc extends Bloc<ThemesEvent, ThemesState> {
     }
     final themes = _themes;
     if (themes == null) return;
-    final bookIdByMark = {for (final mark in _bookmarks) mark.id: mark.bookId};
+    final bookIdByQuote = {for (final quote in _quotes) quote.id: quote.bookId};
     final summaries = themes.map((theme) {
-      final markIds = _membership[theme.id] ?? const <String>{};
-      final bookIds = markIds.map((markId) => bookIdByMark[markId]).whereType<String>().toSet();
-      return ThemeSummary(theme: theme, markCount: markIds.length, bookCount: bookIds.length);
+      final quoteIds = _membership[theme.id] ?? const <String>{};
+      final bookIds = quoteIds.map((quoteId) => bookIdByQuote[quoteId]).whereType<String>().toSet();
+      return ThemeSummary(theme: theme, quoteCount: quoteIds.length, bookCount: bookIds.length);
     }).toList();
-    final totalBooks = _bookmarks.map((mark) => mark.bookId).toSet().length;
+    final totalBooks = _quotes.map((quote) => quote.bookId).toSet().length;
     emit(
-      ThemesLoaded(themes: summaries, totalMarks: _bookmarks.length, totalBooks: totalBooks),
+      ThemesLoaded(themes: summaries, totalQuotes: _quotes.length, totalBooks: totalBooks),
     );
   }
 
@@ -100,7 +100,7 @@ class ThemesBloc extends Bloc<ThemesEvent, ThemesState> {
   Future<void> close() async {
     await _themeSubscription?.cancel();
     await _membershipSubscription?.cancel();
-    await _bookmarkSubscription?.cancel();
+    await _quoteSubscription?.cancel();
     return super.close();
   }
 }

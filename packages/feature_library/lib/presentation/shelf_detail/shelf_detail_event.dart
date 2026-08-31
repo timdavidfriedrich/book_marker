@@ -1,7 +1,7 @@
 import 'package:core/error/app_result.dart';
 import 'package:core/theme/accent_color.dart';
 import 'package:shared/domain/entities/book.dart';
-import 'package:shared/domain/entities/bookmark.dart';
+import 'package:shared/domain/entities/quote.dart';
 import 'package:shared/domain/entities/shelf.dart';
 
 sealed class ShelfDetailEvent {
@@ -17,7 +17,7 @@ class const ShelfDetailMembershipUpdated(final AppResult<Map<String, Set<String>
 
 class const ShelfDetailBooksUpdated(final AppResult<List<Book>> result) extends ShelfDetailEvent;
 
-class const ShelfDetailBookmarksUpdated(final AppResult<List<Bookmark>> result)
+class const ShelfDetailQuotesUpdated(final AppResult<List<Quote>> result)
     extends ShelfDetailEvent;
 
 class const ShelfDetailBookToggled(final String bookId) extends ShelfDetailEvent;

@@ -29,6 +29,8 @@ class BookStatusMapper extends EnumMapper<BookStatus> {
     switch (value) {
       case r'reading':
         return BookStatus.reading;
+      case r'paused':
+        return BookStatus.paused;
       case r'finished':
         return BookStatus.finished;
       default:
@@ -41,6 +43,8 @@ class BookStatusMapper extends EnumMapper<BookStatus> {
     switch (self) {
       case BookStatus.reading:
         return r'reading';
+      case BookStatus.paused:
+        return r'paused';
       case BookStatus.finished:
         return r'finished';
     }

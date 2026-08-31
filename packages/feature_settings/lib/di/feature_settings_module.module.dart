@@ -9,7 +9,7 @@ import 'package:feature_settings/presentation/settings/settings_bloc.dart'
     as _i235;
 import 'package:injectable/injectable.dart' as _i526;
 import 'package:shared/domain/repositories/book_repository.dart' as _i748;
-import 'package:shared/domain/repositories/bookmark_repository.dart' as _i245;
+import 'package:shared/domain/repositories/quote_repository.dart' as _i570;
 import 'package:shared/domain/repositories/settings_repository.dart' as _i0;
 import 'package:shared/domain/repositories/theme_repository.dart' as _i640;
 
@@ -20,7 +20,7 @@ class FeatureSettingsPackageModule extends _i526.MicroPackageModule {
     gh.factory<_i235.SettingsBloc>(() => _i235.SettingsBloc(
           gh<_i0.SettingsRepository>(),
           gh<_i748.BookRepository>(),
-          gh<_i245.BookmarkRepository>(),
+          gh<_i570.QuoteRepository>(),
           gh<_i640.ThemeRepository>(),
         ));
   }

@@ -1,12 +1,12 @@
 import 'package:core/theme/accent_color.dart';
 import 'package:dart_mappable/dart_mappable.dart';
 
-part 'mark_theme.mapper.dart';
+part 'quote_theme.mapper.dart';
 
 @MappableClass()
-class const MarkTheme({
+class const QuoteTheme({
   required final String id,
   required final String name,
   required final DateTime createdAt,
   final AccentColor? accent,
-}) with MarkThemeMappable;
+}) with QuoteThemeMappable;

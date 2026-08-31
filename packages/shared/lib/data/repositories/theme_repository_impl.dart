@@ -5,7 +5,7 @@ import 'package:injectable/injectable.dart';
 import 'package:shared/data/data_sources/theme_local_data_source.dart';
 import 'package:shared/data/mappers/accent_mappers.dart';
 import 'package:shared/data/mappers/theme_mappers.dart';
-import 'package:shared/domain/entities/mark_theme.dart';
+import 'package:shared/domain/entities/quote_theme.dart';
 import 'package:shared/domain/repositories/theme_repository.dart';
 import 'package:uuid/uuid.dart';
 
@@ -16,10 +16,10 @@ class const ThemeRepositoryImpl(
   final ThemeLocalDataSource _localDataSource,
 ) implements ThemeRepository {
   @override
-  Stream<AppResult<List<MarkTheme>>> watchThemes() async* {
+  Stream<AppResult<List<QuoteTheme>>> watchThemes() async* {
     try {
-      yield* _localDataSource.watchThemes().map<AppResult<List<MarkTheme>>>(
-        (rows) => Success(rows.map((it) => it.toMarkTheme()).toList()),
+      yield* _localDataSource.watchThemes().map<AppResult<List<QuoteTheme>>>(
+        (rows) => Success(rows.map((it) => it.toQuoteTheme()).toList()),
       );
     } on Object {
       yield const Failure(UnexpectedError());
@@ -29,10 +29,10 @@ class const ThemeRepositoryImpl(
   @override
   Stream<AppResult<Map<String, Set<String>>>> watchThemeMembership() async* {
     try {
-      yield* _localDataSource.watchThemeMarks().map<AppResult<Map<String, Set<String>>>>((rows) {
+      yield* _localDataSource.watchThemeQuotes().map<AppResult<Map<String, Set<String>>>>((rows) {
         final membership = <String, Set<String>>{};
         for (final row in rows) {
-          membership.putIfAbsent(row.themeId, () => <String>{}).add(row.bookmarkId);
+          membership.putIfAbsent(row.themeId, () => <String>{}).add(row.quoteId);
         }
         return Success(membership);
       });
@@ -42,9 +42,9 @@ class const ThemeRepositoryImpl(
   }
 
   @override
-  Future<AppResult<MarkTheme>> createTheme(String name) async {
+  Future<AppResult<QuoteTheme>> createTheme(String name) async {
     try {
-      final theme = MarkTheme(id: _uuid.v4(), name: name, createdAt: DateTime.now().toUtc());
+      final theme = QuoteTheme(id: _uuid.v4(), name: name, createdAt: DateTime.now().toUtc());
       await _localDataSource.upsertTheme(theme.toLocalTheme());
       return Success(theme);
     } on Object {
@@ -83,12 +83,12 @@ class const ThemeRepositoryImpl(
   }
 
   @override
-  Future<AppResult<()>> addMarkToTheme({
+  Future<AppResult<()>> addQuoteToTheme({
     required String themeId,
-    required String bookmarkId,
+    required String quoteId,
   }) async {
     try {
-      await _localDataSource.addMark(themeId, bookmarkId);
+      await _localDataSource.addQuote(themeId, quoteId);
       return const Success(());
     } on Object {
       return const Failure(UnexpectedError());
@@ -96,12 +96,12 @@ class const ThemeRepositoryImpl(
   }
 
   @override
-  Future<AppResult<()>> removeMarkFromTheme({
+  Future<AppResult<()>> removeQuoteFromTheme({
     required String themeId,
-    required String bookmarkId,
+    required String quoteId,
   }) async {
     try {
-      await _localDataSource.removeMark(themeId, bookmarkId);
+      await _localDataSource.removeQuote(themeId, quoteId);
       return const Success(());
     } on Object {
       return const Failure(UnexpectedError());

@@ -17,7 +17,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:record/record.dart';
-import 'package:shared/domain/entities/mark_theme.dart';
+import 'package:shared/domain/entities/quote_theme.dart';
 import 'package:shared/presentation/extensions/app_error_extensions.dart';
 import 'package:shared/presentation/extensions/context_extensions.dart';
 import 'package:shared/presentation/navigation/navigation_extensions.dart';
@@ -30,7 +30,7 @@ import 'package:shared/presentation/widgets/selectable_chip.dart';
 import 'package:uuid/uuid.dart';
 
 const _uuid = Uuid();
-const _minVoiceMs = 500;
+const _minVoiceNoteMs = 500;
 const _highlightPadding = 2.0;
 const _legendSampleWidth = 28.0;
 const _legendSampleHeight = 16.0;
@@ -552,13 +552,13 @@ class const _SaveSheet() extends HookWidget {
                 const SizedBox(height: Spacing.s),
                 _NoteField(controller: noteController),
                 const SizedBox(height: Spacing.m),
-                _VoiceRecorder(voicePath: state.voicePath, voiceDurationMs: state.voiceDurationMs),
+                _VoiceNoteRecorder(voiceNotePath: state.voiceNotePath, voiceNoteDurationMs: state.voiceNoteDurationMs),
                 const SizedBox(height: Spacing.m),
                 _ThemeChips(themes: state.availableThemes, selected: state.selectedThemeIds),
                 const SizedBox(height: Spacing.m),
                 Row(
                   children: [
-                    _StarToggle(isStarred: state.isStarred),
+                    _FavoriteToggle(isFavorite: state.isFavorite),
                     const SizedBox(width: Spacing.s),
                     Expanded(
                       child: FilledButton(
@@ -698,9 +698,9 @@ class const _NoteField({
   }
 }
 
-class const _VoiceRecorder({
-  required final String? _voicePath,
-  required final int? _voiceDurationMs,
+class const _VoiceNoteRecorder({
+  required final String? _voiceNotePath,
+  required final int? _voiceNoteDurationMs,
 }) extends HookWidget {
   @override
   Widget build(BuildContext context) {
@@ -739,13 +739,13 @@ class const _VoiceRecorder({
       final path = await recorder.stop();
       isRecording.value = false;
       final milliseconds = stopwatch.elapsedMilliseconds;
-      if (path != null && milliseconds > _minVoiceMs && context.mounted) {
-        context.read<MarkingBloc>().add(MarkingVoiceRecorded(path, milliseconds));
+      if (path != null && milliseconds > _minVoiceNoteMs && context.mounted) {
+        context.read<MarkingBloc>().add(MarkingVoiceNoteRecorded(path, milliseconds));
       }
     }
 
     final coral = context.palette.coral;
-    if (_voicePath != null && !isRecording.value) {
+    if (_voiceNotePath != null && !isRecording.value) {
       return Container(
         padding: const EdgeInsets.symmetric(horizontal: Spacing.m, vertical: Spacing.xs),
         decoration: BoxDecoration(
@@ -758,12 +758,12 @@ class const _VoiceRecorder({
             const SizedBox(width: Spacing.s),
             Expanded(
               child: Text(
-                context.s.markVoiceLabel(_formatDuration(_voiceDurationMs ?? 0)),
+                context.s.quoteVoiceNoteLabel(_formatDuration(_voiceNoteDurationMs ?? 0)),
                 style: context.t.bodyLarge?.copyWith(color: coral.onSolid),
               ),
             ),
             IconButton(
-              onPressed: () => context.read<MarkingBloc>().add(const MarkingVoiceCleared()),
+              onPressed: () => context.read<MarkingBloc>().add(const MarkingVoiceNoteCleared()),
               icon: const Icon(Icons.close),
               iconSize: Spacing.iconM,
               color: coral.onSolid,
@@ -775,7 +775,7 @@ class const _VoiceRecorder({
 
     final label = isRecording.value
         ? _formatDuration(elapsed.value.inMilliseconds)
-        : context.s.markingVoiceHint;
+        : context.s.markingVoiceNoteHint;
     return Listener(
       onPointerDown: (_) => start(),
       onPointerUp: (_) => stop(),
@@ -810,24 +810,24 @@ class const _VoiceRecorder({
   }
 }
 
-class const _StarToggle({
-  required final bool _isStarred,
+class const _FavoriteToggle({
+  required final bool _isFavorite,
 }) extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return CircleIconButton(
-      icon: _isStarred ? Icons.star_rounded : Icons.star_outline_rounded,
-      tooltip: context.s.bookmarkDetailStarredLabel,
+      icon: _isFavorite ? Icons.star_rounded : Icons.star_outline_rounded,
+      tooltip: context.s.quoteDetailFavoriteLabel,
       size: 56,
-      backgroundColor: _isStarred ? context.palette.amber.solid : context.palette.amber.fill,
-      foregroundColor: _isStarred ? context.palette.amber.onSolid : context.palette.amber.solid,
-      onPressed: () => context.read<MarkingBloc>().add(const MarkingStarToggled()),
+      backgroundColor: _isFavorite ? context.palette.amber.solid : context.palette.amber.fill,
+      foregroundColor: _isFavorite ? context.palette.amber.onSolid : context.palette.amber.solid,
+      onPressed: () => context.read<MarkingBloc>().add(const MarkingFavoriteToggled()),
     );
   }
 }
 
 class const _ThemeChips({
-  required final List<MarkTheme> _themes,
+  required final List<QuoteTheme> _themes,
   required final Set<String> _selected,
 }) extends StatelessWidget {
   @override

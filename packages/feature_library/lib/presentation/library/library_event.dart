@@ -1,7 +1,7 @@
 import 'package:core/error/app_result.dart';
 import 'package:feature_library/presentation/library/library_state.dart';
 import 'package:shared/domain/entities/book.dart';
-import 'package:shared/domain/entities/bookmark.dart';
+import 'package:shared/domain/entities/quote.dart';
 import 'package:shared/domain/entities/shelf.dart';
 
 sealed class LibraryEvent {
@@ -10,7 +10,7 @@ sealed class LibraryEvent {
 
 class const LibraryStarted() extends LibraryEvent;
 
-class const LibraryBookmarksUpdated(final AppResult<List<Bookmark>> result) extends LibraryEvent;
+class const LibraryQuotesUpdated(final AppResult<List<Quote>> result) extends LibraryEvent;
 
 class const LibraryBooksUpdated(final AppResult<List<Book>> result) extends LibraryEvent;
 

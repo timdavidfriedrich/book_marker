@@ -18,12 +18,12 @@ import 'package:feature_capture/presentation/marking/marking_screen.dart';
 import 'package:feature_library/presentation/book_detail/book_detail_bloc.dart';
 import 'package:feature_library/presentation/book_detail/book_detail_event.dart';
 import 'package:feature_library/presentation/book_detail/book_detail_screen.dart';
-import 'package:feature_library/presentation/bookmark_detail/bookmark_detail_bloc.dart';
-import 'package:feature_library/presentation/bookmark_detail/bookmark_detail_event.dart';
-import 'package:feature_library/presentation/bookmark_detail/bookmark_detail_screen.dart';
 import 'package:feature_library/presentation/library/library_bloc.dart';
 import 'package:feature_library/presentation/library/library_event.dart';
 import 'package:feature_library/presentation/library/library_screen.dart';
+import 'package:feature_library/presentation/quote_detail/quote_detail_bloc.dart';
+import 'package:feature_library/presentation/quote_detail/quote_detail_event.dart';
+import 'package:feature_library/presentation/quote_detail/quote_detail_screen.dart';
 import 'package:feature_library/presentation/shelf_detail/shelf_detail_bloc.dart';
 import 'package:feature_library/presentation/shelf_detail/shelf_detail_event.dart';
 import 'package:feature_library/presentation/shelf_detail/shelf_detail_screen.dart';
@@ -98,15 +98,15 @@ class NavigationRouter {
         ),
       ),
       GoRoute(
-        path: NavigationRoute.libraryMark.path,
+        path: NavigationRoute.libraryQuote.path,
         parentNavigatorKey: _rootNavigatorKey,
         builder: (context, state) => Theme(
           data: AppTheme.dark,
           child: BlocProvider(
             create: (_) =>
-                sl<BookmarkDetailBloc>(param1: state.pathParameters[parameterId])
-                  ..add(const BookmarkDetailStarted()),
-            child: const BookmarkDetailScreen(),
+                sl<QuoteDetailBloc>(param1: state.pathParameters[parameterId])
+                  ..add(const QuoteDetailStarted()),
+            child: const QuoteDetailScreen(),
           ),
         ),
       ),
@@ -191,7 +191,7 @@ class NavigationRouter {
             },
           ),
           GoRoute(
-            path: "mark",
+            path: "quote",
             parentNavigatorKey: _rootNavigatorKey,
             builder: (context, state) {
               final arguments = state.extra;

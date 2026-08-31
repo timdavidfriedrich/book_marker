@@ -70,7 +70,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get libraryEmptyMessage =>
-      'Noch keine Markierungen. Fotografiere eine Buchseite, um zu beginnen.';
+      'Noch keine Zitate. Fotografiere eine Buchseite, um zu beginnen.';
 
   @override
   String get libraryUnknownBook => 'Unbekanntes Buch';
@@ -153,36 +153,36 @@ class AppLocalizationsDe extends AppLocalizations {
   String get markingNothingSelectedMessage => 'Noch nichts ausgewählt.';
 
   @override
-  String get markingSaveButton => 'Markierung speichern';
+  String get markingSaveButton => 'Zitat speichern';
 
   @override
-  String get markingSavedMessage => 'Markierung gespeichert.';
+  String get markingSavedMessage => 'Zitat gespeichert.';
 
   @override
   String get markingSelectPrompt => 'Wähle mindestens eine Zeile zum Speichern aus.';
 
   @override
-  String get bookmarkDetailTitle => 'Markierung';
+  String get quoteDetailTitle => 'Zitat';
 
   @override
-  String get bookmarkDetailQuoteLabel => 'Markierter Text';
+  String get quoteDetailQuoteLabel => 'Zitat';
 
   @override
-  String bookmarkDetailPageLabel(int page) {
+  String quoteDetailPageLabel(int page) {
     return 'Seite $page';
   }
 
   @override
-  String get bookmarkDetailNoPage => 'Keine Seitenzahl';
+  String get quoteDetailNoPage => 'Keine Seitenzahl';
 
   @override
-  String get bookmarkDetailFavoriteAdd => 'Zu Favoriten hinzufügen';
+  String get quoteDetailFavoriteAdd => 'Zu Favoriten hinzufügen';
 
   @override
-  String get bookmarkDetailFavoriteRemove => 'Aus Favoriten entfernen';
+  String get quoteDetailFavoriteRemove => 'Aus Favoriten entfernen';
 
   @override
-  String get librarySearchHint => 'Bücher und Markierungen suchen…';
+  String get librarySearchHint => 'Bücher und Zitate suchen…';
 
   @override
   String get libraryTabBooks => 'Bücher';
@@ -200,26 +200,46 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String libraryFilterReading(int count) {
-    return 'am Lesen $count';
+    return 'Lese ich gerade $count';
+  }
+
+  @override
+  String libraryFilterPaused(int count) {
+    return 'Pausiert $count';
   }
 
   @override
   String libraryFilterFinished(int count) {
-    return 'fertig $count';
+    return 'Abgeschlossen $count';
   }
 
   @override
-  String libraryMarksCount(int count) {
-    return '$count Markierungen';
+  String libraryQuotesCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Zitate',
+      one: '1 Zitat',
+    );
+    return '$_temp0';
   }
 
   @override
-  String libraryStarredCount(int count) {
-    return '$count mit Stern';
+  String libraryFavoritesCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Favoriten',
+      one: '1 Favorit',
+    );
+    return '$_temp0';
   }
 
   @override
-  String get libraryStatusReading => 'am Lesen';
+  String get libraryStatusReading => 'Lese ich gerade';
+
+  @override
+  String get libraryStatusPaused => 'Pausiert';
 
   @override
   String get libraryShelvesPlaceholder => 'Regale kommen im nächsten Update.';
@@ -228,14 +248,82 @@ class AppLocalizationsDe extends AppLocalizations {
   String get librarySearchScopeAll => 'alle Bücher';
 
   @override
-  String get librarySearchScopeStarred => 'mit Stern';
+  String get librarySearchScopeFavorites => 'Favoriten';
 
   @override
   String get librarySearchScopeNotes => 'meine Notizen';
 
   @override
-  String librarySearchCount(int marks, int books) {
-    return '$marks Markierungen in $books Büchern';
+  String libraryBookMeta(int quotes, int favorites) {
+    String _temp0 = intl.Intl.pluralLogic(
+      quotes,
+      locale: localeName,
+      other: '$quotes Zitate',
+      one: '1 Zitat',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      favorites,
+      locale: localeName,
+      other: '$favorites Favoriten',
+      one: '1 Favorit',
+    );
+    return '$_temp0, $_temp1';
+  }
+
+  @override
+  String libraryBookMetaWithStatus(int quotes, int favorites, String status) {
+    String _temp0 = intl.Intl.pluralLogic(
+      quotes,
+      locale: localeName,
+      other: '$quotes Zitate',
+      one: '1 Zitat',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      favorites,
+      locale: localeName,
+      other: '$favorites Favoriten',
+      one: '1 Favorit',
+    );
+    return '$_temp0, $_temp1,\n$status';
+  }
+
+  @override
+  String libraryShelfMeta(int books, int quotes) {
+    String _temp0 = intl.Intl.pluralLogic(
+      books,
+      locale: localeName,
+      other: '$books Bücher',
+      one: '1 Buch',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      quotes,
+      locale: localeName,
+      other: '$quotes Zitate',
+      one: '1 Zitat',
+    );
+    return '$_temp0, $_temp1';
+  }
+
+  @override
+  String quoteSourceLabel(String title, int page) {
+    return '$title, S.$page';
+  }
+
+  @override
+  String librarySearchCount(int quotes, int books) {
+    String _temp0 = intl.Intl.pluralLogic(
+      quotes,
+      locale: localeName,
+      other: '$quotes Zitate',
+      one: '1 Zitat',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      books,
+      locale: localeName,
+      other: '$books Büchern',
+      one: '1 Buch',
+    );
+    return '$_temp0 in $_temp1';
   }
 
   @override
@@ -253,8 +341,8 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
-  String markVoiceLabel(String duration) {
-    return 'Sprache $duration';
+  String quoteVoiceNoteLabel(String duration) {
+    return 'Sprachnotiz $duration';
   }
 
   @override
@@ -264,11 +352,11 @@ class AppLocalizationsDe extends AppLocalizations {
   String get themesTitle => 'Themen';
 
   @override
-  String get themesSubtitlePlaceholder => 'Markierungen über Bücher hinweg';
+  String get themesSubtitlePlaceholder => 'Zitate über Bücher hinweg';
 
   @override
   String get themesPlaceholderMessage =>
-      'Themen sammeln Markierungen aus all deinen Büchern. Sie kommen im nächsten Update.';
+      'Themen sammeln Zitate aus all deinen Büchern. Sie kommen im nächsten Update.';
 
   @override
   String bookDetailAllFilter(int count) {
@@ -276,23 +364,35 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
-  String get bookDetailStarredFilter => 'mit Stern';
+  String get bookDetailFavoritesFilter => 'Favoriten';
 
   @override
-  String get bookDetailVoiceFilter => 'mit Sprache';
+  String get bookDetailVoiceNoteFilter => 'mit Sprachnotiz';
 
   @override
-  String bookDetailMarksStat(int count) {
-    return '$count Markierungen';
+  String bookDetailQuotesStat(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Zitate',
+      one: '1 Zitat',
+    );
+    return '$_temp0';
   }
 
   @override
-  String bookDetailStarredStat(int count) {
-    return '$count mit Stern';
+  String bookDetailFavoritesStat(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Favoriten',
+      one: '1 Favorit',
+    );
+    return '$_temp0';
   }
 
   @override
-  String get bookDetailEmptyMessage => 'Noch keine Markierungen in diesem Buch.';
+  String get bookDetailEmptyMessage => 'Noch keine Zitate in diesem Buch.';
 
   @override
   String get captureSteadyHint => 'ruhig halten für schärferen Text';
@@ -383,10 +483,10 @@ class AppLocalizationsDe extends AppLocalizations {
   String get markingPageAutoLabel => 'auto';
 
   @override
-  String get markingNoteHint => 'worauf bezieht sich das?';
+  String get markingNoteHint => 'Notiz hinzufügen';
 
   @override
-  String get markingVoiceHint => 'gedrückt halten zum Sprechen';
+  String get markingVoiceNoteHint => 'Sprachnotiz';
 
   @override
   String get markingDoneButton => 'Fertig';
@@ -429,55 +529,87 @@ class AppLocalizationsDe extends AppLocalizations {
   String get markingNewThemeChip => '+ neu';
 
   @override
-  String bookmarkDetailPhotoMeta(int page, String date) {
+  String quoteDetailPhotoMeta(int page, String date) {
     return 'Seite $page, aufgenommen $date';
   }
 
   @override
-  String bookmarkDetailShotMeta(String date) {
+  String quoteDetailShotMeta(String date) {
     return 'aufgenommen $date';
   }
 
   @override
-  String get bookmarkDetailNotePlaceholder => 'Notiz hinzufügen — bald verfügbar.';
+  String get quoteDetailNotePlaceholder => 'Notiz hinzufügen — bald verfügbar.';
 
   @override
-  String get bookmarkDetailStarredLabel => 'Stern';
+  String get quoteDetailFavoriteLabel => 'Favorit';
 
   @override
-  String get bookmarkDetailShareLabel => 'teilen';
+  String get quoteDetailShareLabel => 'teilen';
 
   @override
-  String markShareBody(String quote, String source) {
+  String quoteShareBody(String quote, String source) {
     return '„$quote“\n\n— $source';
   }
 
   @override
-  String get bookmarkDetailMoreLabel => 'mehr';
+  String get quoteDetailMoreLabel => 'mehr';
 
   @override
-  String get bookmarkDetailNoteHint => 'Notiz hinzufügen…';
+  String get quoteDetailNoteHint => 'Notiz hinzufügen…';
 
   @override
-  String get libraryStatusFinished => 'fertig';
+  String get libraryStatusFinished => 'Abgeschlossen';
 
   @override
   String libraryFinishedFooter(int count) {
-    return '$count fertige Bücher';
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count abgeschlossene Bücher',
+      one: '1 abgeschlossenes Buch',
+    );
+    return '$_temp0';
   }
 
   @override
   String get libraryShowFinished => 'anzeigen';
 
   @override
-  String get bookDetailMarkFinished => 'Als fertig markieren';
+  String get bookDetailMarkFinished => 'Als Abgeschlossen markieren';
 
   @override
-  String get bookDetailMarkReading => 'Als am Lesen markieren';
+  String get bookDetailMarkReading => 'Als „Lese ich gerade“ markieren';
+
+  @override
+  String get bookDetailMarkPaused => 'Als Pausiert markieren';
 
   @override
   String themesBooksCount(int count) {
-    return '$count Bücher';
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Bücher',
+      one: '1 Buch',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String themesThemeMeta(int quotes, int books) {
+    String _temp0 = intl.Intl.pluralLogic(
+      quotes,
+      locale: localeName,
+      other: '$quotes Zitate',
+      one: '1 Zitat',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      books,
+      locale: localeName,
+      other: '$books Bücher',
+      one: '1 Buch',
+    );
+    return '$_temp0, $_temp1';
   }
 
   @override
@@ -490,18 +622,36 @@ class AppLocalizationsDe extends AppLocalizations {
   String get themesNewThemeHint => 'Themenname';
 
   @override
-  String themeDetailStats(int marks, int books, int starred) {
-    return '$marks Markierungen in $books Büchern,\n$starred favorisiert';
+  String themeDetailStats(int quotes, int books, int favorites) {
+    String _temp0 = intl.Intl.pluralLogic(
+      quotes,
+      locale: localeName,
+      other: '$quotes Zitate',
+      one: '1 Zitat',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      books,
+      locale: localeName,
+      other: '$books Büchern',
+      one: '1 Buch',
+    );
+    String _temp2 = intl.Intl.pluralLogic(
+      favorites,
+      locale: localeName,
+      other: '$favorites Favoriten',
+      one: '1 Favorit',
+    );
+    return '$_temp0 in $_temp1, $_temp2';
   }
 
   @override
-  String get themeDetailAddMarks => 'Markierungen hinzufügen';
+  String get themeDetailAddQuotes => 'Zitate hinzufügen';
 
   @override
-  String get themeDetailEmpty => 'Noch keine Markierungen in diesem Thema.';
+  String get themeDetailEmpty => 'Noch keine Zitate in diesem Thema.';
 
   @override
-  String get themeAddMarksTitle => 'Markierungen hinzufügen';
+  String get themeAddQuotesTitle => 'Zitate hinzufügen';
 
   @override
   String get themeRenameTitle => 'Thema umbenennen';
@@ -510,8 +660,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get themeDeleteTitle => 'Thema löschen?';
 
   @override
-  String get themeDeleteMessage =>
-      'Das Thema wird entfernt. Deine Markierungen und Bücher bleiben.';
+  String get themeDeleteMessage => 'Das Thema wird entfernt. Deine Zitate und Bücher bleiben.';
 
   @override
   String get shelfRenameTitle => 'Regal umbenennen';
@@ -530,17 +679,17 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get bookDeleteMessage =>
-      'Damit werden das Buch und alle seine Markierungen gelöscht. Das kann nicht rückgängig gemacht werden.';
+      'Damit werden das Buch und alle seine Zitate gelöscht. Das kann nicht rückgängig gemacht werden.';
 
   @override
-  String get markDeleteAction => 'Markierung löschen';
+  String get quoteDeleteAction => 'Zitat löschen';
 
   @override
-  String get markDeleteTitle => 'Markierung löschen?';
+  String get quoteDeleteTitle => 'Zitat löschen?';
 
   @override
-  String get markDeleteMessage =>
-      'Damit wird die Markierung gelöscht. Das kann nicht rückgängig gemacht werden.';
+  String get quoteDeleteMessage =>
+      'Damit wird das Zitat gelöscht. Das kann nicht rückgängig gemacht werden.';
 
   @override
   String get libraryNewShelfLabel => 'Neues Regal';
@@ -552,8 +701,20 @@ class AppLocalizationsDe extends AppLocalizations {
   String get libraryNewShelfHint => 'Regalname';
 
   @override
-  String shelfDetailStats(int books, int marks) {
-    return '$books Bücher, $marks Markierungen';
+  String shelfDetailStats(int books, int quotes) {
+    String _temp0 = intl.Intl.pluralLogic(
+      books,
+      locale: localeName,
+      other: '$books Bücher',
+      one: '1 Buch',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      quotes,
+      locale: localeName,
+      other: '$quotes Zitate',
+      one: '1 Zitat',
+    );
+    return '$_temp0, $_temp1';
   }
 
   @override
@@ -572,8 +733,26 @@ class AppLocalizationsDe extends AppLocalizations {
   String get settingsProfileNameHint => 'Dein Name';
 
   @override
-  String settingsStats(int books, int marks, int themes) {
-    return '$books Bücher\n$marks Markierungen\n$themes Themen';
+  String settingsStats(int books, int quotes, int themes) {
+    String _temp0 = intl.Intl.pluralLogic(
+      books,
+      locale: localeName,
+      other: '$books Bücher',
+      one: '1 Buch',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      quotes,
+      locale: localeName,
+      other: '$quotes Zitate',
+      one: '1 Zitat',
+    );
+    String _temp2 = intl.Intl.pluralLogic(
+      themes,
+      locale: localeName,
+      other: '$themes Themen',
+      one: '1 Thema',
+    );
+    return '$_temp0, $_temp1, $_temp2';
   }
 
   @override

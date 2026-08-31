@@ -14,8 +14,8 @@ import 'package:shared/presentation/widgets/book_cover.dart';
 import 'package:shared/presentation/widgets/circle_icon_button.dart';
 import 'package:shared/presentation/widgets/confirm_dialog.dart';
 import 'package:shared/presentation/widgets/ink_tap_box.dart';
-import 'package:shared/presentation/widgets/mark_card.dart';
 import 'package:shared/presentation/widgets/name_input_dialog.dart';
+import 'package:shared/presentation/widgets/quote_card.dart';
 import 'package:shared/presentation/widgets/selectable_chip.dart';
 import 'package:shared/presentation/widgets/sheet_action_tile.dart';
 
@@ -74,20 +74,20 @@ class const _Content({
               ),
               const SizedBox(width: Spacing.xs),
               SelectableChip(
-                label: context.s.bookDetailStarredFilter,
-                selected: _state.filter == ThemeDetailFilter.starred,
+                label: context.s.bookDetailFavoritesFilter,
+                selected: _state.filter == ThemeDetailFilter.favorites,
                 selectedColor: context.c.inverseSurface,
                 selectedTextColor: context.c.onInverseSurface,
                 onTap: () => context
                     .read<ThemeDetailBloc>()
-                    .add(const ThemeDetailFilterChanged(ThemeDetailFilter.starred)),
+                    .add(const ThemeDetailFilterChanged(ThemeDetailFilter.favorites)),
               ),
             ],
           ),
         ),
         const SizedBox(height: Spacing.m),
         Expanded(
-          child: _state.marks.isEmpty
+          child: _state.quotes.isEmpty
               ? Center(
                   child: Padding(
                     padding: const EdgeInsets.all(Spacing.l),
@@ -100,23 +100,23 @@ class const _Content({
                 )
               : ListView.separated(
                   padding: const EdgeInsets.fromLTRB(Spacing.l, 0, Spacing.l, Spacing.l),
-                  itemCount: _state.marks.length,
+                  itemCount: _state.quotes.length,
                   separatorBuilder: (context, index) => const SizedBox(height: Spacing.m),
                   itemBuilder: (context, index) {
-                    final item = _state.marks[index];
-                    final voiceMs = item.mark.voiceDurationMs;
-                    return MarkCard(
+                    final item = _state.quotes[index];
+                    final voiceNoteMs = item.quote.voiceNoteDurationMs;
+                    return QuoteCard(
                       accent: item.book.id.accent,
-                      quote: "“${item.mark.quote}”",
+                      quote: "“${item.quote.quote}”",
                       thumbnailUrl: item.book.thumbnailUrl,
-                      page: item.mark.pageNumber,
-                      note: item.mark.note,
+                      page: item.quote.pageNumber,
+                      note: item.quote.note,
                       sourceLabel: item.book.title,
-                      isStarred: item.mark.isFavorite,
-                      hasVoice: item.mark.voicePath != null,
-                      voiceDuration: voiceMs == null ? null : Duration(milliseconds: voiceMs),
-                      voicePath: item.mark.voicePath,
-                      onTap: () => context.pushBookmarkDetail(item.mark.id),
+                      isFavorite: item.quote.isFavorite,
+                      hasVoiceNote: item.quote.voiceNotePath != null,
+                      voiceNoteDuration: voiceNoteMs == null ? null : Duration(milliseconds: voiceNoteMs),
+                      voiceNotePath: item.quote.voiceNotePath,
+                      onTap: () => context.pushQuoteDetail(item.quote.id),
                     );
                   },
                 ),
@@ -185,7 +185,7 @@ class const _Header({
                           context.s.themeDetailStats(
                             _state.totalCount,
                             _state.bookCount,
-                            _state.starredCount,
+                            _state.favoriteCount,
                           ),
                           style: context.typography.monoLabel.copyWith(color: swatch.onFillVariant),
                         ),
@@ -218,10 +218,10 @@ class const _BottomBar({
                 color: context.c.surfaceContainerHigh,
                 radius: Spacing.radiusFull,
                 padding: const EdgeInsets.symmetric(vertical: Spacing.m),
-                onTap: () => _showAddMarks(context, _state),
+                onTap: () => _showAddQuotes(context, _state),
                 child: Center(
                   child: Text(
-                    context.s.themeDetailAddMarks,
+                    context.s.themeDetailAddQuotes,
                     style: context.t.labelLarge?.copyWith(color: context.c.onSurfaceVariant),
                   ),
                 ),
@@ -233,7 +233,7 @@ class const _BottomBar({
               size: 56,
               backgroundColor: context.c.inverseSurface,
               foregroundColor: context.c.onInverseSurface,
-              onPressed: () => _showAddMarks(context, _state),
+              onPressed: () => _showAddQuotes(context, _state),
             ),
           ],
         ),
@@ -333,18 +333,18 @@ class const _ThemeMenu() extends StatelessWidget {
   }
 }
 
-Future<void> _showAddMarks(BuildContext context, ThemeDetailLoaded state) async {
+Future<void> _showAddQuotes(BuildContext context, ThemeDetailLoaded state) async {
   final bloc = context.read<ThemeDetailBloc>();
   await showModalBottomSheet<void>(
     context: context,
     isScrollControlled: true,
     useRootNavigator: true,
     backgroundColor: Colors.transparent,
-    builder: (_) => BlocProvider.value(value: bloc, child: const _AddMarksSheet()),
+    builder: (_) => BlocProvider.value(value: bloc, child: const _AddQuotesSheet()),
   );
 }
 
-class const _AddMarksSheet() extends StatelessWidget {
+class const _AddQuotesSheet() extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DraggableScrollableSheet(
@@ -374,14 +374,14 @@ class const _AddMarksSheet() extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: Spacing.m),
-                Text(context.s.themeAddMarksTitle, style: context.t.headlineSmall),
+                Text(context.s.themeAddQuotesTitle, style: context.t.headlineSmall),
                 const SizedBox(height: Spacing.m),
-                for (final item in state.allMarks)
+                for (final item in state.allQuotes)
                   Padding(
                     padding: const EdgeInsets.only(bottom: Spacing.s),
-                    child: _AddMarkRow(
+                    child: _AddQuoteRow(
                       item: item,
-                      selected: state.memberIds.contains(item.mark.id),
+                      selected: state.memberIds.contains(item.quote.id),
                     ),
                   ),
               ],
@@ -393,8 +393,8 @@ class const _AddMarksSheet() extends StatelessWidget {
   }
 }
 
-class const _AddMarkRow({
-  required final ThemeMarkItem _item,
+class const _AddQuoteRow({
+  required final ThemeQuoteItem _item,
   required final bool _selected,
 }) extends StatelessWidget {
   @override
@@ -403,7 +403,7 @@ class const _AddMarkRow({
       color: _selected ? context.palette.resolve(_item.book.id.accent).fill : context.c.surfaceContainerHigh,
       radius: Spacing.radiusL,
       padding: const EdgeInsets.all(Spacing.s),
-      onTap: () => context.read<ThemeDetailBloc>().add(ThemeDetailMarkToggled(_item.mark.id)),
+      onTap: () => context.read<ThemeDetailBloc>().add(ThemeDetailQuoteToggled(_item.quote.id)),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -414,7 +414,7 @@ class const _AddMarkRow({
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  "“${_item.mark.quote}”",
+                  "“${_item.quote.quote}”",
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                   style: context.typography.readingQuote,

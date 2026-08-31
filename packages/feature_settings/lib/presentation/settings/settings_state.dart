@@ -10,6 +10,6 @@ class const SettingsLoaded({
   required final String? displayName,
   required final LocalePreference localePreference,
   required final int bookCount,
-  required final int markCount,
+  required final int quoteCount,
   required final int themeCount,
 }) extends SettingsState;

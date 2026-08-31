@@ -13,11 +13,11 @@ abstract class ThemeLocalDataSource {
 
   Future<void> deleteTheme(String id);
 
-  Stream<List<LocalThemeMark>> watchThemeMarks();
+  Stream<List<LocalThemeQuote>> watchThemeQuotes();
 
-  Future<void> addMark(String themeId, String bookmarkId);
+  Future<void> addQuote(String themeId, String quoteId);
 
-  Future<void> removeMark(String themeId, String bookmarkId);
+  Future<void> removeQuote(String themeId, String quoteId);
 }
 
 @Injectable(as: ThemeLocalDataSource)
@@ -52,16 +52,16 @@ class const ThemeLocalDataSourceImpl(
       (_database.delete(_database.themes)..where((table) => table.id.equals(id))).go();
 
   @override
-  Stream<List<LocalThemeMark>> watchThemeMarks() => _database.select(_database.themeMarks).watch();
+  Stream<List<LocalThemeQuote>> watchThemeQuotes() => _database.select(_database.themeQuotes).watch();
 
   @override
-  Future<void> addMark(String themeId, String bookmarkId) => _database
-      .into(_database.themeMarks)
-      .insertOnConflictUpdate(LocalThemeMark(themeId: themeId, bookmarkId: bookmarkId));
+  Future<void> addQuote(String themeId, String quoteId) => _database
+      .into(_database.themeQuotes)
+      .insertOnConflictUpdate(LocalThemeQuote(themeId: themeId, quoteId: quoteId));
 
   @override
-  Future<void> removeMark(String themeId, String bookmarkId) =>
-      (_database.delete(_database.themeMarks)
-            ..where((table) => table.themeId.equals(themeId) & table.bookmarkId.equals(bookmarkId)))
+  Future<void> removeQuote(String themeId, String quoteId) =>
+      (_database.delete(_database.themeQuotes)
+            ..where((table) => table.themeId.equals(themeId) & table.quoteId.equals(quoteId)))
           .go();
 }

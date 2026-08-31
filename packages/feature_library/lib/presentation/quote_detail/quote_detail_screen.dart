@@ -1,14 +1,14 @@
 import 'package:audioplayers/audioplayers.dart';
 import 'package:core/theme/spacing.dart';
-import 'package:feature_library/presentation/bookmark_detail/bookmark_detail_bloc.dart';
-import 'package:feature_library/presentation/bookmark_detail/bookmark_detail_event.dart';
-import 'package:feature_library/presentation/bookmark_detail/bookmark_detail_state.dart';
+import 'package:feature_library/presentation/quote_detail/quote_detail_bloc.dart';
+import 'package:feature_library/presentation/quote_detail/quote_detail_event.dart';
+import 'package:feature_library/presentation/quote_detail/quote_detail_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:shared/domain/entities/book.dart';
-import 'package:shared/domain/entities/bookmark.dart';
+import 'package:shared/domain/entities/quote.dart';
 import 'package:shared/presentation/extensions/app_error_extensions.dart';
 import 'package:shared/presentation/extensions/context_extensions.dart';
 import 'package:shared/presentation/navigation/navigation_extensions.dart';
@@ -19,29 +19,29 @@ import 'package:shared/presentation/widgets/ink_tap_box.dart';
 import 'package:shared/presentation/widgets/paper_card.dart';
 import 'package:shared/presentation/widgets/sheet_action_tile.dart';
 
-class const BookmarkDetailScreen({
+class const QuoteDetailScreen({
   super.key,
 }) extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
-        child: BlocConsumer<BookmarkDetailBloc, BookmarkDetailState>(
-          listenWhen: (previous, current) => current is BookmarkDetailDeleted,
+        child: BlocConsumer<QuoteDetailBloc, QuoteDetailState>(
+          listenWhen: (previous, current) => current is QuoteDetailDeleted,
           listener: (context, state) => context.closeScreen(),
           builder: (context, state) => switch (state) {
-            BookmarkDetailLoading() => const Center(child: CircularProgressIndicator()),
-            BookmarkDetailFailure(:final error) => Center(
+            QuoteDetailLoading() => const Center(child: CircularProgressIndicator()),
+            QuoteDetailFailure(:final error) => Center(
               child: Padding(
                 padding: const EdgeInsets.all(Spacing.l),
                 child: Text(error.toMessage(context), textAlign: TextAlign.center),
               ),
             ),
-            BookmarkDetailLoaded(:final bookmark, :final book) => _Content(
-              bookmark: bookmark,
+            QuoteDetailLoaded(:final quote, :final book) => _Content(
+              quote: quote,
               book: book,
             ),
-            BookmarkDetailDeleted() => const SizedBox.shrink(),
+            QuoteDetailDeleted() => const SizedBox.shrink(),
           },
         ),
       ),
@@ -50,7 +50,7 @@ class const BookmarkDetailScreen({
 }
 
 class const _Content({
-  required final Bookmark _bookmark,
+  required final Quote _quote,
   required final Book? _book,
 }) extends HookWidget {
   @override
@@ -62,23 +62,23 @@ class const _Content({
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           const SizedBox(height: Spacing.s),
-          _Header(bookmark: _bookmark, book: _book),
+          _Header(quote: _quote, book: _book),
           const SizedBox(height: Spacing.m),
           _ModeToggle(index: mode.value, onChanged: (value) => mode.value = value),
           const SizedBox(height: Spacing.m),
           Expanded(
             child: mode.value == 1
-                ? _PhotoView(bookmark: _bookmark)
-                : _TextView(bookmark: _bookmark),
+                ? _PhotoView(quote: _quote)
+                : _TextView(quote: _quote),
           ),
           const SizedBox(height: Spacing.m),
-          if (_bookmark.voicePath case final String path) ...[
-            _VoicePlayer(path: path, durationMs: _bookmark.voiceDurationMs ?? 0),
+          if (_quote.voiceNotePath case final String path) ...[
+            _VoiceNotePlayer(path: path, durationMs: _quote.voiceNoteDurationMs ?? 0),
             const SizedBox(height: Spacing.m),
           ],
-          _NoteCard(bookmark: _bookmark),
+          _NoteCard(quote: _quote),
           const SizedBox(height: Spacing.m),
-          _Actions(bookmark: _bookmark, book: _book),
+          _Actions(quote: _quote, book: _book),
           const SizedBox(height: Spacing.s),
         ],
       ),
@@ -87,16 +87,16 @@ class const _Content({
 }
 
 class const _Header({
-  required final Bookmark _bookmark,
+  required final Quote _quote,
   required final Book? _book,
 }) extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final date = MaterialLocalizations.of(context).formatMediumDate(_bookmark.createdAt.toLocal());
-    final page = _bookmark.pageNumber;
+    final date = MaterialLocalizations.of(context).formatMediumDate(_quote.createdAt.toLocal());
+    final page = _quote.pageNumber;
     final meta = page == null
-        ? context.s.bookmarkDetailShotMeta(date)
-        : context.s.bookmarkDetailPhotoMeta(page, date);
+        ? context.s.quoteDetailShotMeta(date)
+        : context.s.quoteDetailPhotoMeta(page, date);
     return Row(
       children: [
         CircleIconButton(
@@ -165,7 +165,7 @@ class const _ModeToggle({
 }
 
 class const _PhotoView({
-  required final Bookmark _bookmark,
+  required final Quote _quote,
 }) extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -174,9 +174,9 @@ class const _PhotoView({
       child: Center(
         child: SingleChildScrollView(
           child: HighlightImage(
-            imagePath: _bookmark.photoPath,
-            aspectRatio: _bookmark.imageAspectRatio,
-            highlights: _bookmark.highlights,
+            imagePath: _quote.photoPath,
+            aspectRatio: _quote.imageAspectRatio,
+            highlights: _quote.highlights,
           ),
         ),
       ),
@@ -185,7 +185,7 @@ class const _PhotoView({
 }
 
 class const _TextView({
-  required final Bookmark _bookmark,
+  required final Quote _quote,
 }) extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -194,7 +194,7 @@ class const _TextView({
       child: SingleChildScrollView(
         child: Text.rich(
           TextSpan(
-            text: _bookmark.quote,
+            text: _quote.quote,
             style: context.typography.readingBody.copyWith(
               background: Paint()..color = context.palette.amber.solid,
             ),
@@ -206,11 +206,11 @@ class const _TextView({
 }
 
 class const _NoteCard({
-  required final Bookmark _bookmark,
+  required final Quote _quote,
 }) extends HookWidget {
   @override
   Widget build(BuildContext context) {
-    final controller = useTextEditingController(text: _bookmark.note ?? "");
+    final controller = useTextEditingController(text: _quote.note ?? "");
     return Container(
       padding: const EdgeInsets.all(Spacing.m),
       decoration: BoxDecoration(
@@ -221,7 +221,7 @@ class const _NoteCard({
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            '“${_bookmark.quote}”',
+            '“${_quote.quote}”',
             style: context.typography.readingQuoteItalic.copyWith(color: context.c.onSurface),
           ),
           const SizedBox(height: Spacing.xs),
@@ -232,7 +232,7 @@ class const _NoteCard({
             textCapitalization: TextCapitalization.sentences,
             style: context.t.bodyMedium?.copyWith(color: context.c.onSurface),
             onChanged: (value) =>
-                context.read<BookmarkDetailBloc>().add(BookmarkDetailNoteChanged(value)),
+                context.read<QuoteDetailBloc>().add(QuoteDetailNoteChanged(value)),
             decoration: InputDecoration(
               isDense: true,
               filled: false,
@@ -240,7 +240,7 @@ class const _NoteCard({
               enabledBorder: InputBorder.none,
               focusedBorder: InputBorder.none,
               contentPadding: EdgeInsets.zero,
-              hintText: context.s.bookmarkDetailNoteHint,
+              hintText: context.s.quoteDetailNoteHint,
             ),
           ),
         ],
@@ -250,7 +250,7 @@ class const _NoteCard({
 }
 
 class const _Actions({
-  required final Bookmark _bookmark,
+  required final Quote _quote,
   required final Book? _book,
 }) extends StatelessWidget {
   @override
@@ -259,58 +259,58 @@ class const _Actions({
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         _ActionButton(
-          icon: _bookmark.isFavorite ? Icons.star_rounded : Icons.star_outline_rounded,
-          label: context.s.bookmarkDetailStarredLabel,
-          highlighted: _bookmark.isFavorite,
+          icon: _quote.isFavorite ? Icons.star_rounded : Icons.star_outline_rounded,
+          label: context.s.quoteDetailFavoriteLabel,
+          highlighted: _quote.isFavorite,
           onTap: () =>
-              context.read<BookmarkDetailBloc>().add(const BookmarkDetailFavoriteToggled()),
+              context.read<QuoteDetailBloc>().add(const QuoteDetailFavoriteToggled()),
         ),
         const SizedBox(width: Spacing.xl),
         _ActionButton(
           icon: Icons.north_east,
-          label: context.s.bookmarkDetailShareLabel,
+          label: context.s.quoteDetailShareLabel,
           highlighted: false,
-          onTap: () => _shareMark(context, _bookmark, _book),
+          onTap: () => _shareQuote(context, _quote, _book),
         ),
         const SizedBox(width: Spacing.xl),
         _ActionButton(
           icon: Icons.more_horiz,
-          label: context.s.bookmarkDetailMoreLabel,
+          label: context.s.quoteDetailMoreLabel,
           highlighted: false,
-          onTap: () => _showMarkMenu(context),
+          onTap: () => _showQuoteMenu(context),
         ),
       ],
     );
   }
 }
 
-Future<void> _shareMark(BuildContext context, Bookmark bookmark, Book? book) async {
-  final page = bookmark.pageNumber;
+Future<void> _shareQuote(BuildContext context, Quote quote, Book? book) async {
+  final page = quote.pageNumber;
   final source = book == null
       ? context.s.libraryUnknownBook
-      : (page == null ? book.title : "${book.title}, ${context.s.pageShortLabel(page)}");
-  await Share.share(context.s.markShareBody(bookmark.quote, source));
+      : (page == null ? book.title : context.s.quoteSourceLabel(book.title, page));
+  await Share.share(context.s.quoteShareBody(quote.quote, source));
 }
 
-Future<void> _showMarkMenu(BuildContext context) async {
-  final bloc = context.read<BookmarkDetailBloc>();
+Future<void> _showQuoteMenu(BuildContext context) async {
+  final bloc = context.read<QuoteDetailBloc>();
   final deleteRequested = await showModalBottomSheet<bool>(
     context: context,
     useRootNavigator: true,
-    builder: (_) => const _MarkMenu(),
+    builder: (_) => const _QuoteMenu(),
   );
   if (deleteRequested != true || !context.mounted) return;
   final confirmed = await showConfirmDialog(
     context,
-    title: context.s.markDeleteTitle,
-    message: context.s.markDeleteMessage,
+    title: context.s.quoteDeleteTitle,
+    message: context.s.quoteDeleteMessage,
     confirmLabel: context.s.commonDelete,
     destructive: true,
   );
-  if (confirmed) bloc.add(const BookmarkDetailDeleteRequested());
+  if (confirmed) bloc.add(const QuoteDetailDeleteRequested());
 }
 
-class const _MarkMenu() extends StatelessWidget {
+class const _QuoteMenu() extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -322,7 +322,7 @@ class const _MarkMenu() extends StatelessWidget {
           children: [
             SheetActionTile(
               icon: Icons.delete_outline,
-              label: context.s.markDeleteAction,
+              label: context.s.quoteDeleteAction,
               destructive: true,
               onTap: () => Navigator.of(context).pop(true),
             ),
@@ -361,7 +361,7 @@ class const _ActionButton({
   }
 }
 
-class const _VoicePlayer({
+class const _VoiceNotePlayer({
   required final String _path,
   required final int _durationMs,
 }) extends HookWidget {
@@ -400,7 +400,7 @@ class const _VoicePlayer({
           const SizedBox(width: Spacing.xs),
           Expanded(
             child: Text(
-              context.s.markVoiceLabel(label),
+              context.s.quoteVoiceNoteLabel(label),
               style: context.t.bodyLarge?.copyWith(color: coral.onSolid),
             ),
           ),

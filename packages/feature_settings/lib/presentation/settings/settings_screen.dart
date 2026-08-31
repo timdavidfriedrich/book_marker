@@ -86,7 +86,7 @@ class const _Content({
                     ),
                     const SizedBox(height: Spacing.xxs),
                     Text(
-                      context.s.settingsStats(_state.bookCount, _state.markCount, _state.themeCount),
+                      context.s.settingsStats(_state.bookCount, _state.quoteCount, _state.themeCount),
                       style: context.typography.monoLabel.copyWith(color: context.c.onSurfaceVariant),
                     ),
                   ],

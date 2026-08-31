@@ -1,12 +1,12 @@
 import 'package:core/error/app_error.dart';
 import 'package:core/theme/spacing.dart';
+import 'package:feature_library/presentation/extensions/book_status_extensions.dart';
 import 'package:feature_library/presentation/library/library_bloc.dart';
 import 'package:feature_library/presentation/library/library_event.dart';
 import 'package:feature_library/presentation/library/library_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:shared/domain/entities/book.dart' show BookStatus;
 import 'package:shared/presentation/extensions/accent_extensions.dart';
 import 'package:shared/presentation/extensions/app_error_extensions.dart';
 import 'package:shared/presentation/extensions/context_extensions.dart';
@@ -16,9 +16,9 @@ import 'package:shared/presentation/widgets/book_cover.dart';
 import 'package:shared/presentation/widgets/circle_icon_button.dart';
 import 'package:shared/presentation/widgets/count_badge.dart';
 import 'package:shared/presentation/widgets/ink_tap_box.dart';
-import 'package:shared/presentation/widgets/mark_card.dart';
 import 'package:shared/presentation/widgets/name_input_dialog.dart';
 import 'package:shared/presentation/widgets/profile_avatar.dart';
+import 'package:shared/presentation/widgets/quote_card.dart';
 import 'package:shared/presentation/widgets/segmented_toggle.dart';
 import 'package:shared/presentation/widgets/selectable_chip.dart';
 
@@ -129,9 +129,9 @@ class const _BooksArea({
             ),
             const Spacer(),
             if (isBooks)
-              _StarButton(
+              _FavoriteButton(
                 onTap: () => context.read<LibraryBloc>().add(
-                  const LibrarySearchScopeChanged(LibrarySearchScope.starred),
+                  const LibrarySearchScopeChanged(LibrarySearchScope.favorites),
                 ),
               )
             else
@@ -160,31 +160,21 @@ class const _BookList({
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Row(
-          children: [
-            SelectableChip(
-              label: context.s.libraryFilterAll(_state.totalBooks),
-              selected: _state.filter == LibraryFilter.all,
-              onTap: () =>
-                  context.read<LibraryBloc>().add(const LibraryFilterChanged(LibraryFilter.all)),
-            ),
-            const SizedBox(width: Spacing.xs),
-            SelectableChip(
-              label: context.s.libraryFilterReading(_state.readingCount),
-              selected: _state.filter == LibraryFilter.reading,
-              onTap: () => context.read<LibraryBloc>().add(
-                const LibraryFilterChanged(LibraryFilter.reading),
-              ),
-            ),
-            const SizedBox(width: Spacing.xs),
-            SelectableChip(
-              label: context.s.libraryFilterFinished(_state.finishedCount),
-              selected: _state.filter == LibraryFilter.finished,
-              onTap: () => context.read<LibraryBloc>().add(
-                const LibraryFilterChanged(LibraryFilter.finished),
-              ),
-            ),
-          ],
+        SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Row(
+            children: [
+              for (final (index, filter) in LibraryFilter.values.indexed) ...[
+                if (index > 0) const SizedBox(width: Spacing.xs),
+                SelectableChip(
+                  label: _filterLabel(context, filter, _state),
+                  selected: _state.filter == filter,
+                  onTap: () =>
+                      context.read<LibraryBloc>().add(LibraryFilterChanged(filter)),
+                ),
+              ],
+            ],
+          ),
         ),
         const SizedBox(height: Spacing.m),
         Expanded(
@@ -208,16 +198,19 @@ class const _BookList({
                   itemBuilder: (context, index) {
                     final summary = _state.books[index];
                     final book = summary.book;
-                    final featured = summary.featuredMark;
-                    final statusLabel = book.status == BookStatus.finished
-                        ? context.s.libraryStatusFinished
-                        : context.s.libraryStatusReading;
+                    final featured = summary.featuredQuote;
+                    final statusLabel = book.status.toSummaryLabel(context);
                     return BookCard(
                       accent: book.id.accent,
                       title: book.title,
-                      meta:
-                          "${context.s.libraryMarksCount(summary.markCount)} · ${context.s.libraryStarredCount(summary.starredCount)} · $statusLabel",
-                      count: summary.markCount,
+                      meta: statusLabel == null
+                          ? context.s.libraryBookMeta(summary.quoteCount, summary.favoriteCount)
+                          : context.s.libraryBookMetaWithStatus(
+                              summary.quoteCount,
+                              summary.favoriteCount,
+                              statusLabel,
+                            ),
+                      count: summary.quoteCount,
                       thumbnailUrl: book.thumbnailUrl,
                       featuredQuote: featured == null ? null : "“${featured.quote}”",
                       featuredPage: featured?.pageNumber,
@@ -302,7 +295,7 @@ class const _ShelfCard({
                 ),
                 const SizedBox(height: Spacing.xxs),
                 Text(
-                  "${context.s.themesBooksCount(_summary.bookCount)} · ${context.s.libraryMarksCount(_summary.markCount)}",
+                  context.s.libraryShelfMeta(_summary.bookCount, _summary.quoteCount),
                   style: context.typography.monoLabel.copyWith(color: swatch.onFillVariant),
                 ),
               ],
@@ -378,12 +371,12 @@ class const _SearchResults({
             ),
             const SizedBox(width: Spacing.xs),
             SelectableChip(
-              label: context.s.librarySearchScopeStarred,
-              selected: _state.searchScope == LibrarySearchScope.starred,
+              label: context.s.librarySearchScopeFavorites,
+              selected: _state.searchScope == LibrarySearchScope.favorites,
               selectedColor: context.c.inverseSurface,
               selectedTextColor: context.c.onInverseSurface,
               onTap: () => context.read<LibraryBloc>().add(
-                const LibrarySearchScopeChanged(LibrarySearchScope.starred),
+                const LibrarySearchScopeChanged(LibrarySearchScope.favorites),
               ),
             ),
             const SizedBox(width: Spacing.xs),
@@ -413,17 +406,17 @@ class const _SearchResults({
               final result = _state.results[index];
               final book = result.book;
               final accent = book.id.accent;
-              final page = result.mark.pageNumber;
+              final page = result.quote.pageNumber;
               final source = page == null
                   ? book.title
-                  : "${book.title} · ${context.s.pageShortLabel(page)}";
-              return MarkCard(
+                  : context.s.quoteSourceLabel(book.title, page);
+              return QuoteCard(
                 accent: accent,
-                quote: "“${result.mark.quote}”",
+                quote: "“${result.quote.quote}”",
                 thumbnailUrl: book.thumbnailUrl,
                 sourceLabel: source,
                 backgroundColor: context.palette.resolve(accent).fill,
-                onTap: () => context.pushBookmarkDetail(result.mark.id),
+                onTap: () => context.pushQuoteDetail(result.quote.id),
               );
             },
           ),
@@ -433,14 +426,14 @@ class const _SearchResults({
   }
 }
 
-class const _StarButton({
+class const _FavoriteButton({
   required final VoidCallback _onTap,
 }) extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return CircleIconButton(
       icon: Icons.star_rounded,
-      tooltip: context.s.librarySearchScopeStarred,
+      tooltip: context.s.librarySearchScopeFavorites,
       backgroundColor: context.palette.amber.fill,
       foregroundColor: context.palette.amber.solid,
       onPressed: _onTap,
@@ -470,4 +463,13 @@ class const _Failure({
       ),
     );
   }
+}
+
+String _filterLabel(BuildContext context, LibraryFilter filter, LibraryLoaded state) {
+  return switch (filter) {
+    LibraryFilter.all => context.s.libraryFilterAll(state.totalBooks),
+    LibraryFilter.reading => context.s.libraryFilterReading(state.readingCount),
+    LibraryFilter.paused => context.s.libraryFilterPaused(state.pausedCount),
+    LibraryFilter.finished => context.s.libraryFilterFinished(state.finishedCount),
+  };
 }

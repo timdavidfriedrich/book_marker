@@ -1,7 +1,7 @@
 import 'package:core/error/app_result.dart';
 import 'package:shared/domain/entities/book.dart';
-import 'package:shared/domain/entities/bookmark.dart';
-import 'package:shared/domain/entities/mark_theme.dart';
+import 'package:shared/domain/entities/quote.dart';
+import 'package:shared/domain/entities/quote_theme.dart';
 import 'package:shared/domain/entities/user_settings.dart';
 
 sealed class SettingsEvent {
@@ -14,9 +14,9 @@ class const SettingsSettingsUpdated(final AppResult<UserSettings> result) extend
 
 class const SettingsBooksUpdated(final AppResult<List<Book>> result) extends SettingsEvent;
 
-class const SettingsBookmarksUpdated(final AppResult<List<Bookmark>> result) extends SettingsEvent;
+class const SettingsQuotesUpdated(final AppResult<List<Quote>> result) extends SettingsEvent;
 
-class const SettingsThemesUpdated(final AppResult<List<MarkTheme>> result) extends SettingsEvent;
+class const SettingsThemesUpdated(final AppResult<List<QuoteTheme>> result) extends SettingsEvent;
 
 class const SettingsNameChanged(final String? name) extends SettingsEvent;
 

@@ -1,16 +1,16 @@
 import 'package:shared/data/database/app_database.dart';
-import 'package:shared/domain/entities/bookmark.dart';
+import 'package:shared/domain/entities/quote.dart';
 
-extension LocalBookmarkMappers on LocalBookmark {
-  Bookmark toBookmark() {
-    return Bookmark(
+extension LocalQuoteMappers on LocalQuote {
+  Quote toQuote() {
+    return Quote(
       id: id,
       bookId: bookId,
       pageNumber: pageNumber,
       quote: quote,
       note: note,
-      voicePath: voicePath,
-      voiceDurationMs: voiceDurationMs,
+      voiceNotePath: voiceNotePath,
+      voiceNoteDurationMs: voiceNoteDurationMs,
       photoPath: photoPath,
       imageAspectRatio: imageAspectRatio,
       highlights: highlights,
@@ -20,16 +20,16 @@ extension LocalBookmarkMappers on LocalBookmark {
   }
 }
 
-extension BookmarkMappers on Bookmark {
-  LocalBookmark toLocalBookmark() {
-    return LocalBookmark(
+extension QuoteMappers on Quote {
+  LocalQuote toLocalQuote() {
+    return LocalQuote(
       id: id,
       bookId: bookId,
       pageNumber: pageNumber,
       quote: quote,
       note: note,
-      voicePath: voicePath,
-      voiceDurationMs: voiceDurationMs,
+      voiceNotePath: voiceNotePath,
+      voiceNoteDurationMs: voiceNoteDurationMs,
       photoPath: photoPath,
       imageAspectRatio: imageAspectRatio,
       highlights: highlights,

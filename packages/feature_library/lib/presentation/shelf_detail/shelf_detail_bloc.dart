@@ -7,10 +7,10 @@ import 'package:feature_library/presentation/shelf_detail/shelf_detail_state.dar
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
 import 'package:shared/domain/entities/book.dart';
-import 'package:shared/domain/entities/bookmark.dart';
+import 'package:shared/domain/entities/quote.dart';
 import 'package:shared/domain/entities/shelf.dart';
 import 'package:shared/domain/repositories/book_repository.dart';
-import 'package:shared/domain/repositories/bookmark_repository.dart';
+import 'package:shared/domain/repositories/quote_repository.dart';
 import 'package:shared/domain/repositories/shelf_repository.dart';
 
 @injectable
@@ -18,14 +18,14 @@ class ShelfDetailBloc extends Bloc<ShelfDetailEvent, ShelfDetailState> {
   ShelfDetailBloc(
     this._shelfRepository,
     this._bookRepository,
-    this._bookmarkRepository,
+    this._quoteRepository,
     @factoryParam this._shelfId,
   ) : super(const ShelfDetailLoading()) {
     on<ShelfDetailStarted>(_onStarted);
     on<ShelfDetailShelvesUpdated>(_onShelvesUpdated);
     on<ShelfDetailMembershipUpdated>(_onMembershipUpdated);
     on<ShelfDetailBooksUpdated>(_onBooksUpdated);
-    on<ShelfDetailBookmarksUpdated>(_onBookmarksUpdated);
+    on<ShelfDetailQuotesUpdated>(_onQuotesUpdated);
     on<ShelfDetailBookToggled>(_onBookToggled);
     on<ShelfDetailRenameRequested>(_onRenameRequested);
     on<ShelfDetailAccentChanged>(_onAccentChanged);
@@ -34,23 +34,23 @@ class ShelfDetailBloc extends Bloc<ShelfDetailEvent, ShelfDetailState> {
 
   final ShelfRepository _shelfRepository;
   final BookRepository _bookRepository;
-  final BookmarkRepository _bookmarkRepository;
+  final QuoteRepository _quoteRepository;
   final String _shelfId;
   StreamSubscription<AppResult<List<Shelf>>>? _shelfSubscription;
   StreamSubscription<AppResult<Map<String, Set<String>>>>? _membershipSubscription;
   StreamSubscription<AppResult<List<Book>>>? _bookSubscription;
-  StreamSubscription<AppResult<List<Bookmark>>>? _bookmarkSubscription;
+  StreamSubscription<AppResult<List<Quote>>>? _quoteSubscription;
   Shelf? _shelf;
   Set<String> _memberIds = const {};
   List<Book> _books = const [];
-  List<Bookmark> _bookmarks = const [];
+  List<Quote> _quotes = const [];
   AppError? _error;
 
   Future<void> _onStarted(ShelfDetailStarted event, Emitter<ShelfDetailState> emit) async {
     await _shelfSubscription?.cancel();
     await _membershipSubscription?.cancel();
     await _bookSubscription?.cancel();
-    await _bookmarkSubscription?.cancel();
+    await _quoteSubscription?.cancel();
     _shelfSubscription = _shelfRepository.watchShelves().listen(
       (result) => add(ShelfDetailShelvesUpdated(result)),
     );
@@ -60,8 +60,8 @@ class ShelfDetailBloc extends Bloc<ShelfDetailEvent, ShelfDetailState> {
     _bookSubscription = _bookRepository.watchBooks().listen(
       (result) => add(ShelfDetailBooksUpdated(result)),
     );
-    _bookmarkSubscription = _bookmarkRepository.watchBookmarks().listen(
-      (result) => add(ShelfDetailBookmarksUpdated(result)),
+    _quoteSubscription = _quoteRepository.watchQuotes().listen(
+      (result) => add(ShelfDetailQuotesUpdated(result)),
     );
   }
 
@@ -97,9 +97,9 @@ class ShelfDetailBloc extends Bloc<ShelfDetailEvent, ShelfDetailState> {
     }
   }
 
-  void _onBookmarksUpdated(ShelfDetailBookmarksUpdated event, Emitter<ShelfDetailState> emit) {
+  void _onQuotesUpdated(ShelfDetailQuotesUpdated event, Emitter<ShelfDetailState> emit) {
     if (event.result case Success(:final data)) {
-      _bookmarks = data;
+      _quotes = data;
       _emitState(emit);
     }
   }
@@ -148,12 +148,12 @@ class ShelfDetailBloc extends Bloc<ShelfDetailEvent, ShelfDetailState> {
     }
     final shelf = _shelf;
     if (shelf == null) return;
-    final markCountByBook = <String, int>{};
-    for (final mark in _bookmarks) {
-      markCountByBook.update(mark.bookId, (value) => value + 1, ifAbsent: () => 1);
+    final quoteCountByBook = <String, int>{};
+    for (final quote in _quotes) {
+      quoteCountByBook.update(quote.bookId, (value) => value + 1, ifAbsent: () => 1);
     }
     final allItems = _books
-        .map((book) => ShelfBookItem(book: book, markCount: markCountByBook[book.id] ?? 0))
+        .map((book) => ShelfBookItem(book: book, quoteCount: quoteCountByBook[book.id] ?? 0))
         .toList();
     final memberItems = allItems.where((item) => _memberIds.contains(item.book.id)).toList();
     emit(
@@ -163,7 +163,7 @@ class ShelfDetailBloc extends Bloc<ShelfDetailEvent, ShelfDetailState> {
         allBooks: allItems,
         memberIds: _memberIds,
         bookCount: memberItems.length,
-        markCount: memberItems.fold(0, (total, item) => total + item.markCount),
+        quoteCount: memberItems.fold(0, (total, item) => total + item.quoteCount),
       ),
     );
   }
@@ -173,7 +173,7 @@ class ShelfDetailBloc extends Bloc<ShelfDetailEvent, ShelfDetailState> {
     await _shelfSubscription?.cancel();
     await _membershipSubscription?.cancel();
     await _bookSubscription?.cancel();
-    await _bookmarkSubscription?.cancel();
+    await _quoteSubscription?.cancel();
     return super.close();
   }
 }

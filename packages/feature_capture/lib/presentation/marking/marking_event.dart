@@ -1,5 +1,5 @@
 import 'package:core/error/app_result.dart';
-import 'package:shared/domain/entities/mark_theme.dart';
+import 'package:shared/domain/entities/quote_theme.dart';
 
 sealed class MarkingEvent {
   const MarkingEvent();
@@ -32,15 +32,15 @@ class const MarkingQuoteEdited(
   final String quote,
 ) extends MarkingEvent;
 
-class const MarkingVoiceRecorded(
+class const MarkingVoiceNoteRecorded(
   final String path,
   final int durationMs,
 ) extends MarkingEvent;
 
-class const MarkingVoiceCleared() extends MarkingEvent;
+class const MarkingVoiceNoteCleared() extends MarkingEvent;
 
 class const MarkingThemesUpdated(
-  final AppResult<List<MarkTheme>> result,
+  final AppResult<List<QuoteTheme>> result,
 ) extends MarkingEvent;
 
 class const MarkingThemeToggled(
@@ -51,6 +51,6 @@ class const MarkingThemeCreateRequested(
   final String name,
 ) extends MarkingEvent;
 
-class const MarkingStarToggled() extends MarkingEvent;
+class const MarkingFavoriteToggled() extends MarkingEvent;
 
 class const MarkingSaveRequested() extends MarkingEvent;

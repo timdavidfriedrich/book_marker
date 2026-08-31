@@ -7,30 +7,30 @@ import 'package:feature_library/presentation/book_detail/book_detail_state.dart'
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
 import 'package:shared/domain/entities/book.dart';
-import 'package:shared/domain/entities/bookmark.dart';
+import 'package:shared/domain/entities/quote.dart';
 import 'package:shared/domain/repositories/book_repository.dart';
-import 'package:shared/domain/repositories/bookmark_repository.dart';
+import 'package:shared/domain/repositories/quote_repository.dart';
 
 @injectable
 class BookDetailBloc extends Bloc<BookDetailEvent, BookDetailState> {
   BookDetailBloc(
-    this._bookmarkRepository,
+    this._quoteRepository,
     this._bookRepository,
     @factoryParam this._bookId,
   ) : super(const BookDetailLoading()) {
     on<BookDetailStarted>(_onStarted);
-    on<BookDetailBookmarksUpdated>(_onBookmarksUpdated);
+    on<BookDetailQuotesUpdated>(_onQuotesUpdated);
     on<BookDetailFilterChanged>(_onFilterChanged);
-    on<BookDetailStatusToggled>(_onStatusToggled);
+    on<BookDetailStatusChanged>(_onStatusChanged);
     on<BookDetailDeleteRequested>(_onDeleteRequested);
   }
 
-  final BookmarkRepository _bookmarkRepository;
+  final QuoteRepository _quoteRepository;
   final BookRepository _bookRepository;
   final String _bookId;
-  StreamSubscription<AppResult<List<Bookmark>>>? _subscription;
+  StreamSubscription<AppResult<List<Quote>>>? _subscription;
   Book? _book;
-  List<Bookmark> _marks = const [];
+  List<Quote> _quotes = const [];
   BookDetailFilter _filter = BookDetailFilter.all;
   AppError? _error;
 
@@ -44,18 +44,18 @@ class BookDetailBloc extends Bloc<BookDetailEvent, BookDetailState> {
         _book = data;
     }
     await _subscription?.cancel();
-    _subscription = _bookmarkRepository.watchBookmarks().listen(
-      (result) => add(BookDetailBookmarksUpdated(result)),
+    _subscription = _quoteRepository.watchQuotes().listen(
+      (result) => add(BookDetailQuotesUpdated(result)),
     );
   }
 
-  void _onBookmarksUpdated(BookDetailBookmarksUpdated event, Emitter<BookDetailState> emit) {
+  void _onQuotesUpdated(BookDetailQuotesUpdated event, Emitter<BookDetailState> emit) {
     switch (event.result) {
       case Failure(:final error):
         _error = error;
       case Success(:final data):
         _error = null;
-        _marks = data.where((mark) => mark.bookId == _bookId).toList()
+        _quotes = data.where((quote) => quote.bookId == _bookId).toList()
           ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
     }
     _emitState(emit);
@@ -66,15 +66,14 @@ class BookDetailBloc extends Bloc<BookDetailEvent, BookDetailState> {
     _emitState(emit);
   }
 
-  Future<void> _onStatusToggled(
-    BookDetailStatusToggled event,
+  Future<void> _onStatusChanged(
+    BookDetailStatusChanged event,
     Emitter<BookDetailState> emit,
   ) async {
     final book = _book;
     if (book == null) return;
-    final next = book.status == BookStatus.reading ? BookStatus.finished : BookStatus.reading;
-    if (await _bookRepository.setStatus(book.id, next) case Success()) {
-      _book = book.copyWith(status: next);
+    if (await _bookRepository.setStatus(book.id, event.status) case Success()) {
+      _book = book.copyWith(status: event.status);
       _emitState(emit);
     }
   }
@@ -83,8 +82,8 @@ class BookDetailBloc extends Bloc<BookDetailEvent, BookDetailState> {
     BookDetailDeleteRequested event,
     Emitter<BookDetailState> emit,
   ) async {
-    for (final mark in _marks) {
-      await _bookmarkRepository.deleteBookmark(mark.id);
+    for (final quote in _quotes) {
+      await _quoteRepository.deleteQuote(quote.id);
     }
     if (await _bookRepository.deleteBook(_bookId) case Success()) {
       emit(const BookDetailDeleted());
@@ -100,16 +99,16 @@ class BookDetailBloc extends Bloc<BookDetailEvent, BookDetailState> {
     final book = _book;
     if (book == null) return;
     final visible = switch (_filter) {
-      BookDetailFilter.all => _marks,
-      BookDetailFilter.starred => _marks.where((mark) => mark.isFavorite).toList(),
-      BookDetailFilter.withVoice => _marks.where((mark) => mark.voicePath != null).toList(),
+      BookDetailFilter.all => _quotes,
+      BookDetailFilter.favorites => _quotes.where((quote) => quote.isFavorite).toList(),
+      BookDetailFilter.withVoiceNote => _quotes.where((quote) => quote.voiceNotePath != null).toList(),
     };
     emit(
       BookDetailLoaded(
         book: book,
-        marks: visible,
-        totalCount: _marks.length,
-        starredCount: _marks.where((mark) => mark.isFavorite).length,
+        quotes: visible,
+        totalCount: _quotes.length,
+        favoriteCount: _quotes.where((quote) => quote.isFavorite).length,
         filter: _filter,
       ),
     );

@@ -3,7 +3,7 @@ import 'package:dart_mappable/dart_mappable.dart';
 part 'book.mapper.dart';
 
 @MappableEnum()
-enum BookStatus { reading, finished }
+enum BookStatus { reading, paused, finished }
 
 @MappableClass()
 class const Book({

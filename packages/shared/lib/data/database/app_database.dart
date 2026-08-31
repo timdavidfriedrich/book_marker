@@ -7,6 +7,11 @@ part 'app_database.g.dart';
 
 const _databaseName = "book_marker";
 const _statusReading = "reading";
+const _legacyQuotesTable = "bookmarks";
+const _legacyQuoteThemesTable = "theme_marks";
+const _legacyQuoteIdColumn = "bookmark_id";
+const _legacyVoiceNotePathColumn = "voice_path";
+const _legacyVoiceNoteDurationColumn = "voice_duration_ms";
 
 @DataClassName("LocalBook")
 class Books extends Table {
@@ -30,8 +35,8 @@ class Books extends Table {
   Set<Column<Object>> get primaryKey => {id};
 }
 
-@DataClassName("LocalBookmark")
-class Bookmarks extends Table {
+@DataClassName("LocalQuote")
+class Quotes extends Table {
   TextColumn get id => text()();
 
   TextColumn get bookId => text().references(Books, #id, onDelete: KeyAction.cascade)();
@@ -42,9 +47,9 @@ class Bookmarks extends Table {
 
   TextColumn get note => text().nullable()();
 
-  TextColumn get voicePath => text().nullable()();
+  TextColumn get voiceNotePath => text().nullable()();
 
-  IntColumn get voiceDurationMs => integer().nullable()();
+  IntColumn get voiceNoteDurationMs => integer().nullable()();
 
   TextColumn get photoPath => text()();
 
@@ -74,14 +79,14 @@ class Themes extends Table {
   Set<Column<Object>> get primaryKey => {id};
 }
 
-@DataClassName("LocalThemeMark")
-class ThemeMarks extends Table {
+@DataClassName("LocalThemeQuote")
+class ThemeQuotes extends Table {
   TextColumn get themeId => text().references(Themes, #id, onDelete: KeyAction.cascade)();
 
-  TextColumn get bookmarkId => text().references(Bookmarks, #id, onDelete: KeyAction.cascade)();
+  TextColumn get quoteId => text().references(Quotes, #id, onDelete: KeyAction.cascade)();
 
   @override
-  Set<Column<Object>> get primaryKey => {themeId, bookmarkId};
+  Set<Column<Object>> get primaryKey => {themeId, quoteId};
 }
 
 @DataClassName("LocalShelf")
@@ -120,28 +125,43 @@ class SettingsTable extends Table {
   Set<Column<Object>> get primaryKey => {id};
 }
 
-@DriftDatabase(tables: [Books, Bookmarks, Themes, ThemeMarks, Shelves, ShelfBooks, SettingsTable])
+@DriftDatabase(tables: [Books, Quotes, Themes, ThemeQuotes, Shelves, ShelfBooks, SettingsTable])
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(driftDatabase(name: _databaseName));
 
   @override
-  int get schemaVersion => 5;
+  int get schemaVersion => 6;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
     onCreate: (migrator) => migrator.createAll(),
     onUpgrade: (migrator, from, to) async {
+      if (from < 6) {
+        await migrator.renameTable(quotes, _legacyQuotesTable);
+        if (from >= 2) {
+          await migrator.renameTable(themeQuotes, _legacyQuoteThemesTable);
+          await migrator.renameColumn(themeQuotes, _legacyQuoteIdColumn, themeQuotes.quoteId);
+        }
+        if (from >= 3) {
+          await migrator.renameColumn(quotes, _legacyVoiceNotePathColumn, quotes.voiceNotePath);
+          await migrator.renameColumn(
+            quotes,
+            _legacyVoiceNoteDurationColumn,
+            quotes.voiceNoteDurationMs,
+          );
+        }
+      }
       if (from < 2) {
         await migrator.addColumn(books, books.status);
-        await migrator.addColumn(bookmarks, bookmarks.note);
+        await migrator.addColumn(quotes, quotes.note);
         await migrator.createTable(themes);
-        await migrator.createTable(themeMarks);
+        await migrator.createTable(themeQuotes);
         await migrator.createTable(shelves);
         await migrator.createTable(shelfBooks);
       }
       if (from < 3) {
-        await migrator.addColumn(bookmarks, bookmarks.voicePath);
-        await migrator.addColumn(bookmarks, bookmarks.voiceDurationMs);
+        await migrator.addColumn(quotes, quotes.voiceNotePath);
+        await migrator.addColumn(quotes, quotes.voiceNoteDurationMs);
       }
       if (from < 4) {
         await migrator.addColumn(themes, themes.accent);
