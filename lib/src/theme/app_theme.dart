@@ -72,12 +72,48 @@ const _sky = AccentSwatch(
   onFillVariant: Color(0xFF4E7290),
 );
 
-const _palette = AppPalette(
-  amber: _amber,
-  teal: _teal,
-  coral: _coral,
-  sand: _sand,
-  sky: _sky,
+const _accentFillBlend = 0.82;
+const _accentOnFillVariantBlend = 0.42;
+const _accentOnSolidThreshold = 0.5;
+const _accentOnSolidLight = Color(0xFFFFF6E9);
+
+const _derivedAccents = <AccentColor, Color>{
+  AccentColor.mint: Color(0xFF4FB49A),
+  AccentColor.forest: Color(0xFF2E6B4F),
+  AccentColor.olive: Color(0xFF6E7A32),
+  AccentColor.ocean: Color(0xFF1F6F8B),
+  AccentColor.indigo: Color(0xFF3B4A9E),
+  AccentColor.violet: Color(0xFF6C5CE0),
+  AccentColor.plum: Color(0xFF8E4585),
+  AccentColor.rose: Color(0xFFD6547B),
+  AccentColor.brick: Color(0xFF9E3B2E),
+  AccentColor.rust: Color(0xFFB4551F),
+  AccentColor.mustard: Color(0xFFD8A013),
+  AccentColor.clay: Color(0xFFC08552),
+  AccentColor.mauve: Color(0xFF9B7B9E),
+  AccentColor.slate: Color(0xFF55606E),
+  AccentColor.stone: Color(0xFF8A8072),
+};
+
+AccentSwatch _derivedSwatch(Color solid) {
+  return AccentSwatch(
+    fill: Color.lerp(solid, _cream, _accentFillBlend)!,
+    solid: solid,
+    onSolid: solid.computeLuminance() > _accentOnSolidThreshold ? _inkSoft : _accentOnSolidLight,
+    onFill: _inkSoft,
+    onFillVariant: Color.lerp(solid, _ink, _accentOnFillVariantBlend)!,
+  );
+}
+
+final _palette = AppPalette(
+  accents: {
+    AccentColor.amber: _amber,
+    AccentColor.teal: _teal,
+    AccentColor.coral: _coral,
+    AccentColor.sand: _sand,
+    AccentColor.sky: _sky,
+    for (final entry in _derivedAccents.entries) entry.key: _derivedSwatch(entry.value),
+  },
   paperFill: _paperCard,
   paperText: _paperText,
   paperTextFaint: _paperTextFaint,
@@ -124,7 +160,7 @@ abstract final class AppTheme {
       canvasColor: colorScheme.surface,
       textTheme: textTheme,
       splashFactory: NoSplash.splashFactory,
-      extensions: const [_palette, _typography, _statusLight],
+      extensions: [_palette, _typography, _statusLight],
       badgeTheme: BadgeThemeData(
         backgroundColor: _sky.solid,
         textColor: _sky.onSolid,
@@ -150,23 +186,45 @@ abstract final class AppTheme {
           borderRadius: BorderRadius.all(Radius.circular(Spacing.radiusXl)),
         ),
       ),
-      bottomSheetTheme: const BottomSheetThemeData(
-        backgroundColor: _creamRaised,
-        modalBackgroundColor: _creamRaised,
+      bottomSheetTheme: BottomSheetThemeData(
+        backgroundColor: colorScheme.surfaceContainerLowest,
+        modalBackgroundColor: colorScheme.surfaceContainerLowest,
         surfaceTintColor: Colors.transparent,
         showDragHandle: true,
-        dragHandleColor: _outline,
+        dragHandleColor: colorScheme.outline,
         elevation: 0,
         modalElevation: 0,
-        shape: RoundedRectangleBorder(
+        shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(top: Radius.circular(Spacing.radiusXxl)),
         ),
       ),
-      dialogTheme: const DialogThemeData(
-        backgroundColor: _creamRaised,
+      dialogTheme: DialogThemeData(
+        backgroundColor: colorScheme.surfaceContainerLowest,
         surfaceTintColor: Colors.transparent,
-        shape: RoundedRectangleBorder(
+        insetPadding: const EdgeInsets.symmetric(horizontal: Spacing.xl, vertical: Spacing.xl),
+        shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.all(Radius.circular(Spacing.radiusXl)),
+        ),
+      ),
+      dropdownMenuTheme: DropdownMenuThemeData(
+        textStyle: textTheme.bodyLarge,
+        menuStyle: MenuStyle(
+          backgroundColor: WidgetStatePropertyAll(colorScheme.surfaceContainerLowest),
+          surfaceTintColor: const WidgetStatePropertyAll(Colors.transparent),
+          elevation: const WidgetStatePropertyAll(Spacing.elevationM),
+          padding: const WidgetStatePropertyAll(EdgeInsets.symmetric(vertical: Spacing.xs)),
+          shape: const WidgetStatePropertyAll(
+            RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.circular(Spacing.radiusL)),
+            ),
+          ),
+        ),
+      ),
+      menuButtonTheme: MenuButtonThemeData(
+        style: MenuItemButton.styleFrom(
+          foregroundColor: colorScheme.onSurface,
+          textStyle: textTheme.bodyLarge,
+          padding: const EdgeInsets.symmetric(horizontal: Spacing.l, vertical: Spacing.xs),
         ),
       ),
       filledButtonTheme: FilledButtonThemeData(
@@ -221,8 +279,8 @@ abstract final class AppTheme {
           borderRadius: BorderRadius.all(Radius.circular(Spacing.radiusM)),
         ),
       ),
-      dividerTheme: const DividerThemeData(
-        color: _outlineVariant,
+      dividerTheme: DividerThemeData(
+        color: colorScheme.outlineVariant,
         thickness: Spacing.borderWidthThin,
       ),
       textSelectionTheme: TextSelectionThemeData(

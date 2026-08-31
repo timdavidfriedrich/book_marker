@@ -1,1 +1,24 @@
-enum AccentColor { amber, teal, coral, sand }
+enum AccentColor {
+  amber,
+  teal,
+  coral,
+  sand,
+  sky,
+  mint,
+  forest,
+  olive,
+  ocean,
+  indigo,
+  violet,
+  plum,
+  rose,
+  brick,
+  rust,
+  mustard,
+  clay,
+  mauve,
+  slate,
+  stone;
+
+  static const List<AccentColor> autoValues = [amber, teal, coral, sand];
+}

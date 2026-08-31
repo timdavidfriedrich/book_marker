@@ -116,7 +116,9 @@ class const _Content({
             child: Padding(
               padding: const EdgeInsets.all(Spacing.l),
               child: Text(
-                context.s.bookDetailEmptyMessage,
+                _state.totalCount == 0
+                    ? context.s.bookDetailEmptyMessage
+                    : context.s.filterNoResultsMessage,
                 textAlign: TextAlign.center,
                 style: context.typography.readingBody.copyWith(color: context.c.onSurfaceVariant),
               ),

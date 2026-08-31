@@ -110,7 +110,9 @@ class const _Content({
                   child: Padding(
                     padding: const EdgeInsets.all(Spacing.l),
                     child: Text(
-                      context.s.themeDetailEmpty,
+                      _state.totalCount == 0
+                          ? context.s.themeDetailEmpty
+                          : context.s.filterNoResultsMessage,
                       textAlign: TextAlign.center,
                       style: context.typography.readingBody.copyWith(
                         color: context.c.onSurfaceVariant,
@@ -334,17 +336,19 @@ Future<void> _showAccentSheet(
   await showModalBottomSheet<void>(
     context: context,
     useRootNavigator: true,
+    isScrollControlled: true,
     builder: (sheetContext) => SheetContent(
-      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(sheetContext.s.accentPickerTitle, style: sheetContext.t.titleMedium),
         const SizedBox(height: Spacing.m),
-        AccentPicker(
-          selected: current,
-          onSelected: (accent) {
-            bloc.add(ThemeDetailAccentChanged(accent));
-            Navigator.of(sheetContext).pop();
-          },
+        Flexible(
+          child: AccentPicker(
+            selected: current,
+            onSelected: (accent) {
+              bloc.add(ThemeDetailAccentChanged(accent));
+              Navigator.of(sheetContext).pop();
+            },
+          ),
         ),
       ],
     ),

@@ -1,4 +1,5 @@
 import 'package:core/error/app_result.dart';
+import 'package:shared/domain/entities/book.dart';
 import 'package:shared/domain/entities/quote_theme.dart';
 
 sealed class MarkingEvent {
@@ -6,6 +7,14 @@ sealed class MarkingEvent {
 }
 
 class const MarkingStarted() extends MarkingEvent;
+
+class const MarkingBooksUpdated(
+  final AppResult<List<Book>> result,
+) extends MarkingEvent;
+
+class const MarkingBookChanged(
+  final String bookId,
+) extends MarkingEvent;
 
 class const MarkingWordsSelected(
   final Set<int> wordIndexes,

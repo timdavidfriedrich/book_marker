@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 
 class const SheetContent({
   required final List<Widget> _children,
-  final CrossAxisAlignment _crossAxisAlignment = CrossAxisAlignment.stretch,
   super.key,
 }) extends StatelessWidget {
   @override
@@ -13,7 +12,7 @@ class const SheetContent({
         padding: const EdgeInsets.fromLTRB(Spacing.l, Spacing.xs, Spacing.l, Spacing.s),
         child: Column(
           mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: _crossAxisAlignment,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: _children,
         ),
       ),

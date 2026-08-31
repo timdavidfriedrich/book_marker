@@ -1179,6 +1179,42 @@ abstract class AppLocalizations {
   /// **'Version {version}'**
   String settingsVersionLabel(String version);
 
+  /// No description provided for @filterNoResultsMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing matches this filter.'**
+  String get filterNoResultsMessage;
+
+  /// No description provided for @libraryBookMetaStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'{quotes, plural, =1{1 quote} other{{quotes} quotes}},\n{status}'**
+  String libraryBookMetaStatus(int quotes, String status);
+
+  /// No description provided for @markingBookFieldLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'book'**
+  String get markingBookFieldLabel;
+
+  /// No description provided for @markingBookPickerTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose book'**
+  String get markingBookPickerTitle;
+
+  /// No description provided for @quoteDetailAddThemeChip.
+  ///
+  /// In en, this message translates to:
+  /// **'+ add'**
+  String get quoteDetailAddThemeChip;
+
+  /// No description provided for @quoteDetailThemePickerTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Themes'**
+  String get quoteDetailThemePickerTitle;
+
   /// No description provided for @settingsLicensesLabel.
   ///
   /// In en, this message translates to:

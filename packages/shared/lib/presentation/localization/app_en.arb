@@ -214,5 +214,12 @@
   "settingsAboutLabel": "About",
   "settingsVersionLabel": "Version {version}",
   "@settingsVersionLabel": { "placeholders": { "version": { "type": "String" } } },
+  "filterNoResultsMessage": "Nothing matches this filter.",
+  "libraryBookMetaStatus": "{quotes, plural, =1{1 quote} other{{quotes} quotes}},\n{status}",
+  "@libraryBookMetaStatus": { "placeholders": { "quotes": { "type": "int" }, "status": { "type": "String" } } },
+  "markingBookFieldLabel": "book",
+  "markingBookPickerTitle": "Choose book",
+  "quoteDetailAddThemeChip": "+ add",
+  "quoteDetailThemePickerTitle": "Themes",
   "settingsLicensesLabel": "Open-source licenses"
 }

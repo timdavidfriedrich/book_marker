@@ -11,6 +11,7 @@ import 'package:feature_capture/presentation/capture/page_detection_cubit.dart';
 import 'package:feature_capture/presentation/capture/page_detection_state.dart';
 import 'package:feature_capture/presentation/extensions/camera_image_extensions.dart';
 import 'package:feature_capture/presentation/extensions/page_quad_extensions.dart';
+import 'package:feature_capture/presentation/widgets/book_chooser_bar.dart';
 import 'package:feature_capture/presentation/widgets/page_corner_dot.dart';
 import 'package:feature_capture/presentation/widgets/page_quad_overlay.dart';
 import 'package:flutter/material.dart';
@@ -24,7 +25,6 @@ import 'package:shared/presentation/extensions/context_extensions.dart';
 import 'package:shared/presentation/navigation/crop_arguments.dart';
 import 'package:shared/presentation/navigation/marking_arguments.dart';
 import 'package:shared/presentation/navigation/navigation_extensions.dart';
-import 'package:shared/presentation/widgets/book_cover.dart';
 import 'package:shared/presentation/widgets/ink_tap_box.dart';
 import 'package:shared/presentation/widgets/segmented_toggle.dart';
 
@@ -393,71 +393,12 @@ class const _SelectedBook({
 }) extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(Spacing.s),
-      decoration: BoxDecoration(
-        color: context.palette.paperFill,
-        borderRadius: BorderRadius.circular(Spacing.radiusFull),
-      ),
-      child: Row(
-        children: [
-          BookCover(
-            accent: _book.id.accent,
-            url: _book.thumbnailUrl,
-            width: 36,
-            height: 44,
-            radius: Spacing.radiusS,
-          ),
-          const SizedBox(width: Spacing.s),
-          Expanded(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  context.s.captureMarkingInto,
-                  style: context.typography.monoCaption.copyWith(
-                    color: context.palette.paperTextFaint,
-                  ),
-                ),
-                Text(
-                  _book.title,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: context.t.titleMedium?.copyWith(color: context.palette.paperText),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(width: Spacing.s),
-          const _SwitchButton(),
-        ],
-      ),
-    );
-  }
-}
-
-class const _SwitchButton() extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return InkTapBox(
-      onTap: () => _addBook(context),
-      color: context.palette.amber.solid,
-      radius: Spacing.radiusFull,
-      padding: const EdgeInsets.symmetric(horizontal: Spacing.s, vertical: Spacing.xs),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(
-            context.s.captureSwitchButton,
-            style: context.t.labelMedium?.copyWith(
-              color: context.palette.amber.onSolid,
-              fontSize: 14,
-            ),
-          ),
-          Icon(Icons.arrow_drop_down, size: Spacing.iconS, color: context.palette.amber.onSolid),
-        ],
-      ),
+    return BookChooserBar(
+      title: _book.title,
+      thumbnailUrl: _book.thumbnailUrl,
+      accent: _book.id.accent,
+      label: context.s.captureMarkingInto,
+      onSwitch: () => _addBook(context),
     );
   }
 }

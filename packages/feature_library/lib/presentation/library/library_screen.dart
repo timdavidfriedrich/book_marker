@@ -214,7 +214,9 @@ class const _BookList({
             child: Padding(
               padding: const EdgeInsets.all(Spacing.l),
               child: Text(
-                context.s.libraryEmptyMessage,
+                _state.totalBooks == 0
+                    ? context.s.libraryEmptyMessage
+                    : context.s.filterNoResultsMessage,
                 textAlign: TextAlign.center,
                 style: context.typography.readingBody.copyWith(color: context.c.onSurfaceVariant),
               ),
@@ -234,13 +236,7 @@ class const _BookList({
                 return BookCard(
                   accent: book.id.accent,
                   title: book.title,
-                  meta: statusLabel == null
-                      ? context.s.libraryBookMeta(summary.quoteCount, summary.favoriteCount)
-                      : context.s.libraryBookMetaWithStatus(
-                          summary.quoteCount,
-                          summary.favoriteCount,
-                          statusLabel,
-                        ),
+                  meta: _bookMeta(context, summary, statusLabel),
                   count: summary.quoteCount,
                   thumbnailUrl: book.thumbnailUrl,
                   featuredQuote: featured == null ? null : "“${featured.quote}”",
@@ -466,6 +462,21 @@ class const _Failure({
       ),
     );
   }
+}
+
+String _bookMeta(BuildContext context, LibraryBookSummary summary, String? statusLabel) {
+  if (summary.favoriteCount == 0) {
+    return statusLabel == null
+        ? context.s.libraryQuotesCount(summary.quoteCount)
+        : context.s.libraryBookMetaStatus(summary.quoteCount, statusLabel);
+  }
+  return statusLabel == null
+      ? context.s.libraryBookMeta(summary.quoteCount, summary.favoriteCount)
+      : context.s.libraryBookMetaWithStatus(
+          summary.quoteCount,
+          summary.favoriteCount,
+          statusLabel,
+        );
 }
 
 String _filterLabel(BuildContext context, LibraryFilter filter, LibraryLoaded state) {

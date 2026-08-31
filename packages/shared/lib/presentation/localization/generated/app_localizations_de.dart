@@ -776,5 +776,31 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
+  String get filterNoResultsMessage => 'Zu diesem Filter passt nichts.';
+
+  @override
+  String libraryBookMetaStatus(int quotes, String status) {
+    String _temp0 = intl.Intl.pluralLogic(
+      quotes,
+      locale: localeName,
+      other: '$quotes Zitate',
+      one: '1 Zitat',
+    );
+    return '$_temp0,\n$status';
+  }
+
+  @override
+  String get markingBookFieldLabel => 'Buch';
+
+  @override
+  String get markingBookPickerTitle => 'Buch wählen';
+
+  @override
+  String get quoteDetailAddThemeChip => '+ hinzufügen';
+
+  @override
+  String get quoteDetailThemePickerTitle => 'Themen';
+
+  @override
   String get settingsLicensesLabel => 'Open-Source-Lizenzen';
 }

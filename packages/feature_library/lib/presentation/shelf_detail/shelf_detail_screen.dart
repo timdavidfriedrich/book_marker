@@ -276,17 +276,19 @@ Future<void> _showAccentSheet(
   await showModalBottomSheet<void>(
     context: context,
     useRootNavigator: true,
+    isScrollControlled: true,
     builder: (sheetContext) => SheetContent(
-      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(sheetContext.s.accentPickerTitle, style: sheetContext.t.titleMedium),
         const SizedBox(height: Spacing.m),
-        AccentPicker(
-          selected: current,
-          onSelected: (accent) {
-            bloc.add(ShelfDetailAccentChanged(accent));
-            Navigator.of(sheetContext).pop();
-          },
+        Flexible(
+          child: AccentPicker(
+            selected: current,
+            onSelected: (accent) {
+              bloc.add(ShelfDetailAccentChanged(accent));
+              Navigator.of(sheetContext).pop();
+            },
+          ),
         ),
       ],
     ),

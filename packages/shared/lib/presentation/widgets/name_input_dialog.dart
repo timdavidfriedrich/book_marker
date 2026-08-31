@@ -1,3 +1,4 @@
+import 'package:core/theme/spacing.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:shared/presentation/extensions/context_extensions.dart';
@@ -22,25 +23,38 @@ class const _NameInputDialog({
   @override
   Widget build(BuildContext context) {
     final controller = useTextEditingController(text: _initialValue);
-    return AlertDialog(
-      title: Text(_title),
-      content: TextField(
-        controller: controller,
-        autofocus: true,
-        textCapitalization: TextCapitalization.sentences,
-        decoration: InputDecoration(hintText: _hint),
-        onSubmitted: (value) => Navigator.of(context).pop(value),
+    return Dialog(
+      child: Padding(
+        padding: const EdgeInsets.all(Spacing.l),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Text(_title, style: context.t.headlineSmall),
+            const SizedBox(height: Spacing.m),
+            TextField(
+              controller: controller,
+              autofocus: true,
+              textCapitalization: TextCapitalization.sentences,
+              decoration: InputDecoration(hintText: _hint),
+              onSubmitted: (value) => Navigator.of(context).pop(value),
+            ),
+            const SizedBox(height: Spacing.s),
+            Align(
+              alignment: Alignment.centerRight,
+              child: TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: Text(context.s.cancel),
+              ),
+            ),
+            const SizedBox(height: Spacing.xs),
+            FilledButton(
+              onPressed: () => Navigator.of(context).pop(controller.text),
+              child: Text(context.s.save),
+            ),
+          ],
+        ),
       ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.of(context).pop(),
-          child: Text(context.s.cancel),
-        ),
-        FilledButton(
-          onPressed: () => Navigator.of(context).pop(controller.text),
-          child: Text(context.s.save),
-        ),
-      ],
     );
   }
 }

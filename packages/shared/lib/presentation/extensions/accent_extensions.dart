@@ -9,6 +9,6 @@ extension AccentKeyExtensions on String {
     for (final unit in codeUnits) {
       hash = (hash * _hashPrime + unit) & _hashMask;
     }
-    return AccentColor.values[hash % AccentColor.values.length];
+    return AccentColor.autoValues[hash % AccentColor.autoValues.length];
   }
 }

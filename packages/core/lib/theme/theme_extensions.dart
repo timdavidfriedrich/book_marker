@@ -22,39 +22,28 @@ class const AccentSwatch({
 }
 
 class const AppPalette({
-  required final AccentSwatch amber,
-  required final AccentSwatch teal,
-  required final AccentSwatch coral,
-  required final AccentSwatch sand,
-  required final AccentSwatch sky,
+  required final Map<AccentColor, AccentSwatch> accents,
   required final Color paperFill,
   required final Color paperText,
   required final Color paperTextFaint,
 }) extends ThemeExtension<AppPalette> {
-  AccentSwatch resolve(AccentColor accent) => switch (accent) {
-    AccentColor.amber => amber,
-    AccentColor.teal => teal,
-    AccentColor.coral => coral,
-    AccentColor.sand => sand,
-  };
+  AccentSwatch resolve(AccentColor accent) => accents[accent] ?? accents.values.first;
+
+  AccentSwatch get amber => resolve(AccentColor.amber);
+  AccentSwatch get teal => resolve(AccentColor.teal);
+  AccentSwatch get coral => resolve(AccentColor.coral);
+  AccentSwatch get sand => resolve(AccentColor.sand);
+  AccentSwatch get sky => resolve(AccentColor.sky);
 
   @override
   AppPalette copyWith({
-    AccentSwatch? amber,
-    AccentSwatch? teal,
-    AccentSwatch? coral,
-    AccentSwatch? sand,
-    AccentSwatch? sky,
+    Map<AccentColor, AccentSwatch>? accents,
     Color? paperFill,
     Color? paperText,
     Color? paperTextFaint,
   }) {
     return AppPalette(
-      amber: amber ?? this.amber,
-      teal: teal ?? this.teal,
-      coral: coral ?? this.coral,
-      sand: sand ?? this.sand,
-      sky: sky ?? this.sky,
+      accents: accents ?? this.accents,
       paperFill: paperFill ?? this.paperFill,
       paperText: paperText ?? this.paperText,
       paperTextFaint: paperTextFaint ?? this.paperTextFaint,
@@ -65,11 +54,10 @@ class const AppPalette({
   AppPalette lerp(AppPalette? other, double t) {
     if (other == null) return this;
     return AppPalette(
-      amber: amber.lerp(other.amber, t),
-      teal: teal.lerp(other.teal, t),
-      coral: coral.lerp(other.coral, t),
-      sand: sand.lerp(other.sand, t),
-      sky: sky.lerp(other.sky, t),
+      accents: {
+        for (final entry in accents.entries)
+          entry.key: entry.value.lerp(other.resolve(entry.key), t),
+      },
       paperFill: Color.lerp(paperFill, other.paperFill, t)!,
       paperText: Color.lerp(paperText, other.paperText, t)!,
       paperTextFaint: Color.lerp(paperTextFaint, other.paperTextFaint, t)!,

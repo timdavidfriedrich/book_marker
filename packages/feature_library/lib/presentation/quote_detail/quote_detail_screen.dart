@@ -350,20 +350,73 @@ class const _ThemeChips({
         runSpacing: Spacing.xs,
         children: [
           for (final theme in _themes)
-            SelectableChip(
-              label: theme.name,
-              selected: _selected.contains(theme.id),
-              selectedColor: context.palette.teal.solid,
-              selectedTextColor: context.palette.teal.onSolid,
-              onTap: () => context.read<QuoteDetailBloc>().add(QuoteDetailThemeToggled(theme.id)),
-            ),
+            if (_selected.contains(theme.id))
+              SelectableChip(
+                label: theme.name,
+                selected: true,
+                selectedColor: context.palette.teal.solid,
+                selectedTextColor: context.palette.teal.onSolid,
+                onTap: () => context.read<QuoteDetailBloc>().add(QuoteDetailThemeToggled(theme.id)),
+              ),
           SelectableChip(
-            label: context.s.markingNewThemeChip,
+            label: context.s.quoteDetailAddThemeChip,
             selected: false,
-            onTap: () => _promptNewTheme(context),
+            onTap: () => _showThemePicker(context),
           ),
         ],
       ),
+    );
+  }
+}
+
+Future<void> _showThemePicker(BuildContext context) async {
+  final bloc = context.read<QuoteDetailBloc>();
+  await showModalBottomSheet<void>(
+    context: context,
+    useRootNavigator: true,
+    isScrollControlled: true,
+    builder: (_) => BlocProvider.value(value: bloc, child: const _ThemePickerSheet()),
+  );
+}
+
+class const _ThemePickerSheet() extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<QuoteDetailBloc, QuoteDetailState>(
+      builder: (context, state) {
+        if (state is! QuoteDetailLoaded) return const SizedBox.shrink();
+        return SheetContent(
+          children: [
+            Text(context.s.quoteDetailThemePickerTitle, style: context.t.titleMedium),
+            const SizedBox(height: Spacing.m),
+            Flexible(
+              child: SingleChildScrollView(
+                child: Wrap(
+                  spacing: Spacing.xs,
+                  runSpacing: Spacing.xs,
+                  children: [
+                    for (final theme in state.themes)
+                      SelectableChip(
+                        label: theme.name,
+                        selected: state.selectedThemeIds.contains(theme.id),
+                        selectedColor: context.palette.teal.solid,
+                        selectedTextColor: context.palette.teal.onSolid,
+                        onTap: () => context.read<QuoteDetailBloc>().add(
+                          QuoteDetailThemeToggled(theme.id),
+                        ),
+                      ),
+                    SelectableChip(
+                      label: context.s.markingNewThemeChip,
+                      selected: false,
+                      onTap: () => _promptNewTheme(context),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 }

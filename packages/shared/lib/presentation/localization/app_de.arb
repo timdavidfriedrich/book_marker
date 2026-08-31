@@ -187,5 +187,12 @@
   "settingsAboutLabel": "Über",
   "settingsVersionLabel": "Version {version}",
   "@settingsVersionLabel": { "placeholders": { "version": { "type": "String" } } },
+  "filterNoResultsMessage": "Zu diesem Filter passt nichts.",
+  "libraryBookMetaStatus": "{quotes, plural, =1{1 Zitat} other{{quotes} Zitate}},\n{status}",
+  "@libraryBookMetaStatus": { "placeholders": { "quotes": { "type": "int" }, "status": { "type": "String" } } },
+  "markingBookFieldLabel": "Buch",
+  "markingBookPickerTitle": "Buch wählen",
+  "quoteDetailAddThemeChip": "+ hinzufügen",
+  "quoteDetailThemePickerTitle": "Themen",
   "settingsLicensesLabel": "Open-Source-Lizenzen"
 }

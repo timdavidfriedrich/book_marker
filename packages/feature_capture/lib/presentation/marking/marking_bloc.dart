@@ -10,6 +10,7 @@ import 'package:feature_capture/presentation/marking/marking_event.dart';
 import 'package:feature_capture/presentation/marking/marking_state.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
+import 'package:shared/domain/entities/book.dart';
 import 'package:shared/domain/entities/highlight_region.dart';
 import 'package:shared/domain/entities/quote.dart';
 import 'package:shared/domain/entities/quote_theme.dart';
@@ -30,6 +31,8 @@ class MarkingBloc extends Bloc<MarkingEvent, MarkingState> {
     @factoryParam this._arguments,
   ) : super(const MarkingProcessing()) {
     on<MarkingStarted>(_onStarted);
+    on<MarkingBooksUpdated>(_onBooksUpdated);
+    on<MarkingBookChanged>(_onBookChanged);
     on<MarkingWordsSelected>(_onWordsSelected);
     on<MarkingWordCorrected>(_onWordCorrected);
     on<MarkingWordsMerged>(_onWordsMerged);
@@ -51,8 +54,11 @@ class MarkingBloc extends Bloc<MarkingEvent, MarkingState> {
   final ThemeRepository _themeRepository;
   final MarkingArguments _arguments;
   StreamSubscription<AppResult<List<QuoteTheme>>>? _themeSubscription;
+  StreamSubscription<AppResult<List<Book>>>? _bookSubscription;
   List<QuoteTheme> _themes = const [];
+  List<Book> _books = const [];
   final Set<String> _selectedThemeIds = {};
+  late String _bookId = _arguments.bookId;
 
   Future<void> _onStarted(MarkingStarted event, Emitter<MarkingState> emit) async {
     emit(const MarkingProcessing());
@@ -60,10 +66,16 @@ class MarkingBloc extends Bloc<MarkingEvent, MarkingState> {
     _themeSubscription = _themeRepository.watchThemes().listen(
       (result) => add(MarkingThemesUpdated(result)),
     );
+    await _bookSubscription?.cancel();
+    _bookSubscription = _bookRepository.watchBooks().listen(
+      (result) => add(MarkingBooksUpdated(result)),
+    );
     var bookTitle = "";
+    String? bookThumbnailUrl;
     var bookAuthors = const <String>[];
-    if (await _bookRepository.getBook(_arguments.bookId) case Success(:final data)) {
+    if (await _bookRepository.getBook(_bookId) case Success(:final data)) {
       bookTitle = data.title;
+      bookThumbnailUrl = data.thumbnailUrl;
       bookAuthors = data.authors;
     }
     emit(switch (await _recognizeCapturedPageUseCase(
@@ -73,7 +85,10 @@ class MarkingBloc extends Bloc<MarkingEvent, MarkingState> {
       Success(:final data) => MarkingReady(
         page: data.page,
         imagePath: data.imagePath,
+        bookId: _bookId,
+        books: _books,
         bookTitle: bookTitle,
+        bookThumbnailUrl: bookThumbnailUrl,
         bookAuthors: bookAuthors,
         selectedWordIndexes: const {},
         quoteOverride: null,
@@ -89,6 +104,20 @@ class MarkingBloc extends Bloc<MarkingEvent, MarkingState> {
       ),
       Failure(:final error) => MarkingFailure(error: error),
     });
+  }
+
+  void _onBooksUpdated(MarkingBooksUpdated event, Emitter<MarkingState> emit) {
+    if (event.result case Success(:final data)) {
+      _books = data;
+      if (state case final MarkingReady current) emit(_ready(current));
+    }
+  }
+
+  void _onBookChanged(MarkingBookChanged event, Emitter<MarkingState> emit) {
+    if (state case final MarkingReady current) {
+      _bookId = event.bookId;
+      emit(_ready(current));
+    }
   }
 
   void _onThemesUpdated(MarkingThemesUpdated event, Emitter<MarkingState> emit) {
@@ -309,11 +338,15 @@ class MarkingBloc extends Bloc<MarkingEvent, MarkingState> {
     bool isSaving = false,
     AppError? saveError,
   }) {
+    final book = _selectedBook();
     return MarkingReady(
       page: page ?? current.page,
       imagePath: current.imagePath,
-      bookTitle: current.bookTitle,
-      bookAuthors: current.bookAuthors,
+      bookId: _bookId,
+      books: _books,
+      bookTitle: book?.title ?? current.bookTitle,
+      bookThumbnailUrl: book == null ? current.bookThumbnailUrl : book.thumbnailUrl,
+      bookAuthors: book?.authors ?? current.bookAuthors,
       selectedWordIndexes: selectedWordIndexes ?? current.selectedWordIndexes,
       quoteOverride: keepQuote ? current.quoteOverride : quoteOverride,
       pageNumber: keepPageNumber ? current.pageNumber : pageNumber,
@@ -328,6 +361,13 @@ class MarkingBloc extends Bloc<MarkingEvent, MarkingState> {
     );
   }
 
+  Book? _selectedBook() {
+    for (final book in _books) {
+      if (book.id == _bookId) return book;
+    }
+    return null;
+  }
+
   Quote _buildQuote(MarkingReady state) {
     final orderedIndexes = state.selectedWordIndexes.toList()..sort();
     final selectedWords = orderedIndexes.map((index) => state.page.words[index]).toList();
@@ -338,7 +378,7 @@ class MarkingBloc extends Bloc<MarkingEvent, MarkingState> {
         : joinMarkedWords(state.page.words, orderedIndexes);
     return Quote(
       id: _uuid.v4(),
-      bookId: _arguments.bookId,
+      bookId: _bookId,
       pageNumber: state.pageNumber,
       quote: quote,
       note: (trimmedNote == null || trimmedNote.isEmpty) ? null : trimmedNote,
@@ -365,6 +405,7 @@ class MarkingBloc extends Bloc<MarkingEvent, MarkingState> {
   @override
   Future<void> close() async {
     await _themeSubscription?.cancel();
+    await _bookSubscription?.cancel();
     return super.close();
   }
 }

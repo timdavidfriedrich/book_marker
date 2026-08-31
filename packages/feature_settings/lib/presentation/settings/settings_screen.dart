@@ -13,7 +13,6 @@ import 'package:shared/presentation/widgets/circle_icon_button.dart';
 import 'package:shared/presentation/widgets/ink_tap_box.dart';
 import 'package:shared/presentation/widgets/paper_card.dart';
 import 'package:shared/presentation/widgets/profile_avatar.dart';
-import 'package:shared/presentation/widgets/segmented_toggle.dart';
 
 const _avatarSize = 64.0;
 
@@ -103,14 +102,20 @@ class const _Content({
         const SizedBox(height: Spacing.xl),
         Text(context.s.settingsLanguageLabel, style: context.t.headlineSmall),
         const SizedBox(height: Spacing.s),
-        SegmentedToggle(
-          labels: [
-            for (final preference in LocalePreference.values) _localeLabel(context, preference),
+        DropdownMenu<LocalePreference>(
+          initialSelection: _state.localePreference,
+          expandedInsets: EdgeInsets.zero,
+          requestFocusOnTap: false,
+          trailingIcon: Icon(Icons.expand_more, color: context.c.onSurfaceVariant),
+          selectedTrailingIcon: Icon(Icons.expand_less, color: context.c.onSurfaceVariant),
+          onSelected: (preference) {
+            if (preference == null) return;
+            context.read<SettingsBloc>().add(SettingsLocaleChanged(preference));
+          },
+          dropdownMenuEntries: [
+            for (final preference in LocalePreference.values)
+              DropdownMenuEntry(value: preference, label: _localeLabel(context, preference)),
           ],
-          selectedIndex: LocalePreference.values.indexOf(_state.localePreference),
-          onChanged: (index) => context.read<SettingsBloc>().add(
-            SettingsLocaleChanged(LocalePreference.values[index]),
-          ),
         ),
         const SizedBox(height: Spacing.xl),
         Text(context.s.settingsAboutLabel, style: context.t.headlineSmall),
