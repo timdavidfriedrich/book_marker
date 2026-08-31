@@ -264,7 +264,9 @@ class const _ReadingText({
     final layout = useMemoized(() {
       final groups = _state.page.wordGroups();
       final spans = <InlineSpan>[];
-      final ranges = [for (var index = 0; index < words.length; index++) <int>[0, 0]];
+      final ranges = [
+        for (var index = 0; index < words.length; index++) <int>[0, 0],
+      ];
       var offset = 0;
       for (var groupIndex = 0; groupIndex < groups.length; groupIndex++) {
         final group = groups[groupIndex];
@@ -276,8 +278,7 @@ class const _ReadingText({
               child: UncertainWordChip(
                 text: group.text,
                 number: number,
-                onTap: () =>
-                    showWordCorrectionSheet(context, wordIndex: group.indexes.first),
+                onTap: () => showWordCorrectionSheet(context, wordIndex: group.indexes.first),
               ),
             ),
           );
@@ -527,7 +528,8 @@ class const _SaveSheet() extends HookWidget {
                     minLines: 1,
                     maxLines: 5,
                     style: context.typography.readingQuoteItalic,
-                    onChanged: (value) => context.read<MarkingBloc>().add(MarkingQuoteEdited(value)),
+                    onChanged: (value) =>
+                        context.read<MarkingBloc>().add(MarkingQuoteEdited(value)),
                     decoration: const InputDecoration(
                       isDense: true,
                       filled: false,
@@ -746,7 +748,10 @@ class const _VoiceRecorder({
     if (_voicePath != null && !isRecording.value) {
       return Container(
         padding: const EdgeInsets.symmetric(horizontal: Spacing.m, vertical: Spacing.xs),
-        decoration: BoxDecoration(color: coral.solid, borderRadius: BorderRadius.circular(Spacing.radiusFull)),
+        decoration: BoxDecoration(
+          color: coral.solid,
+          borderRadius: BorderRadius.circular(Spacing.radiusFull),
+        ),
         child: Row(
           children: [
             Icon(Icons.graphic_eq, color: coral.onSolid, size: Spacing.iconM),
@@ -776,7 +781,10 @@ class const _VoiceRecorder({
       onPointerUp: (_) => stop(),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: Spacing.m, vertical: Spacing.s),
-        decoration: BoxDecoration(color: coral.solid, borderRadius: BorderRadius.circular(Spacing.radiusFull)),
+        decoration: BoxDecoration(
+          color: coral.solid,
+          borderRadius: BorderRadius.circular(Spacing.radiusFull),
+        ),
         child: Row(
           children: [
             Container(

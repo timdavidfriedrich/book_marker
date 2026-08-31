@@ -28,6 +28,8 @@ const _spreadAspect = 1.15;
 const _splitBand = 0.2;
 const _minAspect = 0.2;
 const _maxAspect = 5.0;
+const _quadratureTolerance = 25.0;
+const _straightAngle = 90.0;
 const _supportSamples = 18;
 const _supportStart = 0.08;
 const _supportEnd = 0.92;
@@ -153,10 +155,8 @@ class const PageQuadDetector() {
         final bottomLeft = blurred[index + width - 1];
         final bottom = blurred[index + width];
         final bottomRight = blurred[index + width + 1];
-        final horizontal =
-            (topRight + 2 * right + bottomRight) - (topLeft + 2 * left + bottomLeft);
-        final vertical =
-            (bottomLeft + 2 * bottom + bottomRight) - (topLeft + 2 * top + topRight);
+        final horizontal = (topRight + 2 * right + bottomRight) - (topLeft + 2 * left + bottomLeft);
+        final vertical = (bottomLeft + 2 * bottom + bottomRight) - (topLeft + 2 * top + topRight);
         magnitude[index] = horizontal.abs() + vertical.abs();
         var degrees = (math.atan2(vertical, horizontal) * _thetaBins / math.pi).round();
         degrees %= _thetaBins;
@@ -380,8 +380,7 @@ class const PageQuadDetector() {
     for (var index = 0; index < corners.length; index++) {
       final current = corners[index];
       final next = corners[(index + 1) % corners.length];
-      final cross =
-          (next.x - current.x) * (y - current.y) - (next.y - current.y) * (x - current.x);
+      final cross = (next.x - current.x) * (y - current.y) - (next.y - current.y) * (x - current.x);
       if (cross == 0) continue;
       final currentSign = cross > 0 ? 1 : -1;
       if (sign == 0) {
@@ -426,7 +425,33 @@ class const PageQuadDetector() {
     if (leftHeight <= 0) return null;
     final aspect = topWidth / leftHeight;
     if (aspect < _minAspect || aspect > _maxAspect) return null;
+    if (!_hasSquareCorners(quad)) return null;
     return quad;
+  }
+
+  bool _hasSquareCorners(PageQuad quad) {
+    final corners = [quad.topLeft, quad.topRight, quad.bottomRight, quad.bottomLeft];
+    for (var index = 0; index < corners.length; index++) {
+      final previous = corners[(index + corners.length - 1) % corners.length];
+      final current = corners[index];
+      final next = corners[(index + 1) % corners.length];
+      final angle = _cornerAngle(previous, current, next);
+      if (angle == null) return false;
+      if ((angle - _straightAngle).abs() > _quadratureTolerance) return false;
+    }
+    return true;
+  }
+
+  double? _cornerAngle(PagePoint previous, PagePoint current, PagePoint next) {
+    final firstX = previous.x - current.x;
+    final firstY = previous.y - current.y;
+    final secondX = next.x - current.x;
+    final secondY = next.y - current.y;
+    final firstLength = math.sqrt(firstX * firstX + firstY * firstY);
+    final secondLength = math.sqrt(secondX * secondX + secondY * secondY);
+    if (firstLength <= 0 || secondLength <= 0) return null;
+    final cosine = (firstX * secondX + firstY * secondY) / (firstLength * secondLength);
+    return math.acos(cosine.clamp(-1.0, 1.0)) * 180 / math.pi;
   }
 
   PagePoint? _intersect(_Line first, _Line second) {

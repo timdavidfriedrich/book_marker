@@ -108,7 +108,8 @@ class AddBookBloc extends Bloc<AddBookEvent, AddBookState> {
     final matches = trimmed.isEmpty
         ? _libraryBooks
         : _libraryBooks.where((book) {
-            final haystack = "${book.title} ${book.authors.join(" ")} ${book.isbn ?? ""}".toLowerCase();
+            final haystack = "${book.title} ${book.authors.join(" ")} ${book.isbn ?? ""}"
+                .toLowerCase();
             return haystack.contains(trimmed);
           }).toList();
     emit(

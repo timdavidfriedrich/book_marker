@@ -47,7 +47,11 @@ class const PageQuadRefiner() {
         width,
         height,
       ),
-      bottomLeft: _toNormalized(_intersect(edges[2], edges[3], corners[3], maxShift), width, height),
+      bottomLeft: _toNormalized(
+        _intersect(edges[2], edges[3], corners[3], maxShift),
+        width,
+        height,
+      ),
     );
   }
 
@@ -163,8 +167,7 @@ class const PageQuadRefiner() {
     }
     final trace = xx + yy;
     final determinant = xx * yy - xy * xy;
-    final eigenvalue =
-        trace / 2 + math.sqrt(math.max(0.0, trace * trace / 4 - determinant));
+    final eigenvalue = trace / 2 + math.sqrt(math.max(0.0, trace * trace / 4 - determinant));
     var directionX = xy;
     var directionY = eigenvalue - xx;
     if (directionX.abs() < _epsilon && directionY.abs() < _epsilon) {

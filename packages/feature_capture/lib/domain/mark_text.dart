@@ -44,7 +44,6 @@ String joinMarkedWords(List<RecognizedWord> words, Iterable<int> indexes) {
   return buffer.toString().replaceAll(RegExp(r"\s+"), " ").trim();
 }
 
-
 List<RecognizedWord> mergeSplitWords(List<RecognizedWord> words) {
   final characterWidth = _medianCharacterWidth(words);
   if (characterWidth <= 0) return words;
@@ -186,7 +185,6 @@ RecognizedWord _withStem(RecognizedWord word, String stem) {
     joinsWithNext: true,
   );
 }
-
 
 class const JoinCandidate({
   required final int index,

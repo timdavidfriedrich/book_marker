@@ -92,7 +92,9 @@ class const _Sheet({
                     const SizedBox(height: Spacing.m),
                     Row(
                       children: [
-                        Expanded(child: _SearchField(controller: _controller, query: state.query)),
+                        Expanded(
+                          child: _SearchField(controller: _controller, query: state.query),
+                        ),
                         const SizedBox(width: Spacing.s),
                         _BarcodeButton(controller: _controller),
                       ],
@@ -121,7 +123,9 @@ class const _Sheet({
                     const SizedBox(height: Spacing.l),
                     Text(
                       context.s.addBookCatalogueFooter,
-                      style: context.typography.monoLabel.copyWith(color: context.c.onSurfaceVariant),
+                      style: context.typography.monoLabel.copyWith(
+                        color: context.c.onSurfaceVariant,
+                      ),
                     ),
                   ],
                 ),
@@ -194,12 +198,27 @@ class const _OwnedTile({
     final swatch = context.palette.resolve(accent);
     return Container(
       padding: const EdgeInsets.all(Spacing.s),
-      decoration: BoxDecoration(color: swatch.fill, borderRadius: BorderRadius.circular(Spacing.radiusL)),
+      decoration: BoxDecoration(
+        color: swatch.fill,
+        borderRadius: BorderRadius.circular(Spacing.radiusL),
+      ),
       child: Row(
         children: [
-          BookCover(accent: accent, url: _book.thumbnailUrl, width: 44, height: 56, radius: Spacing.radiusS),
+          BookCover(
+            accent: accent,
+            url: _book.thumbnailUrl,
+            width: 44,
+            height: 56,
+            radius: Spacing.radiusS,
+          ),
           const SizedBox(width: Spacing.s),
-          Expanded(child: _TileText(book: _book, titleColor: swatch.onFill, subtitleColor: swatch.onFillVariant)),
+          Expanded(
+            child: _TileText(
+              book: _book,
+              titleColor: swatch.onFill,
+              subtitleColor: swatch.onFillVariant,
+            ),
+          ),
           const SizedBox(width: Spacing.s),
           _PillButton(
             label: context.s.addBookSelectButton,
@@ -261,12 +280,27 @@ class const _CatalogueTile({
     final swatch = context.palette.resolve(AccentColor.sand);
     return Container(
       padding: const EdgeInsets.all(Spacing.s),
-      decoration: BoxDecoration(color: swatch.fill, borderRadius: BorderRadius.circular(Spacing.radiusL)),
+      decoration: BoxDecoration(
+        color: swatch.fill,
+        borderRadius: BorderRadius.circular(Spacing.radiusL),
+      ),
       child: Row(
         children: [
-          BookCover(accent: AccentColor.sand, url: _book.thumbnailUrl, width: 44, height: 56, radius: Spacing.radiusS),
+          BookCover(
+            accent: AccentColor.sand,
+            url: _book.thumbnailUrl,
+            width: 44,
+            height: 56,
+            radius: Spacing.radiusS,
+          ),
           const SizedBox(width: Spacing.s),
-          Expanded(child: _TileText(book: _book, titleColor: swatch.onFill, subtitleColor: swatch.onFillVariant)),
+          Expanded(
+            child: _TileText(
+              book: _book,
+              titleColor: swatch.onFill,
+              subtitleColor: swatch.onFillVariant,
+            ),
+          ),
           const SizedBox(width: Spacing.s),
           _PillButton(
             label: context.s.addBookAddButton,

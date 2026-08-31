@@ -401,7 +401,13 @@ class const _SelectedBook({
       ),
       child: Row(
         children: [
-          BookCover(accent: _book.id.accent, url: _book.thumbnailUrl, width: 36, height: 44, radius: Spacing.radiusS),
+          BookCover(
+            accent: _book.id.accent,
+            url: _book.thumbnailUrl,
+            width: 36,
+            height: 44,
+            radius: Spacing.radiusS,
+          ),
           const SizedBox(width: Spacing.s),
           Expanded(
             child: Column(
@@ -410,7 +416,9 @@ class const _SelectedBook({
               children: [
                 Text(
                   context.s.captureMarkingInto,
-                  style: context.typography.monoCaption.copyWith(color: context.palette.paperTextFaint),
+                  style: context.typography.monoCaption.copyWith(
+                    color: context.palette.paperTextFaint,
+                  ),
                 ),
                 Text(
                   _book.title,
@@ -442,7 +450,10 @@ class const _SwitchButton() extends StatelessWidget {
         children: [
           Text(
             context.s.captureSwitchButton,
-            style: context.t.labelMedium?.copyWith(color: context.palette.amber.onSolid, fontSize: 14),
+            style: context.t.labelMedium?.copyWith(
+              color: context.palette.amber.onSolid,
+              fontSize: 14,
+            ),
           ),
           Icon(Icons.arrow_drop_down, size: Spacing.iconS, color: context.palette.amber.onSolid),
         ],
@@ -476,7 +487,10 @@ class const _NoBook() extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: Spacing.m, vertical: Spacing.xs),
             child: Text(
               context.s.captureAddBookButton,
-              style: context.t.labelMedium?.copyWith(color: context.palette.amber.onSolid, fontSize: 14),
+              style: context.t.labelMedium?.copyWith(
+                color: context.palette.amber.onSolid,
+                fontSize: 14,
+              ),
             ),
           ),
         ],
