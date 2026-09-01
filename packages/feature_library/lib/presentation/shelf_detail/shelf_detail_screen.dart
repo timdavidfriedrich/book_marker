@@ -18,6 +18,7 @@ import 'package:shared/presentation/widgets/columned_sliver_list.dart';
 import 'package:shared/presentation/widgets/confirm_dialog.dart';
 import 'package:shared/presentation/widgets/drag_dismiss_sheet.dart';
 import 'package:shared/presentation/widgets/ink_tap_box.dart';
+import 'package:shared/presentation/widgets/loading_indicator.dart';
 import 'package:shared/presentation/widgets/name_input_dialog.dart';
 import 'package:shared/presentation/widgets/sheet_action_tile.dart';
 import 'package:shared/presentation/widgets/sheet_content.dart';
@@ -40,7 +41,7 @@ class const ShelfDetailScreen({
         listenWhen: (previous, current) => current is ShelfDetailDeleted,
         listener: (context, state) => context.closeScreen(),
         builder: (context, state) => switch (state) {
-          ShelfDetailLoading() => const Center(child: CircularProgressIndicator()),
+          ShelfDetailLoading() => const LoadingIndicator(),
           ShelfDetailFailure(:final error) => Center(
             child: Padding(
               padding: const EdgeInsets.all(Spacing.l),

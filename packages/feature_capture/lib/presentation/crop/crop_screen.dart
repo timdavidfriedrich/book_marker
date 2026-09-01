@@ -10,11 +10,13 @@ import 'package:feature_capture/presentation/widgets/page_corner_dot.dart';
 import 'package:feature_capture/presentation/widgets/page_quad_overlay.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:shared/domain/entities/page_quad.dart';
 import 'package:shared/presentation/extensions/app_error_extensions.dart';
 import 'package:shared/presentation/extensions/context_extensions.dart';
 import 'package:shared/presentation/navigation/navigation_extensions.dart';
 import 'package:shared/presentation/widgets/circle_icon_button.dart';
+import 'package:shared/presentation/widgets/loading_indicator.dart';
 
 const _touchTarget = 48.0;
 const _scrimOpacity = 0.55;
@@ -29,27 +31,11 @@ class const CropScreen({
       body: SafeArea(
         child: BlocBuilder<CropBloc, CropState>(
           builder: (context, state) => switch (state) {
-            CropLoading() => const _LoadingView(),
+            CropLoading() => LoadingIndicator(message: context.s.cropLoadingMessage),
             CropFailure(:final error) => _FailureView(error: error),
             CropReady() => _Editor(state: state),
           },
         ),
-      ),
-    );
-  }
-}
-
-class const _LoadingView() extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          const CircularProgressIndicator(),
-          const SizedBox(height: Spacing.m),
-          Text(context.s.cropLoadingMessage, style: context.typography.label),
-        ],
       ),
     );
   }
@@ -71,9 +57,15 @@ class const _FailureView({
 
 class const _Editor({
   required final CropReady _state,
-}) extends StatelessWidget {
+}) extends HookWidget {
   @override
   Widget build(BuildContext context) {
+    // * a gallery shot decodes for seconds, and the editor is unusable until it is on screen
+    final image = useMemoized(() => FileImage(File(_state.imagePath)), [_state.imagePath]);
+    final decoded = useFuture(useMemoized(() => precacheImage(image, context), [image]));
+    if (decoded.connectionState != ConnectionState.done) {
+      return LoadingIndicator(message: context.s.cropLoadingMessage);
+    }
     final photo = Center(
       child: AspectRatio(
         aspectRatio: _state.aspectRatio,
@@ -168,7 +160,7 @@ class const _Photo({
                 child: Stack(
                   fit: StackFit.expand,
                   children: [
-                    Image.file(File(_state.imagePath), fit: BoxFit.fill),
+                    Image(image: FileImage(File(_state.imagePath)), fit: BoxFit.fill),
                     PageQuadOverlay(
                       quad: _state.quad,
                       lineColor: context.c.primary,

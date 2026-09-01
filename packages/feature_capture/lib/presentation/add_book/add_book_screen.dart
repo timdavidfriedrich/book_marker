@@ -14,6 +14,7 @@ import 'package:shared/presentation/widgets/book_cover.dart';
 import 'package:shared/presentation/widgets/circle_icon_button.dart';
 import 'package:shared/presentation/widgets/drag_dismiss_sheet.dart';
 import 'package:shared/presentation/widgets/ink_tap_box.dart';
+import 'package:shared/presentation/widgets/loading_indicator.dart';
 import 'package:shared/presentation/widgets/section_label.dart';
 
 const _sheetInitialSize = 0.5;
@@ -62,7 +63,7 @@ class const _Sheet({
       child: BlocBuilder<AddBookBloc, AddBookState>(
         builder: (context, state) {
           if (state is! AddBookLoaded) {
-            return const Center(child: CircularProgressIndicator());
+            return const LoadingIndicator();
           }
           final showTitle = state.query.trim().isEmpty;
           return Column(
@@ -245,7 +246,7 @@ class const _CatalogueSection({
     if (_state.isCatalogueLoading) {
       return const Padding(
         padding: EdgeInsets.all(Spacing.l),
-        child: Center(child: CircularProgressIndicator()),
+        child: LoadingIndicator(),
       );
     }
     if (_state.catalogueError case final error?) {

@@ -18,6 +18,7 @@ import 'package:shared/presentation/widgets/collection_mark.dart';
 import 'package:shared/presentation/widgets/columned_sliver_list.dart';
 import 'package:shared/presentation/widgets/floating_header.dart';
 import 'package:shared/presentation/widgets/ink_tap_box.dart';
+import 'package:shared/presentation/widgets/loading_indicator.dart';
 import 'package:shared/presentation/widgets/name_input_dialog.dart';
 import 'package:shared/presentation/widgets/pinned_header.dart';
 import 'package:shared/presentation/widgets/quote_card.dart';
@@ -52,7 +53,7 @@ class const LibraryScreen({
         bottom: false,
         child: BlocBuilder<LibraryBloc, LibraryState>(
           builder: (context, state) => switch (state) {
-            LibraryLoading() => const Center(child: CircularProgressIndicator()),
+            LibraryLoading() => const LoadingIndicator(),
             LibraryFailure(:final error) => _Failure(error: error),
             LibraryLoaded() => _Loaded(state: state, controller: controller),
           },

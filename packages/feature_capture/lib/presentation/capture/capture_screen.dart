@@ -27,6 +27,7 @@ import 'package:shared/presentation/navigation/crop_arguments.dart';
 import 'package:shared/presentation/navigation/marking_arguments.dart';
 import 'package:shared/presentation/navigation/navigation_extensions.dart';
 import 'package:shared/presentation/widgets/ink_tap_box.dart';
+import 'package:shared/presentation/widgets/loading_indicator.dart';
 import 'package:shared/presentation/widgets/segmented_toggle.dart';
 
 const _shutterOuter = 88.0;
@@ -417,7 +418,7 @@ class const _Preview({
                 ),
               )
             else
-              const Center(child: CircularProgressIndicator()),
+              const LoadingIndicator(),
             const _DetectionOverlay(),
             const _PreviewOverlay(),
           ],

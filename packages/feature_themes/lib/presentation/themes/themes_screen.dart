@@ -10,6 +10,7 @@ import 'package:shared/presentation/extensions/screen_layout_extensions.dart';
 import 'package:shared/presentation/navigation/navigation_extensions.dart';
 import 'package:shared/presentation/widgets/collection_mark.dart';
 import 'package:shared/presentation/widgets/ink_tap_box.dart';
+import 'package:shared/presentation/widgets/loading_indicator.dart';
 import 'package:shared/presentation/widgets/name_input_dialog.dart';
 import 'package:shared/presentation/widgets/tab_header.dart';
 
@@ -25,7 +26,7 @@ class const ThemesScreen({
         bottom: false,
         child: BlocBuilder<ThemesBloc, ThemesState>(
           builder: (context, state) => switch (state) {
-            ThemesLoading() => const Center(child: CircularProgressIndicator()),
+            ThemesLoading() => const LoadingIndicator(),
             ThemesFailure(:final error) => Center(
               child: Padding(
                 padding: const EdgeInsets.all(Spacing.l),
