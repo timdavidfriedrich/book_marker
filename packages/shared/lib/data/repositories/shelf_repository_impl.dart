@@ -1,9 +1,12 @@
 import 'package:core/error/app_error.dart';
 import 'package:core/error/app_result.dart';
 import 'package:core/theme/accent_color.dart';
+import 'package:core/theme/collection_symbol.dart';
+import 'package:core/theme/mark_defaults.dart';
 import 'package:injectable/injectable.dart';
 import 'package:shared/data/data_sources/shelf_local_data_source.dart';
 import 'package:shared/data/mappers/accent_mappers.dart';
+import 'package:shared/data/mappers/collection_symbol_mappers.dart';
 import 'package:shared/data/mappers/shelf_mappers.dart';
 import 'package:shared/domain/entities/shelf.dart';
 import 'package:shared/domain/repositories/shelf_repository.dart';
@@ -44,7 +47,14 @@ class const ShelfRepositoryImpl(
   @override
   Future<AppResult<Shelf>> createShelf(String name) async {
     try {
-      final shelf = Shelf(id: _uuid.v4(), name: name, createdAt: DateTime.now().toUtc());
+      final existing = (await _localDataSource.loadShelves()).map((it) => it.toShelf()).toList();
+      final shelf = Shelf(
+        id: _uuid.v4(),
+        name: name,
+        createdAt: DateTime.now().toUtc(),
+        accent: MarkDefaults.accentFor(existing.map((it) => it.accent)),
+        symbol: MarkDefaults.symbolFor(existing.map((it) => it.symbol)),
+      );
       await _localDataSource.upsertShelf(shelf.toLocalShelf());
       return Success(shelf);
     } on Object {
@@ -63,9 +73,19 @@ class const ShelfRepositoryImpl(
   }
 
   @override
-  Future<AppResult<()>> setShelfAccent(String id, AccentColor? accent) async {
+  Future<AppResult<()>> setShelfAccent(String id, AccentColor accent) async {
     try {
-      await _localDataSource.setAccent(id, accent?.value);
+      await _localDataSource.setAccent(id, accent.value);
+      return const Success(());
+    } on Object {
+      return const Failure(UnexpectedError());
+    }
+  }
+
+  @override
+  Future<AppResult<()>> setShelfSymbol(String id, CollectionSymbol symbol) async {
+    try {
+      await _localDataSource.setSymbol(id, symbol.value);
       return const Success(());
     } on Object {
       return const Failure(UnexpectedError());

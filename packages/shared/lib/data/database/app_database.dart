@@ -77,6 +77,8 @@ class Themes extends Table {
 
   TextColumn get accent => text().nullable()();
 
+  TextColumn get symbol => text().nullable()();
+
   DateTimeColumn get createdAt => dateTime()();
 
   @override
@@ -100,6 +102,8 @@ class Shelves extends Table {
   TextColumn get name => text()();
 
   TextColumn get accent => text().nullable()();
+
+  TextColumn get symbol => text().nullable()();
 
   DateTimeColumn get createdAt => dateTime()();
 
@@ -134,7 +138,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(driftDatabase(name: _databaseName));
 
   @override
-  int get schemaVersion => 8;
+  int get schemaVersion => 9;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -186,6 +190,10 @@ class AppDatabase extends _$AppDatabase {
             },
           ),
         );
+      }
+      if (from < 9) {
+        await migrator.addColumn(themes, themes.symbol);
+        await migrator.addColumn(shelves, shelves.symbol);
       }
     },
   );

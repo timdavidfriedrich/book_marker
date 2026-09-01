@@ -1,29 +1,28 @@
-import 'package:core/theme/accent_color.dart';
 import 'package:core/theme/spacing.dart';
 import 'package:feature_library/presentation/shelf_detail/shelf_detail_bloc.dart';
 import 'package:feature_library/presentation/shelf_detail/shelf_detail_event.dart';
 import 'package:feature_library/presentation/shelf_detail/shelf_detail_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:shared/presentation/extensions/accent_extensions.dart';
 import 'package:shared/presentation/extensions/app_error_extensions.dart';
 import 'package:shared/presentation/extensions/context_extensions.dart';
 import 'package:shared/presentation/navigation/navigation_extensions.dart';
-import 'package:shared/presentation/widgets/accent_picker.dart';
 import 'package:shared/presentation/widgets/book_card.dart';
 import 'package:shared/presentation/widgets/book_cover.dart';
 import 'package:shared/presentation/widgets/circle_icon_button.dart';
 import 'package:shared/presentation/widgets/collapsing_header.dart';
+import 'package:shared/presentation/widgets/collection_mark.dart';
+import 'package:shared/presentation/widgets/collection_mark_picker.dart';
 import 'package:shared/presentation/widgets/confirm_dialog.dart';
 import 'package:shared/presentation/widgets/ink_tap_box.dart';
 import 'package:shared/presentation/widgets/name_input_dialog.dart';
 import 'package:shared/presentation/widgets/sheet_action_tile.dart';
 import 'package:shared/presentation/widgets/sheet_content.dart';
 
-const _accentDotSize = 88.0;
+const _markSize = 88.0;
 const _headerHeight = 184.0;
 
-enum _ShelfMenuAction { rename, color, delete }
+enum _ShelfMenuAction { rename, mark, delete }
 
 class const ShelfDetailScreen({
   super.key,
@@ -55,7 +54,7 @@ class const _Content({
 }) extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final accent = _state.shelf.accent ?? _state.shelf.id.accent;
+    final shelf = _state.shelf;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -64,9 +63,9 @@ class const _Content({
             slivers: [
               CollapsingHeader(
                 expandedHeight: _headerHeight,
-                backgroundColor: context.palette.resolve(accent).fill,
-                expanded: _Header(state: _state, accent: accent),
-                collapsed: _CollapsedHeader(state: _state, accent: accent),
+                backgroundColor: context.palette.resolve(shelf.accent).fill,
+                expanded: _Header(state: _state),
+                collapsed: _CollapsedHeader(state: _state),
               ),
               if (_state.books.isEmpty)
                 SliverFillRemaining(
@@ -91,7 +90,6 @@ class const _Content({
                     itemBuilder: (context, index) {
                       final item = _state.books[index];
                       return BookCard(
-                        accent: item.book.id.accent,
                         title: item.book.title,
                         meta: context.s.libraryQuotesCount(item.quoteCount),
                         count: item.quoteCount,
@@ -129,11 +127,11 @@ class const _Content({
 
 class const _Header({
   required final ShelfDetailLoaded _state,
-  required final AccentColor _accent,
 }) extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final swatch = context.palette.resolve(_accent);
+    final shelf = _state.shelf;
+    final swatch = context.palette.resolve(shelf.accent);
     return SafeArea(
       bottom: false,
       child: Padding(
@@ -160,16 +158,11 @@ class const _Header({
             const SizedBox(height: Spacing.m),
             Row(
               children: [
-                Container(
-                  width: _accentDotSize,
-                  height: _accentDotSize,
-                  alignment: Alignment.center,
-                  decoration: BoxDecoration(color: swatch.solid, shape: BoxShape.circle),
-                  child: Icon(
-                    Icons.collections_bookmark,
-                    color: swatch.onSolid,
-                    size: Spacing.iconL,
-                  ),
+                CollectionMark(
+                  kind: CollectionKind.shelf,
+                  accent: shelf.accent,
+                  symbol: shelf.symbol,
+                  size: _markSize,
                 ),
                 const SizedBox(width: Spacing.l),
                 Expanded(
@@ -177,7 +170,7 @@ class const _Header({
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        _state.shelf.name,
+                        shelf.name,
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                         style: context.t.headlineMedium?.copyWith(color: swatch.onFill),
@@ -201,11 +194,10 @@ class const _Header({
 
 class const _CollapsedHeader({
   required final ShelfDetailLoaded _state,
-  required final AccentColor _accent,
 }) extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final swatch = context.palette.resolve(_accent);
+    final swatch = context.palette.resolve(_state.shelf.accent);
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: Spacing.l, vertical: Spacing.xs),
       child: Row(
@@ -254,8 +246,8 @@ Future<void> _showShelfMenu(BuildContext context, ShelfDetailLoaded state) async
         initialValue: state.shelf.name,
       );
       if (name != null && name.trim().isNotEmpty) bloc.add(ShelfDetailRenameRequested(name));
-    case _ShelfMenuAction.color:
-      await _showAccentSheet(context, bloc, state.shelf.accent);
+    case _ShelfMenuAction.mark:
+      await _showMarkSheet(context, bloc);
     case _ShelfMenuAction.delete:
       final confirmed = await showConfirmDialog(
         context,
@@ -268,31 +260,41 @@ Future<void> _showShelfMenu(BuildContext context, ShelfDetailLoaded state) async
   }
 }
 
-Future<void> _showAccentSheet(
-  BuildContext context,
-  ShelfDetailBloc bloc,
-  AccentColor? current,
-) async {
+Future<void> _showMarkSheet(BuildContext context, ShelfDetailBloc bloc) async {
   await showModalBottomSheet<void>(
     context: context,
     useRootNavigator: true,
     isScrollControlled: true,
-    builder: (sheetContext) => SheetContent(
-      children: [
-        Text(sheetContext.s.accentPickerTitle, style: sheetContext.t.titleMedium),
-        const SizedBox(height: Spacing.m),
-        Flexible(
-          child: AccentPicker(
-            selected: current,
-            onSelected: (accent) {
-              bloc.add(ShelfDetailAccentChanged(accent));
-              Navigator.of(sheetContext).pop();
-            },
-          ),
-        ),
-      ],
-    ),
+    builder: (_) => BlocProvider.value(value: bloc, child: const _MarkSheet()),
   );
+}
+
+class const _MarkSheet() extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<ShelfDetailBloc, ShelfDetailState>(
+      builder: (context, state) {
+        if (state is! ShelfDetailLoaded) return const SizedBox.shrink();
+        return SheetContent(
+          children: [
+            Text(context.s.markPickerTitle, style: context.t.titleMedium),
+            const SizedBox(height: Spacing.m),
+            Flexible(
+              child: CollectionMarkPicker(
+                kind: CollectionKind.shelf,
+                accent: state.shelf.accent,
+                symbol: state.shelf.symbol,
+                onSymbolSelected: (symbol) =>
+                    context.read<ShelfDetailBloc>().add(ShelfDetailSymbolChanged(symbol)),
+                onAccentSelected: (accent) =>
+                    context.read<ShelfDetailBloc>().add(ShelfDetailAccentChanged(accent)),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
 }
 
 class const _ShelfMenu() extends StatelessWidget {
@@ -307,8 +309,8 @@ class const _ShelfMenu() extends StatelessWidget {
         ),
         SheetActionTile(
           icon: Icons.palette_outlined,
-          label: context.s.commonChangeColor,
-          onTap: () => Navigator.of(context).pop(_ShelfMenuAction.color),
+          label: context.s.commonChangeMark,
+          onTap: () => Navigator.of(context).pop(_ShelfMenuAction.mark),
         ),
         SheetActionTile(
           icon: Icons.delete_outline,
@@ -387,16 +389,15 @@ class const _AddBookRow({
 }) extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final accent = _item.book.id.accent;
     return InkTapBox(
-      color: _selected ? context.palette.resolve(accent).fill : context.c.surfaceContainerHigh,
+      color: _selected ? context.c.secondaryContainer : context.c.surfaceContainerHigh,
       radius: Spacing.radiusL,
       padding: const EdgeInsets.all(Spacing.s),
       onTap: () => context.read<ShelfDetailBloc>().add(ShelfDetailBookToggled(_item.book.id)),
       child: Row(
         children: [
           BookCover(
-            accent: accent,
+            title: _item.book.title,
             url: _item.book.thumbnailUrl,
             width: 40,
             height: 52,
@@ -414,7 +415,7 @@ class const _AddBookRow({
           const SizedBox(width: Spacing.s),
           Icon(
             _selected ? Icons.check_circle : Icons.circle_outlined,
-            color: _selected ? context.palette.teal.solid : context.c.outline,
+            color: _selected ? context.c.secondary : context.c.outline,
             size: Spacing.iconM,
           ),
         ],

@@ -1,18 +1,17 @@
 import 'package:core/theme/spacing.dart';
-import 'package:core/theme/theme_extensions.dart';
 import 'package:feature_themes/presentation/theme_detail/theme_detail_bloc.dart';
 import 'package:feature_themes/presentation/theme_detail/theme_detail_event.dart';
 import 'package:feature_themes/presentation/theme_detail/theme_detail_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:shared/presentation/extensions/accent_extensions.dart';
 import 'package:shared/presentation/extensions/app_error_extensions.dart';
 import 'package:shared/presentation/extensions/context_extensions.dart';
 import 'package:shared/presentation/navigation/navigation_extensions.dart';
-import 'package:shared/presentation/widgets/accent_picker.dart';
 import 'package:shared/presentation/widgets/book_cover.dart';
 import 'package:shared/presentation/widgets/circle_icon_button.dart';
 import 'package:shared/presentation/widgets/collapsing_header.dart';
+import 'package:shared/presentation/widgets/collection_mark.dart';
+import 'package:shared/presentation/widgets/collection_mark_picker.dart';
 import 'package:shared/presentation/widgets/confirm_dialog.dart';
 import 'package:shared/presentation/widgets/ink_tap_box.dart';
 import 'package:shared/presentation/widgets/name_input_dialog.dart';
@@ -22,9 +21,9 @@ import 'package:shared/presentation/widgets/selectable_chip.dart';
 import 'package:shared/presentation/widgets/sheet_action_tile.dart';
 import 'package:shared/presentation/widgets/sheet_content.dart';
 
-enum _ThemeMenuAction { rename, color, delete }
+enum _ThemeMenuAction { rename, mark, delete }
 
-const _accentDotSize = 88.0;
+const _markSize = 88.0;
 const _headerHeight = 196.0;
 const _chipHeight = 32.0;
 const _chipsHeight = Spacing.m + _chipHeight + Spacing.m;
@@ -59,7 +58,7 @@ class const _Content({
 }) extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final accent = _state.theme.accent ?? _state.theme.id.accent;
+    final theme = _state.theme;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -68,9 +67,9 @@ class const _Content({
             slivers: [
               CollapsingHeader(
                 expandedHeight: _headerHeight,
-                backgroundColor: context.palette.resolve(accent).fill,
-                expanded: _Header(state: _state, accent: accent),
-                collapsed: _CollapsedHeader(state: _state, accent: accent),
+                backgroundColor: context.palette.resolve(theme.accent).fill,
+                expanded: _Header(state: _state),
+                collapsed: _CollapsedHeader(state: _state),
               ),
               PinnedHeader(
                 height: _chipsHeight,
@@ -130,8 +129,8 @@ class const _Content({
                       final item = _state.quotes[index];
                       final voiceNoteMs = item.quote.voiceNoteDurationMs;
                       return QuoteCard(
-                        accent: item.book.id.accent,
                         quote: "“${item.quote.quote}”",
+                        bookTitle: item.book.title,
                         thumbnailUrl: item.book.thumbnailUrl,
                         pages: item.quote.pageNumbers,
                         note: item.quote.note,
@@ -158,11 +157,11 @@ class const _Content({
 
 class const _Header({
   required final ThemeDetailLoaded _state,
-  required final AccentColor _accent,
 }) extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final swatch = context.palette.resolve(_accent);
+    final theme = _state.theme;
+    final swatch = context.palette.resolve(theme.accent);
     return SafeArea(
       bottom: false,
       child: Padding(
@@ -190,10 +189,11 @@ class const _Header({
             Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Container(
-                  width: _accentDotSize,
-                  height: _accentDotSize,
-                  decoration: BoxDecoration(color: swatch.solid, shape: BoxShape.circle),
+                CollectionMark(
+                  kind: CollectionKind.theme,
+                  accent: theme.accent,
+                  symbol: theme.symbol,
+                  size: _markSize,
                 ),
                 const SizedBox(width: Spacing.l),
                 Expanded(
@@ -201,7 +201,7 @@ class const _Header({
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        _state.theme.name,
+                        theme.name,
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                         style: context.t.headlineMedium?.copyWith(color: swatch.onFill),
@@ -229,11 +229,10 @@ class const _Header({
 
 class const _CollapsedHeader({
   required final ThemeDetailLoaded _state,
-  required final AccentColor _accent,
 }) extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final swatch = context.palette.resolve(_accent);
+    final swatch = context.palette.resolve(_state.theme.accent);
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: Spacing.l, vertical: Spacing.xs),
       child: Row(
@@ -314,8 +313,8 @@ Future<void> _showThemeMenu(BuildContext context, ThemeDetailLoaded state) async
         initialValue: state.theme.name,
       );
       if (name != null && name.trim().isNotEmpty) bloc.add(ThemeDetailRenameRequested(name));
-    case _ThemeMenuAction.color:
-      await _showAccentSheet(context, bloc, state.theme.accent);
+    case _ThemeMenuAction.mark:
+      await _showMarkSheet(context, bloc);
     case _ThemeMenuAction.delete:
       final confirmed = await showConfirmDialog(
         context,
@@ -328,31 +327,41 @@ Future<void> _showThemeMenu(BuildContext context, ThemeDetailLoaded state) async
   }
 }
 
-Future<void> _showAccentSheet(
-  BuildContext context,
-  ThemeDetailBloc bloc,
-  AccentColor? current,
-) async {
+Future<void> _showMarkSheet(BuildContext context, ThemeDetailBloc bloc) async {
   await showModalBottomSheet<void>(
     context: context,
     useRootNavigator: true,
     isScrollControlled: true,
-    builder: (sheetContext) => SheetContent(
-      children: [
-        Text(sheetContext.s.accentPickerTitle, style: sheetContext.t.titleMedium),
-        const SizedBox(height: Spacing.m),
-        Flexible(
-          child: AccentPicker(
-            selected: current,
-            onSelected: (accent) {
-              bloc.add(ThemeDetailAccentChanged(accent));
-              Navigator.of(sheetContext).pop();
-            },
-          ),
-        ),
-      ],
-    ),
+    builder: (_) => BlocProvider.value(value: bloc, child: const _MarkSheet()),
   );
+}
+
+class const _MarkSheet() extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<ThemeDetailBloc, ThemeDetailState>(
+      builder: (context, state) {
+        if (state is! ThemeDetailLoaded) return const SizedBox.shrink();
+        return SheetContent(
+          children: [
+            Text(context.s.markPickerTitle, style: context.t.titleMedium),
+            const SizedBox(height: Spacing.m),
+            Flexible(
+              child: CollectionMarkPicker(
+                kind: CollectionKind.theme,
+                accent: state.theme.accent,
+                symbol: state.theme.symbol,
+                onSymbolSelected: (symbol) =>
+                    context.read<ThemeDetailBloc>().add(ThemeDetailSymbolChanged(symbol)),
+                onAccentSelected: (accent) =>
+                    context.read<ThemeDetailBloc>().add(ThemeDetailAccentChanged(accent)),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
 }
 
 class const _ThemeMenu() extends StatelessWidget {
@@ -367,8 +376,8 @@ class const _ThemeMenu() extends StatelessWidget {
         ),
         SheetActionTile(
           icon: Icons.palette_outlined,
-          label: context.s.commonChangeColor,
-          onTap: () => Navigator.of(context).pop(_ThemeMenuAction.color),
+          label: context.s.commonChangeMark,
+          onTap: () => Navigator.of(context).pop(_ThemeMenuAction.mark),
         ),
         SheetActionTile(
           icon: Icons.delete_outline,
@@ -448,9 +457,7 @@ class const _AddQuoteRow({
   @override
   Widget build(BuildContext context) {
     return InkTapBox(
-      color: _selected
-          ? context.palette.resolve(_item.book.id.accent).fill
-          : context.c.surfaceContainerHigh,
+      color: _selected ? context.c.secondaryContainer : context.c.surfaceContainerHigh,
       radius: Spacing.radiusL,
       padding: const EdgeInsets.all(Spacing.s),
       onTap: () => context.read<ThemeDetailBloc>().add(ThemeDetailQuoteToggled(_item.quote.id)),
@@ -458,7 +465,7 @@ class const _AddQuoteRow({
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           BookCover(
-            accent: _item.book.id.accent,
+            title: _item.book.title,
             url: _item.book.thumbnailUrl,
             width: 40,
             height: 52,
@@ -486,7 +493,7 @@ class const _AddQuoteRow({
           const SizedBox(width: Spacing.s),
           Icon(
             _selected ? Icons.check_circle : Icons.circle_outlined,
-            color: _selected ? context.palette.teal.solid : context.c.outline,
+            color: _selected ? context.c.secondary : context.c.outline,
             size: Spacing.iconM,
           ),
         ],

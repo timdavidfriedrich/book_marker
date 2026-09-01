@@ -5,11 +5,15 @@ import 'package:shared/data/database/app_database.dart';
 abstract class ShelfLocalDataSource {
   Stream<List<LocalShelf>> watchShelves();
 
+  Future<List<LocalShelf>> loadShelves();
+
   Future<void> upsertShelf(LocalShelf shelf);
 
   Future<void> renameShelf(String id, String name);
 
-  Future<void> setAccent(String id, String? accent);
+  Future<void> setAccent(String id, String accent);
+
+  Future<void> setSymbol(String id, String symbol);
 
   Future<void> deleteShelf(String id);
 
@@ -32,6 +36,9 @@ class const ShelfLocalDataSourceImpl(
   }
 
   @override
+  Future<List<LocalShelf>> loadShelves() => _database.select(_database.shelves).get();
+
+  @override
   Future<void> upsertShelf(LocalShelf shelf) =>
       _database.into(_database.shelves).insertOnConflictUpdate(shelf);
 
@@ -42,9 +49,15 @@ class const ShelfLocalDataSourceImpl(
   }
 
   @override
-  Future<void> setAccent(String id, String? accent) {
+  Future<void> setAccent(String id, String accent) {
     final statement = _database.update(_database.shelves)..where((table) => table.id.equals(id));
     return statement.write(ShelvesCompanion(accent: Value(accent)));
+  }
+
+  @override
+  Future<void> setSymbol(String id, String symbol) {
+    final statement = _database.update(_database.shelves)..where((table) => table.id.equals(id));
+    return statement.write(ShelvesCompanion(symbol: Value(symbol)));
   }
 
   @override

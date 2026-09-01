@@ -4,15 +4,15 @@ import 'package:feature_themes/presentation/themes/themes_event.dart';
 import 'package:feature_themes/presentation/themes/themes_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:shared/presentation/extensions/accent_extensions.dart';
 import 'package:shared/presentation/extensions/app_error_extensions.dart';
 import 'package:shared/presentation/extensions/context_extensions.dart';
 import 'package:shared/presentation/navigation/navigation_extensions.dart';
+import 'package:shared/presentation/widgets/collection_mark.dart';
 import 'package:shared/presentation/widgets/ink_tap_box.dart';
 import 'package:shared/presentation/widgets/name_input_dialog.dart';
 import 'package:shared/presentation/widgets/profile_avatar.dart';
 
-const _accentDotSize = 68.0;
+const _markSize = 68.0;
 
 class const ThemesScreen({
   super.key,
@@ -82,8 +82,8 @@ class const _ThemeTile({
 }) extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final accent = _summary.theme.accent ?? _summary.theme.id.accent;
-    final swatch = context.palette.resolve(accent);
+    final theme = _summary.theme;
+    final swatch = context.palette.resolve(theme.accent);
     return InkTapBox(
       color: swatch.fill,
       radius: Spacing.radiusXl,
@@ -92,14 +92,15 @@ class const _ThemeTile({
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(
-            width: _accentDotSize,
-            height: _accentDotSize,
-            decoration: BoxDecoration(color: swatch.solid, shape: BoxShape.circle),
+          CollectionMark(
+            kind: CollectionKind.theme,
+            accent: theme.accent,
+            symbol: theme.symbol,
+            size: _markSize,
           ),
           const Spacer(),
           Text(
-            _summary.theme.name,
+            theme.name,
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
             style: context.t.headlineSmall?.copyWith(color: swatch.onFill),
@@ -127,8 +128,8 @@ class const _NewThemeTile() extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
-            width: _accentDotSize,
-            height: _accentDotSize,
+            width: _markSize,
+            height: _markSize,
             alignment: Alignment.center,
             decoration: BoxDecoration(
               color: context.c.surfaceContainerLowest,

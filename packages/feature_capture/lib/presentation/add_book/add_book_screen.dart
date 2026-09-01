@@ -1,5 +1,4 @@
 import 'package:core/theme/spacing.dart';
-import 'package:core/theme/theme_extensions.dart';
 import 'package:feature_capture/presentation/add_book/add_book_bloc.dart';
 import 'package:feature_capture/presentation/add_book/add_book_event.dart';
 import 'package:feature_capture/presentation/add_book/add_book_state.dart';
@@ -7,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:shared/domain/entities/book.dart';
-import 'package:shared/presentation/extensions/accent_extensions.dart';
 import 'package:shared/presentation/extensions/app_error_extensions.dart';
 import 'package:shared/presentation/extensions/context_extensions.dart';
 import 'package:shared/presentation/navigation/navigation_extensions.dart';
@@ -103,7 +101,7 @@ class const _Sheet({
                     if (state.libraryMatches.isNotEmpty) ...[
                       SectionLabel(
                         text: context.s.addBookInLibraryLabel,
-                        dotColor: context.palette.amber.solid,
+                        dotColor: context.c.secondary,
                       ),
                       const SizedBox(height: Spacing.s),
                       for (final book in state.libraryMatches) ...[
@@ -178,7 +176,7 @@ class const _BarcodeButton({
       iconSize: Spacing.iconM,
       style: IconButton.styleFrom(
         backgroundColor: context.c.inverseSurface,
-        foregroundColor: context.palette.amber.solid,
+        foregroundColor: context.c.primary,
         fixedSize: const Size.square(56),
         minimumSize: const Size.square(56),
         padding: EdgeInsets.zero,
@@ -194,18 +192,16 @@ class const _OwnedTile({
 }) extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final accent = _book.id.accent;
-    final swatch = context.palette.resolve(accent);
     return Container(
       padding: const EdgeInsets.all(Spacing.s),
       decoration: BoxDecoration(
-        color: swatch.fill,
+        color: context.c.secondaryContainer,
         borderRadius: BorderRadius.circular(Spacing.radiusL),
       ),
       child: Row(
         children: [
           BookCover(
-            accent: accent,
+            title: _book.title,
             url: _book.thumbnailUrl,
             width: 44,
             height: 56,
@@ -215,15 +211,15 @@ class const _OwnedTile({
           Expanded(
             child: _TileText(
               book: _book,
-              titleColor: swatch.onFill,
-              subtitleColor: swatch.onFillVariant,
+              titleColor: context.c.onSecondaryContainer,
+              subtitleColor: context.c.onSurfaceVariant,
             ),
           ),
           const SizedBox(width: Spacing.s),
           _PillButton(
             label: context.s.addBookSelectButton,
-            background: context.palette.teal.solid,
-            foreground: context.palette.teal.onSolid,
+            background: context.c.secondary,
+            foreground: context.c.onSecondary,
             onTap: () => context.closeScreenWithResult(_book.id),
           ),
         ],
@@ -277,17 +273,16 @@ class const _CatalogueTile({
 }) extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final swatch = context.palette.resolve(AccentColor.sand);
     return Container(
       padding: const EdgeInsets.all(Spacing.s),
       decoration: BoxDecoration(
-        color: swatch.fill,
+        color: context.c.surfaceContainerHigh,
         borderRadius: BorderRadius.circular(Spacing.radiusL),
       ),
       child: Row(
         children: [
           BookCover(
-            accent: AccentColor.sand,
+            title: _book.title,
             url: _book.thumbnailUrl,
             width: 44,
             height: 56,
@@ -297,8 +292,8 @@ class const _CatalogueTile({
           Expanded(
             child: _TileText(
               book: _book,
-              titleColor: swatch.onFill,
-              subtitleColor: swatch.onFillVariant,
+              titleColor: context.c.onSurface,
+              subtitleColor: context.c.onSurfaceVariant,
             ),
           ),
           const SizedBox(width: Spacing.s),

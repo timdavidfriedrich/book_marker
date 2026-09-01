@@ -1,5 +1,4 @@
 import 'package:core/theme/spacing.dart';
-import 'package:core/theme/theme_extensions.dart';
 import 'package:flutter/material.dart';
 import 'package:shared/presentation/extensions/context_extensions.dart';
 import 'package:shared/presentation/extensions/page_number_extensions.dart';
@@ -10,7 +9,6 @@ import 'package:shared/presentation/widgets/ink_tap_box.dart';
 const _featuredQuoteMaxLines = 3;
 
 class const BookCard({
-  required final AccentColor _accent,
   required final String _title,
   required final String _meta,
   required final int _count,
@@ -22,36 +20,34 @@ class const BookCard({
 }) extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final swatch = context.palette.resolve(_accent);
     return InkTapBox(
       onTap: _onTap,
-      color: swatch.fill,
+      color: context.c.surfaceContainerLow,
       radius: Spacing.radiusXl,
       padding: const EdgeInsets.all(Spacing.m),
       child: Column(
         children: [
           Row(
             children: [
-              BookCover(accent: _accent, url: _thumbnailUrl, width: 56, height: 72),
+              BookCover(title: _title, url: _thumbnailUrl, width: 56, height: 72),
               const SizedBox(width: Spacing.m),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      _title,
-                      style: context.t.headlineSmall?.copyWith(color: swatch.onFill),
-                    ),
+                    Text(_title, style: context.t.headlineSmall),
                     const SizedBox(height: Spacing.xxs),
                     Text(
                       _meta,
-                      style: context.typography.monoLabel.copyWith(color: swatch.onFillVariant),
+                      style: context.typography.monoLabel.copyWith(
+                        color: context.c.onSurfaceVariant,
+                      ),
                     ),
                   ],
                 ),
               ),
               const SizedBox(width: Spacing.s),
-              CountBadge(count: _count, accent: _accent),
+              CountBadge(count: _count),
             ],
           ),
           if (_featuredQuote case final String quote) ...[
@@ -66,7 +62,7 @@ class const BookCard({
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   BookCover(
-                    accent: _accent,
+                    title: _title,
                     url: _thumbnailUrl,
                     width: 36,
                     height: 48,

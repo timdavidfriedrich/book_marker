@@ -31,11 +31,15 @@ class QuoteThemeMapper extends ClassMapperBase<QuoteTheme> {
     'createdAt',
     _$createdAt,
   );
-  static AccentColor? _$accent(QuoteTheme v) => v.accent;
+  static AccentColor _$accent(QuoteTheme v) => v.accent;
   static const Field<QuoteTheme, AccentColor> _f$accent = Field(
     'accent',
     _$accent,
-    opt: true,
+  );
+  static CollectionSymbol _$symbol(QuoteTheme v) => v.symbol;
+  static const Field<QuoteTheme, CollectionSymbol> _f$symbol = Field(
+    'symbol',
+    _$symbol,
   );
 
   @override
@@ -44,6 +48,7 @@ class QuoteThemeMapper extends ClassMapperBase<QuoteTheme> {
     #name: _f$name,
     #createdAt: _f$createdAt,
     #accent: _f$accent,
+    #symbol: _f$symbol,
   };
 
   static QuoteTheme _instantiate(DecodingData data) {
@@ -52,6 +57,7 @@ class QuoteThemeMapper extends ClassMapperBase<QuoteTheme> {
       name: data.dec(_f$name),
       createdAt: data.dec(_f$createdAt),
       accent: data.dec(_f$accent),
+      symbol: data.dec(_f$symbol),
     );
   }
 
@@ -115,7 +121,13 @@ extension QuoteThemeValueCopy<$R, $Out>
 
 abstract class QuoteThemeCopyWith<$R, $In extends QuoteTheme, $Out>
     implements ClassCopyWith<$R, $In, $Out> {
-  $R call({String? id, String? name, DateTime? createdAt, AccentColor? accent});
+  $R call({
+    String? id,
+    String? name,
+    DateTime? createdAt,
+    AccentColor? accent,
+    CollectionSymbol? symbol,
+  });
   QuoteThemeCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
 }
 
@@ -132,13 +144,15 @@ class _QuoteThemeCopyWithImpl<$R, $Out>
     String? id,
     String? name,
     DateTime? createdAt,
-    Object? accent = $none,
+    AccentColor? accent,
+    CollectionSymbol? symbol,
   }) => $apply(
     FieldCopyWithData({
       if (id != null) #id: id,
       if (name != null) #name: name,
       if (createdAt != null) #createdAt: createdAt,
-      if (accent != $none) #accent: accent,
+      if (accent != null) #accent: accent,
+      if (symbol != null) #symbol: symbol,
     }),
   );
   @override
@@ -147,6 +161,7 @@ class _QuoteThemeCopyWithImpl<$R, $Out>
     name: data.get(#name, or: $value.name),
     createdAt: data.get(#createdAt, or: $value.createdAt),
     accent: data.get(#accent, or: $value.accent),
+    symbol: data.get(#symbol, or: $value.symbol),
   );
 
   @override

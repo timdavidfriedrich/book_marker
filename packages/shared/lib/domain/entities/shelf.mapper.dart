@@ -31,11 +31,12 @@ class ShelfMapper extends ClassMapperBase<Shelf> {
     'createdAt',
     _$createdAt,
   );
-  static AccentColor? _$accent(Shelf v) => v.accent;
-  static const Field<Shelf, AccentColor> _f$accent = Field(
-    'accent',
-    _$accent,
-    opt: true,
+  static AccentColor _$accent(Shelf v) => v.accent;
+  static const Field<Shelf, AccentColor> _f$accent = Field('accent', _$accent);
+  static CollectionSymbol _$symbol(Shelf v) => v.symbol;
+  static const Field<Shelf, CollectionSymbol> _f$symbol = Field(
+    'symbol',
+    _$symbol,
   );
 
   @override
@@ -44,6 +45,7 @@ class ShelfMapper extends ClassMapperBase<Shelf> {
     #name: _f$name,
     #createdAt: _f$createdAt,
     #accent: _f$accent,
+    #symbol: _f$symbol,
   };
 
   static Shelf _instantiate(DecodingData data) {
@@ -52,6 +54,7 @@ class ShelfMapper extends ClassMapperBase<Shelf> {
       name: data.dec(_f$name),
       createdAt: data.dec(_f$createdAt),
       accent: data.dec(_f$accent),
+      symbol: data.dec(_f$symbol),
     );
   }
 
@@ -101,7 +104,13 @@ extension ShelfValueCopy<$R, $Out> on ObjectCopyWith<$R, Shelf, $Out> {
 
 abstract class ShelfCopyWith<$R, $In extends Shelf, $Out>
     implements ClassCopyWith<$R, $In, $Out> {
-  $R call({String? id, String? name, DateTime? createdAt, AccentColor? accent});
+  $R call({
+    String? id,
+    String? name,
+    DateTime? createdAt,
+    AccentColor? accent,
+    CollectionSymbol? symbol,
+  });
   ShelfCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
 }
 
@@ -116,13 +125,15 @@ class _ShelfCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, Shelf, $Out>
     String? id,
     String? name,
     DateTime? createdAt,
-    Object? accent = $none,
+    AccentColor? accent,
+    CollectionSymbol? symbol,
   }) => $apply(
     FieldCopyWithData({
       if (id != null) #id: id,
       if (name != null) #name: name,
       if (createdAt != null) #createdAt: createdAt,
-      if (accent != $none) #accent: accent,
+      if (accent != null) #accent: accent,
+      if (symbol != null) #symbol: symbol,
     }),
   );
   @override
@@ -131,6 +142,7 @@ class _ShelfCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, Shelf, $Out>
     name: data.get(#name, or: $value.name),
     createdAt: data.get(#createdAt, or: $value.createdAt),
     accent: data.get(#accent, or: $value.accent),
+    symbol: data.get(#symbol, or: $value.symbol),
   );
 
   @override

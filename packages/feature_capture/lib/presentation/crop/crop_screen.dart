@@ -144,7 +144,7 @@ class const _Photo({
                     Image.file(File(_state.imagePath), fit: BoxFit.fill),
                     PageQuadOverlay(
                       quad: _state.quad,
-                      lineColor: context.palette.amber.solid,
+                      lineColor: context.c.primary,
                       scrimColor: context.c.scrim.withValues(alpha: _scrimOpacity),
                     ),
                   ],

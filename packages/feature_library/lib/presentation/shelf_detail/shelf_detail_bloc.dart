@@ -29,6 +29,7 @@ class ShelfDetailBloc extends Bloc<ShelfDetailEvent, ShelfDetailState> {
     on<ShelfDetailBookToggled>(_onBookToggled);
     on<ShelfDetailRenameRequested>(_onRenameRequested);
     on<ShelfDetailAccentChanged>(_onAccentChanged);
+    on<ShelfDetailSymbolChanged>(_onSymbolChanged);
     on<ShelfDetailDeleteRequested>(_onDeleteRequested);
   }
 
@@ -129,6 +130,13 @@ class ShelfDetailBloc extends Bloc<ShelfDetailEvent, ShelfDetailState> {
     Emitter<ShelfDetailState> emit,
   ) async {
     await _shelfRepository.setShelfAccent(_shelfId, event.accent);
+  }
+
+  Future<void> _onSymbolChanged(
+    ShelfDetailSymbolChanged event,
+    Emitter<ShelfDetailState> emit,
+  ) async {
+    await _shelfRepository.setShelfSymbol(_shelfId, event.symbol);
   }
 
   Future<void> _onDeleteRequested(

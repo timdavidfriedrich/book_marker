@@ -29,12 +29,6 @@ class const AppPalette({
 }) extends ThemeExtension<AppPalette> {
   AccentSwatch resolve(AccentColor accent) => accents[accent] ?? accents.values.first;
 
-  AccentSwatch get amber => resolve(AccentColor.amber);
-  AccentSwatch get teal => resolve(AccentColor.teal);
-  AccentSwatch get coral => resolve(AccentColor.coral);
-  AccentSwatch get sand => resolve(AccentColor.sand);
-  AccentSwatch get sky => resolve(AccentColor.sky);
-
   @override
   AppPalette copyWith({
     Map<AccentColor, AccentSwatch>? accents,
@@ -111,20 +105,16 @@ class const AppTypography({
 }
 
 class const StatusColors({
-  required final Color success,
-  required final Color warning,
+  required final AccentSwatch uncertain,
 }) extends ThemeExtension<StatusColors> {
   @override
-  StatusColors copyWith({Color? success, Color? warning}) {
-    return StatusColors(success: success ?? this.success, warning: warning ?? this.warning);
+  StatusColors copyWith({AccentSwatch? uncertain}) {
+    return StatusColors(uncertain: uncertain ?? this.uncertain);
   }
 
   @override
   StatusColors lerp(StatusColors? other, double t) {
     if (other == null) return this;
-    return StatusColors(
-      success: Color.lerp(success, other.success, t)!,
-      warning: Color.lerp(warning, other.warning, t)!,
-    );
+    return StatusColors(uncertain: uncertain.lerp(other.uncertain, t));
   }
 }

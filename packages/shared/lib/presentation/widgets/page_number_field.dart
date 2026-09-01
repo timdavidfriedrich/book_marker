@@ -58,12 +58,12 @@ class const PageNumberField({
             Container(
               padding: const EdgeInsets.symmetric(horizontal: Spacing.xs, vertical: Spacing.xxxs),
               decoration: BoxDecoration(
-                color: context.palette.teal.solid,
+                color: context.c.secondary,
                 borderRadius: BorderRadius.circular(Spacing.radiusFull),
               ),
               child: Text(
                 context.s.pageAutoLabel,
-                style: context.typography.monoBadge.copyWith(color: context.palette.teal.onSolid),
+                style: context.typography.monoBadge.copyWith(color: context.c.onSecondary),
               ),
             ),
         ],

@@ -1,4 +1,3 @@
-import 'package:core/theme/accent_color.dart';
 import 'package:core/theme/spacing.dart';
 import 'package:flutter/material.dart';
 import 'package:shared/presentation/extensions/context_extensions.dart';
@@ -11,7 +10,6 @@ const _coverHeight = 44.0;
 class const BookChooserBar({
   required final String _title,
   required final String? _thumbnailUrl,
-  required final AccentColor _accent,
   required final String _label,
   final VoidCallback? _onSwitch,
   super.key,
@@ -28,7 +26,7 @@ class const BookChooserBar({
       child: Row(
         children: [
           BookCover(
-            accent: _accent,
+            title: title,
             url: _thumbnailUrl,
             width: _coverWidth,
             height: _coverHeight,
@@ -72,7 +70,7 @@ class const _SwitchButton({
   Widget build(BuildContext context) {
     return InkTapBox(
       onTap: _onTap,
-      color: context.palette.amber.solid,
+      color: context.c.primary,
       radius: Spacing.radiusFull,
       padding: const EdgeInsets.symmetric(horizontal: Spacing.s, vertical: Spacing.xs),
       child: Row(
@@ -81,11 +79,11 @@ class const _SwitchButton({
           Text(
             context.s.captureSwitchButton,
             style: context.t.labelMedium?.copyWith(
-              color: context.palette.amber.onSolid,
+              color: context.c.onPrimary,
               fontSize: 14,
             ),
           ),
-          Icon(Icons.arrow_drop_down, size: Spacing.iconS, color: context.palette.amber.onSolid),
+          Icon(Icons.arrow_drop_down, size: Spacing.iconS, color: context.c.onPrimary),
         ],
       ),
     );

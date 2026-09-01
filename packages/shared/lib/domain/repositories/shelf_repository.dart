@@ -1,5 +1,6 @@
 import 'package:core/error/app_result.dart';
 import 'package:core/theme/accent_color.dart';
+import 'package:core/theme/collection_symbol.dart';
 import 'package:shared/domain/entities/shelf.dart';
 
 abstract class ShelfRepository {
@@ -11,7 +12,9 @@ abstract class ShelfRepository {
 
   Future<AppResult<()>> renameShelf(String id, String name);
 
-  Future<AppResult<()>> setShelfAccent(String id, AccentColor? accent);
+  Future<AppResult<()>> setShelfAccent(String id, AccentColor accent);
+
+  Future<AppResult<()>> setShelfSymbol(String id, CollectionSymbol symbol);
 
   Future<AppResult<()>> deleteShelf(String id);
 

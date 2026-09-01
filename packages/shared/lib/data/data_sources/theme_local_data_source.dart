@@ -5,11 +5,15 @@ import 'package:shared/data/database/app_database.dart';
 abstract class ThemeLocalDataSource {
   Stream<List<LocalTheme>> watchThemes();
 
+  Future<List<LocalTheme>> loadThemes();
+
   Future<void> upsertTheme(LocalTheme theme);
 
   Future<void> renameTheme(String id, String name);
 
-  Future<void> setAccent(String id, String? accent);
+  Future<void> setAccent(String id, String accent);
+
+  Future<void> setSymbol(String id, String symbol);
 
   Future<void> deleteTheme(String id);
 
@@ -32,6 +36,9 @@ class const ThemeLocalDataSourceImpl(
   }
 
   @override
+  Future<List<LocalTheme>> loadThemes() => _database.select(_database.themes).get();
+
+  @override
   Future<void> upsertTheme(LocalTheme theme) =>
       _database.into(_database.themes).insertOnConflictUpdate(theme);
 
@@ -42,9 +49,15 @@ class const ThemeLocalDataSourceImpl(
   }
 
   @override
-  Future<void> setAccent(String id, String? accent) {
+  Future<void> setAccent(String id, String accent) {
     final statement = _database.update(_database.themes)..where((table) => table.id.equals(id));
     return statement.write(ThemesCompanion(accent: Value(accent)));
+  }
+
+  @override
+  Future<void> setSymbol(String id, String symbol) {
+    final statement = _database.update(_database.themes)..where((table) => table.id.equals(id));
+    return statement.write(ThemesCompanion(symbol: Value(symbol)));
   }
 
   @override

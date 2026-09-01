@@ -143,7 +143,7 @@ class const _WordCorrectionSheet({
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: Spacing.m, vertical: Spacing.s),
                 decoration: BoxDecoration(
-                  color: context.palette.sky.fill,
+                  color: context.status.uncertain.fill,
                   borderRadius: BorderRadius.circular(Spacing.radiusM),
                 ),
                 child: TextField(
@@ -152,7 +152,7 @@ class const _WordCorrectionSheet({
                   textInputAction: TextInputAction.done,
                   onSubmitted: (_) => apply(),
                   style: context.typography.readingBody.copyWith(
-                    color: context.palette.sky.onFill,
+                    color: context.status.uncertain.onFill,
                   ),
                   decoration: const InputDecoration(
                     isDense: true,

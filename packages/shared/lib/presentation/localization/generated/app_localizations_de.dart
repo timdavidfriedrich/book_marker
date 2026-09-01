@@ -31,16 +31,19 @@ class AppLocalizationsDe extends AppLocalizations {
   String get commonRename => 'Umbenennen';
 
   @override
-  String get commonChangeColor => 'Farbe ändern';
-
-  @override
   String get commonDelete => 'Löschen';
 
   @override
-  String get commonAutomatic => 'Automatisch';
+  String get commonChangeMark => 'Markierung ändern';
 
   @override
-  String get accentPickerTitle => 'Farbe wählen';
+  String get markPickerTitle => 'Markierung wählen';
+
+  @override
+  String get markPickerSymbolLabel => 'Symbol';
+
+  @override
+  String get markPickerColorLabel => 'Farbe';
 
   @override
   String get error => 'Fehler';

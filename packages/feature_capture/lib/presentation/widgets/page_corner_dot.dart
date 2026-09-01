@@ -10,14 +10,14 @@ class const PageCornerDot({
 
   @override
   Widget build(BuildContext context) {
-    final swatch = switch (_corner) {
-      PageCorner.topLeft || PageCorner.topRight => context.palette.amber,
-      PageCorner.bottomLeft || PageCorner.bottomRight => context.palette.coral,
+    final color = switch (_corner) {
+      PageCorner.topLeft || PageCorner.topRight => context.c.primary,
+      PageCorner.bottomLeft || PageCorner.bottomRight => context.c.tertiary,
     };
     return Container(
       width: size,
       height: size,
-      decoration: BoxDecoration(color: swatch.solid, shape: BoxShape.circle),
+      decoration: BoxDecoration(color: color, shape: BoxShape.circle),
     );
   }
 }

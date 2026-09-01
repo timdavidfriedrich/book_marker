@@ -30,6 +30,7 @@ class ThemeDetailBloc extends Bloc<ThemeDetailEvent, ThemeDetailState> {
     on<ThemeDetailQuoteToggled>(_onQuoteToggled);
     on<ThemeDetailRenameRequested>(_onRenameRequested);
     on<ThemeDetailAccentChanged>(_onAccentChanged);
+    on<ThemeDetailSymbolChanged>(_onSymbolChanged);
     on<ThemeDetailDeleteRequested>(_onDeleteRequested);
   }
 
@@ -136,6 +137,13 @@ class ThemeDetailBloc extends Bloc<ThemeDetailEvent, ThemeDetailState> {
     Emitter<ThemeDetailState> emit,
   ) async {
     await _themeRepository.setThemeAccent(_themeId, event.accent);
+  }
+
+  Future<void> _onSymbolChanged(
+    ThemeDetailSymbolChanged event,
+    Emitter<ThemeDetailState> emit,
+  ) async {
+    await _themeRepository.setThemeSymbol(_themeId, event.symbol);
   }
 
   Future<void> _onDeleteRequested(

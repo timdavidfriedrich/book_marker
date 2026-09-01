@@ -1,5 +1,4 @@
 import 'package:core/theme/spacing.dart';
-import 'package:core/theme/theme_extensions.dart';
 import 'package:feature_library/presentation/book_detail/book_detail_bloc.dart';
 import 'package:feature_library/presentation/book_detail/book_detail_event.dart';
 import 'package:feature_library/presentation/book_detail/book_detail_state.dart';
@@ -7,7 +6,6 @@ import 'package:feature_library/presentation/extensions/book_status_extensions.d
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared/domain/entities/book.dart';
-import 'package:shared/presentation/extensions/accent_extensions.dart';
 import 'package:shared/presentation/extensions/app_error_extensions.dart';
 import 'package:shared/presentation/extensions/context_extensions.dart';
 import 'package:shared/presentation/navigation/navigation_extensions.dart';
@@ -58,14 +56,13 @@ class const _Content({
   @override
   Widget build(BuildContext context) {
     final book = _state.book;
-    final accent = book.id.accent;
     return CustomScrollView(
       slivers: [
         CollapsingHeader(
           expandedHeight: _headerHeight,
-          backgroundColor: context.palette.resolve(accent).fill,
-          expanded: _Header(book: book, accent: accent, state: _state),
-          collapsed: _CollapsedHeader(book: book, accent: accent),
+          backgroundColor: context.c.surfaceContainerLow,
+          expanded: _Header(book: book, state: _state),
+          collapsed: _CollapsedHeader(book: book),
         ),
         PinnedHeader(
           height: _chipsHeight,
@@ -134,8 +131,8 @@ class const _Content({
                 final quote = _state.quotes[index];
                 final voiceNoteMs = quote.voiceNoteDurationMs;
                 return QuoteCard(
-                  accent: accent,
                   quote: "“${quote.quote}”",
+                  bookTitle: book.title,
                   thumbnailUrl: book.thumbnailUrl,
                   pages: quote.pageNumbers,
                   note: quote.note,
@@ -157,12 +154,10 @@ class const _Content({
 
 class const _Header({
   required final Book _book,
-  required final AccentColor _accent,
   required final BookDetailLoaded _state,
 }) extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final swatch = context.palette.resolve(_accent);
     final authors = _book.authors.isEmpty ? context.s.bookAuthorsUnknown : _book.authors.join(", ");
     return SafeArea(
       bottom: false,
@@ -194,7 +189,7 @@ class const _Header({
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   BookCover(
-                    accent: _accent,
+                    title: _book.title,
                     url: _book.thumbnailUrl,
                     width: _coverWidth,
                     height: _coverHeight,
@@ -209,7 +204,7 @@ class const _Header({
                           _book.title,
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
-                          style: context.t.headlineMedium?.copyWith(color: swatch.onFill),
+                          style: context.t.headlineMedium,
                         ),
                         const SizedBox(height: Spacing.xs),
                         Text(
@@ -217,7 +212,7 @@ class const _Header({
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: context.typography.monoLabel.copyWith(
-                            color: swatch.onFillVariant,
+                            color: context.c.onSurfaceVariant,
                           ),
                         ),
                         const Spacer(),
@@ -250,11 +245,9 @@ class const _Header({
 
 class const _CollapsedHeader({
   required final Book _book,
-  required final AccentColor _accent,
 }) extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final swatch = context.palette.resolve(_accent);
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: Spacing.l, vertical: Spacing.xs),
       child: Row(
@@ -271,7 +264,7 @@ class const _CollapsedHeader({
               _book.title,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: context.t.titleLarge?.copyWith(color: swatch.onFill),
+              style: context.t.titleLarge,
             ),
           ),
           const SizedBox(width: Spacing.s),

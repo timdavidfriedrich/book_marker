@@ -7,14 +7,13 @@ import 'package:feature_library/presentation/library/library_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:shared/presentation/extensions/accent_extensions.dart';
 import 'package:shared/presentation/extensions/app_error_extensions.dart';
 import 'package:shared/presentation/extensions/context_extensions.dart';
 import 'package:shared/presentation/extensions/page_number_extensions.dart';
 import 'package:shared/presentation/navigation/navigation_extensions.dart';
 import 'package:shared/presentation/widgets/book_card.dart';
 import 'package:shared/presentation/widgets/book_cover.dart';
-import 'package:shared/presentation/widgets/count_badge.dart';
+import 'package:shared/presentation/widgets/collection_mark.dart';
 import 'package:shared/presentation/widgets/floating_header.dart';
 import 'package:shared/presentation/widgets/ink_tap_box.dart';
 import 'package:shared/presentation/widgets/name_input_dialog.dart';
@@ -36,6 +35,7 @@ const _shelfPreviewOffset = 22.0;
 const _shelfPreviewLimit = 3;
 const _shelfPreviewWidth = 84.0;
 const _shelfPreviewHeight = 64.0;
+const _shelfMarkSize = 56.0;
 const _newShelfIconSize = 44.0;
 
 class const LibraryScreen({
@@ -235,7 +235,6 @@ class const _BookList({
                 final featured = summary.featuredQuote;
                 final statusLabel = book.status.toSummaryLabel(context);
                 return BookCard(
-                  accent: book.id.accent,
                   title: book.title,
                   meta: _bookMeta(context, summary, statusLabel),
                   count: summary.quoteCount,
@@ -278,34 +277,21 @@ class const _ShelfCard({
 }) extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final accent = _summary.shelf.accent ?? _summary.shelf.id.accent;
-    final swatch = context.palette.resolve(accent);
+    final shelf = _summary.shelf;
+    final swatch = context.palette.resolve(shelf.accent);
+    final previewBooks = _summary.previewBooks.take(_shelfPreviewLimit).toList();
     return InkTapBox(
       color: swatch.fill,
       radius: Spacing.radiusXl,
       padding: const EdgeInsets.all(Spacing.m),
-      onTap: () => context.pushShelfDetail(_summary.shelf.id),
+      onTap: () => context.pushShelfDetail(shelf.id),
       child: Row(
         children: [
-          SizedBox(
-            width: _shelfPreviewWidth,
-            height: _shelfPreviewHeight,
-            child: Stack(
-              children: [
-                for (final entry
-                    in _summary.previewBooks.take(_shelfPreviewLimit).toList().asMap().entries)
-                  Positioned(
-                    left: entry.key * _shelfPreviewOffset,
-                    child: BookCover(
-                      accent: entry.value.id.accent,
-                      url: entry.value.thumbnailUrl,
-                      width: 40,
-                      height: 56,
-                      radius: Spacing.radiusS,
-                    ),
-                  ),
-              ],
-            ),
+          CollectionMark(
+            kind: CollectionKind.shelf,
+            accent: shelf.accent,
+            symbol: shelf.symbol,
+            size: _shelfMarkSize,
           ),
           const SizedBox(width: Spacing.m),
           Expanded(
@@ -313,7 +299,7 @@ class const _ShelfCard({
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  _summary.shelf.name,
+                  shelf.name,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: context.t.headlineSmall?.copyWith(color: swatch.onFill),
@@ -326,8 +312,28 @@ class const _ShelfCard({
               ],
             ),
           ),
-          const SizedBox(width: Spacing.s),
-          CountBadge(count: _summary.bookCount, accent: accent),
+          if (previewBooks.isNotEmpty) ...[
+            const SizedBox(width: Spacing.s),
+            SizedBox(
+              width: _shelfPreviewWidth,
+              height: _shelfPreviewHeight,
+              child: Stack(
+                children: [
+                  for (final (index, book) in previewBooks.indexed)
+                    Positioned(
+                      left: index * _shelfPreviewOffset,
+                      child: BookCover(
+                        title: book.title,
+                        url: book.thumbnailUrl,
+                        width: 40,
+                        height: 56,
+                        radius: Spacing.radiusS,
+                      ),
+                    ),
+                ],
+              ),
+            ),
+          ],
         ],
       ),
     );
@@ -350,9 +356,9 @@ class const _NewShelfTile({
             width: _newShelfIconSize,
             height: _newShelfIconSize,
             alignment: Alignment.center,
-            decoration: BoxDecoration(
+            decoration: ShapeDecoration(
               color: context.c.surfaceContainerLowest,
-              shape: BoxShape.circle,
+              shape: CollectionKind.shelf.toShape(_newShelfIconSize),
             ),
             child: Icon(Icons.add, color: context.c.onSurfaceVariant, size: Spacing.iconM),
           ),
@@ -420,17 +426,15 @@ class const _SearchResults({
             itemBuilder: (context, index) {
               final result = _state.results[index];
               final book = result.book;
-              final accent = book.id.accent;
               final pages = result.quote.pageNumbers;
               final source = pages.isEmpty
                   ? book.title
                   : context.s.quoteSourceLabel(book.title, pages.toPageLabel());
               return QuoteCard(
-                accent: accent,
                 quote: "“${result.quote.quote}”",
+                bookTitle: book.title,
                 thumbnailUrl: book.thumbnailUrl,
                 sourceLabel: source,
-                backgroundColor: context.palette.resolve(accent).fill,
                 onTap: () => context.pushQuoteDetail(result.quote.id),
               );
             },

@@ -18,7 +18,5 @@ enum AccentColor {
   clay,
   mauve,
   slate,
-  stone;
-
-  static const List<AccentColor> autoValues = [amber, teal, coral, sand];
+  stone,
 }

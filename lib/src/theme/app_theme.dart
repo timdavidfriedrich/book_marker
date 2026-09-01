@@ -140,7 +140,7 @@ const _typography = AppTypography(
   monoBadge: TextStyle(fontFamily: _serif, fontSize: 12.5, fontWeight: FontWeight.w500),
 );
 
-const _statusLight = StatusColors(success: _tealSolid, warning: _amberSolid);
+const _status = StatusColors(uncertain: _sky);
 
 abstract final class AppTheme {
   const AppTheme._();
@@ -160,7 +160,7 @@ abstract final class AppTheme {
       canvasColor: colorScheme.surface,
       textTheme: textTheme,
       splashFactory: NoSplash.splashFactory,
-      extensions: [_palette, _typography, _statusLight],
+      extensions: [_palette, _typography, _status],
       badgeTheme: BadgeThemeData(
         backgroundColor: _sky.solid,
         textColor: _sky.onSolid,

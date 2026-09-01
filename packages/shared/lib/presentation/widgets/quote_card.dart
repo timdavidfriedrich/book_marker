@@ -1,6 +1,5 @@
 import 'package:audioplayers/audioplayers.dart';
 import 'package:core/theme/spacing.dart';
-import 'package:core/theme/theme_extensions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:shared/presentation/extensions/context_extensions.dart';
@@ -16,18 +15,16 @@ const _voiceNoteDotSize = 18.0;
 const _voiceNoteIconSize = 12.0;
 
 class const QuoteCard({
-  required final AccentColor _accent,
   required final String _quote,
+  required final String _bookTitle,
   final String? _thumbnailUrl,
   final List<int> _pages = const [],
-  final bool _pageFilled = false,
   final String? _note,
   final String? _sourceLabel,
   final bool _isFavorite = false,
   final bool _hasVoiceNote = false,
   final Duration? _voiceNoteDuration,
   final String? _voiceNotePath,
-  final Color? _backgroundColor,
   final VoidCallback? _onTap,
   super.key,
 }) extends StatelessWidget {
@@ -35,7 +32,7 @@ class const QuoteCard({
   Widget build(BuildContext context) {
     return InkTapBox(
       onTap: _onTap,
-      color: _backgroundColor ?? context.c.surfaceContainerLow,
+      color: context.c.surfaceContainerLow,
       radius: Spacing.radiusL,
       padding: const EdgeInsets.all(Spacing.m),
       child: Row(
@@ -44,14 +41,14 @@ class const QuoteCard({
           Column(
             children: [
               BookCover(
-                accent: _accent,
+                title: _bookTitle,
                 url: _thumbnailUrl,
                 width: _coverWidth,
                 height: _coverHeight,
               ),
               if (_pages.isNotEmpty) ...[
                 const SizedBox(height: Spacing.xs),
-                PagePill(pages: _pages, accent: _accent, filled: _pageFilled),
+                PagePill(pages: _pages),
               ],
             ],
           ),
@@ -99,7 +96,7 @@ class const QuoteCard({
                       Icon(
                         Icons.star_rounded,
                         size: Spacing.iconM,
-                        color: context.palette.amber.solid,
+                        color: context.c.primary,
                       ),
                     ],
                   ],
@@ -122,7 +119,6 @@ class const _VoiceNoteTag({
     final minutes = _duration.inMinutes;
     final seconds = _duration.inSeconds % 60;
     final label = "$minutes:${seconds.toString().padLeft(2, "0")}";
-    final coral = context.palette.coral;
 
     final player = useMemoized(AudioPlayer.new);
     useEffect(() => player.dispose, [player]);
@@ -140,13 +136,13 @@ class const _VoiceNoteTag({
           width: _voiceNoteDotSize,
           height: _voiceNoteDotSize,
           alignment: Alignment.center,
-          decoration: BoxDecoration(color: coral.solid, shape: BoxShape.circle),
+          decoration: BoxDecoration(color: context.c.tertiary, shape: BoxShape.circle),
           child: Icon(
             path == null
                 ? Icons.mic_rounded
                 : (playing.value ? Icons.pause : Icons.play_arrow_rounded),
             size: _voiceNoteIconSize,
-            color: coral.onSolid,
+            color: context.c.onTertiary,
           ),
         ),
         const SizedBox(width: Spacing.xxs),
@@ -161,7 +157,7 @@ class const _VoiceNoteTag({
 
     return InkTapBox(
       radius: Spacing.radiusFull,
-      color: coral.fill,
+      color: context.c.tertiaryContainer,
       padding: const EdgeInsets.symmetric(horizontal: Spacing.xs, vertical: Spacing.xxs),
       onTap: () async {
         if (playing.value) {

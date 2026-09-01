@@ -430,8 +430,8 @@ class const _ThemeChips({
               SelectableChip(
                 label: theme.name,
                 selected: true,
-                selectedColor: context.palette.teal.solid,
-                selectedTextColor: context.palette.teal.onSolid,
+                selectedColor: context.c.secondary,
+                selectedTextColor: context.c.onSecondary,
                 onTap: () => context.read<QuoteDetailBloc>().add(QuoteDetailThemeToggled(theme.id)),
               ),
           SelectableChip(
@@ -475,8 +475,8 @@ class const _ThemePickerSheet() extends StatelessWidget {
                       SelectableChip(
                         label: theme.name,
                         selected: state.selectedThemeIds.contains(theme.id),
-                        selectedColor: context.palette.teal.solid,
-                        selectedTextColor: context.palette.teal.onSolid,
+                        selectedColor: context.c.secondary,
+                        selectedTextColor: context.c.onSecondary,
                         onTap: () => context.read<QuoteDetailBloc>().add(
                           QuoteDetailThemeToggled(theme.id),
                         ),
@@ -524,7 +524,7 @@ class const _ActionButton({
           icon: _icon,
           size: 56,
           tooltip: _label,
-          foregroundColor: _highlighted ? context.palette.amber.solid : context.c.onSurface,
+          foregroundColor: _highlighted ? context.c.primary : context.c.onSurface,
           onPressed: _onTap,
         ),
         const SizedBox(height: Spacing.xxs),
@@ -551,13 +551,12 @@ class const _VoiceNotePlayer({
       return subscription.cancel;
     }, [player]);
 
-    final coral = context.palette.coral;
     final duration = Duration(milliseconds: _durationMs);
     final label = "${duration.inMinutes}:${(duration.inSeconds % 60).toString().padLeft(2, "0")}";
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: Spacing.m, vertical: Spacing.xs),
       decoration: BoxDecoration(
-        color: coral.solid,
+        color: context.c.tertiary,
         borderRadius: BorderRadius.circular(Spacing.radiusFull),
       ),
       child: Row(
@@ -573,17 +572,17 @@ class const _VoiceNotePlayer({
               }
             },
             icon: Icon(playing.value ? Icons.pause : Icons.play_arrow),
-            color: coral.onSolid,
+            color: context.c.onTertiary,
             iconSize: Spacing.iconM,
           ),
           const SizedBox(width: Spacing.xs),
           Expanded(
             child: Text(
               context.s.quoteVoiceNoteLabel(label),
-              style: context.t.bodyLarge?.copyWith(color: coral.onSolid),
+              style: context.t.bodyLarge?.copyWith(color: context.c.onTertiary),
             ),
           ),
-          Icon(Icons.graphic_eq, color: coral.onSolid, size: Spacing.iconM),
+          Icon(Icons.graphic_eq, color: context.c.onTertiary, size: Spacing.iconM),
         ],
       ),
     );

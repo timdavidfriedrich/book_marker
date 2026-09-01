@@ -18,7 +18,7 @@ class const UncertainWordChip({
 }) extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final swatch = context.palette.sky;
+    final swatch = context.status.uncertain;
     return Padding(
       padding: const EdgeInsets.only(right: uncertainBadgeSize + _badgeGap),
       child: Badge(

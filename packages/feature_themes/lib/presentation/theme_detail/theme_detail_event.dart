@@ -1,5 +1,6 @@
 import 'package:core/error/app_result.dart';
 import 'package:core/theme/accent_color.dart';
+import 'package:core/theme/collection_symbol.dart';
 import 'package:feature_themes/presentation/theme_detail/theme_detail_state.dart';
 import 'package:shared/domain/entities/book.dart';
 import 'package:shared/domain/entities/quote.dart';
@@ -27,6 +28,8 @@ class const ThemeDetailQuoteToggled(final String quoteId) extends ThemeDetailEve
 
 class const ThemeDetailRenameRequested(final String name) extends ThemeDetailEvent;
 
-class const ThemeDetailAccentChanged(final AccentColor? accent) extends ThemeDetailEvent;
+class const ThemeDetailAccentChanged(final AccentColor accent) extends ThemeDetailEvent;
+
+class const ThemeDetailSymbolChanged(final CollectionSymbol symbol) extends ThemeDetailEvent;
 
 class const ThemeDetailDeleteRequested() extends ThemeDetailEvent;

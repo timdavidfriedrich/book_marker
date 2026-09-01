@@ -1,5 +1,6 @@
 import 'package:core/error/app_result.dart';
 import 'package:core/theme/accent_color.dart';
+import 'package:core/theme/collection_symbol.dart';
 import 'package:shared/domain/entities/book.dart';
 import 'package:shared/domain/entities/quote.dart';
 import 'package:shared/domain/entities/shelf.dart';
@@ -23,6 +24,8 @@ class const ShelfDetailBookToggled(final String bookId) extends ShelfDetailEvent
 
 class const ShelfDetailRenameRequested(final String name) extends ShelfDetailEvent;
 
-class const ShelfDetailAccentChanged(final AccentColor? accent) extends ShelfDetailEvent;
+class const ShelfDetailAccentChanged(final AccentColor accent) extends ShelfDetailEvent;
+
+class const ShelfDetailSymbolChanged(final CollectionSymbol symbol) extends ShelfDetailEvent;
 
 class const ShelfDetailDeleteRequested() extends ShelfDetailEvent;

@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:core/theme/spacing.dart';
-import 'package:core/theme/theme_extensions.dart';
 import 'package:feature_capture/domain/mark_text.dart';
 import 'package:feature_capture/domain/recognized_page.dart';
 import 'package:feature_capture/presentation/extensions/recognized_word_extensions.dart';
@@ -19,7 +18,6 @@ import 'package:path_provider/path_provider.dart';
 import 'package:record/record.dart';
 import 'package:shared/domain/entities/book.dart';
 import 'package:shared/domain/entities/quote_theme.dart';
-import 'package:shared/presentation/extensions/accent_extensions.dart';
 import 'package:shared/presentation/extensions/app_error_extensions.dart';
 import 'package:shared/presentation/extensions/context_extensions.dart';
 import 'package:shared/presentation/navigation/navigation_extensions.dart';
@@ -143,7 +141,6 @@ class const _Editor({
           BookChooserBar(
             title: _state.bookTitle,
             thumbnailUrl: _state.bookThumbnailUrl,
-            accent: _state.bookId.accent,
             label: context.s.captureMarkingInto,
             onSwitch: _state.books.isEmpty ? null : () => _showBookPicker(context),
           ),
@@ -175,8 +172,7 @@ class const _Header({
               onPressed: context.closeScreen,
             ),
             const Spacer(),
-            if (_state.pageNumbers.isNotEmpty)
-              PagePill(pages: _state.pageNumbers, accent: AccentColor.coral),
+            if (_state.pageNumbers.isNotEmpty) PagePill(pages: _state.pageNumbers),
           ],
         ),
       ],
@@ -234,7 +230,7 @@ class const _UncertainLegend() extends StatelessWidget {
             width: _legendSampleWidth,
             height: _legendSampleHeight,
             decoration: BoxDecoration(
-              color: context.palette.sky.fill,
+              color: context.status.uncertain.fill,
               borderRadius: BorderRadius.circular(Spacing.radiusS),
             ),
           ),
@@ -409,7 +405,7 @@ class const _WordBox({
       width: _word.width * _size.width,
       height: _word.height * _size.height,
       child: DecoratedBox(
-        decoration: BoxDecoration(color: context.palette.amber.solid.withValues(alpha: 0.4)),
+        decoration: BoxDecoration(color: context.c.primary.withValues(alpha: 0.4)),
       ),
     );
   }
@@ -423,7 +419,7 @@ class const _UncertainHighlight({
 }) extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final swatch = context.palette.sky;
+    final swatch = context.status.uncertain;
     return Positioned(
       left: _word.left * _size.width - _highlightPadding,
       top: _word.top * _size.height - _highlightPadding,
@@ -524,7 +520,7 @@ class const _SaveSheet() extends HookWidget {
                         width: 24,
                         height: 24,
                         decoration: BoxDecoration(
-                          color: context.palette.teal.solid,
+                          color: context.c.secondary,
                           shape: BoxShape.circle,
                         ),
                       ),
@@ -551,7 +547,7 @@ class const _SaveSheet() extends HookWidget {
                   Container(
                     padding: const EdgeInsets.all(Spacing.m),
                     decoration: BoxDecoration(
-                      color: context.palette.amber.fill,
+                      color: context.c.primaryContainer,
                       borderRadius: BorderRadius.circular(Spacing.radiusL),
                     ),
                     child: TextField(
@@ -579,7 +575,6 @@ class const _SaveSheet() extends HookWidget {
                   BookChooserBar(
                     title: state.bookTitle,
                     thumbnailUrl: state.bookThumbnailUrl,
-                    accent: state.bookId.accent,
                     label: context.s.markingBookFieldLabel,
                     onSwitch: state.books.isEmpty ? null : () => _showBookPicker(context),
                   ),
@@ -646,12 +641,12 @@ class const _UnsureHint({
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Icon(Icons.error_outline, size: Spacing.iconS, color: context.palette.coral.solid),
+        Icon(Icons.error_outline, size: Spacing.iconS, color: context.c.tertiary),
         const SizedBox(width: Spacing.xs),
         Expanded(
           child: Text(
             context.s.markingUnsureWordsLabel(_count),
-            style: context.typography.monoCaption.copyWith(color: context.palette.coral.solid),
+            style: context.typography.monoCaption.copyWith(color: context.c.tertiary),
           ),
         ),
       ],
@@ -706,7 +701,7 @@ class const _BookPickerRow({
   Widget build(BuildContext context) {
     final authors = _book.authors.isEmpty ? context.s.bookAuthorsUnknown : _book.authors.join(", ");
     return InkTapBox(
-      color: _selected ? context.palette.teal.fill : context.c.surfaceContainerHigh,
+      color: _selected ? context.c.secondaryContainer : context.c.surfaceContainerHigh,
       radius: Spacing.radiusL,
       padding: const EdgeInsets.all(Spacing.s),
       onTap: () {
@@ -716,7 +711,7 @@ class const _BookPickerRow({
       child: Row(
         children: [
           BookCover(
-            accent: _book.id.accent,
+            title: _book.title,
             url: _book.thumbnailUrl,
             width: _pickerCoverWidth,
             height: _pickerCoverHeight,
@@ -747,7 +742,7 @@ class const _BookPickerRow({
           const SizedBox(width: Spacing.s),
           Icon(
             _selected ? Icons.check_circle : Icons.circle_outlined,
-            color: _selected ? context.palette.teal.solid : context.c.outline,
+            color: _selected ? context.c.secondary : context.c.outline,
             size: Spacing.iconM,
           ),
         ],
@@ -834,31 +829,30 @@ class const _VoiceNoteRecorder({
       }
     }
 
-    final coral = context.palette.coral;
     if (_voiceNotePath != null && !isRecording.value) {
       return Container(
         padding: const EdgeInsets.symmetric(horizontal: Spacing.m, vertical: Spacing.xs),
         decoration: BoxDecoration(
-          color: coral.solid,
+          color: context.c.tertiary,
           borderRadius: BorderRadius.circular(Spacing.radiusFull),
         ),
         child: Row(
           children: [
-            Icon(Icons.graphic_eq, color: coral.onSolid, size: Spacing.iconM),
+            Icon(Icons.graphic_eq, color: context.c.onTertiary, size: Spacing.iconM),
             const SizedBox(width: Spacing.s),
             Expanded(
               child: Text(
                 context.s.quoteVoiceNoteLabel(_formatDuration(_voiceNoteDurationMs ?? 0)),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: context.t.bodyLarge?.copyWith(color: coral.onSolid),
+                style: context.t.bodyLarge?.copyWith(color: context.c.onTertiary),
               ),
             ),
             IconButton(
               onPressed: () => context.read<MarkingBloc>().add(const MarkingVoiceNoteCleared()),
               icon: const Icon(Icons.close),
               iconSize: Spacing.iconM,
-              color: coral.onSolid,
+              color: context.c.onTertiary,
             ),
           ],
         ),
@@ -874,7 +868,7 @@ class const _VoiceNoteRecorder({
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: Spacing.m, vertical: Spacing.s),
         decoration: BoxDecoration(
-          color: coral.solid,
+          color: context.c.tertiary,
           borderRadius: BorderRadius.circular(Spacing.radiusFull),
         ),
         child: Row(
@@ -883,8 +877,8 @@ class const _VoiceNoteRecorder({
               width: 28,
               height: 28,
               alignment: Alignment.center,
-              decoration: BoxDecoration(color: coral.onSolid, shape: BoxShape.circle),
-              child: Icon(Icons.mic_rounded, size: Spacing.iconS, color: coral.solid),
+              decoration: BoxDecoration(color: context.c.onTertiary, shape: BoxShape.circle),
+              child: Icon(Icons.mic_rounded, size: Spacing.iconS, color: context.c.tertiary),
             ),
             const SizedBox(width: Spacing.s),
             Expanded(
@@ -892,12 +886,12 @@ class const _VoiceNoteRecorder({
                 label,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: context.t.bodyLarge?.copyWith(color: coral.onSolid),
+                style: context.t.bodyLarge?.copyWith(color: context.c.onTertiary),
               ),
             ),
             Icon(
               isRecording.value ? Icons.fiber_manual_record : Icons.graphic_eq,
-              color: coral.onSolid,
+              color: context.c.onTertiary,
               size: Spacing.iconM,
             ),
           ],
@@ -916,8 +910,8 @@ class const _FavoriteToggle({
       icon: _isFavorite ? Icons.star_rounded : Icons.star_outline_rounded,
       tooltip: context.s.quoteDetailFavoriteLabel,
       size: 56,
-      backgroundColor: _isFavorite ? context.palette.amber.solid : context.palette.amber.fill,
-      foregroundColor: _isFavorite ? context.palette.amber.onSolid : context.palette.amber.solid,
+      backgroundColor: _isFavorite ? context.c.primary : context.c.primaryContainer,
+      foregroundColor: _isFavorite ? context.c.onPrimary : context.c.primary,
       onPressed: () => context.read<MarkingBloc>().add(const MarkingFavoriteToggled()),
     );
   }
@@ -937,8 +931,8 @@ class const _ThemeChips({
           SelectableChip(
             label: theme.name,
             selected: _selected.contains(theme.id),
-            selectedColor: context.palette.teal.solid,
-            selectedTextColor: context.palette.teal.onSolid,
+            selectedColor: context.c.secondary,
+            selectedTextColor: context.c.onSecondary,
             onTap: () => context.read<MarkingBloc>().add(MarkingThemeToggled(theme.id)),
           ),
         SelectableChip(

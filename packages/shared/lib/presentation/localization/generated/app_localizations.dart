@@ -135,29 +135,35 @@ abstract class AppLocalizations {
   /// **'Rename'**
   String get commonRename;
 
-  /// No description provided for @commonChangeColor.
-  ///
-  /// In en, this message translates to:
-  /// **'Change color'**
-  String get commonChangeColor;
-
   /// No description provided for @commonDelete.
   ///
   /// In en, this message translates to:
   /// **'Delete'**
   String get commonDelete;
 
-  /// No description provided for @commonAutomatic.
+  /// No description provided for @commonChangeMark.
   ///
   /// In en, this message translates to:
-  /// **'Automatic'**
-  String get commonAutomatic;
+  /// **'Change mark'**
+  String get commonChangeMark;
 
-  /// No description provided for @accentPickerTitle.
+  /// No description provided for @markPickerTitle.
   ///
   /// In en, this message translates to:
-  /// **'Choose a color'**
-  String get accentPickerTitle;
+  /// **'Choose a mark'**
+  String get markPickerTitle;
+
+  /// No description provided for @markPickerSymbolLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'symbol'**
+  String get markPickerSymbolLabel;
+
+  /// No description provided for @markPickerColorLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'color'**
+  String get markPickerColorLabel;
 
   /// No description provided for @error.
   ///

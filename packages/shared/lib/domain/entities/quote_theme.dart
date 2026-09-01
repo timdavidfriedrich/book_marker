@@ -1,4 +1,5 @@
 import 'package:core/theme/accent_color.dart';
+import 'package:core/theme/collection_symbol.dart';
 import 'package:dart_mappable/dart_mappable.dart';
 
 part 'quote_theme.mapper.dart';
@@ -8,5 +9,6 @@ class const QuoteTheme({
   required final String id,
   required final String name,
   required final DateTime createdAt,
-  final AccentColor? accent,
+  required final AccentColor accent,
+  required final CollectionSymbol symbol,
 }) with QuoteThemeMappable;

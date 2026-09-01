@@ -3,7 +3,6 @@ import 'dart:io';
 
 import 'package:camera/camera.dart';
 import 'package:core/theme/spacing.dart';
-import 'package:core/theme/theme_extensions.dart';
 import 'package:feature_capture/domain/capture_mode.dart';
 import 'package:feature_capture/domain/capture_span.dart';
 import 'package:feature_capture/presentation/capture/capture_bloc.dart';
@@ -23,7 +22,6 @@ import 'package:image_picker/image_picker.dart';
 import 'package:shared/domain/entities/book.dart';
 import 'package:shared/domain/entities/captured_shot.dart';
 import 'package:shared/domain/entities/page_quad.dart';
-import 'package:shared/presentation/extensions/accent_extensions.dart';
 import 'package:shared/presentation/extensions/context_extensions.dart';
 import 'package:shared/presentation/navigation/crop_arguments.dart';
 import 'package:shared/presentation/navigation/marking_arguments.dart';
@@ -286,8 +284,8 @@ class const _CaptureTray({
             count: shots.length,
             onContinue: () => _onContinue(selectedBookId, shots),
           ),
-        CaptureReady(span: CaptureSpan.spread) || CaptureEmpty(span: CaptureSpan.spread) =>
-          _Hint(text: context.s.captureSpreadHint),
+        CaptureReady(span: CaptureSpan.spread) ||
+        CaptureEmpty(span: CaptureSpan.spread) => _Hint(text: context.s.captureSpreadHint),
         _ => _Hint(text: context.s.captureSteadyHint),
       },
     );
@@ -361,13 +359,13 @@ class const _ShotThumbnail({
                 height: _removeBadge,
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
-                  color: context.palette.coral.solid,
+                  color: context.c.tertiary,
                   shape: BoxShape.circle,
                 ),
                 child: Icon(
                   Icons.close,
                   size: _removeIcon,
-                  color: context.palette.coral.onSolid,
+                  color: context.c.onTertiary,
                 ),
               ),
             ),
@@ -437,7 +435,7 @@ class const _DetectionOverlay() extends StatelessWidget {
               if (quad != null && frame != null)
                 Positioned.fromRect(
                   rect: frame,
-                  child: PageQuadOverlay(quad: quad, lineColor: context.palette.amber.solid),
+                  child: PageQuadOverlay(quad: quad, lineColor: context.c.primary),
                 ),
               for (final corner in PageCorner.values)
                 _OverlayDot(
@@ -596,7 +594,6 @@ class const _SelectedBook({
     return BookChooserBar(
       title: _book.title,
       thumbnailUrl: _book.thumbnailUrl,
-      accent: _book.id.accent,
       label: context.s.captureMarkingInto,
       onSwitch: () => _addBook(context),
     );
@@ -623,13 +620,13 @@ class const _NoBook() extends StatelessWidget {
           const SizedBox(width: Spacing.s),
           InkTapBox(
             onTap: () => _addBook(context),
-            color: context.palette.amber.solid,
+            color: context.c.primary,
             radius: Spacing.radiusFull,
             padding: const EdgeInsets.symmetric(horizontal: Spacing.m, vertical: Spacing.xs),
             child: Text(
               context.s.captureAddBookButton,
               style: context.t.labelMedium?.copyWith(
-                color: context.palette.amber.onSolid,
+                color: context.c.onPrimary,
                 fontSize: 14,
               ),
             ),
@@ -677,7 +674,6 @@ class const _GalleryButton({
 }) extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final swatch = context.palette.resolve(AccentColor.sand);
     return SizedBox(
       width: _controlIcon + 24,
       child: Column(
@@ -688,7 +684,10 @@ class const _GalleryButton({
             tooltip: context.s.captureGalleryLabel,
             icon: const Icon(Icons.photo_library_outlined),
             iconSize: Spacing.iconM,
-            style: _squareStyle(background: swatch.solid, foreground: swatch.onSolid),
+            style: _squareStyle(
+              background: context.c.inverseSurface,
+              foreground: context.c.onInverseSurface,
+            ),
           ),
           const SizedBox(height: Spacing.xxs),
           Text(
@@ -725,7 +724,7 @@ class const _ShutterButton({
       child: InkTapBox(
         onTap: _onTap,
         circle: true,
-        color: context.palette.amber.solid,
+        color: context.c.primary,
         child: SizedBox(
           width: _shutterOuter,
           height: _shutterOuter,
@@ -733,7 +732,7 @@ class const _ShutterButton({
             child: Container(
               width: _shutterInner,
               height: _shutterInner,
-              decoration: BoxDecoration(color: context.palette.coral.solid, shape: BoxShape.circle),
+              decoration: BoxDecoration(color: context.c.tertiary, shape: BoxShape.circle),
             ),
           ),
         ),
@@ -760,8 +759,8 @@ class const _TorchButton({
             icon: Icon(_on ? Icons.flash_on : Icons.flash_off),
             iconSize: Spacing.iconM,
             style: _squareStyle(
-              background: _on ? context.palette.amber.solid : context.c.surfaceContainerHigh,
-              foreground: _on ? context.palette.amber.onSolid : context.c.onSurfaceVariant,
+              background: _on ? context.c.primary : context.c.surfaceContainerHigh,
+              foreground: _on ? context.c.onPrimary : context.c.onSurfaceVariant,
             ),
           ),
           const SizedBox(height: Spacing.xxs),
@@ -769,7 +768,7 @@ class const _TorchButton({
             _on ? context.s.captureLightOn : context.s.captureLightOff,
             textAlign: TextAlign.center,
             style: context.typography.monoCaption.copyWith(
-              color: _on ? context.palette.amber.solid : context.c.onSurfaceVariant,
+              color: _on ? context.c.primary : context.c.onSurfaceVariant,
             ),
           ),
         ],

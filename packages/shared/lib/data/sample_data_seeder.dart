@@ -1,9 +1,13 @@
+import 'package:core/theme/accent_color.dart';
+import 'package:core/theme/collection_symbol.dart';
 import 'package:injectable/injectable.dart';
 import 'package:shared/data/data_sources/book_local_data_source.dart';
 import 'package:shared/data/data_sources/quote_local_data_source.dart';
 import 'package:shared/data/data_sources/shelf_local_data_source.dart';
 import 'package:shared/data/data_sources/theme_local_data_source.dart';
 import 'package:shared/data/database/app_database.dart';
+import 'package:shared/data/mappers/accent_mappers.dart';
+import 'package:shared/data/mappers/collection_symbol_mappers.dart';
 
 // * Dev-only: seeds example books/quotes/themes/shelves on first launch when the
 // * library is empty. To remove: delete this file, its call in main.dart, and the
@@ -93,10 +97,22 @@ class const SampleDataSeeder(
     }
 
     await _themeLocalDataSource.upsertTheme(
-      LocalTheme(id: "seed-t1", name: "Attention", createdAt: at(30)),
+      LocalTheme(
+        id: "seed-t1",
+        name: "Attention",
+        createdAt: at(30),
+        accent: AccentColor.teal.value,
+        symbol: CollectionSymbol.eye.value,
+      ),
     );
     await _themeLocalDataSource.upsertTheme(
-      LocalTheme(id: "seed-t2", name: "Reciprocity", createdAt: at(50)),
+      LocalTheme(
+        id: "seed-t2",
+        name: "Reciprocity",
+        createdAt: at(50),
+        accent: AccentColor.plum.value,
+        symbol: CollectionSymbol.wave.value,
+      ),
     );
     for (final quoteId in ["seed-m1", "seed-m5", "seed-m6"]) {
       await _themeLocalDataSource.addQuote("seed-t1", quoteId);
@@ -106,7 +122,13 @@ class const SampleDataSeeder(
     }
 
     await _shelfLocalDataSource.upsertShelf(
-      LocalShelf(id: "seed-s1", name: "Nature writing", createdAt: at(20)),
+      LocalShelf(
+        id: "seed-s1",
+        name: "Nature writing",
+        createdAt: at(20),
+        accent: AccentColor.forest.value,
+        symbol: CollectionSymbol.leaf.value,
+      ),
     );
     for (final bookId in ["seed-braiding", "seed-wintering"]) {
       await _shelfLocalDataSource.addBook("seed-s1", bookId);
