@@ -8,6 +8,7 @@ import 'package:shared/presentation/widgets/ink_tap_box.dart';
 const _markerSize = 30.0;
 const _captureSize = 64.0;
 const _captureDotSize = 28.0;
+const _barMaxWidth = 520.0;
 
 class const NavigationShellContainer({
   required final StatefulNavigationShell _navigationShell,
@@ -15,6 +16,26 @@ class const NavigationShellContainer({
 }) extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    // * in landscape the vertical space is scarce, so the tabs move to a rail beside the content
+    if (context.layout.isLandscape) {
+      return Scaffold(
+        // * the branches keep their own inset handling; resizing here would shrink them twice
+        resizeToAvoidBottomInset: false,
+        body: Row(
+          children: [
+            _SideRail(navigationShell: _navigationShell),
+            // * the rail already sits inside the left inset, so the content must not repeat it
+            Expanded(
+              child: MediaQuery.removePadding(
+                context: context,
+                removeLeft: true,
+                child: _navigationShell,
+              ),
+            ),
+          ],
+        ),
+      );
+    }
     return Scaffold(
       body: _navigationShell,
       bottomNavigationBar: _BottomBar(navigationShell: _navigationShell),
@@ -30,11 +51,51 @@ class const _BottomBar({
     final index = _navigationShell.currentIndex;
     return SafeArea(
       top: false,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: Spacing.xxl, vertical: Spacing.xs),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          crossAxisAlignment: CrossAxisAlignment.end,
+      // * heightFactor keeps the bar shrink-wrapped; a bare Center would eat the whole body
+      child: Center(
+        heightFactor: 1,
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: _barMaxWidth),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: Spacing.xxl, vertical: Spacing.xs),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                _TabItem(
+                  label: context.s.navLibraryLabel,
+                  active: index == 0,
+                  rounded: true,
+                  onTap: () => _navigationShell.goBranch(0),
+                ),
+                _CaptureButton(onTap: context.pushCapture),
+                _TabItem(
+                  label: context.s.navThemesLabel,
+                  active: index == 1,
+                  rounded: false,
+                  onTap: () => _navigationShell.goBranch(1),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class const _SideRail({
+  required final StatefulNavigationShell _navigationShell,
+}) extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final index = _navigationShell.currentIndex;
+    return SafeArea(
+      right: false,
+      child: SizedBox(
+        width: Spacing.sideRailWidth,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             _TabItem(
               label: context.s.navLibraryLabel,
@@ -42,7 +103,9 @@ class const _BottomBar({
               rounded: true,
               onTap: () => _navigationShell.goBranch(0),
             ),
+            const SizedBox(height: Spacing.xl),
             _CaptureButton(onTap: context.pushCapture),
+            const SizedBox(height: Spacing.xl),
             _TabItem(
               label: context.s.navThemesLabel,
               active: index == 1,

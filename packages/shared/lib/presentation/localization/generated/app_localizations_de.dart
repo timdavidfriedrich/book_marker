@@ -779,16 +779,16 @@ class AppLocalizationsDe extends AppLocalizations {
   String get settingsAppearanceLabel => 'Darstellung';
 
   @override
-  String get settingsThemeLabel => 'Design';
+  String get settingsColorSchemeLabel => 'Farbschema';
 
   @override
-  String get settingsThemeSystem => 'System';
+  String get settingsColorSchemeSystem => 'System';
 
   @override
-  String get settingsThemeLight => 'Hell';
+  String get settingsColorSchemeLight => 'Hell';
 
   @override
-  String get settingsThemeDark => 'Dunkel';
+  String get settingsColorSchemeDark => 'Dunkel';
 
   @override
   String get settingsContrastLabel => 'Kontrast';

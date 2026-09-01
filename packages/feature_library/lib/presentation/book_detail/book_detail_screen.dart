@@ -8,10 +8,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared/domain/entities/book.dart';
 import 'package:shared/presentation/extensions/app_error_extensions.dart';
 import 'package:shared/presentation/extensions/context_extensions.dart';
+import 'package:shared/presentation/extensions/screen_layout_extensions.dart';
 import 'package:shared/presentation/navigation/navigation_extensions.dart';
 import 'package:shared/presentation/widgets/book_cover.dart';
 import 'package:shared/presentation/widgets/circle_icon_button.dart';
 import 'package:shared/presentation/widgets/collapsing_header.dart';
+import 'package:shared/presentation/widgets/columned_sliver_list.dart';
 import 'package:shared/presentation/widgets/confirm_dialog.dart';
 import 'package:shared/presentation/widgets/pinned_header.dart';
 import 'package:shared/presentation/widgets/quote_card.dart';
@@ -24,6 +26,8 @@ const _chipHeight = 32.0;
 const _chipsHeight = Spacing.m + _chipHeight + Spacing.m;
 const _coverWidth = 96.0;
 const _coverHeight = 128.0;
+const _paneCoverWidth = 88.0;
+const _paneCoverHeight = 118.0;
 
 class const BookDetailScreen({
   super.key,
@@ -56,6 +60,21 @@ class const _Content({
   @override
   Widget build(BuildContext context) {
     final book = _state.book;
+    // * landscape turns the header into a standing pane so the quotes keep the full height
+    if (context.layout.isLandscape) {
+      return Row(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          _SidePanel(book: book, state: _state),
+          Expanded(
+            child: SafeArea(
+              left: false,
+              child: CustomScrollView(slivers: [_QuoteSlivers(state: _state)]),
+            ),
+          ),
+        ],
+      );
+    }
     return CustomScrollView(
       slivers: [
         CollapsingHeader(
@@ -64,44 +83,40 @@ class const _Content({
           expanded: _Header(book: book, state: _state),
           collapsed: _CollapsedHeader(book: book),
         ),
+        _QuoteSlivers(state: _state),
+      ],
+    );
+  }
+}
+
+class const _QuoteSlivers({
+  required final BookDetailLoaded _state,
+}) extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final margin = context.layout.pageMargin;
+    return SliverMainAxisGroup(
+      slivers: [
         PinnedHeader(
           height: _chipsHeight,
           child: ColoredBox(
             color: context.c.surface,
             child: SingleChildScrollView(
               scrollDirection: Axis.horizontal,
-              padding: const EdgeInsets.fromLTRB(Spacing.l, Spacing.m, Spacing.l, Spacing.m),
+              padding: EdgeInsets.fromLTRB(margin, Spacing.m, margin, Spacing.m),
               child: Row(
                 children: [
-                  SelectableChip(
-                    label: context.s.bookDetailAllFilter(_state.totalCount),
-                    selected: _state.filter == BookDetailFilter.all,
-                    selectedColor: context.c.inverseSurface,
-                    selectedTextColor: context.c.onInverseSurface,
-                    onTap: () => context.read<BookDetailBloc>().add(
-                      const BookDetailFilterChanged(BookDetailFilter.all),
+                  for (final (index, filter) in BookDetailFilter.values.indexed) ...[
+                    if (index > 0) const SizedBox(width: Spacing.xs),
+                    SelectableChip(
+                      label: _filterLabel(context, filter, _state),
+                      selected: _state.filter == filter,
+                      selectedColor: context.c.inverseSurface,
+                      selectedTextColor: context.c.onInverseSurface,
+                      onTap: () =>
+                          context.read<BookDetailBloc>().add(BookDetailFilterChanged(filter)),
                     ),
-                  ),
-                  const SizedBox(width: Spacing.xs),
-                  SelectableChip(
-                    label: context.s.bookDetailFavoritesFilter,
-                    selected: _state.filter == BookDetailFilter.favorites,
-                    selectedColor: context.c.inverseSurface,
-                    selectedTextColor: context.c.onInverseSurface,
-                    onTap: () => context.read<BookDetailBloc>().add(
-                      const BookDetailFilterChanged(BookDetailFilter.favorites),
-                    ),
-                  ),
-                  const SizedBox(width: Spacing.xs),
-                  SelectableChip(
-                    label: context.s.bookDetailVoiceNoteFilter,
-                    selected: _state.filter == BookDetailFilter.withVoiceNote,
-                    selectedColor: context.c.inverseSurface,
-                    selectedTextColor: context.c.onInverseSurface,
-                    onTap: () => context.read<BookDetailBloc>().add(
-                      const BookDetailFilterChanged(BookDetailFilter.withVoiceNote),
-                    ),
-                  ),
+                  ],
                 ],
               ),
             ),
@@ -123,17 +138,17 @@ class const _Content({
           )
         else
           SliverPadding(
-            padding: const EdgeInsets.fromLTRB(Spacing.l, 0, Spacing.l, Spacing.xxl),
-            sliver: SliverList.separated(
+            padding: EdgeInsets.fromLTRB(margin, 0, margin, Spacing.xxl),
+            sliver: ColumnedSliverList(
               itemCount: _state.quotes.length,
-              separatorBuilder: (context, index) => const SizedBox(height: Spacing.m),
+              columns: context.layout.cardColumns,
               itemBuilder: (context, index) {
                 final quote = _state.quotes[index];
                 final voiceNoteMs = quote.voiceNoteDurationMs;
                 return QuoteCard(
                   quote: "“${quote.quote}”",
-                  bookTitle: book.title,
-                  thumbnailUrl: book.thumbnailUrl,
+                  bookTitle: _state.book.title,
+                  thumbnailUrl: _state.book.thumbnailUrl,
                   pages: quote.pageNumbers,
                   note: quote.note,
                   isFavorite: quote.isFavorite,
@@ -148,6 +163,93 @@ class const _Content({
             ),
           ),
       ],
+    );
+  }
+}
+
+class const _SidePanel({
+  required final Book _book,
+  required final BookDetailLoaded _state,
+}) extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final authors = _book.authors.isEmpty ? context.s.bookAuthorsUnknown : _book.authors.join(", ");
+    return Container(
+      width: Spacing.detailPaneWidth,
+      color: context.c.surfaceContainerLow,
+      child: SafeArea(
+        right: false,
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.fromLTRB(Spacing.l, Spacing.l, Spacing.l, Spacing.xl),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  CircleIconButton(
+                    icon: Icons.arrow_back,
+                    tooltip: context.s.back,
+                    backgroundColor: context.c.surfaceContainerLowest,
+                    onPressed: context.closeScreen,
+                  ),
+                  CircleIconButton(
+                    icon: Icons.more_horiz,
+                    backgroundColor: context.c.surfaceContainerLowest,
+                    onPressed: () => _showBookMenu(context, _book.status),
+                  ),
+                ],
+              ),
+              const SizedBox(height: Spacing.m),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  BookCover(
+                    title: _book.title,
+                    url: _book.thumbnailUrl,
+                    width: _paneCoverWidth,
+                    height: _paneCoverHeight,
+                    radius: Spacing.radiusL,
+                  ),
+                  const SizedBox(width: Spacing.m),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          _book.title,
+                          maxLines: 3,
+                          overflow: TextOverflow.ellipsis,
+                          style: context.t.headlineSmall,
+                        ),
+                        const SizedBox(height: Spacing.xs),
+                        Text(
+                          authors,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: context.typography.monoLabel.copyWith(
+                            color: context.c.onSurfaceVariant,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: Spacing.m),
+              Wrap(
+                spacing: Spacing.xs,
+                runSpacing: Spacing.xs,
+                children: [
+                  _StatChip(label: context.s.bookDetailQuotesStat(_state.totalCount)),
+                  _StatChip(label: context.s.bookDetailFavoritesStat(_state.favoriteCount)),
+                  _StatChip(label: _book.status.toLabel(context)),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }
@@ -299,6 +401,7 @@ Future<void> _showBookMenu(BuildContext context, BookStatus status) async {
   final bloc = context.read<BookDetailBloc>();
   final deleteRequested = await showModalBottomSheet<bool>(
     context: context,
+    isScrollControlled: true,
     useRootNavigator: true,
     builder: (_) => BlocProvider.value(
       value: bloc,
@@ -342,4 +445,12 @@ class const _BookMenu({
       ],
     );
   }
+}
+
+String _filterLabel(BuildContext context, BookDetailFilter filter, BookDetailLoaded state) {
+  return switch (filter) {
+    BookDetailFilter.all => context.s.bookDetailAllFilter(state.totalCount),
+    BookDetailFilter.favorites => context.s.bookDetailFavoritesFilter,
+    BookDetailFilter.withVoiceNote => context.s.bookDetailVoiceNoteFilter,
+  };
 }

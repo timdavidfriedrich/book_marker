@@ -33,6 +33,7 @@ Future<void> showWordCorrectionSheet(BuildContext context, {required int wordInd
     isScrollControlled: true,
     useRootNavigator: true,
     backgroundColor: Colors.transparent,
+    showDragHandle: false,
     builder: (_) => BlocProvider.value(
       value: bloc,
       child: _WordCorrectionSheet(wordIndex: wordIndex),

@@ -20,9 +20,11 @@ import 'package:shared/domain/entities/book.dart';
 import 'package:shared/domain/entities/quote_theme.dart';
 import 'package:shared/presentation/extensions/app_error_extensions.dart';
 import 'package:shared/presentation/extensions/context_extensions.dart';
+import 'package:shared/presentation/extensions/screen_layout_extensions.dart';
 import 'package:shared/presentation/navigation/navigation_extensions.dart';
 import 'package:shared/presentation/widgets/book_cover.dart';
 import 'package:shared/presentation/widgets/circle_icon_button.dart';
+import 'package:shared/presentation/widgets/drag_dismiss_sheet.dart';
 import 'package:shared/presentation/widgets/ink_tap_box.dart';
 import 'package:shared/presentation/widgets/name_input_dialog.dart';
 import 'package:shared/presentation/widgets/page_dots.dart';
@@ -43,6 +45,10 @@ const _sheetCollapsedSize = 0.55;
 const _sheetExpandedSize = 0.95;
 const _pickerCoverWidth = 36.0;
 const _pickerCoverHeight = 48.0;
+const _sideColumnWidth = 320.0;
+const _saveMarkerSize = 24.0;
+const _handleWidth = 44.0;
+const _handleHeight = 5.0;
 
 String _formatDuration(int milliseconds) {
   final duration = Duration(milliseconds: milliseconds);
@@ -106,6 +112,64 @@ class const _Editor({
   Widget build(BuildContext context) {
     final mode = useState(0);
     final canContinue = _state.selectedWordIndexes.isNotEmpty;
+    final hasUncertainWords = _state.words.wordGroups().any((group) => group.number != null);
+    final page = PaperCard(
+      padding: const EdgeInsets.all(Spacing.m),
+      child: IndexedStack(
+        index: mode.value,
+        sizing: StackFit.expand,
+        children: [
+          _ReadingText(state: _state),
+          _PhotoSelectable(state: _state),
+        ],
+      ),
+    );
+    final chooser = BookChooserBar(
+      title: _state.bookTitle,
+      thumbnailUrl: _state.bookThumbnailUrl,
+      label: context.s.captureMarkingInto,
+      onSwitch: _state.books.isEmpty ? null : () => _showBookPicker(context),
+    );
+    final continueButton = FilledButton(
+      onPressed: canContinue ? () => _openSaveSheet(context) : null,
+      child: Text(context.s.markingContinueButton),
+    );
+    // * landscape keeps the recognised page as tall as possible and stacks its tools beside it
+    if (context.layout.isLandscape) {
+      return Padding(
+        padding: const EdgeInsets.all(Spacing.m),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Expanded(child: page),
+            const SizedBox(width: Spacing.m),
+            SizedBox(
+              width: _sideColumnWidth,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  _Header(state: _state),
+                  const SizedBox(height: Spacing.m),
+                  Row(
+                    children: [
+                      _ModeToggle(index: mode.value, onChanged: (value) => mode.value = value),
+                    ],
+                  ),
+                  if (hasUncertainWords) ...[
+                    const SizedBox(height: Spacing.s),
+                    const _UncertainLegend(),
+                  ],
+                  const Spacer(),
+                  chooser,
+                  const SizedBox(height: Spacing.s),
+                  continueButton,
+                ],
+              ),
+            ),
+          ],
+        ),
+      );
+    }
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: Spacing.l),
       child: Column(
@@ -119,36 +183,16 @@ class const _Editor({
               _ModeToggle(index: mode.value, onChanged: (value) => mode.value = value),
             ],
           ),
-          if (_state.words.wordGroups().any((group) => group.number != null)) ...[
+          if (hasUncertainWords) ...[
             const SizedBox(height: Spacing.s),
             const _UncertainLegend(),
           ],
           const SizedBox(height: Spacing.m),
-          Expanded(
-            child: PaperCard(
-              padding: const EdgeInsets.all(Spacing.m),
-              child: IndexedStack(
-                index: mode.value,
-                sizing: StackFit.expand,
-                children: [
-                  _ReadingText(state: _state),
-                  _PhotoSelectable(state: _state),
-                ],
-              ),
-            ),
-          ),
+          Expanded(child: page),
           const SizedBox(height: Spacing.m),
-          BookChooserBar(
-            title: _state.bookTitle,
-            thumbnailUrl: _state.bookThumbnailUrl,
-            label: context.s.captureMarkingInto,
-            onSwitch: _state.books.isEmpty ? null : () => _showBookPicker(context),
-          ),
+          chooser,
           const SizedBox(height: Spacing.s),
-          FilledButton(
-            onPressed: canContinue ? () => _openSaveSheet(context) : null,
-            child: Text(context.s.markingContinueButton),
-          ),
+          continueButton,
           const SizedBox(height: Spacing.s),
         ],
       ),
@@ -463,6 +507,7 @@ Future<void> _openSaveSheet(BuildContext context) async {
     isScrollControlled: true,
     useRootNavigator: true,
     backgroundColor: Colors.transparent,
+    showDragHandle: false,
     builder: (_) => BlocProvider.value(value: bloc, child: const _SaveSheet()),
   );
   if (bloc.state is MarkingSaved && context.mounted) {
@@ -486,12 +531,12 @@ class const _SaveSheet() extends HookWidget {
     final quoteController = useTextEditingController(text: initialQuote);
     final bottomInset = MediaQuery.viewInsetsOf(context).bottom;
     final keyboardVisible = bottomInset > 0;
+    final collapsedSize = context.layout.sheetSize(_sheetCollapsedSize);
     return Padding(
       padding: EdgeInsets.only(bottom: bottomInset),
-      child: DraggableScrollableSheet(
-        initialChildSize: keyboardVisible ? _sheetExpandedSize : _sheetCollapsedSize,
-        minChildSize: keyboardVisible ? _sheetExpandedSize : _sheetCollapsedSize,
-        maxChildSize: _sheetExpandedSize,
+      child: DragDismissSheet(
+        restingSize: keyboardVisible ? _sheetExpandedSize : collapsedSize,
+        expandedSize: _sheetExpandedSize,
         builder: (context, scrollController) => DecoratedBox(
           decoration: BoxDecoration(
             color: context.c.surfaceContainerLowest,
@@ -502,14 +547,112 @@ class const _SaveSheet() extends HookWidget {
             listener: (context, state) => Navigator.of(context).pop(),
             builder: (context, state) {
               if (state is! MarkingReady) return const SizedBox.shrink();
+              final quoteField = Container(
+                padding: const EdgeInsets.all(Spacing.m),
+                decoration: BoxDecoration(
+                  color: context.c.primaryContainer,
+                  borderRadius: BorderRadius.circular(Spacing.radiusL),
+                ),
+                child: TextField(
+                  controller: quoteController,
+                  minLines: 1,
+                  maxLines: 5,
+                  style: context.typography.readingQuoteItalic.copyWith(
+                    color: context.c.onPrimaryContainer,
+                  ),
+                  onChanged: (value) => context.read<MarkingBloc>().add(MarkingQuoteEdited(value)),
+                  decoration: const InputDecoration(
+                    isDense: true,
+                    filled: false,
+                    border: InputBorder.none,
+                    enabledBorder: InputBorder.none,
+                    focusedBorder: InputBorder.none,
+                    contentPadding: EdgeInsets.zero,
+                  ),
+                ),
+              );
+              final unsureCount = _uncertainSelectionCount(state);
+              final chooser = BookChooserBar(
+                title: state.bookTitle,
+                thumbnailUrl: state.bookThumbnailUrl,
+                label: context.s.markingBookFieldLabel,
+                onSwitch: state.books.isEmpty ? null : () => _showBookPicker(context),
+              );
+              final pageAndVoiceNote = Row(
+                children: [
+                  PageNumberField(
+                    pages: state.pageNumbers,
+                    wasDetected: state.detectedPageNumbers.isNotEmpty,
+                    onChanged: (pages) => context.read<MarkingBloc>().add(
+                      MarkingPageNumbersChanged(pages),
+                    ),
+                  ),
+                  const SizedBox(width: Spacing.s),
+                  Expanded(
+                    child: _VoiceNoteRecorder(
+                      voiceNotePath: state.voiceNotePath,
+                      voiceNoteDurationMs: state.voiceNoteDurationMs,
+                    ),
+                  ),
+                ],
+              );
+              final actions = Row(
+                children: [
+                  _FavoriteToggle(isFavorite: state.isFavorite),
+                  const SizedBox(width: Spacing.s),
+                  Expanded(
+                    child: FilledButton(
+                      onPressed: state.isSaving
+                          ? null
+                          : () => context.read<MarkingBloc>().add(const MarkingSaveRequested()),
+                      child: state.isSaving
+                          ? const SizedBox(
+                              height: Spacing.iconM,
+                              width: Spacing.iconM,
+                              child: CircularProgressIndicator(
+                                strokeWidth: Spacing.borderWidthMedium,
+                              ),
+                            )
+                          : Text(context.s.markingDoneButton),
+                    ),
+                  ),
+                ],
+              );
+              final header = Row(
+                children: [
+                  Container(
+                    width: _saveMarkerSize,
+                    height: _saveMarkerSize,
+                    decoration: BoxDecoration(
+                      color: context.c.secondary,
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                  const SizedBox(width: Spacing.s),
+                  Expanded(
+                    child: Text(
+                      context.s.markingSaveSheetTitle(
+                        state.bookTitle.isEmpty ? context.s.libraryUnknownBook : state.bookTitle,
+                      ),
+                      style: context.t.titleLarge,
+                    ),
+                  ),
+                  const SizedBox(width: Spacing.s),
+                  CircleIconButton(
+                    icon: Icons.close,
+                    tooltip: context.s.close,
+                    onPressed: () => Navigator.of(context).pop(),
+                  ),
+                ],
+              );
               return ListView(
                 controller: scrollController,
                 padding: const EdgeInsets.fromLTRB(Spacing.l, Spacing.s, Spacing.l, Spacing.s),
                 children: [
                   Center(
                     child: Container(
-                      width: 44,
-                      height: 5,
+                      width: _handleWidth,
+                      height: _handleHeight,
                       decoration: BoxDecoration(
                         color: context.c.outline,
                         borderRadius: BorderRadius.circular(Spacing.radiusFull),
@@ -517,118 +660,64 @@ class const _SaveSheet() extends HookWidget {
                     ),
                   ),
                   const SizedBox(height: Spacing.m),
-                  Row(
-                    children: [
-                      Container(
-                        width: 24,
-                        height: 24,
-                        decoration: BoxDecoration(
-                          color: context.c.secondary,
-                          shape: BoxShape.circle,
-                        ),
-                      ),
-                      const SizedBox(width: Spacing.s),
-                      Expanded(
-                        child: Text(
-                          context.s.markingSaveSheetTitle(
-                            state.bookTitle.isEmpty
-                                ? context.s.libraryUnknownBook
-                                : state.bookTitle,
+                  header,
+                  const SizedBox(height: Spacing.m),
+                  // * a single column stretches every field across a landscape viewport
+                  if (context.layout.isLandscape)
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              quoteField,
+                              if (unsureCount > 0) ...[
+                                const SizedBox(height: Spacing.s),
+                                _UnsureHint(count: unsureCount),
+                              ],
+                              const SizedBox(height: Spacing.m),
+                              _NoteField(controller: noteController),
+                            ],
                           ),
-                          style: context.t.titleLarge,
                         ),
-                      ),
-                      const SizedBox(width: Spacing.s),
-                      CircleIconButton(
-                        icon: Icons.close,
-                        tooltip: context.s.close,
-                        onPressed: () => Navigator.of(context).pop(),
-                      ),
+                        const SizedBox(width: Spacing.l),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              chooser,
+                              const SizedBox(height: Spacing.s),
+                              pageAndVoiceNote,
+                              const SizedBox(height: Spacing.m),
+                              _ThemeChips(
+                                themes: state.availableThemes,
+                                selected: state.selectedThemeIds,
+                              ),
+                              const SizedBox(height: Spacing.m),
+                              actions,
+                            ],
+                          ),
+                        ),
+                      ],
+                    )
+                  else ...[
+                    quoteField,
+                    if (unsureCount > 0) ...[
+                      const SizedBox(height: Spacing.s),
+                      _UnsureHint(count: unsureCount),
                     ],
-                  ),
-                  const SizedBox(height: Spacing.m),
-                  Container(
-                    padding: const EdgeInsets.all(Spacing.m),
-                    decoration: BoxDecoration(
-                      color: context.c.primaryContainer,
-                      borderRadius: BorderRadius.circular(Spacing.radiusL),
-                    ),
-                    child: TextField(
-                      controller: quoteController,
-                      minLines: 1,
-                      maxLines: 5,
-                      style: context.typography.readingQuoteItalic.copyWith(
-                        color: context.c.onPrimaryContainer,
-                      ),
-                      onChanged: (value) =>
-                          context.read<MarkingBloc>().add(MarkingQuoteEdited(value)),
-                      decoration: const InputDecoration(
-                        isDense: true,
-                        filled: false,
-                        border: InputBorder.none,
-                        enabledBorder: InputBorder.none,
-                        focusedBorder: InputBorder.none,
-                        contentPadding: EdgeInsets.zero,
-                      ),
-                    ),
-                  ),
-                  if (_uncertainSelectionCount(state) case final count when count > 0) ...[
+                    const SizedBox(height: Spacing.m),
+                    chooser,
                     const SizedBox(height: Spacing.s),
-                    _UnsureHint(count: count),
+                    pageAndVoiceNote,
+                    const SizedBox(height: Spacing.s),
+                    _NoteField(controller: noteController),
+                    const SizedBox(height: Spacing.m),
+                    _ThemeChips(themes: state.availableThemes, selected: state.selectedThemeIds),
+                    const SizedBox(height: Spacing.m),
+                    actions,
                   ],
-                  const SizedBox(height: Spacing.m),
-                  BookChooserBar(
-                    title: state.bookTitle,
-                    thumbnailUrl: state.bookThumbnailUrl,
-                    label: context.s.markingBookFieldLabel,
-                    onSwitch: state.books.isEmpty ? null : () => _showBookPicker(context),
-                  ),
-                  const SizedBox(height: Spacing.s),
-                  Row(
-                    children: [
-                      PageNumberField(
-                        pages: state.pageNumbers,
-                        wasDetected: state.detectedPageNumbers.isNotEmpty,
-                        onChanged: (pages) => context.read<MarkingBloc>().add(
-                          MarkingPageNumbersChanged(pages),
-                        ),
-                      ),
-                      const SizedBox(width: Spacing.s),
-                      Expanded(
-                        child: _VoiceNoteRecorder(
-                          voiceNotePath: state.voiceNotePath,
-                          voiceNoteDurationMs: state.voiceNoteDurationMs,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: Spacing.s),
-                  _NoteField(controller: noteController),
-                  const SizedBox(height: Spacing.m),
-                  _ThemeChips(themes: state.availableThemes, selected: state.selectedThemeIds),
-                  const SizedBox(height: Spacing.m),
-                  Row(
-                    children: [
-                      _FavoriteToggle(isFavorite: state.isFavorite),
-                      const SizedBox(width: Spacing.s),
-                      Expanded(
-                        child: FilledButton(
-                          onPressed: state.isSaving
-                              ? null
-                              : () => context.read<MarkingBloc>().add(const MarkingSaveRequested()),
-                          child: state.isSaving
-                              ? const SizedBox(
-                                  height: Spacing.iconM,
-                                  width: Spacing.iconM,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: Spacing.borderWidthMedium,
-                                  ),
-                                )
-                              : Text(context.s.markingDoneButton),
-                        ),
-                      ),
-                    ],
-                  ),
                 ],
               );
             },
@@ -663,8 +752,8 @@ Future<void> _showBookPicker(BuildContext context) async {
   final bloc = context.read<MarkingBloc>();
   await showModalBottomSheet<void>(
     context: context,
-    useRootNavigator: true,
     isScrollControlled: true,
+    useRootNavigator: true,
     builder: (_) => BlocProvider.value(value: bloc, child: const _BookPickerSheet()),
   );
 }

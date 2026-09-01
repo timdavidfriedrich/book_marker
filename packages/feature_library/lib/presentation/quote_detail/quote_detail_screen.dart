@@ -16,6 +16,7 @@ import 'package:shared/domain/entities/quote_theme.dart';
 import 'package:shared/presentation/extensions/app_error_extensions.dart';
 import 'package:shared/presentation/extensions/context_extensions.dart';
 import 'package:shared/presentation/extensions/page_number_extensions.dart';
+import 'package:shared/presentation/extensions/screen_layout_extensions.dart';
 import 'package:shared/presentation/navigation/navigation_extensions.dart';
 import 'package:shared/presentation/widgets/circle_icon_button.dart';
 import 'package:shared/presentation/widgets/confirm_dialog.dart';
@@ -35,6 +36,8 @@ const _sourceImageHeight = 320.0;
 const _sourceThumbnailWidth = 44.0;
 const _sourceThumbnailHeight = 60.0;
 const _sourceThumbnailCacheWidth = 132;
+const _readingColumnFlex = 3;
+const _metadataColumnFlex = 2;
 
 class const QuoteDetailScreen({
   super.key,
@@ -77,34 +80,81 @@ class const _Content({
 }) extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final layout = context.layout;
+    final margin = layout.pageMargin;
+    final reading = <Widget>[
+      _CitationCard(quote: _quote),
+      const SizedBox(height: Spacing.m),
+      _NoteCard(quote: _quote),
+      if (_quote.voiceNotePath case final String path) ...[
+        const SizedBox(height: Spacing.m),
+        _VoiceNotePlayer(path: path, durationMs: _quote.voiceNoteDurationMs ?? 0),
+      ],
+    ];
+    final metadata = <Widget>[
+      Align(
+        alignment: Alignment.centerLeft,
+        child: PageNumberField(
+          pages: _quote.pageNumbers,
+          onChanged: (pages) => context.read<QuoteDetailBloc>().add(
+            QuoteDetailPageNumbersChanged(pages),
+          ),
+        ),
+      ),
+      const SizedBox(height: Spacing.m),
+      _ThemeChips(themes: _themes, selected: _selectedThemeIds),
+      const SizedBox(height: Spacing.m),
+      _SourceCard(quote: _quote),
+      const SizedBox(height: Spacing.m),
+      _Actions(quote: _quote, book: _book),
+    ];
+    // * the quote stays on the reading side while its metadata moves into a second column
+    if (layout.isWide) {
+      return Padding(
+        padding: EdgeInsets.fromLTRB(margin, Spacing.s, margin, Spacing.l),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            _Header(quote: _quote, book: _book),
+            const SizedBox(height: Spacing.m),
+            Expanded(
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    flex: _readingColumnFlex,
+                    child: SingleChildScrollView(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: reading,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: Spacing.xl),
+                  Expanded(
+                    flex: _metadataColumnFlex,
+                    child: SingleChildScrollView(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: metadata,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      );
+    }
     return ListView(
-      padding: const EdgeInsets.fromLTRB(Spacing.l, Spacing.s, Spacing.l, Spacing.l),
+      padding: EdgeInsets.fromLTRB(margin, Spacing.s, margin, Spacing.l),
       children: [
         _Header(quote: _quote, book: _book),
         const SizedBox(height: Spacing.m),
-        _CitationCard(quote: _quote),
+        ...reading,
         const SizedBox(height: Spacing.m),
-        _NoteCard(quote: _quote),
-        const SizedBox(height: Spacing.m),
-        if (_quote.voiceNotePath case final String path) ...[
-          _VoiceNotePlayer(path: path, durationMs: _quote.voiceNoteDurationMs ?? 0),
-          const SizedBox(height: Spacing.m),
-        ],
-        Align(
-          alignment: Alignment.centerLeft,
-          child: PageNumberField(
-            pages: _quote.pageNumbers,
-            onChanged: (pages) => context.read<QuoteDetailBloc>().add(
-              QuoteDetailPageNumbersChanged(pages),
-            ),
-          ),
-        ),
-        const SizedBox(height: Spacing.m),
-        _ThemeChips(themes: _themes, selected: _selectedThemeIds),
-        const SizedBox(height: Spacing.m),
-        _SourceCard(quote: _quote),
-        const SizedBox(height: Spacing.m),
-        _Actions(quote: _quote, book: _book),
+        ...metadata,
       ],
     );
   }
@@ -383,6 +433,7 @@ Future<void> _showQuoteMenu(BuildContext context) async {
   final bloc = context.read<QuoteDetailBloc>();
   final deleteRequested = await showModalBottomSheet<bool>(
     context: context,
+    isScrollControlled: true,
     useRootNavigator: true,
     builder: (_) => const _QuoteMenu(),
   );
@@ -449,8 +500,8 @@ Future<void> _showThemePicker(BuildContext context) async {
   final bloc = context.read<QuoteDetailBloc>();
   await showModalBottomSheet<void>(
     context: context,
-    useRootNavigator: true,
     isScrollControlled: true,
+    useRootNavigator: true,
     builder: (_) => BlocProvider.value(value: bloc, child: const _ThemePickerSheet()),
   );
 }

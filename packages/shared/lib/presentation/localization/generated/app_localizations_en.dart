@@ -776,16 +776,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsAppearanceLabel => 'Appearance';
 
   @override
-  String get settingsThemeLabel => 'Theme';
+  String get settingsColorSchemeLabel => 'Color scheme';
 
   @override
-  String get settingsThemeSystem => 'System';
+  String get settingsColorSchemeSystem => 'System';
 
   @override
-  String get settingsThemeLight => 'Light';
+  String get settingsColorSchemeLight => 'Light';
 
   @override
-  String get settingsThemeDark => 'Dark';
+  String get settingsColorSchemeDark => 'Dark';
 
   @override
   String get settingsContrastLabel => 'Contrast';

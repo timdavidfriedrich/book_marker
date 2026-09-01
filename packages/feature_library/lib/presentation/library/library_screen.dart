@@ -10,10 +10,12 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:shared/presentation/extensions/app_error_extensions.dart';
 import 'package:shared/presentation/extensions/context_extensions.dart';
 import 'package:shared/presentation/extensions/page_number_extensions.dart';
+import 'package:shared/presentation/extensions/screen_layout_extensions.dart';
 import 'package:shared/presentation/navigation/navigation_extensions.dart';
 import 'package:shared/presentation/widgets/book_card.dart';
 import 'package:shared/presentation/widgets/book_cover.dart';
 import 'package:shared/presentation/widgets/collection_mark.dart';
+import 'package:shared/presentation/widgets/columned_sliver_list.dart';
 import 'package:shared/presentation/widgets/floating_header.dart';
 import 'package:shared/presentation/widgets/ink_tap_box.dart';
 import 'package:shared/presentation/widgets/name_input_dialog.dart';
@@ -29,8 +31,11 @@ const _toggleHeight = 40.0;
 const _chipHeight = 32.0;
 const _avatarHeight = 44.0;
 const _titleBarHeight = _avatarHeight + Spacing.m + Spacing.s;
+const _wideTitleBarHeight = _searchFieldHeight + Spacing.m + Spacing.s;
 const _headerHeight = _searchFieldHeight + Spacing.m + _toggleHeight + Spacing.xs;
+const _wideHeaderHeight = _toggleHeight + Spacing.xs;
 const _chipsHeight = Spacing.xs + _chipHeight + Spacing.m;
+const _toggleMaxWidth = 480.0;
 const _shelfPreviewOffset = 22.0;
 const _shelfPreviewWidth = 84.0;
 const _shelfPreviewHeight = 64.0;
@@ -44,6 +49,8 @@ class const LibraryScreen({
   Widget build(BuildContext context) {
     final controller = useTextEditingController();
     return Scaffold(
+      // * resizing would squeeze the short landscape viewport to nothing while typing
+      resizeToAvoidBottomInset: !context.layout.isLandscape,
       body: SafeArea(
         bottom: false,
         child: BlocBuilder<LibraryBloc, LibraryState>(
@@ -64,34 +71,18 @@ class const _Loaded({
 }) extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final layout = context.layout;
     return CustomScrollView(
       slivers: [
-        if (!_state.isSearching)
+        if (layout.isWide)
           PinnedHeader(
-            height: _titleBarHeight,
-            child: ColoredBox(
-              color: context.c.surface,
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(Spacing.l, Spacing.m, Spacing.l, Spacing.s),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Expanded(
-                      child: Text(
-                        context.s.libraryTitle,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: context.t.displaySmall,
-                      ),
-                    ),
-                    ProfileAvatar(onTap: () => context.pushSettings()),
-                  ],
-                ),
-              ),
-            ),
-          ),
+            height: _wideTitleBarHeight,
+            child: _WideTitleBar(state: _state, controller: _controller),
+          )
+        else if (!_state.isSearching)
+          const PinnedHeader(height: _titleBarHeight, child: _TitleBar()),
         FloatingHeader(
-          height: _headerHeight,
+          height: layout.isWide ? _wideHeaderHeight : _headerHeight,
           child: _Header(state: _state, controller: _controller),
         ),
         switch (_state.view) {
@@ -104,7 +95,39 @@ class const _Loaded({
   }
 }
 
-class const _Header({
+class const _TitleBar() extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return ColoredBox(
+      color: context.c.surface,
+      child: Padding(
+        padding: EdgeInsets.fromLTRB(
+          context.layout.pageMargin,
+          Spacing.m,
+          context.layout.pageMargin,
+          Spacing.s,
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Expanded(
+              child: Text(
+                context.s.libraryTitle,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: context.t.displaySmall,
+              ),
+            ),
+            ProfileAvatar(onTap: () => context.pushSettings()),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// * with more width than height the title, the search and the profile share one band
+class const _WideTitleBar({
   required final LibraryLoaded _state,
   required final TextEditingController _controller,
 }) extends StatelessWidget {
@@ -113,27 +136,80 @@ class const _Header({
     return ColoredBox(
       color: context.c.surface,
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: Spacing.l),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
+        padding: EdgeInsets.fromLTRB(
+          context.layout.pageMargin,
+          Spacing.m,
+          context.layout.pageMargin,
+          Spacing.s,
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            SizedBox(
-              height: _searchFieldHeight,
-              child: _SearchField(controller: _controller, state: _state),
+            Text(
+              context.s.libraryTitle,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: context.t.displaySmall,
             ),
-            const SizedBox(height: Spacing.m),
-            SegmentedToggle(
-              labels: [
-                context.s.libraryTabBooks,
-                context.s.libraryTabShelves,
-                context.s.libraryTabQuotes,
-              ],
-              selectedIndex: _state.view.index,
-              onChanged: (index) =>
-                  context.read<LibraryBloc>().add(LibraryViewChanged(LibraryView.values[index])),
+            const SizedBox(width: Spacing.l),
+            Expanded(
+              child: Align(
+                alignment: Alignment.centerRight,
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: Spacing.searchFieldMaxWidth),
+                  child: SizedBox(
+                    height: _searchFieldHeight,
+                    child: _SearchField(controller: _controller, state: _state),
+                  ),
+                ),
+              ),
             ),
+            const SizedBox(width: Spacing.m),
+            ProfileAvatar(onTap: () => context.pushSettings()),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class const _Header({
+  required final LibraryLoaded _state,
+  required final TextEditingController _controller,
+}) extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final layout = context.layout;
+    final toggle = ConstrainedBox(
+      constraints: const BoxConstraints(maxWidth: _toggleMaxWidth),
+      child: SegmentedToggle(
+        labels: [
+          context.s.libraryTabBooks,
+          context.s.libraryTabShelves,
+          context.s.libraryTabQuotes,
+        ],
+        selectedIndex: _state.view.index,
+        onChanged: (index) =>
+            context.read<LibraryBloc>().add(LibraryViewChanged(LibraryView.values[index])),
+      ),
+    );
+    return ColoredBox(
+      color: context.c.surface,
+      child: Padding(
+        padding: EdgeInsets.symmetric(horizontal: layout.pageMargin),
+        child: layout.isWide
+            ? Align(alignment: Alignment.centerLeft, child: toggle)
+            : Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  SizedBox(
+                    height: _searchFieldHeight,
+                    child: _SearchField(controller: _controller, state: _state),
+                  ),
+                  const SizedBox(height: Spacing.m),
+                  toggle,
+                ],
+              ),
       ),
     );
   }
@@ -211,6 +287,7 @@ class const _ShelvesView({
     }
     return SliverMainAxisGroup(
       slivers: [
+        const _NoChipsSpacer(),
         if (_state.isSearching)
           _ResultCount(text: context.s.libraryShelvesCount(_state.shelves.length)),
         _ShelfCards(summaries: _state.shelves, withNewTile: !_state.isSearching),
@@ -265,7 +342,12 @@ class const _FilterChips({
         color: context.c.surface,
         child: SingleChildScrollView(
           scrollDirection: Axis.horizontal,
-          padding: const EdgeInsets.fromLTRB(Spacing.l, Spacing.xs, Spacing.l, Spacing.m),
+          padding: EdgeInsets.fromLTRB(
+            context.layout.pageMargin,
+            Spacing.xs,
+            context.layout.pageMargin,
+            Spacing.m,
+          ),
           child: Row(
             children: [
               for (final (index, chip) in _chips.indexed) ...[
@@ -303,10 +385,10 @@ class const _BookCards({
   @override
   Widget build(BuildContext context) {
     return SliverPadding(
-      padding: const EdgeInsets.fromLTRB(Spacing.l, 0, Spacing.l, 0),
-      sliver: SliverList.separated(
+      padding: EdgeInsets.symmetric(horizontal: context.layout.pageMargin),
+      sliver: ColumnedSliverList(
         itemCount: _summaries.length,
-        separatorBuilder: (context, index) => const SizedBox(height: Spacing.m),
+        columns: context.layout.cardColumns,
         itemBuilder: (context, index) {
           final summary = _summaries[index];
           final book = summary.book;
@@ -332,10 +414,10 @@ class const _QuoteCards({
   @override
   Widget build(BuildContext context) {
     return SliverPadding(
-      padding: const EdgeInsets.fromLTRB(Spacing.l, 0, Spacing.l, 0),
-      sliver: SliverList.separated(
+      padding: EdgeInsets.symmetric(horizontal: context.layout.pageMargin),
+      sliver: ColumnedSliverList(
         itemCount: _results.length,
-        separatorBuilder: (context, index) => const SizedBox(height: Spacing.m),
+        columns: context.layout.cardColumns,
         itemBuilder: (context, index) {
           final result = _results[index];
           final book = result.book;
@@ -369,10 +451,10 @@ class const _ShelfCards({
   @override
   Widget build(BuildContext context) {
     return SliverPadding(
-      padding: const EdgeInsets.fromLTRB(Spacing.l, 0, Spacing.l, 0),
-      sliver: SliverList.separated(
+      padding: EdgeInsets.symmetric(horizontal: context.layout.pageMargin),
+      sliver: ColumnedSliverList(
         itemCount: _summaries.length + (_withNewTile ? 1 : 0),
-        separatorBuilder: (context, index) => const SizedBox(height: Spacing.m),
+        columns: context.layout.cardColumns,
         itemBuilder: (context, index) {
           if (index == _summaries.length) {
             return _NewShelfTile(onTap: () => _promptNewShelf(context));
@@ -391,10 +473,22 @@ class const _ResultCount({
   Widget build(BuildContext context) {
     return SliverToBoxAdapter(
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(Spacing.l, Spacing.xs, Spacing.l, Spacing.s),
+        padding: EdgeInsets.fromLTRB(
+          context.layout.pageMargin,
+          Spacing.xs,
+          context.layout.pageMargin,
+          Spacing.s,
+        ),
         child: SectionLabel(text: _text, dotColor: context.c.outline),
       ),
     );
+  }
+}
+
+class const _NoChipsSpacer() extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return const SliverToBoxAdapter(child: SizedBox(height: Spacing.m));
   }
 }
 

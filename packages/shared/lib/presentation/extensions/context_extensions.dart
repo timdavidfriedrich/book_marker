@@ -13,6 +13,8 @@ extension ContextExtensions on BuildContext {
 
   ContrastLevel get contrast => Theme.of(this).extension<AppContrast>()!.level;
 
+  ScreenLayout get layout => ScreenLayout.of(MediaQuery.sizeOf(this));
+
   AppPalette get palette => Theme.of(this).extension<AppPalette>()!;
 
   AppTypography get typography => Theme.of(this).extension<AppTypography>()!;

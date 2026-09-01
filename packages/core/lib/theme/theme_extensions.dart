@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 export 'package:core/theme/accent_color.dart';
 export 'package:core/theme/contrast_level.dart';
+export 'package:core/theme/screen_layout.dart';
 
 const _lerpMidpoint = 0.5;
 

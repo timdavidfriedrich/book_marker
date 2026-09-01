@@ -18,6 +18,7 @@ import 'package:shared/presentation/widgets/circle_icon_button.dart';
 
 const _touchTarget = 48.0;
 const _scrimOpacity = 0.55;
+const _sideColumnWidth = 300.0;
 
 class const CropScreen({
   super.key,
@@ -73,6 +74,46 @@ class const _Editor({
 }) extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final photo = Center(
+      child: AspectRatio(
+        aspectRatio: _state.aspectRatio,
+        child: _Photo(state: _state),
+      ),
+    );
+    final hint = Text(
+      context.s.cropHint,
+      textAlign: TextAlign.center,
+      style: context.typography.monoLabel.copyWith(color: context.c.onSurfaceVariant),
+    );
+    final continueButton = FilledButton(
+      onPressed: () => context.closeScreenWithResult(_state.quad),
+      child: Text(context.s.cropContinueButton),
+    );
+    if (context.layout.isLandscape) {
+      return Padding(
+        padding: const EdgeInsets.all(Spacing.m),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Expanded(child: photo),
+            const SizedBox(width: Spacing.m),
+            SizedBox(
+              width: _sideColumnWidth,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  const _Header(),
+                  const Spacer(),
+                  hint,
+                  const SizedBox(height: Spacing.m),
+                  continueButton,
+                ],
+              ),
+            ),
+          ],
+        ),
+      );
+    }
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: Spacing.l),
       child: Column(
@@ -81,25 +122,11 @@ class const _Editor({
           const SizedBox(height: Spacing.s),
           const _Header(),
           const SizedBox(height: Spacing.m),
-          Expanded(
-            child: Center(
-              child: AspectRatio(
-                aspectRatio: _state.aspectRatio,
-                child: _Photo(state: _state),
-              ),
-            ),
-          ),
+          Expanded(child: photo),
           const SizedBox(height: Spacing.m),
-          Text(
-            context.s.cropHint,
-            textAlign: TextAlign.center,
-            style: context.typography.monoLabel.copyWith(color: context.c.onSurfaceVariant),
-          ),
+          hint,
           const SizedBox(height: Spacing.m),
-          FilledButton(
-            onPressed: () => context.closeScreenWithResult(_state.quad),
-            child: Text(context.s.cropContinueButton),
-          ),
+          continueButton,
           const SizedBox(height: Spacing.s),
         ],
       ),

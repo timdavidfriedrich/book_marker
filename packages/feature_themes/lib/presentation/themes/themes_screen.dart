@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared/presentation/extensions/app_error_extensions.dart';
 import 'package:shared/presentation/extensions/context_extensions.dart';
+import 'package:shared/presentation/extensions/screen_layout_extensions.dart';
 import 'package:shared/presentation/navigation/navigation_extensions.dart';
 import 'package:shared/presentation/widgets/collection_mark.dart';
 import 'package:shared/presentation/widgets/ink_tap_box.dart';
@@ -44,8 +45,9 @@ class const _Content({
 }) extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final layout = context.layout;
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: Spacing.l),
+      padding: EdgeInsets.symmetric(horizontal: layout.pageMargin),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -60,10 +62,10 @@ class const _Content({
           const SizedBox(height: Spacing.m),
           Expanded(
             child: GridView.count(
-              crossAxisCount: 2,
+              crossAxisCount: layout.tileColumns,
               mainAxisSpacing: Spacing.m,
               crossAxisSpacing: Spacing.m,
-              childAspectRatio: 0.92,
+              childAspectRatio: layout.tileAspectRatio,
               padding: const EdgeInsets.only(bottom: Spacing.xxl),
               children: [
                 for (final summary in _state.themes) _ThemeTile(summary: summary),

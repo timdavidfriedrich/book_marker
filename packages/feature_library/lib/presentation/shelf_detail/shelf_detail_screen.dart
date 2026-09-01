@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared/presentation/extensions/app_error_extensions.dart';
 import 'package:shared/presentation/extensions/context_extensions.dart';
+import 'package:shared/presentation/extensions/screen_layout_extensions.dart';
 import 'package:shared/presentation/navigation/navigation_extensions.dart';
 import 'package:shared/presentation/widgets/book_card.dart';
 import 'package:shared/presentation/widgets/book_cover.dart';
@@ -13,13 +14,18 @@ import 'package:shared/presentation/widgets/circle_icon_button.dart';
 import 'package:shared/presentation/widgets/collapsing_header.dart';
 import 'package:shared/presentation/widgets/collection_mark.dart';
 import 'package:shared/presentation/widgets/collection_mark_picker.dart';
+import 'package:shared/presentation/widgets/columned_sliver_list.dart';
 import 'package:shared/presentation/widgets/confirm_dialog.dart';
+import 'package:shared/presentation/widgets/drag_dismiss_sheet.dart';
 import 'package:shared/presentation/widgets/ink_tap_box.dart';
 import 'package:shared/presentation/widgets/name_input_dialog.dart';
 import 'package:shared/presentation/widgets/sheet_action_tile.dart';
 import 'package:shared/presentation/widgets/sheet_content.dart';
 
+const _sheetCollapsedSize = 0.6;
+const _sheetExpandedSize = 0.95;
 const _markSize = 88.0;
+const _paneMarkSize = 104.0;
 const _headerHeight = 184.0;
 
 enum _ShelfMenuAction { rename, mark, delete }
@@ -55,6 +61,21 @@ class const _Content({
   @override
   Widget build(BuildContext context) {
     final shelf = _state.shelf;
+    // * landscape turns the accent header into a standing pane beside the books
+    if (context.layout.isLandscape) {
+      return Row(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          _SidePanel(state: _state),
+          Expanded(
+            child: SafeArea(
+              left: false,
+              child: CustomScrollView(slivers: [_BookSlivers(state: _state)]),
+            ),
+          ),
+        ],
+      );
+    }
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -67,60 +88,151 @@ class const _Content({
                 expanded: _Header(state: _state),
                 collapsed: _CollapsedHeader(state: _state),
               ),
-              if (_state.books.isEmpty)
-                SliverFillRemaining(
-                  hasScrollBody: false,
-                  child: Padding(
-                    padding: const EdgeInsets.all(Spacing.l),
-                    child: Text(
-                      context.s.shelfDetailEmpty,
-                      textAlign: TextAlign.center,
-                      style: context.typography.readingBody.copyWith(
-                        color: context.c.onSurfaceVariant,
-                      ),
-                    ),
-                  ),
-                )
-              else
-                SliverPadding(
-                  padding: const EdgeInsets.fromLTRB(Spacing.l, Spacing.m, Spacing.l, Spacing.l),
-                  sliver: SliverList.separated(
-                    itemCount: _state.books.length,
-                    separatorBuilder: (context, index) => const SizedBox(height: Spacing.m),
-                    itemBuilder: (context, index) {
-                      final item = _state.books[index];
-                      return BookCard(
-                        title: item.book.title,
-                        meta: context.s.libraryQuotesCount(item.quoteCount),
-                        count: item.quoteCount,
-                        thumbnailUrl: item.book.thumbnailUrl,
-                        onTap: () => context.pushBookDetail(item.book.id),
-                      );
-                    },
-                  ),
-                ),
+              _BookSlivers(state: _state),
             ],
           ),
         ),
         SafeArea(
           top: false,
           child: Padding(
-            padding: const EdgeInsets.fromLTRB(Spacing.l, 0, Spacing.l, Spacing.s),
-            child: InkTapBox(
-              color: context.c.surfaceContainerHigh,
-              radius: Spacing.radiusFull,
-              padding: const EdgeInsets.symmetric(vertical: Spacing.m),
-              onTap: () => _showAddBooks(context),
-              child: Center(
-                child: Text(
-                  context.s.shelfDetailAddBooks,
-                  style: context.t.labelLarge?.copyWith(color: context.c.onSurfaceVariant),
-                ),
-              ),
+            padding: EdgeInsets.fromLTRB(
+              context.layout.pageMargin,
+              0,
+              context.layout.pageMargin,
+              Spacing.s,
             ),
+            child: const _AddBooksButton(),
           ),
         ),
       ],
+    );
+  }
+}
+
+class const _BookSlivers({
+  required final ShelfDetailLoaded _state,
+}) extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final margin = context.layout.pageMargin;
+    if (_state.books.isEmpty) {
+      return SliverFillRemaining(
+        hasScrollBody: false,
+        child: Padding(
+          padding: const EdgeInsets.all(Spacing.l),
+          child: Text(
+            context.s.shelfDetailEmpty,
+            textAlign: TextAlign.center,
+            style: context.typography.readingBody.copyWith(color: context.c.onSurfaceVariant),
+          ),
+        ),
+      );
+    }
+    return SliverPadding(
+      padding: EdgeInsets.fromLTRB(margin, Spacing.m, margin, Spacing.l),
+      sliver: ColumnedSliverList(
+        itemCount: _state.books.length,
+        columns: context.layout.cardColumns,
+        itemBuilder: (context, index) {
+          final item = _state.books[index];
+          return BookCard(
+            title: item.book.title,
+            meta: context.s.libraryQuotesCount(item.quoteCount),
+            count: item.quoteCount,
+            thumbnailUrl: item.book.thumbnailUrl,
+            onTap: () => context.pushBookDetail(item.book.id),
+          );
+        },
+      ),
+    );
+  }
+}
+
+class const _AddBooksButton() extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return InkTapBox(
+      color: context.c.surfaceContainerHigh,
+      radius: Spacing.radiusFull,
+      padding: const EdgeInsets.symmetric(vertical: Spacing.m),
+      onTap: () => _showAddBooks(context),
+      child: Center(
+        child: Text(
+          context.s.shelfDetailAddBooks,
+          textAlign: TextAlign.center,
+          style: context.t.labelLarge?.copyWith(color: context.c.onSurfaceVariant),
+        ),
+      ),
+    );
+  }
+}
+
+class const _SidePanel({
+  required final ShelfDetailLoaded _state,
+}) extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final shelf = _state.shelf;
+    final swatch = context.palette.resolve(shelf.accent);
+    return Container(
+      width: Spacing.detailPaneWidth,
+      color: swatch.fill,
+      child: SafeArea(
+        right: false,
+        child: Padding(
+          padding: const EdgeInsets.all(Spacing.l),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  CircleIconButton(
+                    icon: Icons.arrow_back,
+                    tooltip: context.s.back,
+                    backgroundColor: context.c.surfaceContainerLowest,
+                    onPressed: context.closeScreen,
+                  ),
+                  CircleIconButton(
+                    icon: Icons.more_horiz,
+                    backgroundColor: context.c.surfaceContainerLowest,
+                    onPressed: () => _showShelfMenu(context, _state),
+                  ),
+                ],
+              ),
+              Expanded(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.symmetric(vertical: Spacing.l),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      CollectionMark(
+                        kind: CollectionKind.shelf,
+                        accent: shelf.accent,
+                        symbol: shelf.symbol,
+                        size: _paneMarkSize,
+                      ),
+                      const SizedBox(height: Spacing.m),
+                      Text(
+                        shelf.name,
+                        maxLines: 3,
+                        overflow: TextOverflow.ellipsis,
+                        style: context.t.headlineMedium?.copyWith(color: swatch.onFill),
+                      ),
+                      const SizedBox(height: Spacing.xs),
+                      Text(
+                        context.s.shelfDetailStats(_state.bookCount, _state.quoteCount),
+                        style: context.typography.monoLabel.copyWith(color: swatch.onFillVariant),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const _AddBooksButton(),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }
@@ -233,6 +345,7 @@ Future<void> _showShelfMenu(BuildContext context, ShelfDetailLoaded state) async
   final bloc = context.read<ShelfDetailBloc>();
   final action = await showModalBottomSheet<_ShelfMenuAction>(
     context: context,
+    isScrollControlled: true,
     useRootNavigator: true,
     builder: (_) => const _ShelfMenu(),
   );
@@ -263,8 +376,8 @@ Future<void> _showShelfMenu(BuildContext context, ShelfDetailLoaded state) async
 Future<void> _showMarkSheet(BuildContext context, ShelfDetailBloc bloc) async {
   await showModalBottomSheet<void>(
     context: context,
-    useRootNavigator: true,
     isScrollControlled: true,
+    useRootNavigator: true,
     builder: (_) => BlocProvider.value(value: bloc, child: const _MarkSheet()),
   );
 }
@@ -330,6 +443,7 @@ Future<void> _showAddBooks(BuildContext context) async {
     isScrollControlled: true,
     useRootNavigator: true,
     backgroundColor: Colors.transparent,
+    showDragHandle: false,
     builder: (_) => BlocProvider.value(value: bloc, child: const _AddBooksSheet()),
   );
 }
@@ -337,10 +451,9 @@ Future<void> _showAddBooks(BuildContext context) async {
 class const _AddBooksSheet() extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return DraggableScrollableSheet(
-      initialChildSize: 0.6,
-      minChildSize: 0.6,
-      maxChildSize: 0.95,
+    return DragDismissSheet(
+      restingSize: context.layout.sheetSize(_sheetCollapsedSize),
+      expandedSize: _sheetExpandedSize,
       builder: (context, scrollController) => DecoratedBox(
         decoration: BoxDecoration(
           color: context.c.surfaceContainerLowest,

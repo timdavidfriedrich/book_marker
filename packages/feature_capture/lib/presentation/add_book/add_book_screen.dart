@@ -8,11 +8,16 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:shared/domain/entities/book.dart';
 import 'package:shared/presentation/extensions/app_error_extensions.dart';
 import 'package:shared/presentation/extensions/context_extensions.dart';
+import 'package:shared/presentation/extensions/screen_layout_extensions.dart';
 import 'package:shared/presentation/navigation/navigation_extensions.dart';
 import 'package:shared/presentation/widgets/book_cover.dart';
 import 'package:shared/presentation/widgets/circle_icon_button.dart';
+import 'package:shared/presentation/widgets/drag_dismiss_sheet.dart';
 import 'package:shared/presentation/widgets/ink_tap_box.dart';
 import 'package:shared/presentation/widgets/section_label.dart';
+
+const _sheetInitialSize = 0.5;
+const _sheetExpandedSize = 0.95;
 
 class const AddBookScreen({
   super.key,
@@ -27,12 +32,16 @@ class const AddBookScreen({
         listener: (context, state) {
           if (state is AddBookSaved) context.closeScreenWithResult(state.bookId);
         },
-        child: DraggableScrollableSheet(
-          initialChildSize: 0.5,
-          minChildSize: 0.5,
-          maxChildSize: 0.95,
-          builder: (context, scrollController) =>
-              _Sheet(controller: controller, scrollController: scrollController),
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: Spacing.contentMaxWidth),
+            child: DragDismissSheet(
+              restingSize: context.layout.sheetSize(_sheetInitialSize),
+              expandedSize: _sheetExpandedSize,
+              builder: (context, scrollController) =>
+                  _Sheet(controller: controller, scrollController: scrollController),
+            ),
+          ),
         ),
       ),
     );

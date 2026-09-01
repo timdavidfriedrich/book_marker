@@ -38,6 +38,7 @@ const _shotHeight = 60.0;
 const _removeBadge = 18.0;
 const _removeIcon = 12.0;
 const _shotCacheWidth = 132;
+const _sideColumnWidth = 300.0;
 
 typedef _ContinueCallback = Future<void> Function(String bookId, List<CapturedShot> shots);
 
@@ -185,6 +186,45 @@ class const CaptureScreen({
       };
     }, const []);
 
+    final preview = _Preview(
+      camera: hasError.value ? null : controller.value,
+      unavailable: hasError.value,
+    );
+    final controls = _Controls(
+      camera: controller.value,
+      torchOn: torchOn.value,
+      onToggleTorch: toggleTorch,
+      onCapture: capture,
+      onGallery: pickFromGallery,
+    );
+    // * landscape puts the viewfinder next to its controls instead of squeezing both vertically
+    if (context.layout.isLandscape) {
+      return Scaffold(
+        body: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(Spacing.m),
+            child: Row(
+              children: [
+                Expanded(child: preview),
+                const SizedBox(width: Spacing.m),
+                SizedBox(
+                  width: _sideColumnWidth,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const _SpanToggle(),
+                      const _BookBar(),
+                      _CaptureTray(onContinue: continueWithSpread),
+                      controls,
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
     return Scaffold(
       body: SafeArea(
         child: Padding(
@@ -194,24 +234,13 @@ class const CaptureScreen({
               const SizedBox(height: Spacing.s),
               const _SpanToggle(),
               const SizedBox(height: Spacing.m),
-              Expanded(
-                child: _Preview(
-                  camera: hasError.value ? null : controller.value,
-                  unavailable: hasError.value,
-                ),
-              ),
+              Expanded(child: preview),
               const SizedBox(height: Spacing.m),
               const _BookBar(),
               const SizedBox(height: Spacing.s),
               _CaptureTray(onContinue: continueWithSpread),
               const SizedBox(height: Spacing.m),
-              _Controls(
-                camera: controller.value,
-                torchOn: torchOn.value,
-                onToggleTorch: toggleTorch,
-                onCapture: capture,
-                onGallery: pickFromGallery,
-              ),
+              controls,
               const SizedBox(height: Spacing.s),
             ],
           ),
@@ -244,7 +273,7 @@ class const _SpanToggle() extends StatelessWidget {
                   InkTapBox(
                     onTap: () => context.read<CaptureBloc>().add(CaptureSpanSelected(entry.$2)),
                     radius: Spacing.radiusFull,
-                    color: entry.$2 == span ? context.palette.paperFill : Colors.transparent,
+                    color: entry.$2 == span ? context.c.inverseSurface : Colors.transparent,
                     padding: const EdgeInsets.symmetric(
                       horizontal: Spacing.l,
                       vertical: Spacing.xs,
@@ -257,7 +286,7 @@ class const _SpanToggle() extends StatelessWidget {
                       style: context.t.labelMedium?.copyWith(
                         fontSize: 14,
                         color: entry.$2 == span
-                            ? context.palette.paperText
+                            ? context.c.onInverseSurface
                             : context.c.onSurfaceVariant,
                       ),
                     ),
@@ -401,11 +430,9 @@ class const _Preview({
                 ),
               )
             else if (_camera case final CameraController camera)
-              FittedBox(
-                fit: BoxFit.cover,
-                child: SizedBox(
-                  width: camera.value.previewSize?.height ?? 1,
-                  height: camera.value.previewSize?.width ?? 1,
+              Center(
+                child: AspectRatio(
+                  aspectRatio: _previewAspectRatio(context, camera),
                   child: CameraPreview(camera),
                 ),
               )
@@ -428,7 +455,13 @@ class const _DetectionOverlay() extends StatelessWidget {
         builder: (context, constraints) {
           if (state.mode != CaptureMode.auto) return const SizedBox.shrink();
           final size = constraints.biggest;
-          final frame = _frameRect(size, state.frameAspectRatio);
+          // * the cubit reports the upright portrait ratio of the frame
+          final aspectRatio = switch (state.frameAspectRatio) {
+            final double ratio when context.layout.isLandscape => 1 / ratio,
+            final double ratio => ratio,
+            _ => null,
+          };
+          final frame = _frameRect(size, aspectRatio);
           final quad = state.quad;
           return Stack(
             children: [
@@ -499,8 +532,8 @@ class const _CaptureModeToggle() extends StatelessWidget {
           index == 0 ? CaptureMode.auto : CaptureMode.manual,
         ),
         trackColor: context.c.surfaceContainerHigh,
-        activeColor: context.palette.paperFill,
-        activeTextColor: context.palette.paperText,
+        activeColor: context.c.inverseSurface,
+        activeTextColor: context.c.onInverseSurface,
       ),
     );
   }
@@ -545,14 +578,24 @@ class const _ShotStrip() extends StatelessWidget {
   }
 }
 
+// * previewSize is reported in sensor orientation, so the sides are ordered by the device instead
+double _previewAspectRatio(BuildContext context, CameraController camera) {
+  final size = camera.value.previewSize;
+  if (size == null) return 1;
+  return context.layout.isLandscape
+      ? size.longestSide / size.shortestSide
+      : size.shortestSide / size.longestSide;
+}
+
+// * the preview is contained in its box, so the detection frame is letterboxed the same way
 Rect? _frameRect(Size size, double? aspectRatio) {
   if (aspectRatio == null) return null;
   if (aspectRatio > size.width / size.height) {
-    final width = size.height * aspectRatio;
-    return Rect.fromLTWH((size.width - width) / 2, 0, width, size.height);
+    final height = size.width / aspectRatio;
+    return Rect.fromLTWH(0, (size.height - height) / 2, size.width, height);
   }
-  final height = size.width / aspectRatio;
-  return Rect.fromLTWH(0, (size.height - height) / 2, size.width, height);
+  final width = size.height * aspectRatio;
+  return Rect.fromLTWH((size.width - width) / 2, 0, width, size.height);
 }
 
 Offset _cornerOffset(PageCorner corner, Size size, Rect? frame, PageQuad? quad) {
@@ -606,7 +649,7 @@ class const _NoBook() extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(Spacing.s),
       decoration: BoxDecoration(
-        color: context.palette.paperFill,
+        color: context.c.inverseSurface,
         borderRadius: BorderRadius.circular(Spacing.radiusFull),
       ),
       child: Row(
@@ -614,7 +657,7 @@ class const _NoBook() extends StatelessWidget {
           Expanded(
             child: Text(
               context.s.captureNoBooksMessage,
-              style: context.t.bodyMedium?.copyWith(color: context.palette.paperText),
+              style: context.t.bodyMedium?.copyWith(color: context.c.onInverseSurface),
             ),
           ),
           const SizedBox(width: Spacing.s),
@@ -650,19 +693,20 @@ class const _Controls({
       builder: (context, state) {
         final selectedBookId = state is CaptureReady ? state.selectedBookId : null;
         final canCapture = _camera != null && selectedBookId != null;
+        final children = [
+          _GalleryButton(
+            onTap: selectedBookId == null ? null : () => _onGallery(selectedBookId),
+          ),
+          _ShutterButton(
+            enabled: canCapture,
+            onTap: canCapture ? () => _onCapture(selectedBookId) : null,
+          ),
+          _TorchButton(enabled: _camera != null, on: _torchOn, onToggle: _onToggleTorch),
+        ];
         return Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            _GalleryButton(
-              onTap: selectedBookId == null ? null : () => _onGallery(selectedBookId),
-            ),
-            _ShutterButton(
-              enabled: canCapture,
-              onTap: canCapture ? () => _onCapture(selectedBookId) : null,
-            ),
-            _TorchButton(enabled: _camera != null, on: _torchOn, onToggle: _onToggleTorch),
-          ],
+          children: children,
         );
       },
     );

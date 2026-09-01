@@ -6,13 +6,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared/presentation/extensions/app_error_extensions.dart';
 import 'package:shared/presentation/extensions/context_extensions.dart';
+import 'package:shared/presentation/extensions/screen_layout_extensions.dart';
 import 'package:shared/presentation/navigation/navigation_extensions.dart';
 import 'package:shared/presentation/widgets/book_cover.dart';
 import 'package:shared/presentation/widgets/circle_icon_button.dart';
 import 'package:shared/presentation/widgets/collapsing_header.dart';
 import 'package:shared/presentation/widgets/collection_mark.dart';
 import 'package:shared/presentation/widgets/collection_mark_picker.dart';
+import 'package:shared/presentation/widgets/columned_sliver_list.dart';
 import 'package:shared/presentation/widgets/confirm_dialog.dart';
+import 'package:shared/presentation/widgets/drag_dismiss_sheet.dart';
 import 'package:shared/presentation/widgets/ink_tap_box.dart';
 import 'package:shared/presentation/widgets/name_input_dialog.dart';
 import 'package:shared/presentation/widgets/pinned_header.dart';
@@ -23,7 +26,10 @@ import 'package:shared/presentation/widgets/sheet_content.dart';
 
 enum _ThemeMenuAction { rename, mark, delete }
 
+const _sheetCollapsedSize = 0.6;
+const _sheetExpandedSize = 0.95;
 const _markSize = 88.0;
+const _paneMarkSize = 104.0;
 const _headerHeight = 196.0;
 const _chipHeight = 32.0;
 const _chipsHeight = Spacing.m + _chipHeight + Spacing.m;
@@ -59,6 +65,21 @@ class const _Content({
   @override
   Widget build(BuildContext context) {
     final theme = _state.theme;
+    // * landscape turns the accent header into a standing pane beside the quotes
+    if (context.layout.isLandscape) {
+      return Row(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          _SidePanel(state: _state),
+          Expanded(
+            child: SafeArea(
+              left: false,
+              child: CustomScrollView(slivers: [_QuoteSlivers(state: _state)]),
+            ),
+          ),
+        ],
+      );
+    }
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -71,86 +92,204 @@ class const _Content({
                 expanded: _Header(state: _state),
                 collapsed: _CollapsedHeader(state: _state),
               ),
-              PinnedHeader(
-                height: _chipsHeight,
-                child: ColoredBox(
-                  color: context.c.surface,
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(Spacing.l, Spacing.m, Spacing.l, Spacing.m),
-                    child: Row(
-                      children: [
-                        SelectableChip(
-                          label: context.s.bookDetailAllFilter(_state.totalCount),
-                          selected: _state.filter == ThemeDetailFilter.all,
-                          selectedColor: context.c.inverseSurface,
-                          selectedTextColor: context.c.onInverseSurface,
-                          onTap: () => context.read<ThemeDetailBloc>().add(
-                            const ThemeDetailFilterChanged(ThemeDetailFilter.all),
-                          ),
-                        ),
-                        const SizedBox(width: Spacing.xs),
-                        SelectableChip(
-                          label: context.s.bookDetailFavoritesFilter,
-                          selected: _state.filter == ThemeDetailFilter.favorites,
-                          selectedColor: context.c.inverseSurface,
-                          selectedTextColor: context.c.onInverseSurface,
-                          onTap: () => context.read<ThemeDetailBloc>().add(
-                            const ThemeDetailFilterChanged(ThemeDetailFilter.favorites),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-              if (_state.quotes.isEmpty)
-                SliverFillRemaining(
-                  hasScrollBody: false,
-                  child: Padding(
-                    padding: const EdgeInsets.all(Spacing.l),
-                    child: Text(
-                      _state.totalCount == 0
-                          ? context.s.themeDetailEmpty
-                          : context.s.filterNoResultsMessage,
-                      textAlign: TextAlign.center,
-                      style: context.typography.readingBody.copyWith(
-                        color: context.c.onSurfaceVariant,
-                      ),
-                    ),
-                  ),
-                )
-              else
-                SliverPadding(
-                  padding: const EdgeInsets.fromLTRB(Spacing.l, 0, Spacing.l, Spacing.l),
-                  sliver: SliverList.separated(
-                    itemCount: _state.quotes.length,
-                    separatorBuilder: (context, index) => const SizedBox(height: Spacing.m),
-                    itemBuilder: (context, index) {
-                      final item = _state.quotes[index];
-                      final voiceNoteMs = item.quote.voiceNoteDurationMs;
-                      return QuoteCard(
-                        quote: "“${item.quote.quote}”",
-                        bookTitle: item.book.title,
-                        thumbnailUrl: item.book.thumbnailUrl,
-                        pages: item.quote.pageNumbers,
-                        note: item.quote.note,
-                        sourceLabel: item.book.title,
-                        isFavorite: item.quote.isFavorite,
-                        hasVoiceNote: item.quote.voiceNotePath != null,
-                        voiceNoteDuration: voiceNoteMs == null
-                            ? null
-                            : Duration(milliseconds: voiceNoteMs),
-                        voiceNotePath: item.quote.voiceNotePath,
-                        onTap: () => context.pushQuoteDetail(item.quote.id),
-                      );
-                    },
-                  ),
-                ),
+              _QuoteSlivers(state: _state),
             ],
           ),
         ),
-        _BottomBar(state: _state),
+        SafeArea(
+          top: false,
+          child: Padding(
+            padding: EdgeInsets.fromLTRB(
+              context.layout.pageMargin,
+              0,
+              context.layout.pageMargin,
+              Spacing.s,
+            ),
+            child: _AddQuotesButton(state: _state),
+          ),
+        ),
       ],
+    );
+  }
+}
+
+class const _QuoteSlivers({
+  required final ThemeDetailLoaded _state,
+}) extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final margin = context.layout.pageMargin;
+    return SliverMainAxisGroup(
+      slivers: [
+        PinnedHeader(
+          height: _chipsHeight,
+          child: ColoredBox(
+            color: context.c.surface,
+            child: Padding(
+              padding: EdgeInsets.fromLTRB(margin, Spacing.m, margin, Spacing.m),
+              child: Row(
+                children: [
+                  SelectableChip(
+                    label: context.s.bookDetailAllFilter(_state.totalCount),
+                    selected: _state.filter == ThemeDetailFilter.all,
+                    selectedColor: context.c.inverseSurface,
+                    selectedTextColor: context.c.onInverseSurface,
+                    onTap: () => context.read<ThemeDetailBloc>().add(
+                      const ThemeDetailFilterChanged(ThemeDetailFilter.all),
+                    ),
+                  ),
+                  const SizedBox(width: Spacing.xs),
+                  SelectableChip(
+                    label: context.s.bookDetailFavoritesFilter,
+                    selected: _state.filter == ThemeDetailFilter.favorites,
+                    selectedColor: context.c.inverseSurface,
+                    selectedTextColor: context.c.onInverseSurface,
+                    onTap: () => context.read<ThemeDetailBloc>().add(
+                      const ThemeDetailFilterChanged(ThemeDetailFilter.favorites),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+        if (_state.quotes.isEmpty)
+          SliverFillRemaining(
+            hasScrollBody: false,
+            child: Padding(
+              padding: const EdgeInsets.all(Spacing.l),
+              child: Text(
+                _state.totalCount == 0
+                    ? context.s.themeDetailEmpty
+                    : context.s.filterNoResultsMessage,
+                textAlign: TextAlign.center,
+                style: context.typography.readingBody.copyWith(color: context.c.onSurfaceVariant),
+              ),
+            ),
+          )
+        else
+          SliverPadding(
+            padding: EdgeInsets.fromLTRB(margin, 0, margin, Spacing.l),
+            sliver: ColumnedSliverList(
+              itemCount: _state.quotes.length,
+              columns: context.layout.cardColumns,
+              itemBuilder: (context, index) {
+                final item = _state.quotes[index];
+                final voiceNoteMs = item.quote.voiceNoteDurationMs;
+                return QuoteCard(
+                  quote: "“${item.quote.quote}”",
+                  bookTitle: item.book.title,
+                  thumbnailUrl: item.book.thumbnailUrl,
+                  pages: item.quote.pageNumbers,
+                  note: item.quote.note,
+                  sourceLabel: item.book.title,
+                  isFavorite: item.quote.isFavorite,
+                  hasVoiceNote: item.quote.voiceNotePath != null,
+                  voiceNoteDuration: voiceNoteMs == null
+                      ? null
+                      : Duration(milliseconds: voiceNoteMs),
+                  voiceNotePath: item.quote.voiceNotePath,
+                  onTap: () => context.pushQuoteDetail(item.quote.id),
+                );
+              },
+            ),
+          ),
+      ],
+    );
+  }
+}
+
+class const _AddQuotesButton({
+  required final ThemeDetailLoaded _state,
+}) extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return InkTapBox(
+      color: context.c.surfaceContainerHigh,
+      radius: Spacing.radiusFull,
+      padding: const EdgeInsets.symmetric(vertical: Spacing.m),
+      onTap: () => _showAddQuotes(context, _state),
+      child: Center(
+        child: Text(
+          context.s.themeDetailAddQuotes,
+          textAlign: TextAlign.center,
+          style: context.t.labelLarge?.copyWith(color: context.c.onSurfaceVariant),
+        ),
+      ),
+    );
+  }
+}
+
+class const _SidePanel({
+  required final ThemeDetailLoaded _state,
+}) extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final theme = _state.theme;
+    final swatch = context.palette.resolve(theme.accent);
+    return Container(
+      width: Spacing.detailPaneWidth,
+      color: swatch.fill,
+      child: SafeArea(
+        right: false,
+        child: Padding(
+          padding: const EdgeInsets.all(Spacing.l),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  CircleIconButton(
+                    icon: Icons.arrow_back,
+                    tooltip: context.s.back,
+                    backgroundColor: context.c.surfaceContainerLowest,
+                    onPressed: context.closeScreen,
+                  ),
+                  CircleIconButton(
+                    icon: Icons.more_horiz,
+                    backgroundColor: context.c.surfaceContainerLowest,
+                    onPressed: () => _showThemeMenu(context, _state),
+                  ),
+                ],
+              ),
+              Expanded(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.symmetric(vertical: Spacing.l),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      CollectionMark(
+                        kind: CollectionKind.theme,
+                        accent: theme.accent,
+                        symbol: theme.symbol,
+                        size: _paneMarkSize,
+                      ),
+                      const SizedBox(height: Spacing.m),
+                      Text(
+                        theme.name,
+                        maxLines: 3,
+                        overflow: TextOverflow.ellipsis,
+                        style: context.t.headlineMedium?.copyWith(color: swatch.onFill),
+                      ),
+                      const SizedBox(height: Spacing.xs),
+                      Text(
+                        context.s.themeDetailStats(
+                          _state.totalCount,
+                          _state.bookCount,
+                          _state.favoriteCount,
+                        ),
+                        style: context.typography.monoLabel.copyWith(color: swatch.onFillVariant),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              _AddQuotesButton(state: _state),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }
@@ -264,42 +403,11 @@ class const _CollapsedHeader({
   }
 }
 
-class const _BottomBar({
-  required final ThemeDetailLoaded _state,
-}) extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return SafeArea(
-      top: false,
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(Spacing.l, 0, Spacing.l, Spacing.s),
-        child: Row(
-          children: [
-            Expanded(
-              child: InkTapBox(
-                color: context.c.surfaceContainerHigh,
-                radius: Spacing.radiusFull,
-                padding: const EdgeInsets.symmetric(vertical: Spacing.m),
-                onTap: () => _showAddQuotes(context, _state),
-                child: Center(
-                  child: Text(
-                    context.s.themeDetailAddQuotes,
-                    style: context.t.labelLarge?.copyWith(color: context.c.onSurfaceVariant),
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
 Future<void> _showThemeMenu(BuildContext context, ThemeDetailLoaded state) async {
   final bloc = context.read<ThemeDetailBloc>();
   final action = await showModalBottomSheet<_ThemeMenuAction>(
     context: context,
+    isScrollControlled: true,
     useRootNavigator: true,
     builder: (_) => const _ThemeMenu(),
   );
@@ -330,8 +438,8 @@ Future<void> _showThemeMenu(BuildContext context, ThemeDetailLoaded state) async
 Future<void> _showMarkSheet(BuildContext context, ThemeDetailBloc bloc) async {
   await showModalBottomSheet<void>(
     context: context,
-    useRootNavigator: true,
     isScrollControlled: true,
+    useRootNavigator: true,
     builder: (_) => BlocProvider.value(value: bloc, child: const _MarkSheet()),
   );
 }
@@ -397,6 +505,7 @@ Future<void> _showAddQuotes(BuildContext context, ThemeDetailLoaded state) async
     isScrollControlled: true,
     useRootNavigator: true,
     backgroundColor: Colors.transparent,
+    showDragHandle: false,
     builder: (_) => BlocProvider.value(value: bloc, child: const _AddQuotesSheet()),
   );
 }
@@ -404,10 +513,9 @@ Future<void> _showAddQuotes(BuildContext context, ThemeDetailLoaded state) async
 class const _AddQuotesSheet() extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return DraggableScrollableSheet(
-      initialChildSize: 0.6,
-      minChildSize: 0.6,
-      maxChildSize: 0.95,
+    return DragDismissSheet(
+      restingSize: context.layout.sheetSize(_sheetCollapsedSize),
+      expandedSize: _sheetExpandedSize,
       builder: (context, scrollController) => DecoratedBox(
         decoration: BoxDecoration(
           color: context.c.surfaceContainerLowest,

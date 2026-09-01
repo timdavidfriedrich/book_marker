@@ -29,6 +29,14 @@ abstract final class Spacing {
   static const double iconL = 28;
   static const double iconXl = 32;
 
+  static const double tabletBreakpoint = 600;
+  static const double contentMaxWidth = 760;
+  static const double readingMaxWidth = 620;
+  static const double sideRailWidth = 96;
+  static const double detailPaneWidth = 340;
+  static const double searchFieldMaxWidth = 420;
+  static const double dialogMaxWidth = 420;
+
   static const double elevationXs = 0.5;
   static const double elevationS = 1;
   static const double elevationM = 2;

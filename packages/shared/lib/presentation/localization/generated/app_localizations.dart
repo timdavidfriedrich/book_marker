@@ -1179,29 +1179,29 @@ abstract class AppLocalizations {
   /// **'Appearance'**
   String get settingsAppearanceLabel;
 
-  /// No description provided for @settingsThemeLabel.
+  /// No description provided for @settingsColorSchemeLabel.
   ///
   /// In en, this message translates to:
-  /// **'Theme'**
-  String get settingsThemeLabel;
+  /// **'Color scheme'**
+  String get settingsColorSchemeLabel;
 
-  /// No description provided for @settingsThemeSystem.
+  /// No description provided for @settingsColorSchemeSystem.
   ///
   /// In en, this message translates to:
   /// **'System'**
-  String get settingsThemeSystem;
+  String get settingsColorSchemeSystem;
 
-  /// No description provided for @settingsThemeLight.
+  /// No description provided for @settingsColorSchemeLight.
   ///
   /// In en, this message translates to:
   /// **'Light'**
-  String get settingsThemeLight;
+  String get settingsColorSchemeLight;
 
-  /// No description provided for @settingsThemeDark.
+  /// No description provided for @settingsColorSchemeDark.
   ///
   /// In en, this message translates to:
   /// **'Dark'**
-  String get settingsThemeDark;
+  String get settingsColorSchemeDark;
 
   /// No description provided for @settingsContrastLabel.
   ///

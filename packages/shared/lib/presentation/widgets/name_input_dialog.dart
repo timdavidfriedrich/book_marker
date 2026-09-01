@@ -11,7 +11,13 @@ Future<String?> showNameInputDialog(
 }) {
   return showDialog<String>(
     context: context,
-    builder: (_) => _NameInputDialog(title: title, hint: hint, initialValue: initialValue),
+    // * a dialog stretched across a landscape viewport reads badly, so it keeps a phone measure
+    builder: (_) => Center(
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: Spacing.dialogMaxWidth),
+        child: _NameInputDialog(title: title, hint: hint, initialValue: initialValue),
+      ),
+    ),
   );
 }
 
@@ -23,8 +29,18 @@ class const _NameInputDialog({
   @override
   Widget build(BuildContext context) {
     final controller = useTextEditingController(text: _initialValue);
+    final cancel = TextButton(
+      onPressed: () => Navigator.of(context).pop(),
+      child: Text(context.s.cancel),
+    );
+    final save = FilledButton(
+      onPressed: () => Navigator.of(context).pop(controller.text),
+      child: Text(context.s.save),
+    );
     return Dialog(
-      child: Padding(
+      // * the keyboard leaves little height in landscape, so the dialog scrolls and pairs its
+      // * actions instead of stacking them
+      child: SingleChildScrollView(
         padding: const EdgeInsets.all(Spacing.l),
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -40,18 +56,19 @@ class const _NameInputDialog({
               onSubmitted: (value) => Navigator.of(context).pop(value),
             ),
             const SizedBox(height: Spacing.s),
-            Align(
-              alignment: Alignment.centerRight,
-              child: TextButton(
-                onPressed: () => Navigator.of(context).pop(),
-                child: Text(context.s.cancel),
-              ),
-            ),
-            const SizedBox(height: Spacing.xs),
-            FilledButton(
-              onPressed: () => Navigator.of(context).pop(controller.text),
-              child: Text(context.s.save),
-            ),
+            if (context.layout.isLandscape)
+              Row(
+                children: [
+                  cancel,
+                  const SizedBox(width: Spacing.s),
+                  Expanded(child: save),
+                ],
+              )
+            else ...[
+              Align(alignment: Alignment.centerRight, child: cancel),
+              const SizedBox(height: Spacing.xs),
+              save,
+            ],
           ],
         ),
       ),
