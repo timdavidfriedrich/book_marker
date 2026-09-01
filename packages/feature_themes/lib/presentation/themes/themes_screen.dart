@@ -11,7 +11,7 @@ import 'package:shared/presentation/navigation/navigation_extensions.dart';
 import 'package:shared/presentation/widgets/collection_mark.dart';
 import 'package:shared/presentation/widgets/ink_tap_box.dart';
 import 'package:shared/presentation/widgets/name_input_dialog.dart';
-import 'package:shared/presentation/widgets/profile_avatar.dart';
+import 'package:shared/presentation/widgets/tab_header.dart';
 
 const _markSize = 68.0;
 
@@ -46,35 +46,29 @@ class const _Content({
   @override
   Widget build(BuildContext context) {
     final layout = context.layout;
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: layout.pageMargin),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const SizedBox(height: Spacing.m),
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        TabHeader(title: context.s.themesTitle),
+        Expanded(
+          child: GridView.count(
+            crossAxisCount: layout.tileColumns,
+            mainAxisSpacing: Spacing.m,
+            crossAxisSpacing: Spacing.m,
+            childAspectRatio: layout.tileAspectRatio,
+            padding: EdgeInsets.fromLTRB(
+              layout.pageMargin,
+              0,
+              layout.pageMargin,
+              Spacing.xxl,
+            ),
             children: [
-              Expanded(child: Text(context.s.themesTitle, style: context.t.displaySmall)),
-              ProfileAvatar(onTap: () => context.pushSettings()),
+              for (final summary in _state.themes) _ThemeTile(summary: summary),
+              const _NewThemeTile(),
             ],
           ),
-          const SizedBox(height: Spacing.m),
-          Expanded(
-            child: GridView.count(
-              crossAxisCount: layout.tileColumns,
-              mainAxisSpacing: Spacing.m,
-              crossAxisSpacing: Spacing.m,
-              childAspectRatio: layout.tileAspectRatio,
-              padding: const EdgeInsets.only(bottom: Spacing.xxl),
-              children: [
-                for (final summary in _state.themes) _ThemeTile(summary: summary),
-                const _NewThemeTile(),
-              ],
-            ),
-          ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }

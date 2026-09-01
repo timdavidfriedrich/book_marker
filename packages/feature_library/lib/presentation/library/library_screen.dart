@@ -20,17 +20,15 @@ import 'package:shared/presentation/widgets/floating_header.dart';
 import 'package:shared/presentation/widgets/ink_tap_box.dart';
 import 'package:shared/presentation/widgets/name_input_dialog.dart';
 import 'package:shared/presentation/widgets/pinned_header.dart';
-import 'package:shared/presentation/widgets/profile_avatar.dart';
 import 'package:shared/presentation/widgets/quote_card.dart';
 import 'package:shared/presentation/widgets/section_label.dart';
 import 'package:shared/presentation/widgets/segmented_toggle.dart';
 import 'package:shared/presentation/widgets/selectable_chip.dart';
+import 'package:shared/presentation/widgets/tab_header.dart';
 
 const _searchFieldHeight = 56.0;
 const _toggleHeight = 40.0;
 const _chipHeight = 32.0;
-const _avatarHeight = 44.0;
-const _titleBarHeight = _avatarHeight + Spacing.m + Spacing.s;
 const _wideTitleBarHeight = _searchFieldHeight + Spacing.m + Spacing.s;
 const _headerHeight = _searchFieldHeight + Spacing.m + _toggleHeight + Spacing.xs;
 const _wideHeaderHeight = _toggleHeight + Spacing.xs;
@@ -77,10 +75,23 @@ class const _Loaded({
         if (layout.isWide)
           PinnedHeader(
             height: _wideTitleBarHeight,
-            child: _WideTitleBar(state: _state, controller: _controller),
+            child: TabHeader(
+              title: context.s.libraryTitle,
+              contentHeight: _searchFieldHeight,
+              center: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: Spacing.searchFieldMaxWidth),
+                child: SizedBox(
+                  height: _searchFieldHeight,
+                  child: _SearchField(controller: _controller, state: _state),
+                ),
+              ),
+            ),
           )
         else if (!_state.isSearching)
-          const PinnedHeader(height: _titleBarHeight, child: _TitleBar()),
+          PinnedHeader(
+            height: tabHeaderHeight,
+            child: TabHeader(title: context.s.libraryTitle),
+          ),
         FloatingHeader(
           height: layout.isWide ? _wideHeaderHeight : _headerHeight,
           child: _Header(state: _state, controller: _controller),
@@ -91,84 +102,6 @@ class const _Loaded({
           LibraryView.quotes => _QuotesView(state: _state),
         },
       ],
-    );
-  }
-}
-
-class const _TitleBar() extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return ColoredBox(
-      color: context.c.surface,
-      child: Padding(
-        padding: EdgeInsets.fromLTRB(
-          context.layout.pageMargin,
-          Spacing.m,
-          context.layout.pageMargin,
-          Spacing.s,
-        ),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Expanded(
-              child: Text(
-                context.s.libraryTitle,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: context.t.displaySmall,
-              ),
-            ),
-            ProfileAvatar(onTap: () => context.pushSettings()),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-// * with more width than height the title, the search and the profile share one band
-class const _WideTitleBar({
-  required final LibraryLoaded _state,
-  required final TextEditingController _controller,
-}) extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return ColoredBox(
-      color: context.c.surface,
-      child: Padding(
-        padding: EdgeInsets.fromLTRB(
-          context.layout.pageMargin,
-          Spacing.m,
-          context.layout.pageMargin,
-          Spacing.s,
-        ),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Text(
-              context.s.libraryTitle,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: context.t.displaySmall,
-            ),
-            const SizedBox(width: Spacing.l),
-            Expanded(
-              child: Align(
-                alignment: Alignment.centerRight,
-                child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: Spacing.searchFieldMaxWidth),
-                  child: SizedBox(
-                    height: _searchFieldHeight,
-                    child: _SearchField(controller: _controller, state: _state),
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(width: Spacing.m),
-            ProfileAvatar(onTap: () => context.pushSettings()),
-          ],
-        ),
-      ),
     );
   }
 }
