@@ -139,7 +139,7 @@ class const _BookSlivers({
             title: item.book.title,
             meta: context.s.libraryQuotesCount(item.quoteCount),
             count: item.quoteCount,
-            thumbnailUrl: item.book.thumbnailUrl,
+            coverImage: item.book.coverImage,
             onTap: () => context.pushBookDetail(item.book.id),
           );
         },
@@ -511,7 +511,7 @@ class const _AddBookRow({
         children: [
           BookCover(
             title: _item.book.title,
-            url: _item.book.thumbnailUrl,
+            image: _item.book.coverImage,
             width: 40,
             height: 52,
             radius: Spacing.radiusS,

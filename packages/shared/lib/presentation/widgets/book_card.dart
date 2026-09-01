@@ -12,7 +12,7 @@ class const BookCard({
   required final String _title,
   required final String _meta,
   required final int _count,
-  final String? _thumbnailUrl,
+  final String? _coverImage,
   final String? _featuredQuote,
   final List<int> _featuredPages = const [],
   final VoidCallback? _onTap,
@@ -29,7 +29,7 @@ class const BookCard({
         children: [
           Row(
             children: [
-              BookCover(title: _title, url: _thumbnailUrl, width: 56, height: 72),
+              BookCover(title: _title, image: _coverImage, width: 56, height: 72),
               const SizedBox(width: Spacing.m),
               Expanded(
                 child: Column(

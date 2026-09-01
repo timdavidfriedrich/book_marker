@@ -33,6 +33,8 @@ class Books extends Table {
 
   TextColumn get thumbnailUrl => text().nullable()();
 
+  TextColumn get coverPath => text().nullable()();
+
   TextColumn get status => text().withDefault(const Constant(_statusReading))();
 
   DateTimeColumn get createdAt => dateTime()();
@@ -142,7 +144,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(driftDatabase(name: _databaseName));
 
   @override
-  int get schemaVersion => 10;
+  int get schemaVersion => 11;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -202,6 +204,9 @@ class AppDatabase extends _$AppDatabase {
       if (from < 10) {
         await migrator.addColumn(settingsTable, settingsTable.themePreference);
         await migrator.addColumn(settingsTable, settingsTable.contrastPreference);
+      }
+      if (from < 11) {
+        await migrator.addColumn(books, books.coverPath);
       }
     },
   );

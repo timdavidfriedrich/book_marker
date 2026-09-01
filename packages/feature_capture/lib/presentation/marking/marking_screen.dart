@@ -127,7 +127,7 @@ class const _Editor({
     );
     final chooser = BookChooserBar(
       title: _state.bookTitle,
-      thumbnailUrl: _state.bookThumbnailUrl,
+      coverImage: _state.bookCoverImage,
       label: context.s.captureMarkingInto,
       onSwitch: _state.books.isEmpty ? null : () => _showBookPicker(context),
     );
@@ -514,7 +514,7 @@ class const _SaveSheet() extends HookWidget {
               final unsureCount = _uncertainSelectionCount(state);
               final chooser = BookChooserBar(
                 title: state.bookTitle,
-                thumbnailUrl: state.bookThumbnailUrl,
+                coverImage: state.bookCoverImage,
                 label: context.s.markingBookFieldLabel,
                 onSwitch: state.books.isEmpty ? null : () => _showBookPicker(context),
               );
@@ -746,7 +746,7 @@ class const _BookPickerRow({
         children: [
           BookCover(
             title: _book.title,
-            url: _book.thumbnailUrl,
+            image: _book.coverImage,
             width: _pickerCoverWidth,
             height: _pickerCoverHeight,
             radius: Spacing.radiusS,

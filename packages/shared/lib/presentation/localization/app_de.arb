@@ -209,6 +209,8 @@
   "quoteDetailAddThemeChip": "+ hinzufügen",
   "quoteDetailThemePickerTitle": "Themen",
   "settingsLicensesLabel": "Open-Source-Lizenzen",
+  "settingsDebugLabel": "Debug",
+  "settingsSeedSampleDataButton": "Beispieldaten laden",
   "captureSpreadHint": "fotografiere jede Seite, über die das Zitat läuft",
   "captureSpreadShotsHint": "tippen zum Entfernen · halten zum Sortieren",
   "captureSpreadContinueButton": "{count, plural, =1{Weiter mit 1 Seite} other{Weiter mit {count} Seiten}}",

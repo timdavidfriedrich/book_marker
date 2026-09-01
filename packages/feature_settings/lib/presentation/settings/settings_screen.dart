@@ -1,3 +1,4 @@
+import 'package:core/config/build_config.dart';
 import 'package:core/theme/spacing.dart';
 import 'package:feature_settings/presentation/settings/settings_bloc.dart';
 import 'package:feature_settings/presentation/settings/settings_event.dart';
@@ -115,6 +116,17 @@ class const _Content({
           ],
         ),
       ),
+      if (isInDebugMode) ...[
+        const SizedBox(height: Spacing.xl),
+        Text(context.s.settingsDebugLabel, style: context.t.headlineSmall),
+        const SizedBox(height: Spacing.m),
+        FilledButton(
+          onPressed: _state.hasSampleData
+              ? null
+              : () => context.read<SettingsBloc>().add(const SettingsSampleDataRequested()),
+          child: Text(context.s.settingsSeedSampleDataButton),
+        ),
+      ],
     ];
     // * a landscape viewport is too short for one settings column, so the groups sit side by side
     if (layout.isLandscape) {

@@ -1,14 +1,17 @@
+import 'dart:io';
+
 import 'package:core/theme/spacing.dart';
 import 'package:flutter/material.dart';
 import 'package:shared/presentation/extensions/context_extensions.dart';
 import 'package:shared/presentation/widgets/hatch_painter.dart';
 
+const _remoteScheme = "http";
 const _hatchOpacity = 0.35;
 const _monogramSizeRatio = 0.44;
 
 class const BookCover({
   required final String _title,
-  final String? _url,
+  final String? _image,
   final double _width = 48,
   final double _height = 64,
   final double _radius = Spacing.radiusM,
@@ -16,19 +19,24 @@ class const BookCover({
 }) extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final url = _url;
     return ClipRRect(
       borderRadius: BorderRadius.circular(_radius),
       child: SizedBox(
         width: _width,
         height: _height,
-        child: url == null
-            ? _placeholder(context)
-            : Image.network(
-                url,
-                fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) => _placeholder(context),
-              ),
+        child: switch (_image) {
+          null => _placeholder(context),
+          final image when image.startsWith(_remoteScheme) => Image.network(
+            image,
+            fit: BoxFit.cover,
+            errorBuilder: (context, error, stackTrace) => _placeholder(context),
+          ),
+          final image => Image.file(
+            File(image),
+            fit: BoxFit.cover,
+            errorBuilder: (context, error, stackTrace) => _placeholder(context),
+          ),
+        },
       ),
     );
   }

@@ -12,7 +12,10 @@ class const Book({
   required final List<String> authors,
   required final String? isbn,
   required final String? thumbnailUrl,
+  required final String? coverPath,
   required final BookStatus status,
   required final DateTime createdAt,
   required final DateTime lastUsedAt,
-}) with BookMappable;
+}) with BookMappable {
+  String? get coverImage => coverPath ?? thumbnailUrl;
+}

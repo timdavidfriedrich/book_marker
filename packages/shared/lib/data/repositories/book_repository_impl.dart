@@ -2,6 +2,7 @@ import 'package:core/error/app_error.dart';
 import 'package:core/error/app_result.dart';
 import 'package:dio/dio.dart';
 import 'package:injectable/injectable.dart';
+import 'package:shared/data/data_sources/book_cover_data_source.dart';
 import 'package:shared/data/data_sources/book_local_data_source.dart';
 import 'package:shared/data/data_sources/book_remote_data_source.dart';
 import 'package:shared/data/mappers/book_mappers.dart';
@@ -15,6 +16,7 @@ const _uuid = Uuid();
 class const BookRepositoryImpl(
   final BookLocalDataSource _localDataSource,
   final BookRemoteDataSource _remoteDataSource,
+  final BookCoverDataSource _coverDataSource,
 ) implements BookRepository {
   @override
   Stream<AppResult<List<Book>>> watchBooks() async* {
@@ -68,11 +70,47 @@ class const BookRepositoryImpl(
   @override
   Future<AppResult<()>> saveBook(Book book) async {
     try {
-      await _localDataSource.upsertBook(book.toLocalBook());
+      await _localDataSource.upsertBook((await _withCover(book)).toLocalBook());
       return const Success(());
     } on Object {
       return const Failure(UnexpectedError());
     }
+  }
+
+  @override
+  Future<AppResult<()>> cacheBookCovers() async {
+    try {
+      for (final row in await _localDataSource.readBooks()) {
+        final book = row.toBook();
+        final cached = await _withCover(book);
+        if (cached.coverPath != book.coverPath) {
+          await _localDataSource.upsertBook(cached.toLocalBook());
+        }
+      }
+      return const Success(());
+    } on Object {
+      return const Failure(UnexpectedError());
+    }
+  }
+
+  // * a cover that failed to download stays absent instead of failing the whole write
+  Future<Book> _withCover(Book book) async {
+    if (book.thumbnailUrl case final url?) {
+      if (await _hasCoverFile(book)) return book;
+      try {
+        return book.copyWith(
+          coverPath: await _coverDataSource.downloadCover(url: url, bookId: book.id),
+        );
+      } on Object {
+        return book;
+      }
+    }
+    return book;
+  }
+
+  Future<bool> _hasCoverFile(Book book) async {
+    if (book.coverPath case final path?) return _coverDataSource.hasCover(path);
+    return false;
   }
 
   @override
@@ -98,6 +136,9 @@ class const BookRepositoryImpl(
   @override
   Future<AppResult<()>> deleteBook(String id) async {
     try {
+      if (await _localDataSource.readBook(id) case final row?) {
+        if (row.coverPath case final path?) await _coverDataSource.deleteCover(path);
+      }
       await _localDataSource.deleteBook(id);
       return const Success(());
     } on Object {

@@ -17,7 +17,7 @@ const _voiceNoteIconSize = 12.0;
 class const QuoteCard({
   required final String _quote,
   required final String _bookTitle,
-  final String? _thumbnailUrl,
+  final String? _coverImage,
   final List<int> _pages = const [],
   final String? _note,
   final String? _sourceLabel,
@@ -42,7 +42,7 @@ class const QuoteCard({
             children: [
               BookCover(
                 title: _bookTitle,
-                url: _thumbnailUrl,
+                image: _coverImage,
                 width: _coverWidth,
                 height: _coverHeight,
               ),

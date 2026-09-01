@@ -9,7 +9,7 @@ const _coverHeight = 44.0;
 
 class const BookChooserBar({
   required final String _title,
-  required final String? _thumbnailUrl,
+  required final String? _coverImage,
   required final String _label,
   final VoidCallback? _onSwitch,
   super.key,
@@ -27,7 +27,7 @@ class const BookChooserBar({
         children: [
           BookCover(
             title: title,
-            url: _thumbnailUrl,
+            image: _coverImage,
             width: _coverWidth,
             height: _coverHeight,
             radius: Spacing.radiusS,

@@ -6,6 +6,7 @@ const _isbn13Type = "ISBN_13";
 const _isbn10Type = "ISBN_10";
 const _insecureScheme = "http://";
 const _secureScheme = "https://";
+const _curlParameter = "&edge=curl";
 const _statusReading = "reading";
 const _statusPaused = "paused";
 const _statusFinished = "finished";
@@ -18,6 +19,7 @@ extension LocalBookMappers on LocalBook {
       authors: authors,
       isbn: isbn,
       thumbnailUrl: thumbnailUrl,
+      coverPath: coverPath,
       status: status.toBookStatus(),
       createdAt: createdAt,
       lastUsedAt: lastUsedAt,
@@ -33,6 +35,7 @@ extension BookMappers on Book {
       authors: authors,
       isbn: isbn,
       thumbnailUrl: thumbnailUrl,
+      coverPath: coverPath,
       status: status.value,
       createdAt: createdAt,
       lastUsedAt: lastUsedAt,
@@ -49,6 +52,7 @@ extension RemoteBookMappers on RemoteBook {
       authors: info?.authors ?? const [],
       isbn: info?.industryIdentifiers.toIsbn(),
       thumbnailUrl: info?.imageLinks.toThumbnailUrl(),
+      coverPath: null,
       status: BookStatus.reading,
       createdAt: timestamp,
       lastUsedAt: timestamp,
@@ -89,6 +93,7 @@ extension _ThumbnailMappers on RemoteImageLinks? {
   String? toThumbnailUrl() {
     final links = this;
     final url = links?.thumbnail ?? links?.smallThumbnail;
-    return url?.replaceFirst(_insecureScheme, _secureScheme);
+    // * the curl parameter draws a fake page fold over the cover
+    return url?.replaceFirst(_insecureScheme, _secureScheme).replaceFirst(_curlParameter, "");
   }
 }

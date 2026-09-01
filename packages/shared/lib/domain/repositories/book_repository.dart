@@ -10,6 +10,8 @@ abstract class BookRepository {
 
   Future<AppResult<()>> saveBook(Book book);
 
+  Future<AppResult<()>> cacheBookCovers();
+
   Future<AppResult<()>> markBookUsed(String id);
 
   Future<AppResult<()>> setStatus(String id, BookStatus status);

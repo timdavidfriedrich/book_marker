@@ -25,3 +25,7 @@ class const SettingsLocaleChanged(final LocalePreference preference) extends Set
 class const SettingsThemeChanged(final ThemePreference preference) extends SettingsEvent;
 
 class const SettingsContrastChanged(final ContrastPreference preference) extends SettingsEvent;
+
+class const SettingsSampleDataUpdated(final bool hasSampleData) extends SettingsEvent;
+
+class const SettingsSampleDataRequested() extends SettingsEvent;

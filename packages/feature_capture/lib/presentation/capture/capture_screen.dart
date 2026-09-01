@@ -636,7 +636,7 @@ class const _SelectedBook({
   Widget build(BuildContext context) {
     return BookChooserBar(
       title: _book.title,
-      thumbnailUrl: _book.thumbnailUrl,
+      coverImage: _book.coverImage,
       label: context.s.captureMarkingInto,
       onSwitch: () => _addBook(context),
     );

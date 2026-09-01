@@ -148,7 +148,7 @@ class const _QuoteSlivers({
                 return QuoteCard(
                   quote: "“${quote.quote}”",
                   bookTitle: _state.book.title,
-                  thumbnailUrl: _state.book.thumbnailUrl,
+                  coverImage: _state.book.coverImage,
                   pages: quote.pageNumbers,
                   note: quote.note,
                   isFavorite: quote.isFavorite,
@@ -206,7 +206,7 @@ class const _SidePanel({
                 children: [
                   BookCover(
                     title: _book.title,
-                    url: _book.thumbnailUrl,
+                    image: _book.coverImage,
                     width: _paneCoverWidth,
                     height: _paneCoverHeight,
                     radius: Spacing.radiusL,
@@ -292,7 +292,7 @@ class const _Header({
                 children: [
                   BookCover(
                     title: _book.title,
-                    url: _book.thumbnailUrl,
+                    image: _book.coverImage,
                     width: _coverWidth,
                     height: _coverHeight,
                     radius: Spacing.radiusL,

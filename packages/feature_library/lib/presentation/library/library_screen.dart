@@ -397,7 +397,7 @@ class const _BookCards({
             title: book.title,
             meta: _bookMeta(context, summary, book.status.toSummaryLabel(context)),
             count: summary.quoteCount,
-            thumbnailUrl: book.thumbnailUrl,
+            coverImage: book.coverImage,
             featuredQuote: featured == null ? null : "“${featured.quote}”",
             featuredPages: featured?.pageNumbers ?? const [],
             onTap: () => context.pushBookDetail(book.id),
@@ -427,7 +427,7 @@ class const _QuoteCards({
           return QuoteCard(
             quote: "“${quote.quote}”",
             bookTitle: book.title,
-            thumbnailUrl: book.thumbnailUrl,
+            coverImage: book.coverImage,
             pages: pages,
             sourceLabel: pages.isEmpty
                 ? book.title
@@ -569,7 +569,7 @@ class const _ShelfCard({
                       left: index * _shelfPreviewOffset,
                       child: BookCover(
                         title: book.title,
-                        url: book.thumbnailUrl,
+                        image: book.coverImage,
                         width: 40,
                         height: 56,
                         radius: Spacing.radiusS,

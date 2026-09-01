@@ -179,7 +179,7 @@ class const _QuoteSlivers({
                 return QuoteCard(
                   quote: "“${item.quote.quote}”",
                   bookTitle: item.book.title,
-                  thumbnailUrl: item.book.thumbnailUrl,
+                  coverImage: item.book.coverImage,
                   pages: item.quote.pageNumbers,
                   note: item.quote.note,
                   sourceLabel: item.book.title,
@@ -574,7 +574,7 @@ class const _AddQuoteRow({
         children: [
           BookCover(
             title: _item.book.title,
-            url: _item.book.thumbnailUrl,
+            image: _item.book.coverImage,
             width: 40,
             height: 52,
             radius: Spacing.radiusS,

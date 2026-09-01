@@ -2,12 +2,10 @@ import 'package:book_marker/src/di/service_locator.dart';
 import 'package:book_marker/src/navigation/navigation_router.dart';
 import 'package:book_marker/src/settings/app_settings_cubit.dart';
 import 'package:book_marker/src/theme/app_theme.dart';
-import 'package:core/config/build_config.dart';
 import 'package:core/theme/theme_extensions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:shared/data/sample_data_seeder.dart';
 import 'package:shared/domain/entities/user_settings.dart';
 import 'package:shared/presentation/extensions/context_extensions.dart';
 import 'package:shared/presentation/extensions/locale_preference_extensions.dart';
@@ -17,7 +15,6 @@ import 'package:shared/presentation/localization/generated/app_localizations.dar
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await configureDependencies();
-  if (seedSampleData) await sl<SampleDataSeeder>().seedIfEmpty();
   runApp(const App());
 }
 

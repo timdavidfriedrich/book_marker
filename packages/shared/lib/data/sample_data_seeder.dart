@@ -9,9 +9,12 @@ import 'package:shared/data/database/app_database.dart';
 import 'package:shared/data/mappers/accent_mappers.dart';
 import 'package:shared/data/mappers/collection_symbol_mappers.dart';
 
-// * Dev-only: seeds example books/quotes/themes/shelves on first launch when the
-// * library is empty. To remove: delete this file, its call in main.dart, and the
-// * `seedSampleData` flag in core/config/build_config.dart.
+// * Dev-only: seeds example books/quotes/themes/shelves, triggered from the debug
+// * section of the settings screen. To remove: delete this file together with
+// * SampleDataRepository and the debug section in settings_screen.dart.
+const _coverEndpoint = "https://books.google.com/books/content?vid=ISBN";
+const _coverParameters = "&printsec=frontcover&img=1&zoom=1";
+
 @lazySingleton
 class const SampleDataSeeder(
   final BookLocalDataSource _bookLocalDataSource,
@@ -19,20 +22,18 @@ class const SampleDataSeeder(
   final ThemeLocalDataSource _themeLocalDataSource,
   final ShelfLocalDataSource _shelfLocalDataSource,
 ) {
-  Future<void> seedIfEmpty() async {
-    final existing = await _bookLocalDataSource.watchBooks().first;
-    if (existing.isNotEmpty) return;
+  Future<bool> hasSampleData() async {
+    for (final book in _sampleBooks(DateTime.now().toUtc())) {
+      if (await _bookLocalDataSource.readBook(book.id) != null) return true;
+    }
+    return false;
+  }
 
+  Future<void> seedSampleData() async {
     final now = DateTime.now().toUtc();
     DateTime at(int minutesAgo) => now.subtract(Duration(minutes: minutesAgo));
 
-    final books = [
-      _book("seed-braiding", "Braiding Sweetgrass", "Robin Wall Kimmerer", "reading", at(10)),
-      _book("seed-four-thousand", "Four Thousand Weeks", "Oliver Burkeman", "reading", at(40)),
-      _book("seed-wintering", "Wintering", "Katherine May", "paused", at(90)),
-      _book("seed-dispossessed", "The Dispossessed", "Ursula K. Le Guin", "finished", at(600)),
-    ];
-    for (final book in books) {
+    for (final book in _sampleBooks(now)) {
       await _bookLocalDataSource.upsertBook(book);
     }
 
@@ -135,11 +136,51 @@ class const SampleDataSeeder(
     }
   }
 
-  LocalBook _book(String id, String title, String author, String status, DateTime createdAt) {
+  List<LocalBook> _sampleBooks(DateTime now) {
+    DateTime at(int minutesAgo) => now.subtract(Duration(minutes: minutesAgo));
+    return [
+      _book(
+        "seed-braiding",
+        "Braiding Sweetgrass",
+        "Robin Wall Kimmerer",
+        "9781571313560",
+        "reading",
+        at(10),
+      ),
+      _book(
+        "seed-four-thousand",
+        "Four Thousand Weeks",
+        "Oliver Burkeman",
+        "9780374159122",
+        "reading",
+        at(40),
+      ),
+      _book("seed-wintering", "Wintering", "Katherine May", "9780593189481", "paused", at(90)),
+      _book(
+        "seed-dispossessed",
+        "The Dispossessed",
+        "Ursula K. Le Guin",
+        "9780061054884",
+        "finished",
+        at(600),
+      ),
+    ];
+  }
+
+  LocalBook _book(
+    String id,
+    String title,
+    String author,
+    String isbn,
+    String status,
+    DateTime createdAt,
+  ) {
     return LocalBook(
       id: id,
       title: title,
       authors: [author],
+      isbn: isbn,
+      thumbnailUrl: "$_coverEndpoint$isbn$_coverParameters",
       status: status,
       createdAt: createdAt,
       lastUsedAt: createdAt,

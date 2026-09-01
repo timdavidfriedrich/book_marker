@@ -65,6 +65,7 @@ class LibraryBloc extends Bloc<LibraryEvent, LibraryState> {
     _shelfMembershipSubscription = _shelfRepository.watchShelfMembership().listen(
       (result) => add(LibraryShelfMembershipUpdated(result)),
     );
+    unawaited(_bookRepository.cacheBookCovers());
   }
 
   void _onShelvesUpdated(LibraryShelvesUpdated event, Emitter<LibraryState> emit) {

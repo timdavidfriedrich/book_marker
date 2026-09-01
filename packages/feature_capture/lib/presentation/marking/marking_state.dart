@@ -16,7 +16,7 @@ class const MarkingReady({
   required final String bookId,
   required final List<Book> books,
   required final String bookTitle,
-  required final String? bookThumbnailUrl,
+  required final String? bookCoverImage,
   required final List<String> bookAuthors,
   required final Set<int> selectedWordIndexes,
   required final String? quoteOverride,

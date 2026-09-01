@@ -55,6 +55,17 @@ class $BooksTable extends Books with TableInfo<$BooksTable, LocalBook> {
     type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _coverPathMeta = const VerificationMeta(
+    'coverPath',
+  );
+  @override
+  late final GeneratedColumn<String> coverPath = GeneratedColumn<String>(
+    'cover_path',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
   static const VerificationMeta _statusMeta = const VerificationMeta('status');
   @override
   late final GeneratedColumn<String> status = GeneratedColumn<String>(
@@ -94,6 +105,7 @@ class $BooksTable extends Books with TableInfo<$BooksTable, LocalBook> {
     authors,
     isbn,
     thumbnailUrl,
+    coverPath,
     status,
     createdAt,
     lastUsedAt,
@@ -136,6 +148,12 @@ class $BooksTable extends Books with TableInfo<$BooksTable, LocalBook> {
           data['thumbnail_url']!,
           _thumbnailUrlMeta,
         ),
+      );
+    }
+    if (data.containsKey('cover_path')) {
+      context.handle(
+        _coverPathMeta,
+        coverPath.isAcceptableOrUnknown(data['cover_path']!, _coverPathMeta),
       );
     }
     if (data.containsKey('status')) {
@@ -194,6 +212,10 @@ class $BooksTable extends Books with TableInfo<$BooksTable, LocalBook> {
         DriftSqlType.string,
         data['${effectivePrefix}thumbnail_url'],
       ),
+      coverPath: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}cover_path'],
+      ),
       status: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}status'],
@@ -224,6 +246,7 @@ class LocalBook extends DataClass implements Insertable<LocalBook> {
   final List<String> authors;
   final String? isbn;
   final String? thumbnailUrl;
+  final String? coverPath;
   final String status;
   final DateTime createdAt;
   final DateTime lastUsedAt;
@@ -233,6 +256,7 @@ class LocalBook extends DataClass implements Insertable<LocalBook> {
     required this.authors,
     this.isbn,
     this.thumbnailUrl,
+    this.coverPath,
     required this.status,
     required this.createdAt,
     required this.lastUsedAt,
@@ -253,6 +277,9 @@ class LocalBook extends DataClass implements Insertable<LocalBook> {
     if (!nullToAbsent || thumbnailUrl != null) {
       map['thumbnail_url'] = Variable<String>(thumbnailUrl);
     }
+    if (!nullToAbsent || coverPath != null) {
+      map['cover_path'] = Variable<String>(coverPath);
+    }
     map['status'] = Variable<String>(status);
     map['created_at'] = Variable<DateTime>(createdAt);
     map['last_used_at'] = Variable<DateTime>(lastUsedAt);
@@ -268,6 +295,9 @@ class LocalBook extends DataClass implements Insertable<LocalBook> {
       thumbnailUrl: thumbnailUrl == null && nullToAbsent
           ? const Value.absent()
           : Value(thumbnailUrl),
+      coverPath: coverPath == null && nullToAbsent
+          ? const Value.absent()
+          : Value(coverPath),
       status: Value(status),
       createdAt: Value(createdAt),
       lastUsedAt: Value(lastUsedAt),
@@ -285,6 +315,7 @@ class LocalBook extends DataClass implements Insertable<LocalBook> {
       authors: serializer.fromJson<List<String>>(json['authors']),
       isbn: serializer.fromJson<String?>(json['isbn']),
       thumbnailUrl: serializer.fromJson<String?>(json['thumbnailUrl']),
+      coverPath: serializer.fromJson<String?>(json['coverPath']),
       status: serializer.fromJson<String>(json['status']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
       lastUsedAt: serializer.fromJson<DateTime>(json['lastUsedAt']),
@@ -299,6 +330,7 @@ class LocalBook extends DataClass implements Insertable<LocalBook> {
       'authors': serializer.toJson<List<String>>(authors),
       'isbn': serializer.toJson<String?>(isbn),
       'thumbnailUrl': serializer.toJson<String?>(thumbnailUrl),
+      'coverPath': serializer.toJson<String?>(coverPath),
       'status': serializer.toJson<String>(status),
       'createdAt': serializer.toJson<DateTime>(createdAt),
       'lastUsedAt': serializer.toJson<DateTime>(lastUsedAt),
@@ -311,6 +343,7 @@ class LocalBook extends DataClass implements Insertable<LocalBook> {
     List<String>? authors,
     Value<String?> isbn = const Value.absent(),
     Value<String?> thumbnailUrl = const Value.absent(),
+    Value<String?> coverPath = const Value.absent(),
     String? status,
     DateTime? createdAt,
     DateTime? lastUsedAt,
@@ -320,6 +353,7 @@ class LocalBook extends DataClass implements Insertable<LocalBook> {
     authors: authors ?? this.authors,
     isbn: isbn.present ? isbn.value : this.isbn,
     thumbnailUrl: thumbnailUrl.present ? thumbnailUrl.value : this.thumbnailUrl,
+    coverPath: coverPath.present ? coverPath.value : this.coverPath,
     status: status ?? this.status,
     createdAt: createdAt ?? this.createdAt,
     lastUsedAt: lastUsedAt ?? this.lastUsedAt,
@@ -333,6 +367,7 @@ class LocalBook extends DataClass implements Insertable<LocalBook> {
       thumbnailUrl: data.thumbnailUrl.present
           ? data.thumbnailUrl.value
           : this.thumbnailUrl,
+      coverPath: data.coverPath.present ? data.coverPath.value : this.coverPath,
       status: data.status.present ? data.status.value : this.status,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
       lastUsedAt: data.lastUsedAt.present
@@ -349,6 +384,7 @@ class LocalBook extends DataClass implements Insertable<LocalBook> {
           ..write('authors: $authors, ')
           ..write('isbn: $isbn, ')
           ..write('thumbnailUrl: $thumbnailUrl, ')
+          ..write('coverPath: $coverPath, ')
           ..write('status: $status, ')
           ..write('createdAt: $createdAt, ')
           ..write('lastUsedAt: $lastUsedAt')
@@ -363,6 +399,7 @@ class LocalBook extends DataClass implements Insertable<LocalBook> {
     authors,
     isbn,
     thumbnailUrl,
+    coverPath,
     status,
     createdAt,
     lastUsedAt,
@@ -376,6 +413,7 @@ class LocalBook extends DataClass implements Insertable<LocalBook> {
           other.authors == this.authors &&
           other.isbn == this.isbn &&
           other.thumbnailUrl == this.thumbnailUrl &&
+          other.coverPath == this.coverPath &&
           other.status == this.status &&
           other.createdAt == this.createdAt &&
           other.lastUsedAt == this.lastUsedAt);
@@ -387,6 +425,7 @@ class BooksCompanion extends UpdateCompanion<LocalBook> {
   final Value<List<String>> authors;
   final Value<String?> isbn;
   final Value<String?> thumbnailUrl;
+  final Value<String?> coverPath;
   final Value<String> status;
   final Value<DateTime> createdAt;
   final Value<DateTime> lastUsedAt;
@@ -397,6 +436,7 @@ class BooksCompanion extends UpdateCompanion<LocalBook> {
     this.authors = const Value.absent(),
     this.isbn = const Value.absent(),
     this.thumbnailUrl = const Value.absent(),
+    this.coverPath = const Value.absent(),
     this.status = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.lastUsedAt = const Value.absent(),
@@ -408,6 +448,7 @@ class BooksCompanion extends UpdateCompanion<LocalBook> {
     required List<String> authors,
     this.isbn = const Value.absent(),
     this.thumbnailUrl = const Value.absent(),
+    this.coverPath = const Value.absent(),
     this.status = const Value.absent(),
     required DateTime createdAt,
     required DateTime lastUsedAt,
@@ -423,6 +464,7 @@ class BooksCompanion extends UpdateCompanion<LocalBook> {
     Expression<String>? authors,
     Expression<String>? isbn,
     Expression<String>? thumbnailUrl,
+    Expression<String>? coverPath,
     Expression<String>? status,
     Expression<DateTime>? createdAt,
     Expression<DateTime>? lastUsedAt,
@@ -434,6 +476,7 @@ class BooksCompanion extends UpdateCompanion<LocalBook> {
       if (authors != null) 'authors': authors,
       if (isbn != null) 'isbn': isbn,
       if (thumbnailUrl != null) 'thumbnail_url': thumbnailUrl,
+      if (coverPath != null) 'cover_path': coverPath,
       if (status != null) 'status': status,
       if (createdAt != null) 'created_at': createdAt,
       if (lastUsedAt != null) 'last_used_at': lastUsedAt,
@@ -447,6 +490,7 @@ class BooksCompanion extends UpdateCompanion<LocalBook> {
     Value<List<String>>? authors,
     Value<String?>? isbn,
     Value<String?>? thumbnailUrl,
+    Value<String?>? coverPath,
     Value<String>? status,
     Value<DateTime>? createdAt,
     Value<DateTime>? lastUsedAt,
@@ -458,6 +502,7 @@ class BooksCompanion extends UpdateCompanion<LocalBook> {
       authors: authors ?? this.authors,
       isbn: isbn ?? this.isbn,
       thumbnailUrl: thumbnailUrl ?? this.thumbnailUrl,
+      coverPath: coverPath ?? this.coverPath,
       status: status ?? this.status,
       createdAt: createdAt ?? this.createdAt,
       lastUsedAt: lastUsedAt ?? this.lastUsedAt,
@@ -485,6 +530,9 @@ class BooksCompanion extends UpdateCompanion<LocalBook> {
     if (thumbnailUrl.present) {
       map['thumbnail_url'] = Variable<String>(thumbnailUrl.value);
     }
+    if (coverPath.present) {
+      map['cover_path'] = Variable<String>(coverPath.value);
+    }
     if (status.present) {
       map['status'] = Variable<String>(status.value);
     }
@@ -508,6 +556,7 @@ class BooksCompanion extends UpdateCompanion<LocalBook> {
           ..write('authors: $authors, ')
           ..write('isbn: $isbn, ')
           ..write('thumbnailUrl: $thumbnailUrl, ')
+          ..write('coverPath: $coverPath, ')
           ..write('status: $status, ')
           ..write('createdAt: $createdAt, ')
           ..write('lastUsedAt: $lastUsedAt, ')
@@ -2745,6 +2794,7 @@ typedef $$BooksTableCreateCompanionBuilder = BooksCompanion Function({
   required List<String> authors,
   Value<String?> isbn,
   Value<String?> thumbnailUrl,
+  Value<String?> coverPath,
   Value<String> status,
   required DateTime createdAt,
   required DateTime lastUsedAt,
@@ -2756,6 +2806,7 @@ typedef $$BooksTableUpdateCompanionBuilder = BooksCompanion Function({
   Value<List<String>> authors,
   Value<String?> isbn,
   Value<String?> thumbnailUrl,
+  Value<String?> coverPath,
   Value<String> status,
   Value<DateTime> createdAt,
   Value<DateTime> lastUsedAt,
@@ -2835,6 +2886,11 @@ class $$BooksTableFilterComposer extends Composer<_$AppDatabase, $BooksTable> {
 
   ColumnFilters<String> get thumbnailUrl => $composableBuilder(
     column: $table.thumbnailUrl,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get coverPath => $composableBuilder(
+    column: $table.coverPath,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -2938,6 +2994,11 @@ class $$BooksTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get coverPath => $composableBuilder(
+    column: $table.coverPath,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<String> get status => $composableBuilder(
     column: $table.status,
     builder: (column) => ColumnOrderings(column),
@@ -2979,6 +3040,9 @@ class $$BooksTableAnnotationComposer
     column: $table.thumbnailUrl,
     builder: (column) => column,
   );
+
+  GeneratedColumn<String> get coverPath =>
+      $composableBuilder(column: $table.coverPath, builder: (column) => column);
 
   GeneratedColumn<String> get status =>
       $composableBuilder(column: $table.status, builder: (column) => column);
@@ -3075,6 +3139,7 @@ class $$BooksTableTableManager
                 Value<List<String>> authors = const Value.absent(),
                 Value<String?> isbn = const Value.absent(),
                 Value<String?> thumbnailUrl = const Value.absent(),
+                Value<String?> coverPath = const Value.absent(),
                 Value<String> status = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<DateTime> lastUsedAt = const Value.absent(),
@@ -3085,6 +3150,7 @@ class $$BooksTableTableManager
                 authors: authors,
                 isbn: isbn,
                 thumbnailUrl: thumbnailUrl,
+                coverPath: coverPath,
                 status: status,
                 createdAt: createdAt,
                 lastUsedAt: lastUsedAt,
@@ -3097,6 +3163,7 @@ class $$BooksTableTableManager
                 required List<String> authors,
                 Value<String?> isbn = const Value.absent(),
                 Value<String?> thumbnailUrl = const Value.absent(),
+                Value<String?> coverPath = const Value.absent(),
                 Value<String> status = const Value.absent(),
                 required DateTime createdAt,
                 required DateTime lastUsedAt,
@@ -3107,6 +3174,7 @@ class $$BooksTableTableManager
                 authors: authors,
                 isbn: isbn,
                 thumbnailUrl: thumbnailUrl,
+                coverPath: coverPath,
                 status: status,
                 createdAt: createdAt,
                 lastUsedAt: lastUsedAt,

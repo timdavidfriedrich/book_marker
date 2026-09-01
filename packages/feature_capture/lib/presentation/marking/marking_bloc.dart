@@ -72,11 +72,11 @@ class MarkingBloc extends Bloc<MarkingEvent, MarkingState> {
       (result) => add(MarkingBooksUpdated(result)),
     );
     var bookTitle = "";
-    String? bookThumbnailUrl;
+    String? bookCoverImage;
     var bookAuthors = const <String>[];
     if (await _bookRepository.getBook(_bookId) case Success(:final data)) {
       bookTitle = data.title;
-      bookThumbnailUrl = data.thumbnailUrl;
+      bookCoverImage = data.coverImage;
       bookAuthors = data.authors;
     }
     emit(switch (await _recognizeCapturedSpreadUseCase(_arguments.shots)) {
@@ -86,7 +86,7 @@ class MarkingBloc extends Bloc<MarkingEvent, MarkingState> {
         bookId: _bookId,
         books: _books,
         bookTitle: bookTitle,
-        bookThumbnailUrl: bookThumbnailUrl,
+        bookCoverImage: bookCoverImage,
         bookAuthors: bookAuthors,
         selectedWordIndexes: const {},
         quoteOverride: null,
@@ -335,7 +335,7 @@ class MarkingBloc extends Bloc<MarkingEvent, MarkingState> {
       bookId: _bookId,
       books: _books,
       bookTitle: book?.title ?? current.bookTitle,
-      bookThumbnailUrl: book == null ? current.bookThumbnailUrl : book.thumbnailUrl,
+      bookCoverImage: book == null ? current.bookCoverImage : book.coverImage,
       bookAuthors: book?.authors ?? current.bookAuthors,
       selectedWordIndexes: selectedWordIndexes ?? current.selectedWordIndexes,
       quoteOverride: keepQuote ? current.quoteOverride : quoteOverride,

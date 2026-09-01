@@ -5,6 +5,8 @@ import 'package:shared/data/database/app_database.dart';
 abstract class BookLocalDataSource {
   Stream<List<LocalBook>> watchBooks();
 
+  Future<List<LocalBook>> readBooks();
+
   Future<LocalBook?> readBook(String id);
 
   Future<void> upsertBook(LocalBook book);
@@ -26,6 +28,9 @@ class const BookLocalDataSourceImpl(
       ..orderBy([(table) => OrderingTerm.desc(table.lastUsedAt)]);
     return query.watch();
   }
+
+  @override
+  Future<List<LocalBook>> readBooks() => _database.select(_database.books).get();
 
   @override
   Future<LocalBook?> readBook(String id) {

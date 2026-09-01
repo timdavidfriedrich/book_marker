@@ -849,6 +849,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsLicensesLabel => 'Open-source licenses';
 
   @override
+  String get settingsDebugLabel => 'Debug';
+
+  @override
+  String get settingsSeedSampleDataButton => 'Load sample data';
+
+  @override
   String get captureSpreadHint => 'photograph every page the quote runs across';
 
   @override

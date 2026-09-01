@@ -10,6 +10,8 @@ import 'package:feature_settings/presentation/settings/settings_bloc.dart'
 import 'package:injectable/injectable.dart' as _i526;
 import 'package:shared/domain/repositories/book_repository.dart' as _i748;
 import 'package:shared/domain/repositories/quote_repository.dart' as _i570;
+import 'package:shared/domain/repositories/sample_data_repository.dart'
+    as _i124;
 import 'package:shared/domain/repositories/settings_repository.dart' as _i0;
 import 'package:shared/domain/repositories/theme_repository.dart' as _i640;
 
@@ -22,6 +24,7 @@ class FeatureSettingsPackageModule extends _i526.MicroPackageModule {
           gh<_i748.BookRepository>(),
           gh<_i570.QuoteRepository>(),
           gh<_i640.ThemeRepository>(),
+          gh<_i124.SampleDataRepository>(),
         ));
   }
 }

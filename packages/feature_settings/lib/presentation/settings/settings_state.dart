@@ -14,4 +14,5 @@ class const SettingsLoaded({
   required final int bookCount,
   required final int quoteCount,
   required final int themeCount,
+  required final bool hasSampleData,
 }) extends SettingsState;

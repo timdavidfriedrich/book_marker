@@ -89,6 +89,11 @@ class BookMapper extends ClassMapperBase<Book> {
     'thumbnailUrl',
     _$thumbnailUrl,
   );
+  static String? _$coverPath(Book v) => v.coverPath;
+  static const Field<Book, String> _f$coverPath = Field(
+    'coverPath',
+    _$coverPath,
+  );
   static BookStatus _$status(Book v) => v.status;
   static const Field<Book, BookStatus> _f$status = Field('status', _$status);
   static DateTime _$createdAt(Book v) => v.createdAt;
@@ -109,6 +114,7 @@ class BookMapper extends ClassMapperBase<Book> {
     #authors: _f$authors,
     #isbn: _f$isbn,
     #thumbnailUrl: _f$thumbnailUrl,
+    #coverPath: _f$coverPath,
     #status: _f$status,
     #createdAt: _f$createdAt,
     #lastUsedAt: _f$lastUsedAt,
@@ -121,6 +127,7 @@ class BookMapper extends ClassMapperBase<Book> {
       authors: data.dec(_f$authors),
       isbn: data.dec(_f$isbn),
       thumbnailUrl: data.dec(_f$thumbnailUrl),
+      coverPath: data.dec(_f$coverPath),
       status: data.dec(_f$status),
       createdAt: data.dec(_f$createdAt),
       lastUsedAt: data.dec(_f$lastUsedAt),
@@ -180,6 +187,7 @@ abstract class BookCopyWith<$R, $In extends Book, $Out>
     List<String>? authors,
     String? isbn,
     String? thumbnailUrl,
+    String? coverPath,
     BookStatus? status,
     DateTime? createdAt,
     DateTime? lastUsedAt,
@@ -207,6 +215,7 @@ class _BookCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, Book, $Out>
     List<String>? authors,
     Object? isbn = $none,
     Object? thumbnailUrl = $none,
+    Object? coverPath = $none,
     BookStatus? status,
     DateTime? createdAt,
     DateTime? lastUsedAt,
@@ -217,6 +226,7 @@ class _BookCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, Book, $Out>
       if (authors != null) #authors: authors,
       if (isbn != $none) #isbn: isbn,
       if (thumbnailUrl != $none) #thumbnailUrl: thumbnailUrl,
+      if (coverPath != $none) #coverPath: coverPath,
       if (status != null) #status: status,
       if (createdAt != null) #createdAt: createdAt,
       if (lastUsedAt != null) #lastUsedAt: lastUsedAt,
@@ -229,6 +239,7 @@ class _BookCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, Book, $Out>
     authors: data.get(#authors, or: $value.authors),
     isbn: data.get(#isbn, or: $value.isbn),
     thumbnailUrl: data.get(#thumbnailUrl, or: $value.thumbnailUrl),
+    coverPath: data.get(#coverPath, or: $value.coverPath),
     status: data.get(#status, or: $value.status),
     createdAt: data.get(#createdAt, or: $value.createdAt),
     lastUsedAt: data.get(#lastUsedAt, or: $value.lastUsedAt),

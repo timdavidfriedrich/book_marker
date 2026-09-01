@@ -238,6 +238,8 @@
   "quoteDetailAddThemeChip": "+ add",
   "quoteDetailThemePickerTitle": "Themes",
   "settingsLicensesLabel": "Open-source licenses",
+  "settingsDebugLabel": "Debug",
+  "settingsSeedSampleDataButton": "Load sample data",
   "captureSpreadHint": "photograph every page the quote runs across",
   "captureSpreadShotsHint": "tap to remove · hold to reorder",
   "captureSpreadContinueButton": "{count, plural, =1{Continue with 1 page} other{Continue with {count} pages}}",

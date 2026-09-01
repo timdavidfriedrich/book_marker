@@ -1305,6 +1305,18 @@ abstract class AppLocalizations {
   /// **'Open-source licenses'**
   String get settingsLicensesLabel;
 
+  /// No description provided for @settingsDebugLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Debug'**
+  String get settingsDebugLabel;
+
+  /// No description provided for @settingsSeedSampleDataButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Load sample data'**
+  String get settingsSeedSampleDataButton;
+
   /// No description provided for @captureSpreadHint.
   ///
   /// In en, this message translates to:

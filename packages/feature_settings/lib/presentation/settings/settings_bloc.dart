@@ -11,6 +11,7 @@ import 'package:shared/domain/entities/quote_theme.dart';
 import 'package:shared/domain/entities/user_settings.dart';
 import 'package:shared/domain/repositories/book_repository.dart';
 import 'package:shared/domain/repositories/quote_repository.dart';
+import 'package:shared/domain/repositories/sample_data_repository.dart';
 import 'package:shared/domain/repositories/settings_repository.dart';
 import 'package:shared/domain/repositories/theme_repository.dart';
 
@@ -21,6 +22,7 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
     this._bookRepository,
     this._quoteRepository,
     this._themeRepository,
+    this._sampleDataRepository,
   ) : super(const SettingsLoading()) {
     on<SettingsStarted>(_onStarted);
     on<SettingsSettingsUpdated>(_onSettingsUpdated);
@@ -31,12 +33,15 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
     on<SettingsLocaleChanged>(_onLocaleChanged);
     on<SettingsThemeChanged>(_onThemeChanged);
     on<SettingsContrastChanged>(_onContrastChanged);
+    on<SettingsSampleDataUpdated>(_onSampleDataUpdated);
+    on<SettingsSampleDataRequested>(_onSampleDataRequested);
   }
 
   final SettingsRepository _settingsRepository;
   final BookRepository _bookRepository;
   final QuoteRepository _quoteRepository;
   final ThemeRepository _themeRepository;
+  final SampleDataRepository _sampleDataRepository;
   StreamSubscription<AppResult<UserSettings>>? _settingsSubscription;
   StreamSubscription<AppResult<List<Book>>>? _bookSubscription;
   StreamSubscription<AppResult<List<Quote>>>? _quoteSubscription;
@@ -45,6 +50,7 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
   int _bookCount = 0;
   int _quoteCount = 0;
   int _themeCount = 0;
+  bool _hasSampleData = false;
 
   Future<void> _onStarted(SettingsStarted event, Emitter<SettingsState> emit) async {
     await _settingsSubscription?.cancel();
@@ -63,6 +69,27 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
     _themeSubscription = _themeRepository.watchThemes().listen(
       (result) => add(SettingsThemesUpdated(result)),
     );
+    unawaited(_refreshSampleData());
+  }
+
+  void _onSampleDataUpdated(SettingsSampleDataUpdated event, Emitter<SettingsState> emit) {
+    _hasSampleData = event.hasSampleData;
+    _emitState(emit);
+  }
+
+  Future<void> _onSampleDataRequested(
+    SettingsSampleDataRequested event,
+    Emitter<SettingsState> emit,
+  ) async {
+    if (_hasSampleData) return;
+    await _sampleDataRepository.seedSampleData();
+    await _refreshSampleData();
+  }
+
+  Future<void> _refreshSampleData() async {
+    if (await _sampleDataRepository.hasSampleData() case Success(:final data)) {
+      add(SettingsSampleDataUpdated(data));
+    }
   }
 
   void _onSettingsUpdated(SettingsSettingsUpdated event, Emitter<SettingsState> emit) {
@@ -123,6 +150,7 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
         bookCount: _bookCount,
         quoteCount: _quoteCount,
         themeCount: _themeCount,
+        hasSampleData: _hasSampleData,
       ),
     );
   }

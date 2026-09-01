@@ -211,7 +211,7 @@ class const _OwnedTile({
         children: [
           BookCover(
             title: _book.title,
-            url: _book.thumbnailUrl,
+            image: _book.coverImage,
             width: 44,
             height: 56,
             radius: Spacing.radiusS,
@@ -292,7 +292,7 @@ class const _CatalogueTile({
         children: [
           BookCover(
             title: _book.title,
-            url: _book.thumbnailUrl,
+            image: _book.coverImage,
             width: 44,
             height: 56,
             radius: Spacing.radiusS,
