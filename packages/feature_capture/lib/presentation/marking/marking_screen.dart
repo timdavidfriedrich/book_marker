@@ -296,7 +296,10 @@ class const _ReadingText({
     }, [words]);
 
     final textSpan = useMemoized(
-      () => TextSpan(children: layout.spans, style: context.typography.readingBody),
+      () => TextSpan(
+        children: layout.spans,
+        style: context.typography.readingBody.copyWith(color: context.palette.paperText),
+      ),
       [layout],
     );
 
@@ -554,7 +557,9 @@ class const _SaveSheet() extends HookWidget {
                       controller: quoteController,
                       minLines: 1,
                       maxLines: 5,
-                      style: context.typography.readingQuoteItalic,
+                      style: context.typography.readingQuoteItalic.copyWith(
+                        color: context.c.onPrimaryContainer,
+                      ),
                       onChanged: (value) =>
                           context.read<MarkingBloc>().add(MarkingQuoteEdited(value)),
                       decoration: const InputDecoration(

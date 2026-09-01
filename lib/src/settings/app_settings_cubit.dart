@@ -8,10 +8,7 @@ import 'package:shared/domain/repositories/settings_repository.dart';
 
 @injectable
 class AppSettingsCubit extends Cubit<UserSettings> {
-  AppSettingsCubit(this._settingsRepository)
-    : super(
-        const UserSettings(displayName: null, localePreference: LocalePreference.system),
-      );
+  AppSettingsCubit(this._settingsRepository) : super(defaultUserSettings);
 
   final SettingsRepository _settingsRepository;
   StreamSubscription<AppResult<UserSettings>>? _subscription;

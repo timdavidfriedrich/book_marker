@@ -6,11 +6,6 @@ import 'package:shared/data/mappers/user_settings_mappers.dart';
 import 'package:shared/domain/entities/user_settings.dart';
 import 'package:shared/domain/repositories/settings_repository.dart';
 
-const _defaultSettings = UserSettings(
-  displayName: null,
-  localePreference: LocalePreference.system,
-);
-
 @Injectable(as: SettingsRepository)
 class const SettingsRepositoryImpl(
   final SettingsLocalDataSource _localDataSource,
@@ -19,7 +14,7 @@ class const SettingsRepositoryImpl(
   Stream<AppResult<UserSettings>> watchSettings() async* {
     try {
       yield* _localDataSource.watchSettings().map<AppResult<UserSettings>>(
-        (row) => Success(row?.toUserSettings() ?? _defaultSettings),
+        (row) => Success(row?.toUserSettings() ?? defaultUserSettings),
       );
     } on Object {
       yield const Failure(UnexpectedError());
@@ -27,39 +22,29 @@ class const SettingsRepositoryImpl(
   }
 
   @override
-  Future<AppResult<()>> setDisplayName(String? name) async {
-    try {
-      final current = await _currentSettings();
-      await _localDataSource.upsertSettings(
-        UserSettings(
-          displayName: name,
-          localePreference: current.localePreference,
-        ).toLocalSettings(),
-      );
-      return const Success(());
-    } on Object {
-      return const Failure(UnexpectedError());
-    }
-  }
+  Future<AppResult<()>> setDisplayName(String? name) =>
+      _update((current) => current.copyWith(displayName: name));
 
   @override
-  Future<AppResult<()>> setLocalePreference(LocalePreference preference) async {
+  Future<AppResult<()>> setLocalePreference(LocalePreference preference) =>
+      _update((current) => current.copyWith(localePreference: preference));
+
+  @override
+  Future<AppResult<()>> setThemePreference(ThemePreference preference) =>
+      _update((current) => current.copyWith(themePreference: preference));
+
+  @override
+  Future<AppResult<()>> setContrastPreference(ContrastPreference preference) =>
+      _update((current) => current.copyWith(contrastPreference: preference));
+
+  Future<AppResult<()>> _update(UserSettings Function(UserSettings current) change) async {
     try {
-      final current = await _currentSettings();
-      await _localDataSource.upsertSettings(
-        UserSettings(
-          displayName: current.displayName,
-          localePreference: preference,
-        ).toLocalSettings(),
-      );
+      final row = await _localDataSource.readSettings();
+      final current = row?.toUserSettings() ?? defaultUserSettings;
+      await _localDataSource.upsertSettings(change(current).toLocalSettings());
       return const Success(());
     } on Object {
       return const Failure(UnexpectedError());
     }
-  }
-
-  Future<UserSettings> _currentSettings() async {
-    final row = await _localDataSource.readSettings();
-    return row?.toUserSettings() ?? _defaultSettings;
   }
 }

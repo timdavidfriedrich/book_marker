@@ -1,7 +1,11 @@
 import 'package:core/theme/accent_color.dart';
+import 'package:core/theme/contrast_level.dart';
 import 'package:flutter/material.dart';
 
 export 'package:core/theme/accent_color.dart';
+export 'package:core/theme/contrast_level.dart';
+
+const _lerpMidpoint = 0.5;
 
 class const AccentSwatch({
   required final Color fill,
@@ -117,4 +121,14 @@ class const StatusColors({
     if (other == null) return this;
     return StatusColors(uncertain: uncertain.lerp(other.uncertain, t));
   }
+}
+
+class const AppContrast({
+  required final ContrastLevel level,
+}) extends ThemeExtension<AppContrast> {
+  @override
+  AppContrast copyWith({ContrastLevel? level}) => AppContrast(level: level ?? this.level);
+
+  @override
+  AppContrast lerp(AppContrast? other, double t) => t < _lerpMidpoint ? this : (other ?? this);
 }

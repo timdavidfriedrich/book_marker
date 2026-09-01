@@ -7,4 +7,8 @@ abstract class SettingsRepository {
   Future<AppResult<()>> setDisplayName(String? name);
 
   Future<AppResult<()>> setLocalePreference(LocalePreference preference);
+
+  Future<AppResult<()>> setThemePreference(ThemePreference preference);
+
+  Future<AppResult<()>> setContrastPreference(ContrastPreference preference);
 }

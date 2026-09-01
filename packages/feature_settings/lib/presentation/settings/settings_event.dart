@@ -21,3 +21,7 @@ class const SettingsThemesUpdated(final AppResult<List<QuoteTheme>> result) exte
 class const SettingsNameChanged(final String? name) extends SettingsEvent;
 
 class const SettingsLocaleChanged(final LocalePreference preference) extends SettingsEvent;
+
+class const SettingsThemeChanged(final ThemePreference preference) extends SettingsEvent;
+
+class const SettingsContrastChanged(final ContrastPreference preference) extends SettingsEvent;

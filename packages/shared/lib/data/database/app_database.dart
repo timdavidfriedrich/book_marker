@@ -129,6 +129,10 @@ class SettingsTable extends Table {
 
   TextColumn get localePreference => text().nullable()();
 
+  TextColumn get themePreference => text().nullable()();
+
+  TextColumn get contrastPreference => text().nullable()();
+
   @override
   Set<Column<Object>> get primaryKey => {id};
 }
@@ -138,7 +142,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(driftDatabase(name: _databaseName));
 
   @override
-  int get schemaVersion => 9;
+  int get schemaVersion => 10;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -194,6 +198,10 @@ class AppDatabase extends _$AppDatabase {
       if (from < 9) {
         await migrator.addColumn(themes, themes.symbol);
         await migrator.addColumn(shelves, shelves.symbol);
+      }
+      if (from < 10) {
+        await migrator.addColumn(settingsTable, settingsTable.themePreference);
+        await migrator.addColumn(settingsTable, settingsTable.contrastPreference);
       }
     },
   );

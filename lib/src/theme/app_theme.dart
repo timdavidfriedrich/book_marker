@@ -1,6 +1,7 @@
 import 'package:core/theme/spacing.dart';
 import 'package:core/theme/theme_extensions.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 const _display = "Bricolage Grotesque";
 const _sans = "DM Sans";
@@ -21,6 +22,9 @@ const _outlineVariant = Color(0xFFDED2BC);
 
 const _paperText = Color(0xFF241D12);
 const _paperTextFaint = Color(0xFF9A8B70);
+const _paperCardHigh = Color(0xFFFFFBF0);
+const _paperTextHigh = Color(0xFF0F0B06);
+const _paperTextFaintHigh = Color(0xFF6B5E48);
 
 const _amberSolid = Color(0xFFFFB627);
 const _tealSolid = Color(0xFF157A6E);
@@ -32,8 +36,25 @@ const _darkSurface = Color(0xFF17120E);
 const _darkSurfaceLow = Color(0xFF211A14);
 const _darkSurfaceHigh = Color(0xFF2C241C);
 const _darkOnSurface = Color(0xFFEDE3D2);
-const _darkOnSurfaceVariant = Color(0xFF9A8E7B);
-const _darkOutline = Color(0xFF3C332A);
+const _darkOnSurfaceVariant = Color(0xFFB0A48E);
+const _darkOutline = Color(0xFF52483C);
+
+const _lightHighSurface = Color(0xFFFFFDF7);
+const _lightHighInk = Color(0xFF0F0B08);
+const _lightHighInkVariant = Color(0xFF3B3227);
+const _lightHighOutline = Color(0xFF6B5F4C);
+const _lightHighTeal = Color(0xFF0E5F55);
+const _lightHighCoral = Color(0xFFC23A20);
+const _lightHighError = Color(0xFF8E2A14);
+
+const _darkHighSurface = Color(0xFF0A0705);
+const _darkHighOnSurface = Color(0xFFFFFBF2);
+const _darkHighOnSurfaceVariant = Color(0xFFD8CDB8);
+const _darkHighOutline = Color(0xFF8C8070);
+const _darkHighAmber = Color(0xFFFFC64D);
+const _darkHighTeal = Color(0xFF4FCBB8);
+const _darkHighCoral = Color(0xFFFF8F73);
+const _darkHighError = Color(0xFFFFA893);
 
 const _amber = AccentSwatch(
   fill: Color(0xFFFFE7B8),
@@ -77,6 +98,20 @@ const _accentOnFillVariantBlend = 0.42;
 const _accentOnSolidThreshold = 0.5;
 const _accentOnSolidLight = Color(0xFFFFF6E9);
 
+const _lightHighFillBlend = 0.88;
+const _lightHighOnFillVariantBlend = 0.62;
+
+const _darkFillBlend = 0.8;
+const _darkOnFillBlend = 0.86;
+const _darkOnFillVariantBlend = 0.55;
+const _darkHighFillBlend = 0.87;
+const _darkHighOnFillBlend = 0.94;
+const _darkHighOnFillVariantBlend = 0.75;
+
+// * a solid this dark disappears on a dark surface, so it is lifted before the swatch is derived
+const _darkSolidMinLuminance = 0.03;
+const _darkSolidLift = 0.72;
+
 const _derivedAccents = <AccentColor, Color>{
   AccentColor.mint: Color(0xFF4FB49A),
   AccentColor.forest: Color(0xFF2E6B4F),
@@ -95,49 +130,94 @@ const _derivedAccents = <AccentColor, Color>{
   AccentColor.stone: Color(0xFF8A8072),
 };
 
+Color _onSolid(Color solid) =>
+    solid.computeLuminance() > _accentOnSolidThreshold ? _inkSoft : _accentOnSolidLight;
+
 AccentSwatch _derivedSwatch(Color solid) {
   return AccentSwatch(
     fill: Color.lerp(solid, _cream, _accentFillBlend)!,
     solid: solid,
-    onSolid: solid.computeLuminance() > _accentOnSolidThreshold ? _inkSoft : _accentOnSolidLight,
+    onSolid: _onSolid(solid),
     onFill: _inkSoft,
     onFillVariant: Color.lerp(solid, _ink, _accentOnFillVariantBlend)!,
   );
 }
 
-final _palette = AppPalette(
-  accents: {
-    AccentColor.amber: _amber,
-    AccentColor.teal: _teal,
-    AccentColor.coral: _coral,
-    AccentColor.sand: _sand,
-    AccentColor.sky: _sky,
-    for (final entry in _derivedAccents.entries) entry.key: _derivedSwatch(entry.value),
-  },
+AccentSwatch _lightHighContrastSwatch(Color solid) {
+  return AccentSwatch(
+    fill: Color.lerp(solid, _paperCardHigh, _lightHighFillBlend)!,
+    solid: solid,
+    onSolid: _onSolid(solid),
+    onFill: _lightHighInk,
+    onFillVariant: Color.lerp(solid, _lightHighInk, _lightHighOnFillVariantBlend)!,
+  );
+}
+
+Color _darkSolid(Color solid) => solid.computeLuminance() < _darkSolidMinLuminance
+    ? Color.lerp(solid, _cream, _darkSolidLift)!
+    : solid;
+
+AccentSwatch _darkSwatch(Color solid) {
+  final base = _darkSolid(solid);
+  return AccentSwatch(
+    fill: Color.lerp(base, _darkSurfaceLow, _darkFillBlend)!,
+    solid: base,
+    onSolid: _onSolid(base),
+    onFill: Color.lerp(base, _cream, _darkOnFillBlend)!,
+    onFillVariant: Color.lerp(base, _cream, _darkOnFillVariantBlend)!,
+  );
+}
+
+AccentSwatch _darkHighContrastSwatch(Color solid) {
+  final base = _darkSolid(solid);
+  return AccentSwatch(
+    fill: Color.lerp(base, _darkHighSurface, _darkHighFillBlend)!,
+    solid: base,
+    onSolid: _onSolid(base),
+    onFill: Color.lerp(base, _darkHighOnSurface, _darkHighOnFillBlend)!,
+    onFillVariant: Color.lerp(base, _darkHighOnSurface, _darkHighOnFillVariantBlend)!,
+  );
+}
+
+final _lightAccents = <AccentColor, AccentSwatch>{
+  AccentColor.amber: _amber,
+  AccentColor.teal: _teal,
+  AccentColor.coral: _coral,
+  AccentColor.sand: _sand,
+  AccentColor.sky: _sky,
+  for (final entry in _derivedAccents.entries) entry.key: _derivedSwatch(entry.value),
+};
+
+Map<AccentColor, AccentSwatch> _accentsFrom(AccentSwatch Function(Color solid) build) => {
+  for (final entry in _lightAccents.entries) entry.key: build(entry.value.solid),
+};
+
+final _lightPalette = AppPalette(
+  accents: _lightAccents,
   paperFill: _paperCard,
   paperText: _paperText,
   paperTextFaint: _paperTextFaint,
 );
 
-const _typography = AppTypography(
-  readingBody: TextStyle(fontFamily: _serif, fontSize: 17, height: 1.55, color: _paperText),
-  readingQuote: TextStyle(fontFamily: _serif, fontSize: 17, height: 1.4, color: _paperText),
-  readingQuoteItalic: TextStyle(
-    fontFamily: _serif,
-    fontSize: 17,
-    height: 1.4,
-    fontStyle: FontStyle.italic,
-    color: _paperText,
-  ),
-  monoLabel: TextStyle(fontFamily: _serif, fontSize: 13, height: 1.35),
-  monoLabelStrong: TextStyle(
-    fontFamily: _serif,
-    fontSize: 13,
-    height: 1.35,
-    fontWeight: FontWeight.w500,
-  ),
-  monoCaption: TextStyle(fontFamily: _serif, fontSize: 11.5, height: 1.3),
-  monoBadge: TextStyle(fontFamily: _serif, fontSize: 12.5, fontWeight: FontWeight.w500),
+final _lightHighContrastPalette = AppPalette(
+  accents: _accentsFrom(_lightHighContrastSwatch),
+  paperFill: _paperCardHigh,
+  paperText: _paperTextHigh,
+  paperTextFaint: _paperTextFaintHigh,
+);
+
+final _darkPalette = AppPalette(
+  accents: _accentsFrom(_darkSwatch),
+  paperFill: _paperCard,
+  paperText: _paperText,
+  paperTextFaint: _paperTextFaint,
+);
+
+final _darkHighContrastPalette = AppPalette(
+  accents: _accentsFrom(_darkHighContrastSwatch),
+  paperFill: _paperCardHigh,
+  paperText: _paperTextHigh,
+  paperTextFaint: _paperTextFaintHigh,
 );
 
 const _status = StatusColors(uncertain: _sky);
@@ -145,13 +225,27 @@ const _status = StatusColors(uncertain: _sky);
 abstract final class AppTheme {
   const AppTheme._();
 
-  static ThemeData get light => _build(Brightness.light);
-  static ThemeData get dark => _build(Brightness.dark);
+  static final ThemeData light = _build(Brightness.light, ContrastLevel.standard);
+  static final ThemeData lightHighContrast = _build(Brightness.light, ContrastLevel.high);
+  static final ThemeData dark = _build(Brightness.dark, ContrastLevel.standard);
+  static final ThemeData darkHighContrast = _build(Brightness.dark, ContrastLevel.high);
 
-  static ThemeData _build(Brightness brightness) {
+  static ThemeData lightOf(ContrastLevel contrast) => switch (contrast) {
+    ContrastLevel.standard => light,
+    ContrastLevel.high => lightHighContrast,
+  };
+
+  static ThemeData darkOf(ContrastLevel contrast) => switch (contrast) {
+    ContrastLevel.standard => dark,
+    ContrastLevel.high => darkHighContrast,
+  };
+
+  static ThemeData _build(Brightness brightness, ContrastLevel contrast) {
     final isLight = brightness == Brightness.light;
-    final colorScheme = isLight ? _lightScheme : _darkScheme;
+    final colorScheme = _scheme(brightness, contrast);
+    final palette = _palette(brightness, contrast);
     final textTheme = _textTheme(colorScheme.onSurface);
+    final typography = _typography(colorScheme.onSurface);
     return ThemeData(
       useMaterial3: true,
       brightness: brightness,
@@ -160,11 +254,16 @@ abstract final class AppTheme {
       canvasColor: colorScheme.surface,
       textTheme: textTheme,
       splashFactory: NoSplash.splashFactory,
-      extensions: [_palette, _typography, _status],
+      extensions: [
+        palette,
+        typography,
+        _status,
+        AppContrast(level: contrast),
+      ],
       badgeTheme: BadgeThemeData(
         backgroundColor: _sky.solid,
         textColor: _sky.onSolid,
-        textStyle: _typography.monoBadge.copyWith(fontSize: 10, height: 1),
+        textStyle: typography.monoBadge.copyWith(fontSize: 10, height: 1),
         largeSize: 14,
         padding: const EdgeInsets.symmetric(horizontal: 3),
       ),
@@ -176,6 +275,7 @@ abstract final class AppTheme {
         centerTitle: false,
         titleTextStyle: textTheme.titleLarge,
         foregroundColor: colorScheme.onSurface,
+        systemOverlayStyle: isLight ? SystemUiOverlayStyle.dark : SystemUiOverlayStyle.light,
       ),
       cardTheme: CardThemeData(
         color: colorScheme.surfaceContainerLow,
@@ -255,7 +355,7 @@ abstract final class AppTheme {
       ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: isLight ? _sandField : _darkSurfaceLow,
+        fillColor: colorScheme.surfaceContainerHigh,
         hintStyle: textTheme.bodyLarge?.copyWith(color: colorScheme.onSurfaceVariant),
         contentPadding: const EdgeInsets.symmetric(horizontal: Spacing.l, vertical: Spacing.m),
         border: const OutlineInputBorder(
@@ -272,8 +372,8 @@ abstract final class AppTheme {
         ),
       ),
       snackBarTheme: SnackBarThemeData(
-        backgroundColor: _ink,
-        contentTextStyle: textTheme.bodyMedium?.copyWith(color: _cream),
+        backgroundColor: colorScheme.inverseSurface,
+        contentTextStyle: textTheme.bodyMedium?.copyWith(color: colorScheme.onInverseSurface),
         behavior: SnackBarBehavior.floating,
         shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.all(Radius.circular(Spacing.radiusM)),
@@ -284,12 +384,30 @@ abstract final class AppTheme {
         thickness: Spacing.borderWidthThin,
       ),
       textSelectionTheme: TextSelectionThemeData(
-        selectionColor: _amberSolid.withValues(alpha: 0.4),
+        selectionColor: colorScheme.primary.withValues(alpha: 0.4),
         cursorColor: colorScheme.primary,
         selectionHandleColor: colorScheme.primary,
       ),
       progressIndicatorTheme: ProgressIndicatorThemeData(color: colorScheme.primary),
     );
+  }
+
+  static AppPalette _palette(Brightness brightness, ContrastLevel contrast) {
+    return switch ((brightness, contrast)) {
+      (Brightness.light, ContrastLevel.standard) => _lightPalette,
+      (Brightness.light, ContrastLevel.high) => _lightHighContrastPalette,
+      (Brightness.dark, ContrastLevel.standard) => _darkPalette,
+      (Brightness.dark, ContrastLevel.high) => _darkHighContrastPalette,
+    };
+  }
+
+  static ColorScheme _scheme(Brightness brightness, ContrastLevel contrast) {
+    return switch ((brightness, contrast)) {
+      (Brightness.light, ContrastLevel.standard) => _lightScheme,
+      (Brightness.light, ContrastLevel.high) => _lightHighContrastScheme,
+      (Brightness.dark, ContrastLevel.standard) => _darkScheme,
+      (Brightness.dark, ContrastLevel.high) => _darkHighContrastScheme,
+    };
   }
 
   static const ColorScheme _lightScheme = ColorScheme(
@@ -330,18 +448,56 @@ abstract final class AppTheme {
     surfaceTint: _cream,
   );
 
+  static const ColorScheme _lightHighContrastScheme = ColorScheme(
+    brightness: Brightness.light,
+    primary: _amberSolid,
+    onPrimary: _lightHighInk,
+    primaryContainer: Color(0xFFFFDFA0),
+    onPrimaryContainer: _lightHighInk,
+    secondary: _lightHighTeal,
+    onSecondary: Color(0xFFFFFFFF),
+    secondaryContainer: Color(0xFFCFE3DE),
+    onSecondaryContainer: Color(0xFF06211D),
+    tertiary: _lightHighCoral,
+    onTertiary: Color(0xFFFFFFFF),
+    tertiaryContainer: Color(0xFFFAD3C6),
+    onTertiaryContainer: Color(0xFF2B1006),
+    error: _lightHighError,
+    onError: Color(0xFFFFFFFF),
+    errorContainer: Color(0xFFFAD3C6),
+    onErrorContainer: Color(0xFF2B0704),
+    surface: _lightHighSurface,
+    onSurface: _lightHighInk,
+    surfaceDim: Color(0xFFE0D2B8),
+    surfaceBright: Color(0xFFFFFFFF),
+    surfaceContainerLowest: Color(0xFFFFFFFF),
+    surfaceContainerLow: Color(0xFFFFF9EC),
+    surfaceContainer: Color(0xFFF6EBD6),
+    surfaceContainerHigh: Color(0xFFEFE2C9),
+    surfaceContainerHighest: Color(0xFFE5D6B9),
+    onSurfaceVariant: _lightHighInkVariant,
+    outline: _lightHighOutline,
+    outlineVariant: Color(0xFFA2937A),
+    shadow: Color(0xFF000000),
+    scrim: Color(0xFF000000),
+    inverseSurface: _lightHighInk,
+    onInverseSurface: Color(0xFFFFFDF7),
+    inversePrimary: _amberSolid,
+    surfaceTint: _lightHighSurface,
+  );
+
   static const ColorScheme _darkScheme = ColorScheme(
     brightness: Brightness.dark,
     primary: _amberSolid,
     onPrimary: _inkSoft,
     primaryContainer: Color(0xFF5A420F),
     onPrimaryContainer: Color(0xFFFFE7B8),
-    secondary: _tealSolid,
-    onSecondary: Color(0xFFF4FBF8),
+    secondary: Color(0xFF35A897),
+    onSecondary: Color(0xFF04211D),
     secondaryContainer: Color(0xFF124B44),
     onSecondaryContainer: Color(0xFFE4EFEC),
-    tertiary: _coralSolid,
-    onTertiary: Color(0xFFFFF4EE),
+    tertiary: Color(0xFFFF8A6B),
+    onTertiary: Color(0xFF3A1207),
     tertiaryContainer: Color(0xFF5F2416),
     onTertiaryContainer: Color(0xFFFBDFD6),
     error: Color(0xFFF2907B),
@@ -359,7 +515,7 @@ abstract final class AppTheme {
     surfaceContainerHighest: Color(0xFF362C22),
     onSurfaceVariant: _darkOnSurfaceVariant,
     outline: _darkOutline,
-    outlineVariant: Color(0xFF2C241C),
+    outlineVariant: Color(0xFF3C332A),
     shadow: Color(0xFF000000),
     scrim: Color(0xFF000000),
     inverseSurface: _cream,
@@ -367,6 +523,67 @@ abstract final class AppTheme {
     inversePrimary: _amberSolid,
     surfaceTint: _darkSurface,
   );
+
+  static const ColorScheme _darkHighContrastScheme = ColorScheme(
+    brightness: Brightness.dark,
+    primary: _darkHighAmber,
+    onPrimary: Color(0xFF1A1409),
+    primaryContainer: Color(0xFF6E5314),
+    onPrimaryContainer: Color(0xFFFFF0CE),
+    secondary: _darkHighTeal,
+    onSecondary: Color(0xFF06231F),
+    secondaryContainer: Color(0xFF175D54),
+    onSecondaryContainer: Color(0xFFE9F7F4),
+    tertiary: _darkHighCoral,
+    onTertiary: Color(0xFF2B0C04),
+    tertiaryContainer: Color(0xFF77301D),
+    onTertiaryContainer: Color(0xFFFFEAE3),
+    error: _darkHighError,
+    onError: Color(0xFF2B0704),
+    errorContainer: Color(0xFF77301D),
+    onErrorContainer: Color(0xFFFFEAE3),
+    surface: _darkHighSurface,
+    onSurface: _darkHighOnSurface,
+    surfaceDim: _darkHighSurface,
+    surfaceBright: Color(0xFF362C21),
+    surfaceContainerLowest: Color(0xFF000000),
+    surfaceContainerLow: Color(0xFF16110C),
+    surfaceContainer: Color(0xFF1E1811),
+    surfaceContainerHigh: Color(0xFF2A2219),
+    surfaceContainerHighest: Color(0xFF362C21),
+    onSurfaceVariant: _darkHighOnSurfaceVariant,
+    outline: _darkHighOutline,
+    outlineVariant: Color(0xFF5C5245),
+    shadow: Color(0xFF000000),
+    scrim: Color(0xFF000000),
+    inverseSurface: _darkHighOnSurface,
+    onInverseSurface: Color(0xFF0A0705),
+    inversePrimary: _darkHighAmber,
+    surfaceTint: _darkHighSurface,
+  );
+
+  static AppTypography _typography(Color onSurface) {
+    return AppTypography(
+      readingBody: TextStyle(fontFamily: _serif, fontSize: 17, height: 1.55, color: onSurface),
+      readingQuote: TextStyle(fontFamily: _serif, fontSize: 17, height: 1.4, color: onSurface),
+      readingQuoteItalic: TextStyle(
+        fontFamily: _serif,
+        fontSize: 17,
+        height: 1.4,
+        fontStyle: FontStyle.italic,
+        color: onSurface,
+      ),
+      monoLabel: const TextStyle(fontFamily: _serif, fontSize: 13, height: 1.35),
+      monoLabelStrong: const TextStyle(
+        fontFamily: _serif,
+        fontSize: 13,
+        height: 1.35,
+        fontWeight: FontWeight.w500,
+      ),
+      monoCaption: const TextStyle(fontFamily: _serif, fontSize: 11.5, height: 1.3),
+      monoBadge: const TextStyle(fontFamily: _serif, fontSize: 12.5, fontWeight: FontWeight.w500),
+    );
+  }
 
   static TextTheme _textTheme(Color onSurface) {
     const base = TextTheme(

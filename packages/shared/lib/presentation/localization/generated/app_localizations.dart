@@ -1173,6 +1173,60 @@ abstract class AppLocalizations {
   /// **'{books, plural, =1{1 book} other{{books} books}}, {quotes, plural, =1{1 quote} other{{quotes} quotes}}, {themes, plural, =1{1 theme} other{{themes} themes}}'**
   String settingsStats(int books, int quotes, int themes);
 
+  /// No description provided for @settingsAppearanceLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Appearance'**
+  String get settingsAppearanceLabel;
+
+  /// No description provided for @settingsThemeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Theme'**
+  String get settingsThemeLabel;
+
+  /// No description provided for @settingsThemeSystem.
+  ///
+  /// In en, this message translates to:
+  /// **'System'**
+  String get settingsThemeSystem;
+
+  /// No description provided for @settingsThemeLight.
+  ///
+  /// In en, this message translates to:
+  /// **'Light'**
+  String get settingsThemeLight;
+
+  /// No description provided for @settingsThemeDark.
+  ///
+  /// In en, this message translates to:
+  /// **'Dark'**
+  String get settingsThemeDark;
+
+  /// No description provided for @settingsContrastLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Contrast'**
+  String get settingsContrastLabel;
+
+  /// No description provided for @settingsContrastSystem.
+  ///
+  /// In en, this message translates to:
+  /// **'System'**
+  String get settingsContrastSystem;
+
+  /// No description provided for @settingsContrastStandard.
+  ///
+  /// In en, this message translates to:
+  /// **'Standard'**
+  String get settingsContrastStandard;
+
+  /// No description provided for @settingsContrastHigh.
+  ///
+  /// In en, this message translates to:
+  /// **'High'**
+  String get settingsContrastHigh;
+
   /// No description provided for @settingsLanguageLabel.
   ///
   /// In en, this message translates to:

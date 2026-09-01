@@ -40,6 +40,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:injectable/injectable.dart';
+import 'package:shared/presentation/extensions/context_extensions.dart';
 import 'package:shared/presentation/navigation/crop_arguments.dart';
 import 'package:shared/presentation/navigation/marking_arguments.dart';
 import 'package:shared/presentation/navigation/routes.dart';
@@ -101,7 +102,7 @@ class NavigationRouter {
         path: NavigationRoute.libraryQuote.path,
         parentNavigatorKey: _rootNavigatorKey,
         builder: (context, state) => Theme(
-          data: AppTheme.dark,
+          data: AppTheme.darkOf(context.contrast),
           child: BlocProvider(
             create: (_) =>
                 sl<QuoteDetailBloc>(param1: state.pathParameters[parameterId])
@@ -142,7 +143,7 @@ class NavigationRouter {
         path: NavigationRoute.capture.path,
         parentNavigatorKey: _rootNavigatorKey,
         builder: (context, state) => Theme(
-          data: AppTheme.dark,
+          data: AppTheme.darkOf(context.contrast),
           child: MultiBlocProvider(
             providers: [
               BlocProvider(create: (_) => sl<CaptureBloc>()..add(const CaptureStarted())),
@@ -185,7 +186,7 @@ class NavigationRouter {
               final arguments = state.extra;
               if (arguments is! CropArguments) return const CaptureScreen();
               return Theme(
-                data: AppTheme.dark,
+                data: AppTheme.darkOf(context.contrast),
                 child: BlocProvider(
                   create: (_) => sl<CropBloc>(param1: arguments)..add(const CropStarted()),
                   child: const CropScreen(),
@@ -199,12 +200,9 @@ class NavigationRouter {
             builder: (context, state) {
               final arguments = state.extra;
               if (arguments is! MarkingArguments) return const CaptureScreen();
-              return Theme(
-                data: AppTheme.light,
-                child: BlocProvider(
-                  create: (_) => sl<MarkingBloc>(param1: arguments)..add(const MarkingStarted()),
-                  child: const MarkingScreen(),
-                ),
+              return BlocProvider(
+                create: (_) => sl<MarkingBloc>(param1: arguments)..add(const MarkingStarted()),
+                child: const MarkingScreen(),
               );
             },
           ),

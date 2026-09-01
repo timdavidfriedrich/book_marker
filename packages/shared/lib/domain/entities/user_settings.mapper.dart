@@ -58,6 +58,106 @@ extension LocalePreferenceMapperExtension on LocalePreference {
   }
 }
 
+class ThemePreferenceMapper extends EnumMapper<ThemePreference> {
+  ThemePreferenceMapper._();
+
+  static ThemePreferenceMapper? _instance;
+  static ThemePreferenceMapper ensureInitialized() {
+    if (_instance == null) {
+      MapperContainer.globals.use(_instance = ThemePreferenceMapper._());
+    }
+    return _instance!;
+  }
+
+  static ThemePreference fromValue(dynamic value) {
+    ensureInitialized();
+    return MapperContainer.globals.fromValue(value);
+  }
+
+  @override
+  ThemePreference decode(dynamic value) {
+    switch (value) {
+      case r'system':
+        return ThemePreference.system;
+      case r'light':
+        return ThemePreference.light;
+      case r'dark':
+        return ThemePreference.dark;
+      default:
+        throw MapperException.unknownEnumValue(value);
+    }
+  }
+
+  @override
+  dynamic encode(ThemePreference self) {
+    switch (self) {
+      case ThemePreference.system:
+        return r'system';
+      case ThemePreference.light:
+        return r'light';
+      case ThemePreference.dark:
+        return r'dark';
+    }
+  }
+}
+
+extension ThemePreferenceMapperExtension on ThemePreference {
+  String toValue() {
+    ThemePreferenceMapper.ensureInitialized();
+    return MapperContainer.globals.toValue<ThemePreference>(this) as String;
+  }
+}
+
+class ContrastPreferenceMapper extends EnumMapper<ContrastPreference> {
+  ContrastPreferenceMapper._();
+
+  static ContrastPreferenceMapper? _instance;
+  static ContrastPreferenceMapper ensureInitialized() {
+    if (_instance == null) {
+      MapperContainer.globals.use(_instance = ContrastPreferenceMapper._());
+    }
+    return _instance!;
+  }
+
+  static ContrastPreference fromValue(dynamic value) {
+    ensureInitialized();
+    return MapperContainer.globals.fromValue(value);
+  }
+
+  @override
+  ContrastPreference decode(dynamic value) {
+    switch (value) {
+      case r'system':
+        return ContrastPreference.system;
+      case r'standard':
+        return ContrastPreference.standard;
+      case r'high':
+        return ContrastPreference.high;
+      default:
+        throw MapperException.unknownEnumValue(value);
+    }
+  }
+
+  @override
+  dynamic encode(ContrastPreference self) {
+    switch (self) {
+      case ContrastPreference.system:
+        return r'system';
+      case ContrastPreference.standard:
+        return r'standard';
+      case ContrastPreference.high:
+        return r'high';
+    }
+  }
+}
+
+extension ContrastPreferenceMapperExtension on ContrastPreference {
+  String toValue() {
+    ContrastPreferenceMapper.ensureInitialized();
+    return MapperContainer.globals.toValue<ContrastPreference>(this) as String;
+  }
+}
+
 class UserSettingsMapper extends ClassMapperBase<UserSettings> {
   UserSettingsMapper._();
 
@@ -66,6 +166,8 @@ class UserSettingsMapper extends ClassMapperBase<UserSettings> {
     if (_instance == null) {
       MapperContainer.globals.use(_instance = UserSettingsMapper._());
       LocalePreferenceMapper.ensureInitialized();
+      ThemePreferenceMapper.ensureInitialized();
+      ContrastPreferenceMapper.ensureInitialized();
     }
     return _instance!;
   }
@@ -82,17 +184,30 @@ class UserSettingsMapper extends ClassMapperBase<UserSettings> {
       v.localePreference;
   static const Field<UserSettings, LocalePreference> _f$localePreference =
       Field('localePreference', _$localePreference);
+  static ThemePreference _$themePreference(UserSettings v) => v.themePreference;
+  static const Field<UserSettings, ThemePreference> _f$themePreference = Field(
+    'themePreference',
+    _$themePreference,
+  );
+  static ContrastPreference _$contrastPreference(UserSettings v) =>
+      v.contrastPreference;
+  static const Field<UserSettings, ContrastPreference> _f$contrastPreference =
+      Field('contrastPreference', _$contrastPreference);
 
   @override
   final MappableFields<UserSettings> fields = const {
     #displayName: _f$displayName,
     #localePreference: _f$localePreference,
+    #themePreference: _f$themePreference,
+    #contrastPreference: _f$contrastPreference,
   };
 
   static UserSettings _instantiate(DecodingData data) {
     return UserSettings(
       displayName: data.dec(_f$displayName),
       localePreference: data.dec(_f$localePreference),
+      themePreference: data.dec(_f$themePreference),
+      contrastPreference: data.dec(_f$contrastPreference),
     );
   }
 
@@ -158,7 +273,12 @@ extension UserSettingsValueCopy<$R, $Out>
 
 abstract class UserSettingsCopyWith<$R, $In extends UserSettings, $Out>
     implements ClassCopyWith<$R, $In, $Out> {
-  $R call({String? displayName, LocalePreference? localePreference});
+  $R call({
+    String? displayName,
+    LocalePreference? localePreference,
+    ThemePreference? themePreference,
+    ContrastPreference? contrastPreference,
+  });
   UserSettingsCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
 }
 
@@ -171,17 +291,28 @@ class _UserSettingsCopyWithImpl<$R, $Out>
   late final ClassMapperBase<UserSettings> $mapper =
       UserSettingsMapper.ensureInitialized();
   @override
-  $R call({Object? displayName = $none, LocalePreference? localePreference}) =>
-      $apply(
-        FieldCopyWithData({
-          if (displayName != $none) #displayName: displayName,
-          if (localePreference != null) #localePreference: localePreference,
-        }),
-      );
+  $R call({
+    Object? displayName = $none,
+    LocalePreference? localePreference,
+    ThemePreference? themePreference,
+    ContrastPreference? contrastPreference,
+  }) => $apply(
+    FieldCopyWithData({
+      if (displayName != $none) #displayName: displayName,
+      if (localePreference != null) #localePreference: localePreference,
+      if (themePreference != null) #themePreference: themePreference,
+      if (contrastPreference != null) #contrastPreference: contrastPreference,
+    }),
+  );
   @override
   UserSettings $make(CopyWithData data) => UserSettings(
     displayName: data.get(#displayName, or: $value.displayName),
     localePreference: data.get(#localePreference, or: $value.localePreference),
+    themePreference: data.get(#themePreference, or: $value.themePreference),
+    contrastPreference: data.get(
+      #contrastPreference,
+      or: $value.contrastPreference,
+    ),
   );
 
   @override

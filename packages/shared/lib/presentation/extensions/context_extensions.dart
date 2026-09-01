@@ -11,6 +11,8 @@ extension ContextExtensions on BuildContext {
 
   StatusColors get status => Theme.of(this).extension<StatusColors>()!;
 
+  ContrastLevel get contrast => Theme.of(this).extension<AppContrast>()!.level;
+
   AppPalette get palette => Theme.of(this).extension<AppPalette>()!;
 
   AppTypography get typography => Theme.of(this).extension<AppTypography>()!;

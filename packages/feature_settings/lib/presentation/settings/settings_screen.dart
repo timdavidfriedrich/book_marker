@@ -11,7 +11,6 @@ import 'package:shared/presentation/extensions/context_extensions.dart';
 import 'package:shared/presentation/navigation/navigation_extensions.dart';
 import 'package:shared/presentation/widgets/circle_icon_button.dart';
 import 'package:shared/presentation/widgets/ink_tap_box.dart';
-import 'package:shared/presentation/widgets/paper_card.dart';
 import 'package:shared/presentation/widgets/profile_avatar.dart';
 
 const _avatarSize = 64.0;
@@ -56,66 +55,81 @@ class const _Content({
           ],
         ),
         const SizedBox(height: Spacing.l),
-        PaperCard(
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              const ProfileAvatar(size: _avatarSize),
-              const SizedBox(width: Spacing.m),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    TextField(
-                      controller: controller,
-                      textCapitalization: TextCapitalization.words,
-                      style: context.t.titleLarge,
-                      onChanged: (value) =>
-                          context.read<SettingsBloc>().add(SettingsNameChanged(value)),
-                      decoration: InputDecoration(
-                        isDense: true,
-                        filled: false,
-                        border: InputBorder.none,
-                        enabledBorder: InputBorder.none,
-                        focusedBorder: InputBorder.none,
-                        contentPadding: EdgeInsets.zero,
-                        hintText: context.s.settingsProfileNameHint,
+        Card(
+          child: Padding(
+            padding: const EdgeInsets.all(Spacing.l),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                const ProfileAvatar(size: _avatarSize),
+                const SizedBox(width: Spacing.m),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      TextField(
+                        controller: controller,
+                        textCapitalization: TextCapitalization.words,
+                        style: context.t.titleLarge,
+                        onChanged: (value) =>
+                            context.read<SettingsBloc>().add(SettingsNameChanged(value)),
+                        decoration: InputDecoration(
+                          isDense: true,
+                          filled: false,
+                          border: InputBorder.none,
+                          enabledBorder: InputBorder.none,
+                          focusedBorder: InputBorder.none,
+                          contentPadding: EdgeInsets.zero,
+                          hintText: context.s.settingsProfileNameHint,
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: Spacing.xxs),
-                    Text(
-                      context.s.settingsStats(
-                        _state.bookCount,
-                        _state.quoteCount,
-                        _state.themeCount,
+                      const SizedBox(height: Spacing.xxs),
+                      Text(
+                        context.s.settingsStats(
+                          _state.bookCount,
+                          _state.quoteCount,
+                          _state.themeCount,
+                        ),
+                        style: context.typography.monoLabel.copyWith(
+                          color: context.c.onSurfaceVariant,
+                        ),
                       ),
-                      style: context.typography.monoLabel.copyWith(
-                        color: context.c.onSurfaceVariant,
-                      ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
+        ),
+        const SizedBox(height: Spacing.xl),
+        Text(context.s.settingsAppearanceLabel, style: context.t.headlineSmall),
+        const SizedBox(height: Spacing.s),
+        _PreferenceMenu<ThemePreference>(
+          label: context.s.settingsThemeLabel,
+          selected: _state.themePreference,
+          values: ThemePreference.values,
+          labelOf: _themeLabel,
+          onSelected: (preference) =>
+              context.read<SettingsBloc>().add(SettingsThemeChanged(preference)),
+        ),
+        const SizedBox(height: Spacing.s),
+        _PreferenceMenu<ContrastPreference>(
+          label: context.s.settingsContrastLabel,
+          selected: _state.contrastPreference,
+          values: ContrastPreference.values,
+          labelOf: _contrastLabel,
+          onSelected: (preference) =>
+              context.read<SettingsBloc>().add(SettingsContrastChanged(preference)),
         ),
         const SizedBox(height: Spacing.xl),
         Text(context.s.settingsLanguageLabel, style: context.t.headlineSmall),
         const SizedBox(height: Spacing.s),
-        DropdownMenu<LocalePreference>(
-          initialSelection: _state.localePreference,
-          expandedInsets: EdgeInsets.zero,
-          requestFocusOnTap: false,
-          trailingIcon: Icon(Icons.expand_more, color: context.c.onSurfaceVariant),
-          selectedTrailingIcon: Icon(Icons.expand_less, color: context.c.onSurfaceVariant),
-          onSelected: (preference) {
-            if (preference == null) return;
-            context.read<SettingsBloc>().add(SettingsLocaleChanged(preference));
-          },
-          dropdownMenuEntries: [
-            for (final preference in LocalePreference.values)
-              DropdownMenuEntry(value: preference, label: _localeLabel(context, preference)),
-          ],
+        _PreferenceMenu<LocalePreference>(
+          selected: _state.localePreference,
+          values: LocalePreference.values,
+          labelOf: _localeLabel,
+          onSelected: (preference) =>
+              context.read<SettingsBloc>().add(SettingsLocaleChanged(preference)),
         ),
         const SizedBox(height: Spacing.xl),
         Text(context.s.settingsAboutLabel, style: context.t.headlineSmall),
@@ -149,6 +163,34 @@ class const _Content({
   }
 }
 
+class const _PreferenceMenu<T>({
+  required final T _selected,
+  required final List<T> _values,
+  required final String Function(BuildContext context, T value) _labelOf,
+  required final ValueChanged<T> _onSelected,
+  final String? _label,
+}) extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return DropdownMenu<T>(
+      initialSelection: _selected,
+      label: _label == null ? null : Text(_label),
+      expandedInsets: EdgeInsets.zero,
+      requestFocusOnTap: false,
+      trailingIcon: Icon(Icons.expand_more, color: context.c.onSurfaceVariant),
+      selectedTrailingIcon: Icon(Icons.expand_less, color: context.c.onSurfaceVariant),
+      onSelected: (value) {
+        if (value == null) return;
+        _onSelected(value);
+      },
+      dropdownMenuEntries: [
+        for (final value in _values)
+          DropdownMenuEntry(value: value, label: _labelOf(context, value)),
+      ],
+    );
+  }
+}
+
 Future<String> _loadVersion() async {
   final info = await PackageInfo.fromPlatform();
   return info.version;
@@ -158,4 +200,16 @@ String _localeLabel(BuildContext context, LocalePreference preference) => switch
   LocalePreference.system => context.s.settingsLanguageSystem,
   LocalePreference.english => context.s.settingsLanguageEnglish,
   LocalePreference.german => context.s.settingsLanguageGerman,
+};
+
+String _themeLabel(BuildContext context, ThemePreference preference) => switch (preference) {
+  ThemePreference.system => context.s.settingsThemeSystem,
+  ThemePreference.light => context.s.settingsThemeLight,
+  ThemePreference.dark => context.s.settingsThemeDark,
+};
+
+String _contrastLabel(BuildContext context, ContrastPreference preference) => switch (preference) {
+  ContrastPreference.system => context.s.settingsContrastSystem,
+  ContrastPreference.standard => context.s.settingsContrastStandard,
+  ContrastPreference.high => context.s.settingsContrastHigh,
 };

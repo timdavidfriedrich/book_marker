@@ -1,0 +1,1 @@
+enum ContrastLevel { standard, high }

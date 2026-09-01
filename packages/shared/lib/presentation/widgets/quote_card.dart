@@ -148,7 +148,9 @@ class const _VoiceNoteTag({
         const SizedBox(width: Spacing.xxs),
         Text(
           context.s.quoteVoiceNoteLabel(label),
-          style: context.typography.monoLabel.copyWith(color: context.c.onSurfaceVariant),
+          style: context.typography.monoLabel.copyWith(
+            color: path == null ? context.c.onSurfaceVariant : context.c.onTertiaryContainer,
+          ),
         ),
       ],
     );

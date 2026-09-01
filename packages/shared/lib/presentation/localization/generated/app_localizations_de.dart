@@ -776,6 +776,33 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
+  String get settingsAppearanceLabel => 'Darstellung';
+
+  @override
+  String get settingsThemeLabel => 'Design';
+
+  @override
+  String get settingsThemeSystem => 'System';
+
+  @override
+  String get settingsThemeLight => 'Hell';
+
+  @override
+  String get settingsThemeDark => 'Dunkel';
+
+  @override
+  String get settingsContrastLabel => 'Kontrast';
+
+  @override
+  String get settingsContrastSystem => 'System';
+
+  @override
+  String get settingsContrastStandard => 'Standard';
+
+  @override
+  String get settingsContrastHigh => 'Hoch';
+
+  @override
   String get settingsLanguageLabel => 'Sprache';
 
   @override

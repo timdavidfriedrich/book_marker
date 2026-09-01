@@ -29,6 +29,8 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
     on<SettingsThemesUpdated>(_onThemesUpdated);
     on<SettingsNameChanged>(_onNameChanged);
     on<SettingsLocaleChanged>(_onLocaleChanged);
+    on<SettingsThemeChanged>(_onThemeChanged);
+    on<SettingsContrastChanged>(_onContrastChanged);
   }
 
   final SettingsRepository _settingsRepository;
@@ -39,10 +41,7 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
   StreamSubscription<AppResult<List<Book>>>? _bookSubscription;
   StreamSubscription<AppResult<List<Quote>>>? _quoteSubscription;
   StreamSubscription<AppResult<List<QuoteTheme>>>? _themeSubscription;
-  UserSettings _settings = const UserSettings(
-    displayName: null,
-    localePreference: LocalePreference.system,
-  );
+  UserSettings _settings = defaultUserSettings;
   int _bookCount = 0;
   int _quoteCount = 0;
   int _themeCount = 0;
@@ -103,11 +102,24 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
     await _settingsRepository.setLocalePreference(event.preference);
   }
 
+  Future<void> _onThemeChanged(SettingsThemeChanged event, Emitter<SettingsState> emit) async {
+    await _settingsRepository.setThemePreference(event.preference);
+  }
+
+  Future<void> _onContrastChanged(
+    SettingsContrastChanged event,
+    Emitter<SettingsState> emit,
+  ) async {
+    await _settingsRepository.setContrastPreference(event.preference);
+  }
+
   void _emitState(Emitter<SettingsState> emit) {
     emit(
       SettingsLoaded(
         displayName: _settings.displayName,
         localePreference: _settings.localePreference,
+        themePreference: _settings.themePreference,
+        contrastPreference: _settings.contrastPreference,
         bookCount: _bookCount,
         quoteCount: _quoteCount,
         themeCount: _themeCount,
