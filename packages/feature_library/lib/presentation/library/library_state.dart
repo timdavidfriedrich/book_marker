@@ -3,11 +3,11 @@ import 'package:shared/domain/entities/book.dart';
 import 'package:shared/domain/entities/quote.dart';
 import 'package:shared/domain/entities/shelf.dart';
 
-enum LibraryView { books, shelves }
+enum LibraryView { books, shelves, quotes }
 
 enum LibraryFilter { all, reading, paused, finished }
 
-enum LibrarySearchScope { allBooks, favorites, myNotes }
+enum LibraryQuoteFilter { all, favorites }
 
 class const LibraryBookSummary({
   required final Book book,
@@ -36,19 +36,20 @@ class const LibraryLoading() extends LibraryState;
 
 class const LibraryLoaded({
   required final List<LibraryBookSummary> books,
+  required final List<LibraryQuoteResult> quotes,
+  required final List<LibraryShelfSummary> shelves,
   required final int totalBooks,
   required final int totalQuotes,
+  required final int totalFavorites,
   required final int readingCount,
   required final int pausedCount,
   required final int finishedCount,
   required final LibraryView view,
   required final LibraryFilter filter,
+  required final LibraryQuoteFilter quoteFilter,
   required final String query,
-  required final LibrarySearchScope searchScope,
-  required final List<LibraryQuoteResult> results,
-  required final List<LibraryShelfSummary> shelves,
 }) extends LibraryState {
-  bool get isSearching => query.trim().isNotEmpty || searchScope != LibrarySearchScope.allBooks;
+  bool get isSearching => query.trim().isNotEmpty;
 }
 
 class const LibraryFailure({

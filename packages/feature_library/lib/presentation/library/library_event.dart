@@ -18,9 +18,9 @@ class const LibraryViewChanged(final LibraryView view) extends LibraryEvent;
 
 class const LibraryFilterChanged(final LibraryFilter filter) extends LibraryEvent;
 
-class const LibraryQueryChanged(final String query) extends LibraryEvent;
+class const LibraryQuoteFilterChanged(final LibraryQuoteFilter filter) extends LibraryEvent;
 
-class const LibrarySearchScopeChanged(final LibrarySearchScope scope) extends LibraryEvent;
+class const LibraryQueryChanged(final String query) extends LibraryEvent;
 
 class const LibraryShelvesUpdated(final AppResult<List<Shelf>> result) extends LibraryEvent;
 

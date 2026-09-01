@@ -75,6 +75,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get libraryEmptyMessage => 'No quotes yet. Take a photo of a book page to get started.';
 
   @override
+  String get libraryBooksEmptyMessage =>
+      'No books yet. Take a photo of a book page to get started.';
+
+  @override
   String get libraryUnknownBook => 'Unknown book';
 
   @override
@@ -184,13 +188,22 @@ class AppLocalizationsEn extends AppLocalizations {
   String get quoteDetailFavoriteRemove => 'Remove from favorites';
 
   @override
-  String get librarySearchHint => 'Search books and quotes…';
+  String get librarySearchBooksHint => 'Search books…';
+
+  @override
+  String get librarySearchShelvesHint => 'Search shelves…';
+
+  @override
+  String get librarySearchQuotesHint => 'Search quotes…';
 
   @override
   String get libraryTabBooks => 'books';
 
   @override
   String get libraryTabShelves => 'shelves';
+
+  @override
+  String get libraryTabQuotes => 'quotes';
 
   @override
   String get libraryAddShelfLabel => '+ shelf';
@@ -216,12 +229,39 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String libraryFilterFavorites(int count) {
+    return 'favorites $count';
+  }
+
+  @override
   String libraryQuotesCount(int count) {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
       other: '$count quotes',
       one: '1 quote',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String libraryBooksCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count books',
+      one: '1 book',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String libraryShelvesCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count shelves',
+      one: '1 shelf',
     );
     return '$_temp0';
   }
@@ -245,15 +285,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get libraryShelvesPlaceholder => 'Shelves arrive in the next update.';
-
-  @override
-  String get librarySearchScopeAll => 'all books';
-
-  @override
-  String get librarySearchScopeFavorites => 'favorites';
-
-  @override
-  String get librarySearchScopeNotes => 'my notes';
 
   @override
   String libraryBookMeta(int quotes, int favorites) {
@@ -309,23 +340,6 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String quoteSourceLabel(String title, String pages) {
     return '$title, p.$pages';
-  }
-
-  @override
-  String librarySearchCount(int quotes, int books) {
-    String _temp0 = intl.Intl.pluralLogic(
-      quotes,
-      locale: localeName,
-      other: '$quotes quotes',
-      one: '1 quote',
-    );
-    String _temp1 = intl.Intl.pluralLogic(
-      books,
-      locale: localeName,
-      other: '$books books',
-      one: '1 book',
-    );
-    return '$_temp0 in $_temp1';
   }
 
   @override

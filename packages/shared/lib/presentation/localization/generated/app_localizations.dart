@@ -219,6 +219,12 @@ abstract class AppLocalizations {
   /// **'No quotes yet. Take a photo of a book page to get started.'**
   String get libraryEmptyMessage;
 
+  /// No description provided for @libraryBooksEmptyMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'No books yet. Take a photo of a book page to get started.'**
+  String get libraryBooksEmptyMessage;
+
   /// No description provided for @libraryUnknownBook.
   ///
   /// In en, this message translates to:
@@ -429,11 +435,23 @@ abstract class AppLocalizations {
   /// **'Remove from favorites'**
   String get quoteDetailFavoriteRemove;
 
-  /// No description provided for @librarySearchHint.
+  /// No description provided for @librarySearchBooksHint.
   ///
   /// In en, this message translates to:
-  /// **'Search books and quotes…'**
-  String get librarySearchHint;
+  /// **'Search books…'**
+  String get librarySearchBooksHint;
+
+  /// No description provided for @librarySearchShelvesHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Search shelves…'**
+  String get librarySearchShelvesHint;
+
+  /// No description provided for @librarySearchQuotesHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Search quotes…'**
+  String get librarySearchQuotesHint;
 
   /// No description provided for @libraryTabBooks.
   ///
@@ -446,6 +464,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'shelves'**
   String get libraryTabShelves;
+
+  /// No description provided for @libraryTabQuotes.
+  ///
+  /// In en, this message translates to:
+  /// **'quotes'**
+  String get libraryTabQuotes;
 
   /// No description provided for @libraryAddShelfLabel.
   ///
@@ -477,11 +501,29 @@ abstract class AppLocalizations {
   /// **'finished {count}'**
   String libraryFilterFinished(int count);
 
+  /// No description provided for @libraryFilterFavorites.
+  ///
+  /// In en, this message translates to:
+  /// **'favorites {count}'**
+  String libraryFilterFavorites(int count);
+
   /// No description provided for @libraryQuotesCount.
   ///
   /// In en, this message translates to:
   /// **'{count, plural, =1{1 quote} other{{count} quotes}}'**
   String libraryQuotesCount(int count);
+
+  /// No description provided for @libraryBooksCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 book} other{{count} books}}'**
+  String libraryBooksCount(int count);
+
+  /// No description provided for @libraryShelvesCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 shelf} other{{count} shelves}}'**
+  String libraryShelvesCount(int count);
 
   /// No description provided for @libraryFavoritesCount.
   ///
@@ -507,24 +549,6 @@ abstract class AppLocalizations {
   /// **'Shelves arrive in the next update.'**
   String get libraryShelvesPlaceholder;
 
-  /// No description provided for @librarySearchScopeAll.
-  ///
-  /// In en, this message translates to:
-  /// **'all books'**
-  String get librarySearchScopeAll;
-
-  /// No description provided for @librarySearchScopeFavorites.
-  ///
-  /// In en, this message translates to:
-  /// **'favorites'**
-  String get librarySearchScopeFavorites;
-
-  /// No description provided for @librarySearchScopeNotes.
-  ///
-  /// In en, this message translates to:
-  /// **'my notes'**
-  String get librarySearchScopeNotes;
-
   /// No description provided for @libraryBookMeta.
   ///
   /// In en, this message translates to:
@@ -548,12 +572,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{title}, p.{pages}'**
   String quoteSourceLabel(String title, String pages);
-
-  /// No description provided for @librarySearchCount.
-  ///
-  /// In en, this message translates to:
-  /// **'{quotes, plural, =1{1 quote} other{{quotes} quotes}} in {books, plural, =1{1 book} other{{books} books}}'**
-  String librarySearchCount(int quotes, int books);
 
   /// No description provided for @navLibraryLabel.
   ///

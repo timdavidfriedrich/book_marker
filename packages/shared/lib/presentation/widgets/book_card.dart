@@ -58,36 +58,21 @@ class const BookCard({
                 color: context.c.surfaceContainerLowest,
                 borderRadius: BorderRadius.circular(Spacing.radiusL),
               ),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  BookCover(
-                    title: _title,
-                    url: _thumbnailUrl,
-                    width: 36,
-                    height: 48,
-                    radius: Spacing.radiusS,
-                  ),
-                  const SizedBox(width: Spacing.s),
-                  Expanded(
-                    child: Text.rich(
+              child: Text.rich(
+                TextSpan(
+                  children: [
+                    TextSpan(text: quote, style: context.typography.readingQuote),
+                    if (_featuredPages.isNotEmpty)
                       TextSpan(
-                        children: [
-                          TextSpan(text: quote, style: context.typography.readingQuote),
-                          if (_featuredPages.isNotEmpty)
-                            TextSpan(
-                              text: "  ${context.s.pageShortLabel(_featuredPages.toPageLabel())}",
-                              style: context.typography.monoLabel.copyWith(
-                                color: context.c.onSurfaceVariant,
-                              ),
-                            ),
-                        ],
+                        text: "  ${context.s.pageShortLabel(_featuredPages.toPageLabel())}",
+                        style: context.typography.monoLabel.copyWith(
+                          color: context.c.onSurfaceVariant,
+                        ),
                       ),
-                      maxLines: _featuredQuoteMaxLines,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                ],
+                  ],
+                ),
+                maxLines: _featuredQuoteMaxLines,
+                overflow: TextOverflow.ellipsis,
               ),
             ),
           ],

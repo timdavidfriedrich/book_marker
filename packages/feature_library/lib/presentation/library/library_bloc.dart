@@ -24,8 +24,8 @@ class LibraryBloc extends Bloc<LibraryEvent, LibraryState> {
     on<LibraryBooksUpdated>(_onBooksUpdated);
     on<LibraryViewChanged>(_onViewChanged);
     on<LibraryFilterChanged>(_onFilterChanged);
+    on<LibraryQuoteFilterChanged>(_onQuoteFilterChanged);
     on<LibraryQueryChanged>(_onQueryChanged);
-    on<LibrarySearchScopeChanged>(_onSearchScopeChanged);
     on<LibraryShelvesUpdated>(_onShelvesUpdated);
     on<LibraryShelfMembershipUpdated>(_onShelfMembershipUpdated);
     on<LibraryShelfCreateRequested>(_onShelfCreateRequested);
@@ -44,7 +44,7 @@ class LibraryBloc extends Bloc<LibraryEvent, LibraryState> {
   Map<String, Set<String>> _shelfMembership = const {};
   LibraryView _view = LibraryView.books;
   LibraryFilter _filter = LibraryFilter.all;
-  LibrarySearchScope _scope = LibrarySearchScope.allBooks;
+  LibraryQuoteFilter _quoteFilter = LibraryQuoteFilter.all;
   String _query = "";
   AppError? _error;
 
@@ -122,13 +122,13 @@ class LibraryBloc extends Bloc<LibraryEvent, LibraryState> {
     _emitState(emit);
   }
 
-  void _onQueryChanged(LibraryQueryChanged event, Emitter<LibraryState> emit) {
-    _query = event.query;
+  void _onQuoteFilterChanged(LibraryQuoteFilterChanged event, Emitter<LibraryState> emit) {
+    _quoteFilter = event.filter;
     _emitState(emit);
   }
 
-  void _onSearchScopeChanged(LibrarySearchScopeChanged event, Emitter<LibraryState> emit) {
-    _scope = event.scope;
+  void _onQueryChanged(LibraryQueryChanged event, Emitter<LibraryState> emit) {
+    _query = event.query;
     _emitState(emit);
   }
 
@@ -141,6 +141,9 @@ class LibraryBloc extends Bloc<LibraryEvent, LibraryState> {
     final books = _books;
     if (quotes == null || books == null) return;
 
+    final query = _query.trim().toLowerCase();
+    final booksById = {for (final book in books) book.id: book};
+
     final quotesByBook = <String, List<Quote>>{};
     for (final quote in quotes) {
       quotesByBook.putIfAbsent(quote.bookId, () => []).add(quote);
@@ -148,13 +151,13 @@ class LibraryBloc extends Bloc<LibraryEvent, LibraryState> {
 
     final summaries = <LibraryBookSummary>[];
     for (final book in books) {
-      final quotes = quotesByBook[book.id] ?? const [];
-      final sorted = [...quotes]..sort((a, b) => b.createdAt.compareTo(a.createdAt));
+      final bookQuotes = quotesByBook[book.id] ?? const <Quote>[];
+      final sorted = [...bookQuotes]..sort((a, b) => b.createdAt.compareTo(a.createdAt));
       summaries.add(
         LibraryBookSummary(
           book: book,
-          quoteCount: quotes.length,
-          favoriteCount: quotes.where((quote) => quote.isFavorite).length,
+          quoteCount: bookQuotes.length,
+          favoriteCount: bookQuotes.where((quote) => quote.isFavorite).length,
           featuredQuote: sorted.isEmpty ? null : sorted.first,
         ),
       );
@@ -164,64 +167,73 @@ class LibraryBloc extends Bloc<LibraryEvent, LibraryState> {
     final readingCount = summaries.where((it) => it.book.status == BookStatus.reading).length;
     final pausedCount = summaries.where((it) => it.book.status == BookStatus.paused).length;
     final finishedCount = summaries.where((it) => it.book.status == BookStatus.finished).length;
-    final visibleSummaries = switch (_filter) {
-      LibraryFilter.all => summaries,
-      LibraryFilter.reading =>
-        summaries.where((it) => it.book.status == BookStatus.reading).toList(),
-      LibraryFilter.paused => summaries.where((it) => it.book.status == BookStatus.paused).toList(),
-      LibraryFilter.finished =>
-        summaries.where((it) => it.book.status == BookStatus.finished).toList(),
-    };
 
-    final booksById = {for (final book in books) book.id: book};
-    final query = _query.trim().toLowerCase();
+    final visibleSummaries = summaries
+        .where(
+          (summary) => switch (_filter) {
+            LibraryFilter.all => true,
+            LibraryFilter.reading => summary.book.status == BookStatus.reading,
+            LibraryFilter.paused => summary.book.status == BookStatus.paused,
+            LibraryFilter.finished => summary.book.status == BookStatus.finished,
+          },
+        )
+        .where((summary) => query.isEmpty || _matchesBook(summary.book, query))
+        .toList();
+
     final results = <LibraryQuoteResult>[];
-    if (query.isNotEmpty || _scope != LibrarySearchScope.allBooks) {
-      for (final quote in quotes) {
-        final book = booksById[quote.bookId];
-        if (book == null) continue;
-        final matchesScope = switch (_scope) {
-          LibrarySearchScope.allBooks => true,
-          LibrarySearchScope.favorites => quote.isFavorite,
-          LibrarySearchScope.myNotes => false,
-        };
-        if (!matchesScope) continue;
-        final haystack = "${quote.quote} ${book.title}".toLowerCase();
-        if (haystack.contains(query)) {
-          results.add(LibraryQuoteResult(quote: quote, book: book));
-        }
-      }
-      results.sort((a, b) => b.quote.createdAt.compareTo(a.quote.createdAt));
+    for (final quote in quotes) {
+      final book = booksById[quote.bookId];
+      if (book == null) continue;
+      if (_quoteFilter == LibraryQuoteFilter.favorites && !quote.isFavorite) continue;
+      if (query.isNotEmpty && !_matchesQuote(quote, book, query)) continue;
+      results.add(LibraryQuoteResult(quote: quote, book: book));
     }
+    // * favourites lead the quote list, the rest follow newest first
+    results.sort((a, b) {
+      if (a.quote.isFavorite != b.quote.isFavorite) return a.quote.isFavorite ? -1 : 1;
+      return b.quote.createdAt.compareTo(a.quote.createdAt);
+    });
 
-    final shelfSummaries = _shelves.map((shelf) {
+    final shelfSummaries = <LibraryShelfSummary>[];
+    for (final shelf in _shelves) {
+      if (query.isNotEmpty && !shelf.name.toLowerCase().contains(query)) continue;
       final bookIds = _shelfMembership[shelf.id] ?? const <String>{};
       final shelfBooks = bookIds.map((id) => booksById[id]).whereType<Book>().toList();
-      final quoteCount = quotes.where((quote) => bookIds.contains(quote.bookId)).length;
-      return LibraryShelfSummary(
-        shelf: shelf,
-        bookCount: bookIds.length,
-        quoteCount: quoteCount,
-        previewBooks: shelfBooks.take(_shelfPreviewLimit).toList(),
+      shelfSummaries.add(
+        LibraryShelfSummary(
+          shelf: shelf,
+          bookCount: bookIds.length,
+          quoteCount: quotes.where((quote) => bookIds.contains(quote.bookId)).length,
+          previewBooks: shelfBooks.take(_shelfPreviewLimit).toList(),
+        ),
       );
-    }).toList();
+    }
 
     emit(
       LibraryLoaded(
         books: visibleSummaries,
+        quotes: results,
+        shelves: shelfSummaries,
         totalBooks: books.length,
         totalQuotes: quotes.length,
+        totalFavorites: quotes.where((quote) => quote.isFavorite).length,
         readingCount: readingCount,
         pausedCount: pausedCount,
         finishedCount: finishedCount,
         view: _view,
         filter: _filter,
+        quoteFilter: _quoteFilter,
         query: _query,
-        searchScope: _scope,
-        results: results,
-        shelves: shelfSummaries,
       ),
     );
+  }
+
+  bool _matchesBook(Book book, String query) {
+    return "${book.title} ${book.authors.join(" ")}".toLowerCase().contains(query);
+  }
+
+  bool _matchesQuote(Quote quote, Book book, String query) {
+    return "${quote.quote} ${book.title}".toLowerCase().contains(query);
   }
 
   @override

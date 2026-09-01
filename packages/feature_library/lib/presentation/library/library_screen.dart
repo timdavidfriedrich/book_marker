@@ -20,6 +20,7 @@ import 'package:shared/presentation/widgets/name_input_dialog.dart';
 import 'package:shared/presentation/widgets/pinned_header.dart';
 import 'package:shared/presentation/widgets/profile_avatar.dart';
 import 'package:shared/presentation/widgets/quote_card.dart';
+import 'package:shared/presentation/widgets/section_label.dart';
 import 'package:shared/presentation/widgets/segmented_toggle.dart';
 import 'package:shared/presentation/widgets/selectable_chip.dart';
 
@@ -29,10 +30,8 @@ const _chipHeight = 32.0;
 const _avatarHeight = 44.0;
 const _titleBarHeight = _avatarHeight + Spacing.m + Spacing.s;
 const _headerHeight = _searchFieldHeight + Spacing.m + _toggleHeight + Spacing.xs;
-const _searchHeaderHeight = _searchFieldHeight + Spacing.xs;
 const _chipsHeight = Spacing.xs + _chipHeight + Spacing.m;
 const _shelfPreviewOffset = 22.0;
-const _shelfPreviewLimit = 3;
 const _shelfPreviewWidth = 84.0;
 const _shelfPreviewHeight = 64.0;
 const _shelfMarkSize = 56.0;
@@ -65,10 +64,9 @@ class const _Loaded({
 }) extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final isSearching = _state.isSearching;
     return CustomScrollView(
       slivers: [
-        if (!isSearching)
+        if (!_state.isSearching)
           PinnedHeader(
             height: _titleBarHeight,
             child: ColoredBox(
@@ -93,15 +91,14 @@ class const _Loaded({
             ),
           ),
         FloatingHeader(
-          height: isSearching ? _searchHeaderHeight : _headerHeight,
+          height: _headerHeight,
           child: _Header(state: _state, controller: _controller),
         ),
-        if (isSearching)
-          _SearchResults(state: _state)
-        else if (_state.view == LibraryView.books)
-          _BookList(state: _state)
-        else
-          _ShelvesList(state: _state),
+        switch (_state.view) {
+          LibraryView.books => _BooksView(state: _state),
+          LibraryView.shelves => _ShelvesView(state: _state),
+          LibraryView.quotes => _QuotesView(state: _state),
+        },
       ],
     );
   }
@@ -113,7 +110,6 @@ class const _Header({
 }) extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final isBooks = _state.view == LibraryView.books;
     return ColoredBox(
       color: context.c.surface,
       child: Padding(
@@ -123,18 +119,19 @@ class const _Header({
           children: [
             SizedBox(
               height: _searchFieldHeight,
-              child: _SearchField(controller: _controller, showClear: _state.isSearching),
+              child: _SearchField(controller: _controller, state: _state),
             ),
-            if (!_state.isSearching) ...[
-              const SizedBox(height: Spacing.m),
-              SegmentedToggle(
-                labels: [context.s.libraryTabBooks, context.s.libraryTabShelves],
-                selectedIndex: isBooks ? 0 : 1,
-                onChanged: (index) => context.read<LibraryBloc>().add(
-                  LibraryViewChanged(index == 0 ? LibraryView.books : LibraryView.shelves),
-                ),
-              ),
-            ],
+            const SizedBox(height: Spacing.m),
+            SegmentedToggle(
+              labels: [
+                context.s.libraryTabBooks,
+                context.s.libraryTabShelves,
+                context.s.libraryTabQuotes,
+              ],
+              selectedIndex: _state.view.index,
+              onChanged: (index) =>
+                  context.read<LibraryBloc>().add(LibraryViewChanged(LibraryView.values[index])),
+            ),
           ],
         ),
       ),
@@ -144,7 +141,7 @@ class const _Header({
 
 class const _SearchField({
   required final TextEditingController _controller,
-  required final bool _showClear,
+  required final LibraryLoaded _state,
 }) extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -154,16 +151,14 @@ class const _SearchField({
       style: context.t.bodyLarge,
       onChanged: (value) => context.read<LibraryBloc>().add(LibraryQueryChanged(value)),
       decoration: InputDecoration(
-        hintText: context.s.librarySearchHint,
+        hintText: _searchHint(context, _state.view),
         prefixIcon: Icon(Icons.search, color: context.c.onSurfaceVariant),
-        suffixIcon: _showClear
+        suffixIcon: _state.isSearching
             ? IconButton(
                 icon: Icon(Icons.close, color: context.c.onSurfaceVariant),
                 onPressed: () {
                   _controller.clear();
-                  context.read<LibraryBloc>()
-                    ..add(const LibraryQueryChanged(""))
-                    ..add(const LibrarySearchScopeChanged(LibrarySearchScope.allBooks));
+                  context.read<LibraryBloc>().add(const LibraryQueryChanged(""));
                 },
               )
             : null,
@@ -172,101 +167,258 @@ class const _SearchField({
   }
 }
 
-class const _BookList({
+class const _BooksView({
   required final LibraryLoaded _state,
 }) extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SliverMainAxisGroup(
       slivers: [
-        PinnedHeader(
-          height: _chipsHeight,
-          child: ColoredBox(
-            color: context.c.surface,
-            child: SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              padding: const EdgeInsets.fromLTRB(Spacing.l, Spacing.xs, Spacing.l, Spacing.m),
-              child: Row(
-                children: [
-                  for (final (index, filter) in LibraryFilter.values.indexed) ...[
-                    if (index > 0) const SizedBox(width: Spacing.xs),
-                    SelectableChip(
-                      label: _filterLabel(context, filter, _state),
-                      selected: _state.filter == filter,
-                      onTap: () => context.read<LibraryBloc>().add(LibraryFilterChanged(filter)),
-                    ),
-                  ],
-                  const SizedBox(width: Spacing.xs),
-                  SelectableChip(
-                    label: context.s.librarySearchScopeFavorites,
-                    selected: false,
-                    onTap: () => context.read<LibraryBloc>().add(
-                      const LibrarySearchScopeChanged(LibrarySearchScope.favorites),
-                    ),
-                  ),
-                ],
+        _FilterChips(
+          chips: [
+            for (final filter in LibraryFilter.values)
+              _FilterChip(
+                label: _filterLabel(context, filter, _state),
+                selected: _state.filter == filter,
+                onTap: () => context.read<LibraryBloc>().add(LibraryFilterChanged(filter)),
               ),
-            ),
-          ),
+          ],
         ),
         if (_state.books.isEmpty)
-          SliverFillRemaining(
-            hasScrollBody: false,
-            child: Padding(
-              padding: const EdgeInsets.all(Spacing.l),
-              child: Text(
-                _state.totalBooks == 0
-                    ? context.s.libraryEmptyMessage
-                    : context.s.filterNoResultsMessage,
-                textAlign: TextAlign.center,
-                style: context.typography.readingBody.copyWith(color: context.c.onSurfaceVariant),
-              ),
-            ),
+          _EmptyMessage(
+            text: _state.totalBooks == 0
+                ? context.s.libraryBooksEmptyMessage
+                : context.s.filterNoResultsMessage,
           )
-        else
-          SliverPadding(
-            padding: const EdgeInsets.fromLTRB(Spacing.l, 0, Spacing.l, Spacing.xxl),
-            sliver: SliverList.separated(
-              itemCount: _state.books.length,
-              separatorBuilder: (context, index) => const SizedBox(height: Spacing.m),
-              itemBuilder: (context, index) {
-                final summary = _state.books[index];
-                final book = summary.book;
-                final featured = summary.featuredQuote;
-                final statusLabel = book.status.toSummaryLabel(context);
-                return BookCard(
-                  title: book.title,
-                  meta: _bookMeta(context, summary, statusLabel),
-                  count: summary.quoteCount,
-                  thumbnailUrl: book.thumbnailUrl,
-                  featuredQuote: featured == null ? null : "“${featured.quote}”",
-                  featuredPages: featured?.pageNumbers ?? const [],
-                  onTap: () => context.pushBookDetail(book.id),
-                );
-              },
-            ),
-          ),
+        else ...[
+          if (_state.isSearching)
+            _ResultCount(text: context.s.libraryBooksCount(_state.books.length)),
+          _BookCards(summaries: _state.books),
+          const _BottomSpacer(),
+        ],
       ],
     );
   }
 }
 
-class const _ShelvesList({
+class const _ShelvesView({
   required final LibraryLoaded _state,
 }) extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    if (_state.shelves.isEmpty && _state.isSearching) {
+      return _EmptyMessage(text: context.s.filterNoResultsMessage);
+    }
+    return SliverMainAxisGroup(
+      slivers: [
+        if (_state.isSearching)
+          _ResultCount(text: context.s.libraryShelvesCount(_state.shelves.length)),
+        _ShelfCards(summaries: _state.shelves, withNewTile: !_state.isSearching),
+        const _BottomSpacer(),
+      ],
+    );
+  }
+}
+
+class const _QuotesView({
+  required final LibraryLoaded _state,
+}) extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return SliverMainAxisGroup(
+      slivers: [
+        _FilterChips(
+          chips: [
+            for (final filter in LibraryQuoteFilter.values)
+              _FilterChip(
+                label: _quoteFilterLabel(context, filter, _state),
+                selected: _state.quoteFilter == filter,
+                onTap: () => context.read<LibraryBloc>().add(LibraryQuoteFilterChanged(filter)),
+              ),
+          ],
+        ),
+        if (_state.quotes.isEmpty)
+          _EmptyMessage(
+            text: _state.totalQuotes == 0
+                ? context.s.libraryEmptyMessage
+                : context.s.filterNoResultsMessage,
+          )
+        else ...[
+          if (_state.isSearching)
+            _ResultCount(text: context.s.libraryQuotesCount(_state.quotes.length)),
+          _QuoteCards(results: _state.quotes),
+          const _BottomSpacer(),
+        ],
+      ],
+    );
+  }
+}
+
+class const _FilterChips({
+  required final List<Widget> _chips,
+}) extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return PinnedHeader(
+      height: _chipsHeight,
+      child: ColoredBox(
+        color: context.c.surface,
+        child: SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          padding: const EdgeInsets.fromLTRB(Spacing.l, Spacing.xs, Spacing.l, Spacing.m),
+          child: Row(
+            children: [
+              for (final (index, chip) in _chips.indexed) ...[
+                if (index > 0) const SizedBox(width: Spacing.xs),
+                chip,
+              ],
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class const _FilterChip({
+  required final String _label,
+  required final bool _selected,
+  required final VoidCallback _onTap,
+}) extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return SelectableChip(
+      label: _label,
+      selected: _selected,
+      selectedColor: context.c.inverseSurface,
+      selectedTextColor: context.c.onInverseSurface,
+      onTap: _onTap,
+    );
+  }
+}
+
+class const _BookCards({
+  required final List<LibraryBookSummary> _summaries,
+}) extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
     return SliverPadding(
-      padding: const EdgeInsets.fromLTRB(Spacing.l, 0, Spacing.l, Spacing.xxl),
+      padding: const EdgeInsets.fromLTRB(Spacing.l, 0, Spacing.l, 0),
       sliver: SliverList.separated(
-        itemCount: _state.shelves.length + 1,
+        itemCount: _summaries.length,
         separatorBuilder: (context, index) => const SizedBox(height: Spacing.m),
         itemBuilder: (context, index) {
-          if (index == _state.shelves.length) {
+          final summary = _summaries[index];
+          final book = summary.book;
+          final featured = summary.featuredQuote;
+          return BookCard(
+            title: book.title,
+            meta: _bookMeta(context, summary, book.status.toSummaryLabel(context)),
+            count: summary.quoteCount,
+            thumbnailUrl: book.thumbnailUrl,
+            featuredQuote: featured == null ? null : "“${featured.quote}”",
+            featuredPages: featured?.pageNumbers ?? const [],
+            onTap: () => context.pushBookDetail(book.id),
+          );
+        },
+      ),
+    );
+  }
+}
+
+class const _QuoteCards({
+  required final List<LibraryQuoteResult> _results,
+}) extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return SliverPadding(
+      padding: const EdgeInsets.fromLTRB(Spacing.l, 0, Spacing.l, 0),
+      sliver: SliverList.separated(
+        itemCount: _results.length,
+        separatorBuilder: (context, index) => const SizedBox(height: Spacing.m),
+        itemBuilder: (context, index) {
+          final result = _results[index];
+          final book = result.book;
+          final quote = result.quote;
+          final pages = quote.pageNumbers;
+          final voiceNoteMs = quote.voiceNoteDurationMs;
+          return QuoteCard(
+            quote: "“${quote.quote}”",
+            bookTitle: book.title,
+            thumbnailUrl: book.thumbnailUrl,
+            pages: pages,
+            sourceLabel: pages.isEmpty
+                ? book.title
+                : context.s.quoteSourceLabel(book.title, pages.toPageLabel()),
+            isFavorite: quote.isFavorite,
+            hasVoiceNote: quote.voiceNotePath != null,
+            voiceNoteDuration: voiceNoteMs == null ? null : Duration(milliseconds: voiceNoteMs),
+            voiceNotePath: quote.voiceNotePath,
+            onTap: () => context.pushQuoteDetail(quote.id),
+          );
+        },
+      ),
+    );
+  }
+}
+
+class const _ShelfCards({
+  required final List<LibraryShelfSummary> _summaries,
+  final bool _withNewTile = false,
+}) extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return SliverPadding(
+      padding: const EdgeInsets.fromLTRB(Spacing.l, 0, Spacing.l, 0),
+      sliver: SliverList.separated(
+        itemCount: _summaries.length + (_withNewTile ? 1 : 0),
+        separatorBuilder: (context, index) => const SizedBox(height: Spacing.m),
+        itemBuilder: (context, index) {
+          if (index == _summaries.length) {
             return _NewShelfTile(onTap: () => _promptNewShelf(context));
           }
-          return _ShelfCard(summary: _state.shelves[index]);
+          return _ShelfCard(summary: _summaries[index]);
         },
+      ),
+    );
+  }
+}
+
+class const _ResultCount({
+  required final String _text,
+}) extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return SliverToBoxAdapter(
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(Spacing.l, Spacing.xs, Spacing.l, Spacing.s),
+        child: SectionLabel(text: _text, dotColor: context.c.outline),
+      ),
+    );
+  }
+}
+
+class const _BottomSpacer() extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return const SliverToBoxAdapter(child: SizedBox(height: Spacing.xxl));
+  }
+}
+
+class const _EmptyMessage({
+  required final String _text,
+}) extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return SliverFillRemaining(
+      hasScrollBody: false,
+      child: Padding(
+        padding: const EdgeInsets.all(Spacing.l),
+        child: Text(
+          _text,
+          textAlign: TextAlign.center,
+          style: context.typography.readingBody.copyWith(color: context.c.onSurfaceVariant),
+        ),
       ),
     );
   }
@@ -279,7 +431,6 @@ class const _ShelfCard({
   Widget build(BuildContext context) {
     final shelf = _summary.shelf;
     final swatch = context.palette.resolve(shelf.accent);
-    final previewBooks = _summary.previewBooks.take(_shelfPreviewLimit).toList();
     return InkTapBox(
       color: swatch.fill,
       radius: Spacing.radiusXl,
@@ -312,14 +463,14 @@ class const _ShelfCard({
               ],
             ),
           ),
-          if (previewBooks.isNotEmpty) ...[
+          if (_summary.previewBooks.isNotEmpty) ...[
             const SizedBox(width: Spacing.s),
             SizedBox(
               width: _shelfPreviewWidth,
               height: _shelfPreviewHeight,
               child: Stack(
                 children: [
-                  for (final (index, book) in previewBooks.indexed)
+                  for (final (index, book) in _summary.previewBooks.indexed)
                     Positioned(
                       left: index * _shelfPreviewOffset,
                       child: BookCover(
@@ -380,71 +531,6 @@ Future<void> _promptNewShelf(BuildContext context) async {
   if (name != null && name.trim().isNotEmpty) bloc.add(LibraryShelfCreateRequested(name));
 }
 
-class const _SearchResults({
-  required final LibraryLoaded _state,
-}) extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    final bookCount = _state.results.map((result) => result.book.id).toSet().length;
-    return SliverMainAxisGroup(
-      slivers: [
-        SliverToBoxAdapter(
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(Spacing.l, Spacing.m, Spacing.l, Spacing.m),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    for (final (index, scope) in LibrarySearchScope.values.indexed) ...[
-                      if (index > 0) const SizedBox(width: Spacing.xs),
-                      SelectableChip(
-                        label: _scopeLabel(context, scope),
-                        selected: _state.searchScope == scope,
-                        selectedColor: context.c.inverseSurface,
-                        selectedTextColor: context.c.onInverseSurface,
-                        onTap: () =>
-                            context.read<LibraryBloc>().add(LibrarySearchScopeChanged(scope)),
-                      ),
-                    ],
-                  ],
-                ),
-                const SizedBox(height: Spacing.m),
-                Text(
-                  context.s.librarySearchCount(_state.results.length, bookCount),
-                  style: context.typography.monoLabel.copyWith(color: context.c.onSurfaceVariant),
-                ),
-              ],
-            ),
-          ),
-        ),
-        SliverPadding(
-          padding: const EdgeInsets.fromLTRB(Spacing.l, 0, Spacing.l, Spacing.xxl),
-          sliver: SliverList.separated(
-            itemCount: _state.results.length,
-            separatorBuilder: (context, index) => const SizedBox(height: Spacing.m),
-            itemBuilder: (context, index) {
-              final result = _state.results[index];
-              final book = result.book;
-              final pages = result.quote.pageNumbers;
-              final source = pages.isEmpty
-                  ? book.title
-                  : context.s.quoteSourceLabel(book.title, pages.toPageLabel());
-              return QuoteCard(
-                quote: "“${result.quote.quote}”",
-                bookTitle: book.title,
-                thumbnailUrl: book.thumbnailUrl,
-                sourceLabel: source,
-                onTap: () => context.pushQuoteDetail(result.quote.id),
-              );
-            },
-          ),
-        ),
-      ],
-    );
-  }
-}
-
 class const _Failure({
   required final AppError _error,
 }) extends StatelessWidget {
@@ -469,6 +555,14 @@ class const _Failure({
   }
 }
 
+String _searchHint(BuildContext context, LibraryView view) {
+  return switch (view) {
+    LibraryView.books => context.s.librarySearchBooksHint,
+    LibraryView.shelves => context.s.librarySearchShelvesHint,
+    LibraryView.quotes => context.s.librarySearchQuotesHint,
+  };
+}
+
 String _bookMeta(BuildContext context, LibraryBookSummary summary, String? statusLabel) {
   if (summary.favoriteCount == 0) {
     return statusLabel == null
@@ -484,19 +578,22 @@ String _bookMeta(BuildContext context, LibraryBookSummary summary, String? statu
         );
 }
 
+String _quoteFilterLabel(
+  BuildContext context,
+  LibraryQuoteFilter filter,
+  LibraryLoaded state,
+) {
+  return switch (filter) {
+    LibraryQuoteFilter.all => context.s.libraryFilterAll(state.totalQuotes),
+    LibraryQuoteFilter.favorites => context.s.libraryFilterFavorites(state.totalFavorites),
+  };
+}
+
 String _filterLabel(BuildContext context, LibraryFilter filter, LibraryLoaded state) {
   return switch (filter) {
     LibraryFilter.all => context.s.libraryFilterAll(state.totalBooks),
     LibraryFilter.reading => context.s.libraryFilterReading(state.readingCount),
     LibraryFilter.paused => context.s.libraryFilterPaused(state.pausedCount),
     LibraryFilter.finished => context.s.libraryFilterFinished(state.finishedCount),
-  };
-}
-
-String _scopeLabel(BuildContext context, LibrarySearchScope scope) {
-  return switch (scope) {
-    LibrarySearchScope.allBooks => context.s.librarySearchScopeAll,
-    LibrarySearchScope.favorites => context.s.librarySearchScopeFavorites,
-    LibrarySearchScope.myNotes => context.s.librarySearchScopeNotes,
   };
 }
