@@ -29,6 +29,7 @@ import 'package:shared/presentation/widgets/page_dots.dart';
 import 'package:shared/presentation/widgets/page_number_field.dart';
 import 'package:shared/presentation/widgets/page_pill.dart';
 import 'package:shared/presentation/widgets/paper_card.dart';
+import 'package:shared/presentation/widgets/segmented_toggle.dart';
 import 'package:shared/presentation/widgets/selectable_chip.dart';
 import 'package:shared/presentation/widgets/sheet_content.dart';
 import 'package:shared/presentation/widgets/voice_note_recorder.dart';
@@ -219,33 +220,11 @@ class const _ModeToggle({
 }) extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(Spacing.xxxs),
-      decoration: BoxDecoration(
-        color: context.c.surfaceContainerHigh,
-        borderRadius: BorderRadius.circular(Spacing.radiusFull),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          for (final entry in [context.s.markingModeText, context.s.markingModePhoto].indexed)
-            InkTapBox(
-              onTap: () => _onChanged(entry.$1),
-              radius: Spacing.radiusFull,
-              color: entry.$1 == _index ? context.c.inverseSurface : Colors.transparent,
-              padding: const EdgeInsets.symmetric(horizontal: Spacing.m, vertical: Spacing.xs),
-              child: Text(
-                entry.$2,
-                style: context.t.labelMedium?.copyWith(
-                  fontSize: 14,
-                  color: entry.$1 == _index
-                      ? context.c.onInverseSurface
-                      : context.c.onSurfaceVariant,
-                ),
-              ),
-            ),
-        ],
-      ),
+    return SegmentedToggle(
+      isExpanded: false,
+      labels: [context.s.markingModeText, context.s.markingModePhoto],
+      selectedIndex: _index,
+      onChanged: _onChanged,
     );
   }
 }

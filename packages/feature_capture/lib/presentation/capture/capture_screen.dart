@@ -260,38 +260,18 @@ class const _SpanToggle() extends StatelessWidget {
           _ => CaptureSpan.onePage,
         };
         return Center(
-          child: Container(
-            padding: const EdgeInsets.all(Spacing.xxxs),
-            decoration: BoxDecoration(
-              color: context.c.surfaceContainerHigh,
-              borderRadius: BorderRadius.circular(Spacing.radiusFull),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                for (final entry in CaptureSpan.values.indexed)
-                  InkTapBox(
-                    onTap: () => context.read<CaptureBloc>().add(CaptureSpanSelected(entry.$2)),
-                    radius: Spacing.radiusFull,
-                    color: entry.$2 == span ? context.c.inverseSurface : Colors.transparent,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: Spacing.l,
-                      vertical: Spacing.xs,
-                    ),
-                    child: Text(
-                      switch (entry.$2) {
-                        CaptureSpan.onePage => context.s.captureModeOnePage,
-                        CaptureSpan.spread => context.s.captureModeSpread,
-                      },
-                      style: context.t.labelMedium?.copyWith(
-                        fontSize: 14,
-                        color: entry.$2 == span
-                            ? context.c.onInverseSurface
-                            : context.c.onSurfaceVariant,
-                      ),
-                    ),
-                  ),
-              ],
+          child: SegmentedToggle(
+            isExpanded: false,
+            labels: [
+              for (final value in CaptureSpan.values)
+                switch (value) {
+                  CaptureSpan.onePage => context.s.captureModeOnePage,
+                  CaptureSpan.spread => context.s.captureModeSpread,
+                },
+            ],
+            selectedIndex: CaptureSpan.values.indexOf(span),
+            onChanged: (index) => context.read<CaptureBloc>().add(
+              CaptureSpanSelected(CaptureSpan.values[index]),
             ),
           ),
         );

@@ -27,11 +27,10 @@ import 'package:shared/presentation/widgets/selectable_chip.dart';
 import 'package:shared/presentation/widgets/tab_header.dart';
 
 const _searchFieldHeight = 56.0;
-const _toggleHeight = 40.0;
 const _chipHeight = 32.0;
 const _wideTitleBarHeight = _searchFieldHeight + Spacing.m + Spacing.s;
-const _headerHeight = _searchFieldHeight + Spacing.m + _toggleHeight + Spacing.xs;
-const _wideHeaderHeight = _toggleHeight + Spacing.xs;
+const _headerHeight = _searchFieldHeight + Spacing.m + segmentedToggleHeight + Spacing.xs;
+const _wideHeaderHeight = segmentedToggleHeight + Spacing.xs;
 const _chipsHeight = Spacing.xs + _chipHeight + Spacing.m;
 const _toggleMaxWidth = 480.0;
 const _shelfPreviewOffset = 22.0;
