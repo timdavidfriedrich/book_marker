@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'dart:io';
 
 import 'package:core/theme/spacing.dart';
@@ -15,8 +14,6 @@ import 'package:feature_capture/presentation/widgets/word_selection_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:record/record.dart';
 import 'package:shared/domain/entities/book.dart';
 import 'package:shared/domain/entities/quote_theme.dart';
 import 'package:shared/presentation/extensions/app_error_extensions.dart';
@@ -34,10 +31,8 @@ import 'package:shared/presentation/widgets/page_pill.dart';
 import 'package:shared/presentation/widgets/paper_card.dart';
 import 'package:shared/presentation/widgets/selectable_chip.dart';
 import 'package:shared/presentation/widgets/sheet_content.dart';
-import 'package:uuid/uuid.dart';
+import 'package:shared/presentation/widgets/voice_note_recorder.dart';
 
-const _uuid = Uuid();
-const _minVoiceNoteMs = 500;
 const _highlightPadding = 2.0;
 const _legendSampleWidth = 28.0;
 const _legendSampleHeight = 16.0;
@@ -50,13 +45,6 @@ const _sideColumnWidth = 320.0;
 const _saveMarkerSize = 24.0;
 const _handleWidth = 44.0;
 const _handleHeight = 5.0;
-
-String _formatDuration(int milliseconds) {
-  final duration = Duration(milliseconds: milliseconds);
-  final minutes = duration.inMinutes;
-  final seconds = duration.inSeconds % 60;
-  return "$minutes:${seconds.toString().padLeft(2, "0")}";
-}
 
 class const MarkingScreen({
   super.key,
@@ -518,23 +506,23 @@ class const _SaveSheet() extends HookWidget {
                 label: context.s.markingBookFieldLabel,
                 onSwitch: state.books.isEmpty ? null : () => _showBookPicker(context),
               );
-              final pageAndVoiceNote = Row(
-                children: [
-                  PageNumberField(
-                    pages: state.pageNumbers,
-                    wasDetected: state.detectedPageNumbers.isNotEmpty,
-                    onChanged: (pages) => context.read<MarkingBloc>().add(
-                      MarkingPageNumbersChanged(pages),
-                    ),
+              final pageField = Align(
+                alignment: Alignment.centerLeft,
+                child: PageNumberField(
+                  pages: state.pageNumbers,
+                  wasDetected: state.detectedPageNumbers.isNotEmpty,
+                  onChanged: (pages) => context.read<MarkingBloc>().add(
+                    MarkingPageNumbersChanged(pages),
                   ),
-                  const SizedBox(width: Spacing.s),
-                  Expanded(
-                    child: _VoiceNoteRecorder(
-                      voiceNotePath: state.voiceNotePath,
-                      voiceNoteDurationMs: state.voiceNoteDurationMs,
-                    ),
-                  ),
-                ],
+                ),
+              );
+              final voiceNote = VoiceNoteRecorder(
+                path: state.voiceNotePath,
+                durationMs: state.voiceNoteDurationMs,
+                onRecorded: (path, durationMs) => context.read<MarkingBloc>().add(
+                  MarkingVoiceNoteRecorded(path, durationMs),
+                ),
+                onCleared: () => context.read<MarkingBloc>().add(const MarkingVoiceNoteCleared()),
               );
               final actions = Row(
                 children: [
@@ -628,7 +616,9 @@ class const _SaveSheet() extends HookWidget {
                             children: [
                               chooser,
                               const SizedBox(height: Spacing.s),
-                              pageAndVoiceNote,
+                              pageField,
+                              const SizedBox(height: Spacing.l),
+                              voiceNote,
                               const SizedBox(height: Spacing.m),
                               _ThemeChips(
                                 themes: state.availableThemes,
@@ -650,7 +640,9 @@ class const _SaveSheet() extends HookWidget {
                     const SizedBox(height: Spacing.m),
                     chooser,
                     const SizedBox(height: Spacing.s),
-                    pageAndVoiceNote,
+                    pageField,
+                    const SizedBox(height: Spacing.l),
+                    voiceNote,
                     const SizedBox(height: Spacing.s),
                     _NoteField(controller: noteController),
                     const SizedBox(height: Spacing.m),
@@ -811,124 +803,6 @@ class const _NoteField({
           focusedBorder: InputBorder.none,
           contentPadding: EdgeInsets.zero,
           hintText: context.s.markingNoteHint,
-        ),
-      ),
-    );
-  }
-}
-
-class const _VoiceNoteRecorder({
-  required final String? _voiceNotePath,
-  required final int? _voiceNoteDurationMs,
-}) extends HookWidget {
-  @override
-  Widget build(BuildContext context) {
-    final recorder = useMemoized(AudioRecorder.new);
-    useEffect(() => recorder.dispose, [recorder]);
-    final isRecording = useState(false);
-    final stopwatch = useMemoized(Stopwatch.new);
-    final elapsed = useState(Duration.zero);
-
-    useEffect(() {
-      if (!isRecording.value) return null;
-      final timer = Timer.periodic(const Duration(milliseconds: 200), (_) {
-        elapsed.value = stopwatch.elapsed;
-      });
-      return timer.cancel;
-    }, [isRecording.value]);
-
-    Future<void> start() async {
-      if (!await recorder.hasPermission()) {
-        if (context.mounted) context.showToast(context.s.errorUnexpected);
-        return;
-      }
-      final directory = await getApplicationDocumentsDirectory();
-      final path = "${directory.path}/voice_${_uuid.v4()}.m4a";
-      await recorder.start(const RecordConfig(), path: path);
-      stopwatch
-        ..reset()
-        ..start();
-      elapsed.value = Duration.zero;
-      isRecording.value = true;
-    }
-
-    Future<void> stop() async {
-      if (!isRecording.value) return;
-      stopwatch.stop();
-      final path = await recorder.stop();
-      isRecording.value = false;
-      final milliseconds = stopwatch.elapsedMilliseconds;
-      if (path != null && milliseconds > _minVoiceNoteMs && context.mounted) {
-        context.read<MarkingBloc>().add(MarkingVoiceNoteRecorded(path, milliseconds));
-      }
-    }
-
-    if (_voiceNotePath != null && !isRecording.value) {
-      return Container(
-        padding: const EdgeInsets.symmetric(horizontal: Spacing.m, vertical: Spacing.xs),
-        decoration: BoxDecoration(
-          color: context.c.tertiary,
-          borderRadius: BorderRadius.circular(Spacing.radiusFull),
-        ),
-        child: Row(
-          children: [
-            Icon(Icons.graphic_eq, color: context.c.onTertiary, size: Spacing.iconM),
-            const SizedBox(width: Spacing.s),
-            Expanded(
-              child: Text(
-                context.s.quoteVoiceNoteLabel(_formatDuration(_voiceNoteDurationMs ?? 0)),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: context.t.bodyLarge?.copyWith(color: context.c.onTertiary),
-              ),
-            ),
-            IconButton(
-              onPressed: () => context.read<MarkingBloc>().add(const MarkingVoiceNoteCleared()),
-              icon: const Icon(Icons.close),
-              iconSize: Spacing.iconM,
-              color: context.c.onTertiary,
-            ),
-          ],
-        ),
-      );
-    }
-
-    final label = isRecording.value
-        ? _formatDuration(elapsed.value.inMilliseconds)
-        : context.s.markingVoiceNoteHint;
-    return Listener(
-      onPointerDown: (_) => start(),
-      onPointerUp: (_) => stop(),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: Spacing.m, vertical: Spacing.s),
-        decoration: BoxDecoration(
-          color: context.c.tertiary,
-          borderRadius: BorderRadius.circular(Spacing.radiusFull),
-        ),
-        child: Row(
-          children: [
-            Container(
-              width: 28,
-              height: 28,
-              alignment: Alignment.center,
-              decoration: BoxDecoration(color: context.c.onTertiary, shape: BoxShape.circle),
-              child: Icon(Icons.mic_rounded, size: Spacing.iconS, color: context.c.tertiary),
-            ),
-            const SizedBox(width: Spacing.s),
-            Expanded(
-              child: Text(
-                label,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: context.t.bodyLarge?.copyWith(color: context.c.onTertiary),
-              ),
-            ),
-            Icon(
-              isRecording.value ? Icons.fiber_manual_record : Icons.graphic_eq,
-              color: context.c.onTertiary,
-              size: Spacing.iconM,
-            ),
-          ],
         ),
       ),
     );

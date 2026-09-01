@@ -11,6 +11,7 @@ import 'package:shared/presentation/extensions/context_extensions.dart';
 import 'package:shared/presentation/extensions/locale_preference_extensions.dart';
 import 'package:shared/presentation/extensions/theme_preference_extensions.dart';
 import 'package:shared/presentation/localization/generated/app_localizations.dart';
+import 'package:shared/presentation/voice_note_cubit.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -23,8 +24,12 @@ class const App({
 }) extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) => sl<AppSettingsCubit>()..start(),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(create: (_) => sl<AppSettingsCubit>()..start()),
+        // * one shared player keeps a single voice note audible across all screens
+        BlocProvider(create: (_) => sl<VoiceNoteCubit>()),
+      ],
       child: BlocBuilder<AppSettingsCubit, UserSettings>(
         builder: (context, settings) {
           final contrast = settings.contrastPreference.toContrastLevel();

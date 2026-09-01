@@ -63,6 +63,10 @@ class AppLocalizationsDe extends AppLocalizations {
   String get errorValidation => 'Die empfangenen Daten sind ungültig.';
 
   @override
+  String get errorMicrophonePermission =>
+      'Erlaube den Mikrofonzugriff, um eine Sprachnotiz aufzunehmen.';
+
+  @override
   String get errorNotFound => 'Nicht gefunden.';
 
   @override
@@ -506,7 +510,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get markingNoteHint => 'Notiz hinzufügen';
 
   @override
-  String get markingVoiceNoteHint => 'Sprachnotiz';
+  String get voiceNoteHint => 'Sprachnotiz hinzufügen';
 
   @override
   String get markingDoneButton => 'Fertig';
@@ -700,6 +704,13 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get bookDeleteMessage =>
       'Damit werden das Buch und alle seine Zitate gelöscht. Das kann nicht rückgängig gemacht werden.';
+
+  @override
+  String get voiceNoteDeleteTitle => 'Sprachnotiz löschen?';
+
+  @override
+  String get voiceNoteDeleteMessage =>
+      'Damit wird die Aufnahme gelöscht. Das kann nicht rückgängig gemacht werden.';
 
   @override
   String get quoteDeleteAction => 'Zitat löschen';

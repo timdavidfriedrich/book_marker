@@ -6,6 +6,7 @@ import 'package:shared/data/data_sources/quote_local_data_source.dart';
 import 'package:shared/data/mappers/quote_mappers.dart';
 import 'package:shared/domain/entities/quote.dart';
 import 'package:shared/domain/entities/quote_page.dart';
+import 'package:shared/domain/entities/voice_note.dart';
 import 'package:shared/domain/repositories/quote_repository.dart';
 
 @Injectable(as: QuoteRepository)
@@ -77,6 +78,16 @@ class const QuoteRepositoryImpl(
   Future<AppResult<()>> setPageNumbers(String id, List<int> pageNumbers) async {
     try {
       await _localDataSource.setPageNumbers(id, pageNumbers);
+      return const Success(());
+    } on Object {
+      return const Failure(UnexpectedError());
+    }
+  }
+
+  @override
+  Future<AppResult<()>> setVoiceNote(String id, VoiceNote? voiceNote) async {
+    try {
+      await _localDataSource.setVoiceNote(id, voiceNote?.path, voiceNote?.durationMs);
       return const Success(());
     } on Object {
       return const Failure(UnexpectedError());

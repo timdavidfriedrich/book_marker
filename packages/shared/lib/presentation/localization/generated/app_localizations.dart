@@ -195,6 +195,12 @@ abstract class AppLocalizations {
   /// **'The data received is invalid.'**
   String get errorValidation;
 
+  /// No description provided for @errorMicrophonePermission.
+  ///
+  /// In en, this message translates to:
+  /// **'Allow microphone access to record a voice note.'**
+  String get errorMicrophonePermission;
+
   /// No description provided for @errorNotFound.
   ///
   /// In en, this message translates to:
@@ -843,11 +849,11 @@ abstract class AppLocalizations {
   /// **'add a note'**
   String get markingNoteHint;
 
-  /// No description provided for @markingVoiceNoteHint.
+  /// No description provided for @voiceNoteHint.
   ///
   /// In en, this message translates to:
-  /// **'voice note'**
-  String get markingVoiceNoteHint;
+  /// **'add voice note'**
+  String get voiceNoteHint;
 
   /// No description provided for @markingDoneButton.
   ///
@@ -1094,6 +1100,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'This deletes the book and all its quotes. This can\'t be undone.'**
   String get bookDeleteMessage;
+
+  /// No description provided for @voiceNoteDeleteTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete voice note?'**
+  String get voiceNoteDeleteTitle;
+
+  /// No description provided for @voiceNoteDeleteMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'This deletes the recording. This can\'t be undone.'**
+  String get voiceNoteDeleteMessage;
 
   /// No description provided for @quoteDeleteAction.
   ///

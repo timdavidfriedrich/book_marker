@@ -17,6 +17,13 @@ class const QuoteDetailPageNumbersChanged(
   final List<int> pageNumbers,
 ) extends QuoteDetailEvent;
 
+class const QuoteDetailVoiceNoteRecorded(
+  final String path,
+  final int durationMs,
+) extends QuoteDetailEvent;
+
+class const QuoteDetailVoiceNoteCleared() extends QuoteDetailEvent;
+
 class const QuoteDetailThemesUpdated(
   final AppResult<List<QuoteTheme>> result,
 ) extends QuoteDetailEvent;

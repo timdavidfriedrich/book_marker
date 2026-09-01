@@ -1,8 +1,12 @@
-import 'package:audioplayers/audioplayers.dart';
+import 'dart:async';
+
 import 'package:core/theme/spacing.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared/presentation/extensions/context_extensions.dart';
+import 'package:shared/presentation/extensions/duration_extensions.dart';
+import 'package:shared/presentation/voice_note_cubit.dart';
+import 'package:shared/presentation/voice_note_state.dart';
 import 'package:shared/presentation/widgets/book_cover.dart';
 import 'package:shared/presentation/widgets/expandable_text.dart';
 import 'package:shared/presentation/widgets/ink_tap_box.dart';
@@ -113,64 +117,62 @@ class const QuoteCard({
 class const _VoiceNoteTag({
   required final Duration _duration,
   final String? _path,
-}) extends HookWidget {
+}) extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final minutes = _duration.inMinutes;
-    final seconds = _duration.inSeconds % 60;
-    final label = "$minutes:${seconds.toString().padLeft(2, "0")}";
-
-    final player = useMemoized(AudioPlayer.new);
-    useEffect(() => player.dispose, [player]);
-    final playing = useState(false);
-    useEffect(() {
-      final subscription = player.onPlayerComplete.listen((_) => playing.value = false);
-      return subscription.cancel;
-    }, [player]);
-
     final path = _path;
-    final content = Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Container(
-          width: _voiceNoteDotSize,
-          height: _voiceNoteDotSize,
-          alignment: Alignment.center,
-          decoration: BoxDecoration(color: context.c.tertiary, shape: BoxShape.circle),
-          child: Icon(
-            path == null
-                ? Icons.mic_rounded
-                : (playing.value ? Icons.pause : Icons.play_arrow_rounded),
-            size: _voiceNoteIconSize,
-            color: context.c.onTertiary,
-          ),
+    // * a card only rebuilds while its own note plays, not on every tick of another one
+    return BlocSelector<VoiceNoteCubit, VoiceNoteState, ({bool isPlaying, Duration elapsed})>(
+      selector: (state) => switch (state) {
+        VoiceNotePlaying(path: final playingPath, :final position) when playingPath == path => (
+          isPlaying: true,
+          elapsed: position,
         ),
-        const SizedBox(width: Spacing.xxs),
-        Text(
-          context.s.quoteVoiceNoteLabel(label),
-          style: context.typography.monoLabel.copyWith(
-            color: path == null ? context.c.onSurfaceVariant : context.c.onTertiaryContainer,
-          ),
-        ),
-      ],
-    );
-
-    if (path == null) return content;
-
-    return InkTapBox(
-      radius: Spacing.radiusFull,
-      color: context.c.tertiaryContainer,
-      padding: const EdgeInsets.symmetric(horizontal: Spacing.xs, vertical: Spacing.xxs),
-      onTap: () async {
-        if (playing.value) {
-          await player.pause();
-          playing.value = false;
-        } else {
-          await player.play(DeviceFileSource(path));
-          playing.value = true;
-        }
+        _ => (isPlaying: false, elapsed: _duration),
       },
-      child: content,
+      builder: (context, selection) {
+        final content = Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: _voiceNoteDotSize,
+              height: _voiceNoteDotSize,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(color: context.c.tertiary, shape: BoxShape.circle),
+              child: Icon(
+                switch ((path, selection.isPlaying)) {
+                  (null, _) => Icons.mic_rounded,
+                  (_, true) => Icons.pause,
+                  (_, false) => Icons.play_arrow_rounded,
+                },
+                size: _voiceNoteIconSize,
+                color: context.c.onTertiary,
+              ),
+            ),
+            const SizedBox(width: Spacing.xxs),
+            Text(
+              context.s.quoteVoiceNoteLabel(selection.elapsed.toMinutesSecondsString()),
+              style: context.typography.monoLabel.copyWith(
+                color: path == null ? context.c.onSurfaceVariant : context.c.onTertiaryContainer,
+              ),
+            ),
+          ],
+        );
+
+        if (path == null) return content;
+
+        return InkTapBox(
+          radius: Spacing.radiusFull,
+          color: context.c.tertiaryContainer,
+          padding: const EdgeInsets.symmetric(horizontal: Spacing.xs, vertical: Spacing.xxs),
+          onTap: () => unawaited(
+            selection.isPlaying
+                ? context.read<VoiceNoteCubit>().pausePlayback()
+                : context.read<VoiceNoteCubit>().startPlayback(path),
+          ),
+          child: content,
+        );
+      },
     );
   }
 }

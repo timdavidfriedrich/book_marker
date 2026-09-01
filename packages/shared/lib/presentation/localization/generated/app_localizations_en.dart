@@ -63,6 +63,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get errorValidation => 'The data received is invalid.';
 
   @override
+  String get errorMicrophonePermission => 'Allow microphone access to record a voice note.';
+
+  @override
   String get errorNotFound => 'Not found.';
 
   @override
@@ -505,7 +508,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get markingNoteHint => 'add a note';
 
   @override
-  String get markingVoiceNoteHint => 'voice note';
+  String get voiceNoteHint => 'add voice note';
 
   @override
   String get markingDoneButton => 'Done';
@@ -698,6 +701,12 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get bookDeleteMessage =>
       'This deletes the book and all its quotes. This can\'t be undone.';
+
+  @override
+  String get voiceNoteDeleteTitle => 'Delete voice note?';
+
+  @override
+  String get voiceNoteDeleteMessage => 'This deletes the recording. This can\'t be undone.';
 
   @override
   String get quoteDeleteAction => 'Delete quote';

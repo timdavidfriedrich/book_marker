@@ -9,6 +9,7 @@ import 'package:injectable/injectable.dart';
 import 'package:shared/domain/entities/book.dart';
 import 'package:shared/domain/entities/quote.dart';
 import 'package:shared/domain/entities/quote_theme.dart';
+import 'package:shared/domain/entities/voice_note.dart';
 import 'package:shared/domain/repositories/book_repository.dart';
 import 'package:shared/domain/repositories/quote_repository.dart';
 import 'package:shared/domain/repositories/theme_repository.dart';
@@ -25,6 +26,8 @@ class QuoteDetailBloc extends Bloc<QuoteDetailEvent, QuoteDetailState> {
     on<QuoteDetailFavoriteToggled>(_onFavoriteToggled);
     on<QuoteDetailNoteChanged>(_onNoteChanged);
     on<QuoteDetailPageNumbersChanged>(_onPageNumbersChanged);
+    on<QuoteDetailVoiceNoteRecorded>(_onVoiceNoteRecorded);
+    on<QuoteDetailVoiceNoteCleared>(_onVoiceNoteCleared);
     on<QuoteDetailThemesUpdated>(_onThemesUpdated);
     on<QuoteDetailThemeMembershipUpdated>(_onThemeMembershipUpdated);
     on<QuoteDetailThemeToggled>(_onThemeToggled);
@@ -100,6 +103,34 @@ class QuoteDetailBloc extends Bloc<QuoteDetailEvent, QuoteDetailState> {
     if (quote == null) return;
     if (await _quoteRepository.setPageNumbers(quote.id, event.pageNumbers) case Success()) {
       _quote = quote.copyWith(pageNumbers: event.pageNumbers);
+      _emitState(emit);
+    }
+  }
+
+  Future<void> _onVoiceNoteRecorded(
+    QuoteDetailVoiceNoteRecorded event,
+    Emitter<QuoteDetailState> emit,
+  ) async {
+    final quote = _quote;
+    if (quote == null) return;
+    final voiceNote = VoiceNote(path: event.path, durationMs: event.durationMs);
+    if (await _quoteRepository.setVoiceNote(quote.id, voiceNote) case Success()) {
+      _quote = quote.copyWith(
+        voiceNotePath: voiceNote.path,
+        voiceNoteDurationMs: voiceNote.durationMs,
+      );
+      _emitState(emit);
+    }
+  }
+
+  Future<void> _onVoiceNoteCleared(
+    QuoteDetailVoiceNoteCleared event,
+    Emitter<QuoteDetailState> emit,
+  ) async {
+    final quote = _quote;
+    if (quote == null) return;
+    if (await _quoteRepository.setVoiceNote(quote.id, null) case Success()) {
+      _quote = quote.copyWith(voiceNotePath: null, voiceNoteDurationMs: null);
       _emitState(emit);
     }
   }

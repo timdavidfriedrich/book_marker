@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:audioplayers/audioplayers.dart';
 import 'package:core/theme/spacing.dart';
 import 'package:feature_library/presentation/quote_detail/quote_detail_bloc.dart';
 import 'package:feature_library/presentation/quote_detail/quote_detail_event.dart';
@@ -28,6 +27,7 @@ import 'package:shared/presentation/widgets/paper_card.dart';
 import 'package:shared/presentation/widgets/selectable_chip.dart';
 import 'package:shared/presentation/widgets/sheet_action_tile.dart';
 import 'package:shared/presentation/widgets/sheet_content.dart';
+import 'package:shared/presentation/widgets/voice_note_recorder.dart';
 
 const _quoteMaxLines = 8;
 const _sourceThumbnailWidth = 44.0;
@@ -82,11 +82,16 @@ class const _Content({
     final reading = <Widget>[
       _CitationCard(quote: _quote),
       const SizedBox(height: Spacing.m),
+      VoiceNoteRecorder(
+        path: _quote.voiceNotePath,
+        durationMs: _quote.voiceNoteDurationMs,
+        onRecorded: (path, durationMs) => context.read<QuoteDetailBloc>().add(
+          QuoteDetailVoiceNoteRecorded(path, durationMs),
+        ),
+        onCleared: () => context.read<QuoteDetailBloc>().add(const QuoteDetailVoiceNoteCleared()),
+      ),
+      const SizedBox(height: Spacing.m),
       _NoteCard(quote: _quote),
-      if (_quote.voiceNotePath case final String path) ...[
-        const SizedBox(height: Spacing.m),
-        _VoiceNotePlayer(path: path, durationMs: _quote.voiceNoteDurationMs ?? 0),
-      ],
     ];
     final metadata = <Widget>[
       Align(
@@ -557,58 +562,6 @@ class const _ActionButton({
           style: context.typography.monoCaption.copyWith(color: context.c.onSurfaceVariant),
         ),
       ],
-    );
-  }
-}
-
-class const _VoiceNotePlayer({
-  required final String _path,
-  required final int _durationMs,
-}) extends HookWidget {
-  @override
-  Widget build(BuildContext context) {
-    final player = useMemoized(AudioPlayer.new);
-    useEffect(() => player.dispose, [player]);
-    final playing = useState(false);
-    useEffect(() {
-      final subscription = player.onPlayerComplete.listen((_) => playing.value = false);
-      return subscription.cancel;
-    }, [player]);
-
-    final duration = Duration(milliseconds: _durationMs);
-    final label = "${duration.inMinutes}:${(duration.inSeconds % 60).toString().padLeft(2, "0")}";
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: Spacing.m, vertical: Spacing.xs),
-      decoration: BoxDecoration(
-        color: context.c.tertiary,
-        borderRadius: BorderRadius.circular(Spacing.radiusFull),
-      ),
-      child: Row(
-        children: [
-          IconButton(
-            onPressed: () async {
-              if (playing.value) {
-                await player.pause();
-                playing.value = false;
-              } else {
-                await player.play(DeviceFileSource(_path));
-                playing.value = true;
-              }
-            },
-            icon: Icon(playing.value ? Icons.pause : Icons.play_arrow),
-            color: context.c.onTertiary,
-            iconSize: Spacing.iconM,
-          ),
-          const SizedBox(width: Spacing.xs),
-          Expanded(
-            child: Text(
-              context.s.quoteVoiceNoteLabel(label),
-              style: context.t.bodyLarge?.copyWith(color: context.c.onTertiary),
-            ),
-          ),
-          Icon(Icons.graphic_eq, color: context.c.onTertiary, size: Spacing.iconM),
-        ],
-      ),
     );
   }
 }

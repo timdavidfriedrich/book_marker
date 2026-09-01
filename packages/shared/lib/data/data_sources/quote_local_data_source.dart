@@ -15,6 +15,8 @@ abstract class QuoteLocalDataSource {
 
   Future<void> setPageNumbers(String id, List<int> pageNumbers);
 
+  Future<void> setVoiceNote(String id, String? path, int? durationMs);
+
   Future<void> deleteQuote(String id);
 }
 
@@ -55,6 +57,14 @@ class const QuoteLocalDataSourceImpl(
   Future<void> setPageNumbers(String id, List<int> pageNumbers) {
     final statement = _database.update(_database.quotes)..where((table) => table.id.equals(id));
     return statement.write(QuotesCompanion(pageNumbers: Value(pageNumbers)));
+  }
+
+  @override
+  Future<void> setVoiceNote(String id, String? path, int? durationMs) {
+    final statement = _database.update(_database.quotes)..where((table) => table.id.equals(id));
+    return statement.write(
+      QuotesCompanion(voiceNotePath: Value(path), voiceNoteDurationMs: Value(durationMs)),
+    );
   }
 
   @override

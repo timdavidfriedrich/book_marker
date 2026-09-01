@@ -28,6 +28,8 @@ import 'package:shared/data/repositories/settings_repository_impl.dart'
     as _i921;
 import 'package:shared/data/repositories/shelf_repository_impl.dart' as _i812;
 import 'package:shared/data/repositories/theme_repository_impl.dart' as _i308;
+import 'package:shared/data/repositories/voice_note_repository_impl.dart'
+    as _i908;
 import 'package:shared/data/sample_data_seeder.dart' as _i716;
 import 'package:shared/domain/repositories/book_repository.dart' as _i748;
 import 'package:shared/domain/repositories/quote_repository.dart' as _i570;
@@ -36,6 +38,8 @@ import 'package:shared/domain/repositories/sample_data_repository.dart'
 import 'package:shared/domain/repositories/settings_repository.dart' as _i0;
 import 'package:shared/domain/repositories/shelf_repository.dart' as _i793;
 import 'package:shared/domain/repositories/theme_repository.dart' as _i640;
+import 'package:shared/domain/repositories/voice_note_repository.dart' as _i88;
+import 'package:shared/presentation/voice_note_cubit.dart' as _i610;
 
 class SharedPackageModule extends _i526.MicroPackageModule {
 // initializes the registration of main-scope dependencies inside of GetIt
@@ -66,6 +70,7 @@ class SharedPackageModule extends _i526.MicroPackageModule {
         ));
     gh.factory<_i0.SettingsRepository>(() =>
         _i921.SettingsRepositoryImpl(gh<_i115.SettingsLocalDataSource>()));
+    gh.factory<_i88.VoiceNoteRepository>(() => _i908.VoiceNoteRepositoryImpl());
     gh.factory<_i640.ThemeRepository>(
         () => _i308.ThemeRepositoryImpl(gh<_i814.ThemeLocalDataSource>()));
     gh.factory<_i570.QuoteRepository>(() => _i943.QuoteRepositoryImpl(
@@ -80,6 +85,8 @@ class SharedPackageModule extends _i526.MicroPackageModule {
           gh<_i814.ThemeLocalDataSource>(),
           gh<_i1026.ShelfLocalDataSource>(),
         ));
+    gh.factory<_i610.VoiceNoteCubit>(
+        () => _i610.VoiceNoteCubit(gh<_i88.VoiceNoteRepository>()));
     gh.factory<_i124.SampleDataRepository>(
         () => _i136.SampleDataRepositoryImpl(gh<_i716.SampleDataSeeder>()));
   }
