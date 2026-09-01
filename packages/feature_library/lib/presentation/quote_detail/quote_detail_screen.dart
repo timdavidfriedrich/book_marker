@@ -21,10 +21,8 @@ import 'package:shared/presentation/navigation/navigation_extensions.dart';
 import 'package:shared/presentation/widgets/circle_icon_button.dart';
 import 'package:shared/presentation/widgets/confirm_dialog.dart';
 import 'package:shared/presentation/widgets/expandable_text.dart';
-import 'package:shared/presentation/widgets/highlight_image.dart';
-import 'package:shared/presentation/widgets/ink_tap_box.dart';
+import 'package:shared/presentation/widgets/fullscreen_image_viewer.dart';
 import 'package:shared/presentation/widgets/name_input_dialog.dart';
-import 'package:shared/presentation/widgets/page_dots.dart';
 import 'package:shared/presentation/widgets/page_number_field.dart';
 import 'package:shared/presentation/widgets/paper_card.dart';
 import 'package:shared/presentation/widgets/selectable_chip.dart';
@@ -32,7 +30,6 @@ import 'package:shared/presentation/widgets/sheet_action_tile.dart';
 import 'package:shared/presentation/widgets/sheet_content.dart';
 
 const _quoteMaxLines = 8;
-const _sourceImageHeight = 320.0;
 const _sourceThumbnailWidth = 44.0;
 const _sourceThumbnailHeight = 60.0;
 const _sourceThumbnailCacheWidth = 132;
@@ -108,7 +105,6 @@ class const _Content({
       const SizedBox(height: Spacing.m),
       _Actions(quote: _quote, book: _book),
     ];
-    // * the quote stays on the reading side while its metadata moves into a second column
     if (layout.isWide) {
       return Padding(
         padding: EdgeInsets.fromLTRB(margin, Spacing.s, margin, Spacing.l),
@@ -180,10 +176,9 @@ class const _CitationCard({
 
 class const _SourceCard({
   required final Quote _quote,
-}) extends HookWidget {
+}) extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final expanded = useState(false);
     final pages = _quote.pages;
     return Container(
       padding: const EdgeInsets.all(Spacing.m),
@@ -194,46 +189,25 @@ class const _SourceCard({
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          InkTapBox(
-            onTap: pages.isEmpty ? null : () => expanded.value = !expanded.value,
-            radius: Spacing.radiusS,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Row(
-                  children: [
-                    Expanded(
-                      child: Text(
-                        context.s.quoteDetailSourceLabel,
-                        style: context.typography.monoLabel.copyWith(
-                          color: context.c.onSurfaceVariant,
-                        ),
-                      ),
-                    ),
-                    if (pages.isNotEmpty)
-                      Icon(
-                        expanded.value ? Icons.expand_less : Icons.expand_more,
-                        size: Spacing.iconM,
-                        color: context.c.onSurfaceVariant,
-                      ),
-                  ],
-                ),
-                if (pages.isEmpty) ...[
-                  const SizedBox(height: Spacing.s),
-                  Text(
-                    context.s.quoteDetailNoPhotoMessage,
-                    style: context.t.bodyMedium?.copyWith(color: context.c.onSurfaceVariant),
-                  ),
-                ] else if (!expanded.value) ...[
-                  const SizedBox(height: Spacing.s),
-                  _SourceThumbnails(pages: pages),
-                ],
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                context.s.quoteDetailSourceLabel,
+                style: context.typography.monoLabel.copyWith(color: context.c.onSurfaceVariant),
+              ),
+              if (pages.isNotEmpty) ...[
+                const SizedBox(width: Spacing.m),
+                Expanded(child: _SourceThumbnails(pages: pages)),
               ],
-            ),
+            ],
           ),
-          if (pages.isNotEmpty && expanded.value) ...[
-            const SizedBox(height: Spacing.m),
-            _SourcePages(pages: pages),
+          if (pages.isEmpty) ...[
+            const SizedBox(height: Spacing.s),
+            Text(
+              context.s.quoteDetailNoPhotoMessage,
+              style: context.t.bodyMedium?.copyWith(color: context.c.onSurfaceVariant),
+            ),
           ],
         ],
       ),
@@ -248,56 +222,55 @@ class const _SourceThumbnails({
   Widget build(BuildContext context) {
     return SizedBox(
       height: _sourceThumbnailHeight,
-      child: ListView.separated(
+      child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
-        padding: EdgeInsets.zero,
-        itemCount: _pages.length,
-        separatorBuilder: (context, index) => const SizedBox(width: Spacing.xs),
-        itemBuilder: (context, index) => ClipRRect(
-          borderRadius: BorderRadius.circular(Spacing.radiusM),
-          child: Image.file(
-            File(_pages[index].photoPath),
-            width: _sourceThumbnailWidth,
-            height: _sourceThumbnailHeight,
-            cacheWidth: _sourceThumbnailCacheWidth,
-            fit: BoxFit.cover,
-          ),
+        reverse: true,
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            for (final (index, page) in _pages.indexed) ...[
+              if (index > 0) const SizedBox(width: Spacing.xs),
+              _SourceThumbnail(
+                page: page,
+                onTap: () => showFullscreenImageViewer(
+                  context,
+                  pages: _pages,
+                  initialIndex: index,
+                ),
+              ),
+            ],
+          ],
         ),
       ),
     );
   }
 }
 
-class const _SourcePages({
-  required final List<QuotePage> _pages,
-}) extends HookWidget {
+class const _SourceThumbnail({
+  required final QuotePage _page,
+  required final VoidCallback _onTap,
+}) extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final controller = usePageController();
-    final visiblePage = useState(0);
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        SizedBox(
-          height: _sourceImageHeight,
-          child: PageView.builder(
-            controller: controller,
-            itemCount: _pages.length,
-            onPageChanged: (index) => visiblePage.value = index,
-            itemBuilder: (context, index) => Center(
-              child: HighlightImage(
-                imagePath: _pages[index].photoPath,
-                aspectRatio: _pages[index].imageAspectRatio,
-                highlights: _pages[index].highlights,
-              ),
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(Spacing.radiusM),
+      child: Stack(
+        children: [
+          Image.file(
+            File(_page.photoPath),
+            width: _sourceThumbnailWidth,
+            height: _sourceThumbnailHeight,
+            cacheWidth: _sourceThumbnailCacheWidth,
+            fit: BoxFit.cover,
+          ),
+          Positioned.fill(
+            child: Material(
+              color: Colors.transparent,
+              child: InkWell(onTap: _onTap),
             ),
           ),
-        ),
-        if (_pages.length > 1) ...[
-          const SizedBox(height: Spacing.s),
-          PageDots(count: _pages.length, index: visiblePage.value),
         ],
-      ],
+      ),
     );
   }
 }
