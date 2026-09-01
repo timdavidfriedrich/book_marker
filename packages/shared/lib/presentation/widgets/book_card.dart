@@ -39,7 +39,7 @@ class const BookCard({
                     const SizedBox(height: Spacing.xxs),
                     Text(
                       _meta,
-                      style: context.typography.monoLabel.copyWith(
+                      style: context.typography.label.copyWith(
                         color: context.c.onSurfaceVariant,
                       ),
                     ),
@@ -65,7 +65,7 @@ class const BookCard({
                     if (_featuredPages.isNotEmpty)
                       TextSpan(
                         text: "  ${context.s.pageShortLabel(_featuredPages.toPageLabel())}",
-                        style: context.typography.monoLabel.copyWith(
+                        style: context.typography.label.copyWith(
                           color: context.c.onSurfaceVariant,
                         ),
                       ),

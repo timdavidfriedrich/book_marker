@@ -222,7 +222,7 @@ class const _SidePanel({
                       const SizedBox(height: Spacing.xs),
                       Text(
                         context.s.shelfDetailStats(_state.bookCount, _state.quoteCount),
-                        style: context.typography.monoLabel.copyWith(color: swatch.onFillVariant),
+                        style: context.typography.label.copyWith(color: swatch.onFillVariant),
                       ),
                     ],
                   ),
@@ -290,7 +290,7 @@ class const _Header({
                       const SizedBox(height: Spacing.xs),
                       Text(
                         context.s.shelfDetailStats(_state.bookCount, _state.quoteCount),
-                        style: context.typography.monoLabel.copyWith(color: swatch.onFillVariant),
+                        style: context.typography.label.copyWith(color: swatch.onFillVariant),
                       ),
                     ],
                   ),

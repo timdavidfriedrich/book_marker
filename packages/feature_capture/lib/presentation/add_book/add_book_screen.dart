@@ -130,7 +130,7 @@ class const _Sheet({
                     const SizedBox(height: Spacing.l),
                     Text(
                       context.s.addBookCatalogueFooter,
-                      style: context.typography.monoLabel.copyWith(
+                      style: context.typography.label.copyWith(
                         color: context.c.onSurfaceVariant,
                       ),
                     ),
@@ -341,7 +341,7 @@ class const _TileText({
           authors,
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
-          style: context.typography.monoLabel.copyWith(color: _subtitleColor),
+          style: context.typography.label.copyWith(color: _subtitleColor),
         ),
       ],
     );

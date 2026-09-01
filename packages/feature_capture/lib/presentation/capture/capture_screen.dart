@@ -329,7 +329,7 @@ class const _Hint({
     return Text(
       _text,
       textAlign: TextAlign.center,
-      style: context.typography.monoLabel.copyWith(color: context.c.onSurfaceVariant),
+      style: context.typography.label.copyWith(color: context.c.onSurfaceVariant),
     );
   }
 }
@@ -345,7 +345,7 @@ class const _ShotActions({
         Text(
           context.s.captureSpreadShotsHint,
           textAlign: TextAlign.center,
-          style: context.typography.monoCaption.copyWith(color: context.c.onSurfaceVariant),
+          style: context.typography.caption.copyWith(color: context.c.onSurfaceVariant),
         ),
         const SizedBox(height: Spacing.xs),
         FilledButton(
@@ -425,7 +425,7 @@ class const _Preview({
                   child: Text(
                     context.s.captureCameraUnavailable,
                     textAlign: TextAlign.center,
-                    style: context.typography.monoLabel.copyWith(color: context.c.onSurfaceVariant),
+                    style: context.typography.label.copyWith(color: context.c.onSurfaceVariant),
                   ),
                 ),
               )
@@ -737,7 +737,7 @@ class const _GalleryButton({
           Text(
             context.s.captureGalleryLabel,
             textAlign: TextAlign.center,
-            style: context.typography.monoCaption.copyWith(color: context.c.onSurfaceVariant),
+            style: context.typography.caption.copyWith(color: context.c.onSurfaceVariant),
           ),
         ],
       ),
@@ -811,7 +811,7 @@ class const _TorchButton({
           Text(
             _on ? context.s.captureLightOn : context.s.captureLightOff,
             textAlign: TextAlign.center,
-            style: context.typography.monoCaption.copyWith(
+            style: context.typography.caption.copyWith(
               color: _on ? context.c.primary : context.c.onSurfaceVariant,
             ),
           ),

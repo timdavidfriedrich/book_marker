@@ -117,7 +117,7 @@ class const _WordCorrectionSheet({
               const SizedBox(height: Spacing.xs),
               Text(
                 context.s.markingCorrectionHint,
-                style: context.typography.monoLabel.copyWith(color: context.c.onSurfaceVariant),
+                style: context.typography.label.copyWith(color: context.c.onSurfaceVariant),
               ),
               const SizedBox(height: Spacing.m),
               _WordPreview(

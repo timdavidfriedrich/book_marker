@@ -31,7 +31,7 @@ class const ProfileAvatar({
             Center(
               child: Text(
                 context.s.profileYouLabel,
-                style: context.typography.monoCaption.copyWith(color: context.c.onSurfaceVariant),
+                style: context.typography.caption.copyWith(color: context.c.onSurfaceVariant),
               ),
             ),
           ],

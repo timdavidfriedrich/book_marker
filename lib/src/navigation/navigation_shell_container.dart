@@ -146,8 +146,9 @@ class const _TabItem({
           const SizedBox(height: Spacing.xxs),
           Text(
             _label,
-            style: (_active ? context.typography.monoLabelStrong : context.typography.monoLabel)
-                .copyWith(color: _active ? context.c.onSurface : context.c.onSurfaceVariant),
+            style: (_active ? context.typography.labelStrong : context.typography.label).copyWith(
+              color: _active ? context.c.onSurface : context.c.onSurfaceVariant,
+            ),
           ),
         ],
       ),

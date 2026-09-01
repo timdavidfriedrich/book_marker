@@ -2,7 +2,6 @@ The bundled fonts are licensed under the SIL Open Font License, Version 1.1.
 
 - Bricolage Grotesque — Copyright (c) The Bricolage Grotesque Project Authors (https://github.com/ateliertriay/bricolage)
 - DM Sans — Copyright (c) The DM Sans Project Authors (https://github.com/googlefonts/dm-fonts)
-- DM Mono — Copyright (c) The DM Mono Project Authors (https://github.com/googlefonts/dm-fonts)
 - Newsreader — Copyright (c) The Newsreader Project Authors (https://github.com/productiontype/Newsreader)
 
 Full license text: https://openfontlicense.org

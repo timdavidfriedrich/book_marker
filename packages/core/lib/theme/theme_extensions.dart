@@ -68,29 +68,29 @@ class const AppTypography({
   required final TextStyle readingBody,
   required final TextStyle readingQuote,
   required final TextStyle readingQuoteItalic,
-  required final TextStyle monoLabel,
-  required final TextStyle monoLabelStrong,
-  required final TextStyle monoCaption,
-  required final TextStyle monoBadge,
+  required final TextStyle label,
+  required final TextStyle labelStrong,
+  required final TextStyle caption,
+  required final TextStyle badge,
 }) extends ThemeExtension<AppTypography> {
   @override
   AppTypography copyWith({
     TextStyle? readingBody,
     TextStyle? readingQuote,
     TextStyle? readingQuoteItalic,
-    TextStyle? monoLabel,
-    TextStyle? monoLabelStrong,
-    TextStyle? monoCaption,
-    TextStyle? monoBadge,
+    TextStyle? label,
+    TextStyle? labelStrong,
+    TextStyle? caption,
+    TextStyle? badge,
   }) {
     return AppTypography(
       readingBody: readingBody ?? this.readingBody,
       readingQuote: readingQuote ?? this.readingQuote,
       readingQuoteItalic: readingQuoteItalic ?? this.readingQuoteItalic,
-      monoLabel: monoLabel ?? this.monoLabel,
-      monoLabelStrong: monoLabelStrong ?? this.monoLabelStrong,
-      monoCaption: monoCaption ?? this.monoCaption,
-      monoBadge: monoBadge ?? this.monoBadge,
+      label: label ?? this.label,
+      labelStrong: labelStrong ?? this.labelStrong,
+      caption: caption ?? this.caption,
+      badge: badge ?? this.badge,
     );
   }
 
@@ -101,10 +101,10 @@ class const AppTypography({
       readingBody: TextStyle.lerp(readingBody, other.readingBody, t)!,
       readingQuote: TextStyle.lerp(readingQuote, other.readingQuote, t)!,
       readingQuoteItalic: TextStyle.lerp(readingQuoteItalic, other.readingQuoteItalic, t)!,
-      monoLabel: TextStyle.lerp(monoLabel, other.monoLabel, t)!,
-      monoLabelStrong: TextStyle.lerp(monoLabelStrong, other.monoLabelStrong, t)!,
-      monoCaption: TextStyle.lerp(monoCaption, other.monoCaption, t)!,
-      monoBadge: TextStyle.lerp(monoBadge, other.monoBadge, t)!,
+      label: TextStyle.lerp(label, other.label, t)!,
+      labelStrong: TextStyle.lerp(labelStrong, other.labelStrong, t)!,
+      caption: TextStyle.lerp(caption, other.caption, t)!,
+      badge: TextStyle.lerp(badge, other.badge, t)!,
     );
   }
 }

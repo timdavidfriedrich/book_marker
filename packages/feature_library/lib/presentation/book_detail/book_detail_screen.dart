@@ -227,7 +227,7 @@ class const _SidePanel({
                           authors,
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
-                          style: context.typography.monoLabel.copyWith(
+                          style: context.typography.label.copyWith(
                             color: context.c.onSurfaceVariant,
                           ),
                         ),
@@ -313,7 +313,7 @@ class const _Header({
                           authors,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
-                          style: context.typography.monoLabel.copyWith(
+                          style: context.typography.label.copyWith(
                             color: context.c.onSurfaceVariant,
                           ),
                         ),
@@ -392,7 +392,7 @@ class const _StatChip({
         color: context.c.surfaceContainerLowest,
         borderRadius: BorderRadius.circular(Spacing.radiusFull),
       ),
-      child: Text(_label, style: context.typography.monoLabel.copyWith(color: context.c.onSurface)),
+      child: Text(_label, style: context.typography.label.copyWith(color: context.c.onSurface)),
     );
   }
 }

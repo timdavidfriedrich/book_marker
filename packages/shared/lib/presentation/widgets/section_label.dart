@@ -22,7 +22,7 @@ class const SectionLabel({
         Flexible(
           child: Text(
             _text,
-            style: context.typography.monoLabel.copyWith(color: context.c.onSurfaceVariant),
+            style: context.typography.label.copyWith(color: context.c.onSurfaceVariant),
           ),
         ),
       ],

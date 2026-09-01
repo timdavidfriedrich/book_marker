@@ -48,7 +48,7 @@ class const _LoadingView() extends StatelessWidget {
         children: [
           const CircularProgressIndicator(),
           const SizedBox(height: Spacing.m),
-          Text(context.s.cropLoadingMessage, style: context.typography.monoLabel),
+          Text(context.s.cropLoadingMessage, style: context.typography.label),
         ],
       ),
     );
@@ -83,7 +83,7 @@ class const _Editor({
     final hint = Text(
       context.s.cropHint,
       textAlign: TextAlign.center,
-      style: context.typography.monoLabel.copyWith(color: context.c.onSurfaceVariant),
+      style: context.typography.label.copyWith(color: context.c.onSurfaceVariant),
     );
     final continueButton = FilledButton(
       onPressed: () => context.closeScreenWithResult(_state.quad),

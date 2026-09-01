@@ -87,7 +87,7 @@ class const _ProcessingView() extends StatelessWidget {
         children: [
           const CircularProgressIndicator(),
           const SizedBox(height: Spacing.m),
-          Text(context.s.markingProcessingMessage, style: context.typography.monoLabel),
+          Text(context.s.markingProcessingMessage, style: context.typography.label),
         ],
       ),
     );
@@ -272,7 +272,7 @@ class const _UncertainLegend() extends StatelessWidget {
         Expanded(
           child: Text(
             context.s.markingUncertainLegend,
-            style: context.typography.monoCaption.copyWith(color: context.c.onSurfaceVariant),
+            style: context.typography.caption.copyWith(color: context.c.onSurfaceVariant),
           ),
         ),
       ],
@@ -672,7 +672,7 @@ class const _UnsureHint({
         Expanded(
           child: Text(
             context.s.markingUnsureWordsLabel(_count),
-            style: context.typography.monoCaption.copyWith(color: context.c.tertiary),
+            style: context.typography.caption.copyWith(color: context.c.tertiary),
           ),
         ),
       ],
@@ -758,7 +758,7 @@ class const _BookPickerRow({
                   authors,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: context.typography.monoLabel.copyWith(
+                  style: context.typography.label.copyWith(
                     color: context.c.onSurfaceVariant,
                   ),
                 ),

@@ -46,7 +46,7 @@ class const ExpandableText({
                   ),
                   child: Text(
                     expanded.value ? context.s.showLess : context.s.showMore,
-                    style: context.typography.monoLabel.copyWith(
+                    style: context.typography.label.copyWith(
                       color: context.c.onSurfaceVariant,
                     ),
                   ),

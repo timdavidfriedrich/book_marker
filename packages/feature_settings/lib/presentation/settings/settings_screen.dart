@@ -96,7 +96,7 @@ class const _Content({
         padding: const EdgeInsets.symmetric(horizontal: Spacing.xs),
         child: Text(
           context.s.settingsVersionLabel(version.data ?? ""),
-          style: context.typography.monoLabel.copyWith(color: context.c.onSurfaceVariant),
+          style: context.typography.label.copyWith(color: context.c.onSurfaceVariant),
         ),
       ),
       const SizedBox(height: Spacing.xs),
@@ -221,7 +221,7 @@ class const _ProfileCard({
                       _state.quoteCount,
                       _state.themeCount,
                     ),
-                    style: context.typography.monoLabel.copyWith(
+                    style: context.typography.label.copyWith(
                       color: context.c.onSurfaceVariant,
                     ),
                   ),
@@ -251,7 +251,7 @@ class const _PreferenceToggle<T>({
           padding: const EdgeInsets.symmetric(horizontal: Spacing.xs),
           child: Text(
             _label,
-            style: context.typography.monoLabel.copyWith(color: context.c.onSurfaceVariant),
+            style: context.typography.label.copyWith(color: context.c.onSurfaceVariant),
           ),
         ),
         const SizedBox(height: Spacing.xs),

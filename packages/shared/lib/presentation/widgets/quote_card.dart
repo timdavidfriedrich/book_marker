@@ -80,7 +80,7 @@ class const QuoteCard({
                       Expanded(
                         child: Text(
                           source,
-                          style: context.typography.monoLabel.copyWith(
+                          style: context.typography.label.copyWith(
                             color: context.c.onSurfaceVariant,
                           ),
                           overflow: TextOverflow.ellipsis,
@@ -152,7 +152,7 @@ class const _VoiceNoteTag({
             const SizedBox(width: Spacing.xxs),
             Text(
               context.s.quoteVoiceNoteLabel(selection.elapsed.toMinutesSecondsString()),
-              style: context.typography.monoLabel.copyWith(
+              style: context.typography.label.copyWith(
                 color: path == null ? context.c.onSurfaceVariant : context.c.onTertiaryContainer,
               ),
             ),

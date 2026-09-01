@@ -104,7 +104,7 @@ class const _ThemeTile({
           const SizedBox(height: Spacing.xxs),
           Text(
             context.s.themesThemeMeta(_summary.quoteCount, _summary.bookCount),
-            style: context.typography.monoLabel.copyWith(color: swatch.onFillVariant),
+            style: context.typography.label.copyWith(color: swatch.onFillVariant),
           ),
         ],
       ),

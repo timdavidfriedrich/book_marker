@@ -40,7 +40,7 @@ class const BookChooserBar({
               children: [
                 Text(
                   _label,
-                  style: context.typography.monoCaption.copyWith(
+                  style: context.typography.caption.copyWith(
                     color: context.palette.paperTextFaint,
                   ),
                 ),

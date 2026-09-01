@@ -58,12 +58,6 @@ flutter:
           weight: 500
         - asset: assets/fonts/DMSans-Bold.ttf
           weight: 700
-    - family: DM Mono
-      fonts:
-        - asset: assets/fonts/DMMono-Regular.ttf
-          weight: 400
-        - asset: assets/fonts/DMMono-Medium.ttf
-          weight: 500
     - family: Newsreader
       fonts:
         - asset: assets/fonts/Newsreader-Regular.ttf

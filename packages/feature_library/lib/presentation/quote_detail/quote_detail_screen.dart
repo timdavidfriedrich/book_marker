@@ -199,7 +199,7 @@ class const _SourceCard({
             children: [
               Text(
                 context.s.quoteDetailSourceLabel,
-                style: context.typography.monoLabel.copyWith(color: context.c.onSurfaceVariant),
+                style: context.typography.label.copyWith(color: context.c.onSurfaceVariant),
               ),
               if (pages.isNotEmpty) ...[
                 const SizedBox(width: Spacing.m),
@@ -311,7 +311,7 @@ class const _Header({
               ),
               Text(
                 meta,
-                style: context.typography.monoLabel.copyWith(color: context.c.onSurfaceVariant),
+                style: context.typography.label.copyWith(color: context.c.onSurfaceVariant),
               ),
             ],
           ),
@@ -338,7 +338,7 @@ class const _NoteCard({
         children: [
           Text(
             context.s.quoteDetailNotesLabel,
-            style: context.typography.monoLabel.copyWith(color: context.c.onSurfaceVariant),
+            style: context.typography.label.copyWith(color: context.c.onSurfaceVariant),
           ),
           const SizedBox(height: Spacing.xs),
           TextField(
@@ -559,7 +559,7 @@ class const _ActionButton({
         const SizedBox(height: Spacing.xxs),
         Text(
           _label,
-          style: context.typography.monoCaption.copyWith(color: context.c.onSurfaceVariant),
+          style: context.typography.caption.copyWith(color: context.c.onSurfaceVariant),
         ),
       ],
     );

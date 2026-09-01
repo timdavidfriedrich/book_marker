@@ -29,7 +29,7 @@ class const PageNumberField({
         children: [
           Text(
             context.s.pageFieldLabel,
-            style: context.typography.monoLabel.copyWith(color: context.c.onSurfaceVariant),
+            style: context.typography.label.copyWith(color: context.c.onSurfaceVariant),
           ),
           const SizedBox(width: Spacing.s),
           SizedBox(
@@ -38,7 +38,7 @@ class const PageNumberField({
               controller: controller,
               keyboardType: const TextInputType.numberWithOptions(signed: true),
               inputFormatters: [FilteringTextInputFormatter.allow(_allowedCharacters)],
-              style: context.typography.monoLabelStrong.copyWith(
+              style: context.typography.labelStrong.copyWith(
                 fontSize: _fieldFontSize,
                 color: context.c.onSurface,
               ),
@@ -63,7 +63,7 @@ class const PageNumberField({
               ),
               child: Text(
                 context.s.pageAutoLabel,
-                style: context.typography.monoBadge.copyWith(color: context.c.onSecondary),
+                style: context.typography.badge.copyWith(color: context.c.onSecondary),
               ),
             ),
         ],

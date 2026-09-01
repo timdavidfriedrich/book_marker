@@ -485,7 +485,7 @@ class const _ShelfCard({
                 const SizedBox(height: Spacing.xxs),
                 Text(
                   context.s.libraryShelfMeta(_summary.bookCount, _summary.quoteCount),
-                  style: context.typography.monoLabel.copyWith(color: swatch.onFillVariant),
+                  style: context.typography.label.copyWith(color: swatch.onFillVariant),
                 ),
               ],
             ),

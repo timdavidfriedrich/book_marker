@@ -17,7 +17,7 @@ class const CountBadge({
       decoration: BoxDecoration(color: context.c.inverseSurface, shape: BoxShape.circle),
       child: Text(
         "$_count",
-        style: context.typography.monoLabelStrong.copyWith(
+        style: context.typography.labelStrong.copyWith(
           color: context.c.onInverseSurface,
           fontSize: _badgeTextSize,
         ),

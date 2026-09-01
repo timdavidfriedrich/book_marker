@@ -5,7 +5,6 @@ import 'package:flutter/services.dart';
 
 const _display = "Bricolage Grotesque";
 const _sans = "DM Sans";
-const _mono = "DM Mono";
 const _serif = "Newsreader";
 
 const _cream = Color(0xFFFFF4E2);
@@ -263,7 +262,7 @@ abstract final class AppTheme {
       badgeTheme: BadgeThemeData(
         backgroundColor: _sky.solid,
         textColor: _sky.onSolid,
-        textStyle: typography.monoBadge.copyWith(fontSize: 10, height: 1),
+        textStyle: typography.badge.copyWith(fontSize: 10, height: 1),
         largeSize: 14,
         padding: const EdgeInsets.symmetric(horizontal: 3),
       ),
@@ -342,7 +341,7 @@ abstract final class AppTheme {
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
           foregroundColor: colorScheme.secondary,
-          textStyle: const TextStyle(fontFamily: _mono, fontSize: 13, fontWeight: FontWeight.w500),
+          textStyle: typography.labelStrong,
         ),
       ),
       floatingActionButtonTheme: FloatingActionButtonThemeData(
@@ -574,15 +573,15 @@ abstract final class AppTheme {
         fontStyle: FontStyle.italic,
         color: onSurface,
       ),
-      monoLabel: const TextStyle(fontFamily: _serif, fontSize: 13, height: 1.35),
-      monoLabelStrong: const TextStyle(
+      label: const TextStyle(fontFamily: _serif, fontSize: 13, height: 1.35),
+      labelStrong: const TextStyle(
         fontFamily: _serif,
         fontSize: 13,
         height: 1.35,
         fontWeight: FontWeight.w500,
       ),
-      monoCaption: const TextStyle(fontFamily: _serif, fontSize: 11.5, height: 1.3),
-      monoBadge: const TextStyle(fontFamily: _serif, fontSize: 12.5, fontWeight: FontWeight.w500),
+      caption: const TextStyle(fontFamily: _serif, fontSize: 11.5, height: 1.3),
+      badge: const TextStyle(fontFamily: _serif, fontSize: 12.5, fontWeight: FontWeight.w500),
     );
   }
 

@@ -17,7 +17,7 @@ class const PagePill({
       ),
       child: Text(
         context.s.pageShortLabel(_pages.toPageLabel()),
-        style: context.typography.monoBadge.copyWith(color: context.c.onSurfaceVariant),
+        style: context.typography.badge.copyWith(color: context.c.onSurfaceVariant),
       ),
     );
   }
