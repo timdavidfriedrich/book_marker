@@ -11,6 +11,7 @@ import 'package:feature_capture/presentation/marking/marking_state.dart';
 import 'package:feature_capture/presentation/widgets/book_chooser_bar.dart';
 import 'package:feature_capture/presentation/widgets/uncertain_word_chip.dart';
 import 'package:feature_capture/presentation/widgets/word_correction_sheet.dart';
+import 'package:feature_capture/presentation/widgets/word_selection_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -293,80 +294,19 @@ class const _UncertainLegend() extends StatelessWidget {
 
 class const _ReadingText({
   required final MarkingReady _state,
-}) extends HookWidget {
+}) extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final words = _state.words;
-    if (words.isEmpty) {
+    if (_state.words.isEmpty) {
       return Center(child: Text(context.s.markingNoTextMessage, textAlign: TextAlign.center));
     }
-    final bloc = context.read<MarkingBloc>();
-    final layout = useMemoized(() {
-      final groups = words.wordGroups();
-      final spans = <InlineSpan>[];
-      final ranges = [
-        for (var index = 0; index < words.length; index++) <int>[0, 0],
-      ];
-      var offset = 0;
-      for (var groupIndex = 0; groupIndex < groups.length; groupIndex++) {
-        final group = groups[groupIndex];
-        final int length;
-        if (group.number case final int number) {
-          spans.add(
-            WidgetSpan(
-              alignment: PlaceholderAlignment.middle,
-              child: UncertainWordChip(
-                text: group.text,
-                number: number,
-                onTap: () => showWordCorrectionSheet(context, wordIndex: group.indexes.first),
-              ),
-            ),
-          );
-          length = 1;
-        } else {
-          spans.add(TextSpan(text: group.text));
-          length = group.text.length;
-        }
-        for (final index in group.indexes) {
-          ranges[index] = [offset, offset + length];
-        }
-        offset += length;
-        if (groupIndex < groups.length - 1) {
-          spans.add(const TextSpan(text: " "));
-          offset += 1;
-        }
-      }
-      return (spans: spans, ranges: ranges);
-    }, [words]);
-
-    final textSpan = useMemoized(
-      () => TextSpan(
-        children: layout.spans,
-        style: context.typography.readingBody.copyWith(color: context.palette.paperText),
-      ),
-      [layout],
-    );
-
-    void selectionChanged(TextSelection selection) {
-      if (selection.start < 0 || selection.end < 0) return;
-      final next = <int>{};
-      for (var index = 0; index < layout.ranges.length; index++) {
-        if (layout.ranges[index][0] < selection.end && layout.ranges[index][1] > selection.start) {
-          next.add(index);
-        }
-      }
-      if (bloc.state case final MarkingReady current
-          when next.length == current.selectedWordIndexes.length &&
-              next.containsAll(current.selectedWordIndexes)) {
-        return;
-      }
-      bloc.add(MarkingWordsSelected(next));
-    }
-
     return SingleChildScrollView(
-      child: SelectableText.rich(
-        textSpan,
-        onSelectionChanged: (selection, cause) => selectionChanged(selection),
+      child: WordSelectionText(
+        words: _state.words,
+        selectedWordIndexes: _state.selectedWordIndexes,
+        onSelectionChanged: (indexes) =>
+            context.read<MarkingBloc>().add(MarkingWordsSelected(indexes)),
+        onUncertainWordTap: (wordIndex) => showWordCorrectionSheet(context, wordIndex: wordIndex),
       ),
     );
   }
