@@ -52,6 +52,10 @@ class const MarkingThemesUpdated(
   final AppResult<List<QuoteTheme>> result,
 ) extends MarkingEvent;
 
+class const MarkingThemeMembershipUpdated(
+  final AppResult<Map<String, Set<String>>> result,
+) extends MarkingEvent;
+
 class const MarkingThemeToggled(
   final String themeId,
 ) extends MarkingEvent;

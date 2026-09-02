@@ -11,6 +11,8 @@ abstract class QuoteLocalDataSource {
 
   Future<void> setFavorite(String id, {required bool isFavorite});
 
+  Future<void> setQuote(String id, String quote);
+
   Future<void> setNote(String id, String? note);
 
   Future<void> setPageNumbers(String id, List<int> pageNumbers);
@@ -45,6 +47,12 @@ class const QuoteLocalDataSourceImpl(
   Future<void> setFavorite(String id, {required bool isFavorite}) {
     final statement = _database.update(_database.quotes)..where((table) => table.id.equals(id));
     return statement.write(QuotesCompanion(isFavorite: Value(isFavorite)));
+  }
+
+  @override
+  Future<void> setQuote(String id, String quote) {
+    final statement = _database.update(_database.quotes)..where((table) => table.id.equals(id));
+    return statement.write(QuotesCompanion(quote: Value(quote)));
   }
 
   @override

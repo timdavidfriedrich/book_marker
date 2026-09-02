@@ -2,7 +2,6 @@ import 'dart:math' as math;
 import 'dart:ui' as ui;
 
 import 'package:core/theme/spacing.dart';
-import 'package:feature_capture/domain/recognized_page.dart';
 import 'package:feature_capture/presentation/extensions/recognized_word_extensions.dart';
 import 'package:feature_capture/presentation/widgets/uncertain_word_chip.dart';
 import 'package:flutter/gestures.dart';
@@ -10,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:shared/domain/entities/recognized_word.dart';
 import 'package:shared/presentation/extensions/context_extensions.dart';
 
 const _highlightOpacity = 0.4;

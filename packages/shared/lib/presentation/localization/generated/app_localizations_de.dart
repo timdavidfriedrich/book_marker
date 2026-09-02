@@ -580,6 +580,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get quoteDetailMoreLabel => 'mehr';
 
   @override
+  String get quoteDetailQuoteHint => 'Zitat schreiben…';
+
+  @override
   String get quoteDetailNoteHint => 'Notiz hinzufügen…';
 
   @override
@@ -711,6 +714,9 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get voiceNoteDeleteMessage =>
       'Damit wird die Aufnahme gelöscht. Das kann nicht rückgängig gemacht werden.';
+
+  @override
+  String get quoteEditAction => 'Zitat bearbeiten';
 
   @override
   String get quoteDeleteAction => 'Zitat löschen';

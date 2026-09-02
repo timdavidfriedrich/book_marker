@@ -1,4 +1,4 @@
-import 'package:feature_capture/domain/recognized_page.dart';
+import 'package:shared/domain/entities/recognized_word.dart';
 
 class const SpreadPage({
   required final String imagePath,

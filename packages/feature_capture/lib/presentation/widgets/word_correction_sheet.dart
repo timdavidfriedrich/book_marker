@@ -2,7 +2,6 @@ import 'dart:io';
 import 'dart:math' as math;
 
 import 'package:core/theme/spacing.dart';
-import 'package:feature_capture/domain/recognized_page.dart';
 import 'package:feature_capture/domain/recognized_spread.dart';
 import 'package:feature_capture/presentation/extensions/recognized_word_extensions.dart';
 import 'package:feature_capture/presentation/marking/marking_bloc.dart';
@@ -11,6 +10,7 @@ import 'package:feature_capture/presentation/marking/marking_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:shared/domain/entities/recognized_word.dart';
 import 'package:shared/presentation/extensions/context_extensions.dart';
 import 'package:shared/presentation/widgets/circle_icon_button.dart';
 import 'package:shared/presentation/widgets/selectable_chip.dart';

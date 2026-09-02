@@ -1,7 +1,7 @@
 import 'dart:math' as math;
 
-import 'package:feature_capture/domain/recognized_page.dart';
 import 'package:feature_capture/domain/spell_check_report.dart';
+import 'package:shared/domain/entities/recognized_word.dart';
 
 const _uncertainThreshold = 0.55;
 const _maxUncertainRatio = 0.1;

@@ -2,7 +2,6 @@ import 'dart:io';
 
 import 'package:core/theme/spacing.dart';
 import 'package:feature_capture/domain/mark_text.dart';
-import 'package:feature_capture/domain/recognized_page.dart';
 import 'package:feature_capture/presentation/extensions/recognized_word_extensions.dart';
 import 'package:feature_capture/presentation/marking/marking_bloc.dart';
 import 'package:feature_capture/presentation/marking/marking_event.dart';
@@ -16,6 +15,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:shared/domain/entities/book.dart';
 import 'package:shared/domain/entities/quote_theme.dart';
+import 'package:shared/domain/entities/recognized_word.dart';
 import 'package:shared/presentation/extensions/app_error_extensions.dart';
 import 'package:shared/presentation/extensions/context_extensions.dart';
 import 'package:shared/presentation/extensions/screen_layout_extensions.dart';
@@ -409,8 +409,13 @@ Future<void> _openSaveSheet(BuildContext context) async {
     showDragHandle: false,
     builder: (_) => BlocProvider.value(value: bloc, child: const _SaveSheet()),
   );
-  if (bloc.state is MarkingSaved && context.mounted) {
+  if (bloc.state case MarkingSaved(:final isEditing) when context.mounted) {
     context.showToast(context.s.markingSavedMessage);
+    // * an edit returns to the quote it came from, a fresh capture ends in the library
+    if (isEditing) {
+      context.closeScreen();
+      return;
+    }
     context.goLibrary();
   }
 }
@@ -420,13 +425,18 @@ class const _SaveSheet() extends HookWidget {
   Widget build(BuildContext context) {
     final initialState = context.read<MarkingBloc>().state;
     final initialQuote = switch (initialState) {
+      MarkingReady(quoteOverride: final String quote) => quote,
       MarkingReady(:final selectedWordIndexes, :final words) => joinMarkedWords(
         words,
         selectedWordIndexes,
       ),
       _ => "",
     };
-    final noteController = useTextEditingController();
+    final initialNote = switch (initialState) {
+      MarkingReady(:final String note) => note,
+      _ => "",
+    };
+    final noteController = useTextEditingController(text: initialNote);
     final quoteController = useTextEditingController(text: initialQuote);
     final bottomInset = MediaQuery.viewInsetsOf(context).bottom;
     final keyboardVisible = bottomInset > 0;

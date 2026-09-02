@@ -203,6 +203,8 @@ class const SampleDataSeeder(
       quote: quote,
       note: note,
       pages: const [],
+      words: const [],
+      markedWordIndexes: const [],
       isFavorite: isFavorite,
       createdAt: createdAt,
     );

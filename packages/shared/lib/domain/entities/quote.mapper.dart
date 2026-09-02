@@ -16,6 +16,7 @@ class QuoteMapper extends ClassMapperBase<Quote> {
     if (_instance == null) {
       MapperContainer.globals.use(_instance = QuoteMapper._());
       QuotePageMapper.ensureInitialized();
+      RecognizedWordMapper.ensureInitialized();
     }
     return _instance!;
   }
@@ -58,6 +59,20 @@ class QuoteMapper extends ClassMapperBase<Quote> {
     'createdAt',
     _$createdAt,
   );
+  static List<RecognizedWord> _$words(Quote v) => v.words;
+  static const Field<Quote, List<RecognizedWord>> _f$words = Field(
+    'words',
+    _$words,
+    opt: true,
+    def: const [],
+  );
+  static List<int> _$markedWordIndexes(Quote v) => v.markedWordIndexes;
+  static const Field<Quote, List<int>> _f$markedWordIndexes = Field(
+    'markedWordIndexes',
+    _$markedWordIndexes,
+    opt: true,
+    def: const [],
+  );
 
   @override
   final MappableFields<Quote> fields = const {
@@ -71,6 +86,8 @@ class QuoteMapper extends ClassMapperBase<Quote> {
     #pages: _f$pages,
     #isFavorite: _f$isFavorite,
     #createdAt: _f$createdAt,
+    #words: _f$words,
+    #markedWordIndexes: _f$markedWordIndexes,
   };
 
   static Quote _instantiate(DecodingData data) {
@@ -85,6 +102,8 @@ class QuoteMapper extends ClassMapperBase<Quote> {
       pages: data.dec(_f$pages),
       isFavorite: data.dec(_f$isFavorite),
       createdAt: data.dec(_f$createdAt),
+      words: data.dec(_f$words),
+      markedWordIndexes: data.dec(_f$markedWordIndexes),
     );
   }
 
@@ -137,6 +156,13 @@ abstract class QuoteCopyWith<$R, $In extends Quote, $Out>
   ListCopyWith<$R, int, ObjectCopyWith<$R, int, int>> get pageNumbers;
   ListCopyWith<$R, QuotePage, QuotePageCopyWith<$R, QuotePage, QuotePage>>
   get pages;
+  ListCopyWith<
+    $R,
+    RecognizedWord,
+    RecognizedWordCopyWith<$R, RecognizedWord, RecognizedWord>
+  >
+  get words;
+  ListCopyWith<$R, int, ObjectCopyWith<$R, int, int>> get markedWordIndexes;
   $R call({
     String? id,
     String? bookId,
@@ -148,6 +174,8 @@ abstract class QuoteCopyWith<$R, $In extends Quote, $Out>
     List<QuotePage>? pages,
     bool? isFavorite,
     DateTime? createdAt,
+    List<RecognizedWord>? words,
+    List<int>? markedWordIndexes,
   });
   QuoteCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
 }
@@ -173,6 +201,24 @@ class _QuoteCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, Quote, $Out>
     (v) => call(pages: v),
   );
   @override
+  ListCopyWith<
+    $R,
+    RecognizedWord,
+    RecognizedWordCopyWith<$R, RecognizedWord, RecognizedWord>
+  >
+  get words => ListCopyWith(
+    $value.words,
+    (v, t) => v.copyWith.$chain(t),
+    (v) => call(words: v),
+  );
+  @override
+  ListCopyWith<$R, int, ObjectCopyWith<$R, int, int>> get markedWordIndexes =>
+      ListCopyWith(
+        $value.markedWordIndexes,
+        (v, t) => ObjectCopyWith(v, $identity, t),
+        (v) => call(markedWordIndexes: v),
+      );
+  @override
   $R call({
     String? id,
     String? bookId,
@@ -184,6 +230,8 @@ class _QuoteCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, Quote, $Out>
     List<QuotePage>? pages,
     bool? isFavorite,
     DateTime? createdAt,
+    List<RecognizedWord>? words,
+    List<int>? markedWordIndexes,
   }) => $apply(
     FieldCopyWithData({
       if (id != null) #id: id,
@@ -197,6 +245,8 @@ class _QuoteCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, Quote, $Out>
       if (pages != null) #pages: pages,
       if (isFavorite != null) #isFavorite: isFavorite,
       if (createdAt != null) #createdAt: createdAt,
+      if (words != null) #words: words,
+      if (markedWordIndexes != null) #markedWordIndexes: markedWordIndexes,
     }),
   );
   @override
@@ -214,6 +264,11 @@ class _QuoteCopyWithImpl<$R, $Out> extends ClassCopyWithBase<$R, Quote, $Out>
     pages: data.get(#pages, or: $value.pages),
     isFavorite: data.get(#isFavorite, or: $value.isFavorite),
     createdAt: data.get(#createdAt, or: $value.createdAt),
+    words: data.get(#words, or: $value.words),
+    markedWordIndexes: data.get(
+      #markedWordIndexes,
+      or: $value.markedWordIndexes,
+    ),
   );
 
   @override

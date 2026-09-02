@@ -577,6 +577,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get quoteDetailMoreLabel => 'more';
 
   @override
+  String get quoteDetailQuoteHint => 'Write the quote…';
+
+  @override
   String get quoteDetailNoteHint => 'Add a note…';
 
   @override
@@ -707,6 +710,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get voiceNoteDeleteMessage => 'This deletes the recording. This can\'t be undone.';
+
+  @override
+  String get quoteEditAction => 'Edit quote';
 
   @override
   String get quoteDeleteAction => 'Delete quote';

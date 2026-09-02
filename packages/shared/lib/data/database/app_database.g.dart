@@ -649,6 +649,26 @@ class $QuotesTable extends Quotes with TableInfo<$QuotesTable, LocalQuote> {
         type: DriftSqlType.string,
         requiredDuringInsert: true,
       ).withConverter<List<QuotePage>>($QuotesTable.$converterpages);
+  @override
+  late final GeneratedColumnWithTypeConverter<List<RecognizedWord>, String>
+  words = GeneratedColumn<String>(
+    'words',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(_emptyJsonList),
+  ).withConverter<List<RecognizedWord>>($QuotesTable.$converterwords);
+  @override
+  late final GeneratedColumnWithTypeConverter<List<int>, String>
+  markedWordIndexes = GeneratedColumn<String>(
+    'marked_word_indexes',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(_emptyJsonList),
+  ).withConverter<List<int>>($QuotesTable.$convertermarkedWordIndexes);
   static const VerificationMeta _isFavoriteMeta = const VerificationMeta(
     'isFavorite',
   );
@@ -685,6 +705,8 @@ class $QuotesTable extends Quotes with TableInfo<$QuotesTable, LocalQuote> {
     voiceNotePath,
     voiceNoteDurationMs,
     pages,
+    words,
+    markedWordIndexes,
     isFavorite,
     createdAt,
   ];
@@ -804,6 +826,18 @@ class $QuotesTable extends Quotes with TableInfo<$QuotesTable, LocalQuote> {
           data['${effectivePrefix}pages'],
         )!,
       ),
+      words: $QuotesTable.$converterwords.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.string,
+          data['${effectivePrefix}words'],
+        )!,
+      ),
+      markedWordIndexes: $QuotesTable.$convertermarkedWordIndexes.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.string,
+          data['${effectivePrefix}marked_word_indexes'],
+        )!,
+      ),
       isFavorite: attachedDatabase.typeMapping.read(
         DriftSqlType.bool,
         data['${effectivePrefix}is_favorite'],
@@ -824,6 +858,10 @@ class $QuotesTable extends Quotes with TableInfo<$QuotesTable, LocalQuote> {
       const IntListConverter();
   static TypeConverter<List<QuotePage>, String> $converterpages =
       const QuotePageListConverter();
+  static TypeConverter<List<RecognizedWord>, String> $converterwords =
+      const RecognizedWordListConverter();
+  static TypeConverter<List<int>, String> $convertermarkedWordIndexes =
+      const IntListConverter();
 }
 
 class LocalQuote extends DataClass implements Insertable<LocalQuote> {
@@ -835,6 +873,8 @@ class LocalQuote extends DataClass implements Insertable<LocalQuote> {
   final String? voiceNotePath;
   final int? voiceNoteDurationMs;
   final List<QuotePage> pages;
+  final List<RecognizedWord> words;
+  final List<int> markedWordIndexes;
   final bool isFavorite;
   final DateTime createdAt;
   const LocalQuote({
@@ -846,6 +886,8 @@ class LocalQuote extends DataClass implements Insertable<LocalQuote> {
     this.voiceNotePath,
     this.voiceNoteDurationMs,
     required this.pages,
+    required this.words,
+    required this.markedWordIndexes,
     required this.isFavorite,
     required this.createdAt,
   });
@@ -874,6 +916,16 @@ class LocalQuote extends DataClass implements Insertable<LocalQuote> {
         $QuotesTable.$converterpages.toSql(pages),
       );
     }
+    {
+      map['words'] = Variable<String>(
+        $QuotesTable.$converterwords.toSql(words),
+      );
+    }
+    {
+      map['marked_word_indexes'] = Variable<String>(
+        $QuotesTable.$convertermarkedWordIndexes.toSql(markedWordIndexes),
+      );
+    }
     map['is_favorite'] = Variable<bool>(isFavorite);
     map['created_at'] = Variable<DateTime>(createdAt);
     return map;
@@ -893,6 +945,8 @@ class LocalQuote extends DataClass implements Insertable<LocalQuote> {
           ? const Value.absent()
           : Value(voiceNoteDurationMs),
       pages: Value(pages),
+      words: Value(words),
+      markedWordIndexes: Value(markedWordIndexes),
       isFavorite: Value(isFavorite),
       createdAt: Value(createdAt),
     );
@@ -914,6 +968,10 @@ class LocalQuote extends DataClass implements Insertable<LocalQuote> {
         json['voiceNoteDurationMs'],
       ),
       pages: serializer.fromJson<List<QuotePage>>(json['pages']),
+      words: serializer.fromJson<List<RecognizedWord>>(json['words']),
+      markedWordIndexes: serializer.fromJson<List<int>>(
+        json['markedWordIndexes'],
+      ),
       isFavorite: serializer.fromJson<bool>(json['isFavorite']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
     );
@@ -930,6 +988,8 @@ class LocalQuote extends DataClass implements Insertable<LocalQuote> {
       'voiceNotePath': serializer.toJson<String?>(voiceNotePath),
       'voiceNoteDurationMs': serializer.toJson<int?>(voiceNoteDurationMs),
       'pages': serializer.toJson<List<QuotePage>>(pages),
+      'words': serializer.toJson<List<RecognizedWord>>(words),
+      'markedWordIndexes': serializer.toJson<List<int>>(markedWordIndexes),
       'isFavorite': serializer.toJson<bool>(isFavorite),
       'createdAt': serializer.toJson<DateTime>(createdAt),
     };
@@ -944,6 +1004,8 @@ class LocalQuote extends DataClass implements Insertable<LocalQuote> {
     Value<String?> voiceNotePath = const Value.absent(),
     Value<int?> voiceNoteDurationMs = const Value.absent(),
     List<QuotePage>? pages,
+    List<RecognizedWord>? words,
+    List<int>? markedWordIndexes,
     bool? isFavorite,
     DateTime? createdAt,
   }) => LocalQuote(
@@ -959,6 +1021,8 @@ class LocalQuote extends DataClass implements Insertable<LocalQuote> {
         ? voiceNoteDurationMs.value
         : this.voiceNoteDurationMs,
     pages: pages ?? this.pages,
+    words: words ?? this.words,
+    markedWordIndexes: markedWordIndexes ?? this.markedWordIndexes,
     isFavorite: isFavorite ?? this.isFavorite,
     createdAt: createdAt ?? this.createdAt,
   );
@@ -978,6 +1042,10 @@ class LocalQuote extends DataClass implements Insertable<LocalQuote> {
           ? data.voiceNoteDurationMs.value
           : this.voiceNoteDurationMs,
       pages: data.pages.present ? data.pages.value : this.pages,
+      words: data.words.present ? data.words.value : this.words,
+      markedWordIndexes: data.markedWordIndexes.present
+          ? data.markedWordIndexes.value
+          : this.markedWordIndexes,
       isFavorite: data.isFavorite.present
           ? data.isFavorite.value
           : this.isFavorite,
@@ -996,6 +1064,8 @@ class LocalQuote extends DataClass implements Insertable<LocalQuote> {
           ..write('voiceNotePath: $voiceNotePath, ')
           ..write('voiceNoteDurationMs: $voiceNoteDurationMs, ')
           ..write('pages: $pages, ')
+          ..write('words: $words, ')
+          ..write('markedWordIndexes: $markedWordIndexes, ')
           ..write('isFavorite: $isFavorite, ')
           ..write('createdAt: $createdAt')
           ..write(')'))
@@ -1012,6 +1082,8 @@ class LocalQuote extends DataClass implements Insertable<LocalQuote> {
     voiceNotePath,
     voiceNoteDurationMs,
     pages,
+    words,
+    markedWordIndexes,
     isFavorite,
     createdAt,
   );
@@ -1027,6 +1099,8 @@ class LocalQuote extends DataClass implements Insertable<LocalQuote> {
           other.voiceNotePath == this.voiceNotePath &&
           other.voiceNoteDurationMs == this.voiceNoteDurationMs &&
           other.pages == this.pages &&
+          other.words == this.words &&
+          other.markedWordIndexes == this.markedWordIndexes &&
           other.isFavorite == this.isFavorite &&
           other.createdAt == this.createdAt);
 }
@@ -1040,6 +1114,8 @@ class QuotesCompanion extends UpdateCompanion<LocalQuote> {
   final Value<String?> voiceNotePath;
   final Value<int?> voiceNoteDurationMs;
   final Value<List<QuotePage>> pages;
+  final Value<List<RecognizedWord>> words;
+  final Value<List<int>> markedWordIndexes;
   final Value<bool> isFavorite;
   final Value<DateTime> createdAt;
   final Value<int> rowid;
@@ -1052,6 +1128,8 @@ class QuotesCompanion extends UpdateCompanion<LocalQuote> {
     this.voiceNotePath = const Value.absent(),
     this.voiceNoteDurationMs = const Value.absent(),
     this.pages = const Value.absent(),
+    this.words = const Value.absent(),
+    this.markedWordIndexes = const Value.absent(),
     this.isFavorite = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.rowid = const Value.absent(),
@@ -1065,6 +1143,8 @@ class QuotesCompanion extends UpdateCompanion<LocalQuote> {
     this.voiceNotePath = const Value.absent(),
     this.voiceNoteDurationMs = const Value.absent(),
     required List<QuotePage> pages,
+    this.words = const Value.absent(),
+    this.markedWordIndexes = const Value.absent(),
     this.isFavorite = const Value.absent(),
     required DateTime createdAt,
     this.rowid = const Value.absent(),
@@ -1083,6 +1163,8 @@ class QuotesCompanion extends UpdateCompanion<LocalQuote> {
     Expression<String>? voiceNotePath,
     Expression<int>? voiceNoteDurationMs,
     Expression<String>? pages,
+    Expression<String>? words,
+    Expression<String>? markedWordIndexes,
     Expression<bool>? isFavorite,
     Expression<DateTime>? createdAt,
     Expression<int>? rowid,
@@ -1097,6 +1179,8 @@ class QuotesCompanion extends UpdateCompanion<LocalQuote> {
       if (voiceNoteDurationMs != null)
         'voice_note_duration_ms': voiceNoteDurationMs,
       if (pages != null) 'pages': pages,
+      if (words != null) 'words': words,
+      if (markedWordIndexes != null) 'marked_word_indexes': markedWordIndexes,
       if (isFavorite != null) 'is_favorite': isFavorite,
       if (createdAt != null) 'created_at': createdAt,
       if (rowid != null) 'rowid': rowid,
@@ -1112,6 +1196,8 @@ class QuotesCompanion extends UpdateCompanion<LocalQuote> {
     Value<String?>? voiceNotePath,
     Value<int?>? voiceNoteDurationMs,
     Value<List<QuotePage>>? pages,
+    Value<List<RecognizedWord>>? words,
+    Value<List<int>>? markedWordIndexes,
     Value<bool>? isFavorite,
     Value<DateTime>? createdAt,
     Value<int>? rowid,
@@ -1125,6 +1211,8 @@ class QuotesCompanion extends UpdateCompanion<LocalQuote> {
       voiceNotePath: voiceNotePath ?? this.voiceNotePath,
       voiceNoteDurationMs: voiceNoteDurationMs ?? this.voiceNoteDurationMs,
       pages: pages ?? this.pages,
+      words: words ?? this.words,
+      markedWordIndexes: markedWordIndexes ?? this.markedWordIndexes,
       isFavorite: isFavorite ?? this.isFavorite,
       createdAt: createdAt ?? this.createdAt,
       rowid: rowid ?? this.rowid,
@@ -1162,6 +1250,16 @@ class QuotesCompanion extends UpdateCompanion<LocalQuote> {
         $QuotesTable.$converterpages.toSql(pages.value),
       );
     }
+    if (words.present) {
+      map['words'] = Variable<String>(
+        $QuotesTable.$converterwords.toSql(words.value),
+      );
+    }
+    if (markedWordIndexes.present) {
+      map['marked_word_indexes'] = Variable<String>(
+        $QuotesTable.$convertermarkedWordIndexes.toSql(markedWordIndexes.value),
+      );
+    }
     if (isFavorite.present) {
       map['is_favorite'] = Variable<bool>(isFavorite.value);
     }
@@ -1185,6 +1283,8 @@ class QuotesCompanion extends UpdateCompanion<LocalQuote> {
           ..write('voiceNotePath: $voiceNotePath, ')
           ..write('voiceNoteDurationMs: $voiceNoteDurationMs, ')
           ..write('pages: $pages, ')
+          ..write('words: $words, ')
+          ..write('markedWordIndexes: $markedWordIndexes, ')
           ..write('isFavorite: $isFavorite, ')
           ..write('createdAt: $createdAt, ')
           ..write('rowid: $rowid')
@@ -3266,6 +3366,8 @@ typedef $$QuotesTableCreateCompanionBuilder = QuotesCompanion Function({
   Value<String?> voiceNotePath,
   Value<int?> voiceNoteDurationMs,
   required List<QuotePage> pages,
+  Value<List<RecognizedWord>> words,
+  Value<List<int>> markedWordIndexes,
   Value<bool> isFavorite,
   required DateTime createdAt,
   Value<int> rowid,
@@ -3279,6 +3381,8 @@ typedef $$QuotesTableUpdateCompanionBuilder = QuotesCompanion Function({
   Value<String?> voiceNotePath,
   Value<int?> voiceNoteDurationMs,
   Value<List<QuotePage>> pages,
+  Value<List<RecognizedWord>> words,
+  Value<List<int>> markedWordIndexes,
   Value<bool> isFavorite,
   Value<DateTime> createdAt,
   Value<int> rowid,
@@ -3367,6 +3471,22 @@ class $$QuotesTableFilterComposer
   ColumnWithTypeConverterFilters<List<QuotePage>, List<QuotePage>, String>
   get pages => $composableBuilder(
     column: $table.pages,
+    builder: (column) => ColumnWithTypeConverterFilters(column),
+  );
+
+  ColumnWithTypeConverterFilters<
+    List<RecognizedWord>,
+    List<RecognizedWord>,
+    String
+  >
+  get words => $composableBuilder(
+    column: $table.words,
+    builder: (column) => ColumnWithTypeConverterFilters(column),
+  );
+
+  ColumnWithTypeConverterFilters<List<int>, List<int>, String>
+  get markedWordIndexes => $composableBuilder(
+    column: $table.markedWordIndexes,
     builder: (column) => ColumnWithTypeConverterFilters(column),
   );
 
@@ -3473,6 +3593,16 @@ class $$QuotesTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get words => $composableBuilder(
+    column: $table.words,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get markedWordIndexes => $composableBuilder(
+    column: $table.markedWordIndexes,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<bool> get isFavorite => $composableBuilder(
     column: $table.isFavorite,
     builder: (column) => ColumnOrderings(column),
@@ -3543,6 +3673,15 @@ class $$QuotesTableAnnotationComposer
 
   GeneratedColumnWithTypeConverter<List<QuotePage>, String> get pages =>
       $composableBuilder(column: $table.pages, builder: (column) => column);
+
+  GeneratedColumnWithTypeConverter<List<RecognizedWord>, String> get words =>
+      $composableBuilder(column: $table.words, builder: (column) => column);
+
+  GeneratedColumnWithTypeConverter<List<int>, String> get markedWordIndexes =>
+      $composableBuilder(
+        column: $table.markedWordIndexes,
+        builder: (column) => column,
+      );
 
   GeneratedColumn<bool> get isFavorite => $composableBuilder(
     column: $table.isFavorite,
@@ -3637,6 +3776,8 @@ class $$QuotesTableTableManager
                 Value<String?> voiceNotePath = const Value.absent(),
                 Value<int?> voiceNoteDurationMs = const Value.absent(),
                 Value<List<QuotePage>> pages = const Value.absent(),
+                Value<List<RecognizedWord>> words = const Value.absent(),
+                Value<List<int>> markedWordIndexes = const Value.absent(),
                 Value<bool> isFavorite = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
@@ -3649,6 +3790,8 @@ class $$QuotesTableTableManager
                 voiceNotePath: voiceNotePath,
                 voiceNoteDurationMs: voiceNoteDurationMs,
                 pages: pages,
+                words: words,
+                markedWordIndexes: markedWordIndexes,
                 isFavorite: isFavorite,
                 createdAt: createdAt,
                 rowid: rowid,
@@ -3663,6 +3806,8 @@ class $$QuotesTableTableManager
                 Value<String?> voiceNotePath = const Value.absent(),
                 Value<int?> voiceNoteDurationMs = const Value.absent(),
                 required List<QuotePage> pages,
+                Value<List<RecognizedWord>> words = const Value.absent(),
+                Value<List<int>> markedWordIndexes = const Value.absent(),
                 Value<bool> isFavorite = const Value.absent(),
                 required DateTime createdAt,
                 Value<int> rowid = const Value.absent(),
@@ -3675,6 +3820,8 @@ class $$QuotesTableTableManager
                 voiceNotePath: voiceNotePath,
                 voiceNoteDurationMs: voiceNoteDurationMs,
                 pages: pages,
+                words: words,
+                markedWordIndexes: markedWordIndexes,
                 isFavorite: isFavorite,
                 createdAt: createdAt,
                 rowid: rowid,

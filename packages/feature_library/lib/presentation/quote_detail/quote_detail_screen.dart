@@ -9,6 +9,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:shared/domain/entities/book.dart';
+import 'package:shared/domain/entities/captured_shot.dart';
+import 'package:shared/domain/entities/page_quad.dart';
 import 'package:shared/domain/entities/quote.dart';
 import 'package:shared/domain/entities/quote_page.dart';
 import 'package:shared/domain/entities/quote_theme.dart';
@@ -16,10 +18,10 @@ import 'package:shared/presentation/extensions/app_error_extensions.dart';
 import 'package:shared/presentation/extensions/context_extensions.dart';
 import 'package:shared/presentation/extensions/page_number_extensions.dart';
 import 'package:shared/presentation/extensions/screen_layout_extensions.dart';
+import 'package:shared/presentation/navigation/marking_arguments.dart';
 import 'package:shared/presentation/navigation/navigation_extensions.dart';
 import 'package:shared/presentation/widgets/circle_icon_button.dart';
 import 'package:shared/presentation/widgets/confirm_dialog.dart';
-import 'package:shared/presentation/widgets/expandable_text.dart';
 import 'package:shared/presentation/widgets/fullscreen_image_viewer.dart';
 import 'package:shared/presentation/widgets/loading_indicator.dart';
 import 'package:shared/presentation/widgets/name_input_dialog.dart';
@@ -164,16 +166,35 @@ class const _Content({
 
 class const _CitationCard({
   required final Quote _quote,
-}) extends StatelessWidget {
+}) extends HookWidget {
   @override
   Widget build(BuildContext context) {
+    final controller = useTextEditingController(text: _quote.quote);
+    // * comparing trimmed keeps the space the user just typed while re-marking still lands here
+    useEffect(() {
+      if (controller.text.trim() != _quote.quote) controller.text = _quote.quote;
+      return null;
+    }, [_quote.quote]);
     return PaperCard(
       padding: const EdgeInsets.all(Spacing.l),
-      child: ExpandableText(
-        text: '“${_quote.quote}”',
+      child: TextField(
+        controller: controller,
+        minLines: 1,
         maxLines: _quoteMaxLines,
-        style: context.typography.readingQuoteItalic.copyWith(
-          color: context.palette.paperText,
+        textCapitalization: TextCapitalization.sentences,
+        style: context.typography.readingQuoteItalic.copyWith(color: context.palette.paperText),
+        onChanged: (value) => context.read<QuoteDetailBloc>().add(QuoteDetailQuoteChanged(value)),
+        decoration: InputDecoration(
+          isDense: true,
+          filled: false,
+          border: InputBorder.none,
+          enabledBorder: InputBorder.none,
+          focusedBorder: InputBorder.none,
+          contentPadding: EdgeInsets.zero,
+          hintText: context.s.quoteDetailQuoteHint,
+          hintStyle: context.typography.readingQuoteItalic.copyWith(
+            color: context.palette.paperTextFaint,
+          ),
         ),
       ),
     );
@@ -328,6 +349,11 @@ class const _NoteCard({
   @override
   Widget build(BuildContext context) {
     final controller = useTextEditingController(text: _quote.note ?? "");
+    useEffect(() {
+      final note = _quote.note ?? "";
+      if (controller.text.trim() != note) controller.text = note;
+      return null;
+    }, [_quote.note]);
     return Container(
       padding: const EdgeInsets.all(Spacing.m),
       decoration: BoxDecoration(
@@ -393,7 +419,7 @@ class const _Actions({
           icon: Icons.more_horiz,
           label: context.s.quoteDetailMoreLabel,
           highlighted: false,
-          onTap: () => _showQuoteMenu(context),
+          onTap: () => _showQuoteMenu(context, _quote),
         ),
       ],
     );
@@ -408,15 +434,40 @@ Future<void> _shareQuote(BuildContext context, Quote quote, Book? book) async {
   await Share.share(context.s.quoteShareBody(quote.quote, source));
 }
 
-Future<void> _showQuoteMenu(BuildContext context) async {
-  final bloc = context.read<QuoteDetailBloc>();
-  final deleteRequested = await showModalBottomSheet<bool>(
+Future<void> _showQuoteMenu(BuildContext context, Quote quote) async {
+  final action = await showModalBottomSheet<_QuoteMenuAction>(
     context: context,
     isScrollControlled: true,
     useRootNavigator: true,
-    builder: (_) => const _QuoteMenu(),
+    builder: (_) => _QuoteMenu(canEdit: quote.pages.isNotEmpty),
   );
-  if (deleteRequested != true || !context.mounted) return;
+  if (action == null || !context.mounted) return;
+  switch (action) {
+    case _QuoteMenuAction.edit:
+      await _editQuote(context, quote);
+    case _QuoteMenuAction.delete:
+      await _deleteQuote(context);
+  }
+}
+
+// * re-marking runs the capture flow again on the pages the quote already carries
+Future<void> _editQuote(BuildContext context, Quote quote) async {
+  final bloc = context.read<QuoteDetailBloc>();
+  await context.pushMarking(
+    MarkingArguments(
+      shots: [
+        for (final page in quote.pages)
+          CapturedShot(imagePath: page.photoPath, pageQuad: fullFramePageQuad),
+      ],
+      bookId: quote.bookId,
+      quote: quote,
+    ),
+  );
+  bloc.add(const QuoteDetailStarted());
+}
+
+Future<void> _deleteQuote(BuildContext context) async {
+  final bloc = context.read<QuoteDetailBloc>();
   final confirmed = await showConfirmDialog(
     context,
     title: context.s.quoteDeleteTitle,
@@ -427,16 +478,26 @@ Future<void> _showQuoteMenu(BuildContext context) async {
   if (confirmed) bloc.add(const QuoteDetailDeleteRequested());
 }
 
-class const _QuoteMenu() extends StatelessWidget {
+enum _QuoteMenuAction { edit, delete }
+
+class const _QuoteMenu({
+  required final bool _canEdit,
+}) extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SheetContent(
       children: [
+        if (_canEdit)
+          SheetActionTile(
+            icon: Icons.edit_outlined,
+            label: context.s.quoteEditAction,
+            onTap: () => Navigator.of(context).pop(_QuoteMenuAction.edit),
+          ),
         SheetActionTile(
           icon: Icons.delete_outline,
           label: context.s.quoteDeleteAction,
           destructive: true,
-          onTap: () => Navigator.of(context).pop(true),
+          onTap: () => Navigator.of(context).pop(_QuoteMenuAction.delete),
         ),
       ],
     );

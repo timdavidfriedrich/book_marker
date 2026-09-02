@@ -1,3 +1,5 @@
+import 'package:shared/domain/entities/recognized_word.dart';
+
 class const RecognizedPage({
   required final List<RecognizedLine> lines,
   required final List<RecognizedWord> words,
@@ -11,18 +13,4 @@ class const RecognizedLine({
   required final double top,
   required final double width,
   required final double height,
-});
-
-class const RecognizedWord({
-  required final String text,
-  required final double left,
-  required final double top,
-  required final double width,
-  required final double height,
-  required final int lineIndex,
-  required final int pageIndex,
-  required final double? confidence,
-  required final bool isUncertain,
-  required final bool joinsWithNext,
-  final List<String> suggestions = const [],
 });

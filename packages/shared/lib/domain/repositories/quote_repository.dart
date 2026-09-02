@@ -11,6 +11,8 @@ abstract class QuoteRepository {
 
   Future<AppResult<()>> setFavorite(String id, {required bool isFavorite});
 
+  Future<AppResult<()>> setQuote(String id, String quote);
+
   Future<AppResult<()>> setNote(String id, String? note);
 
   Future<AppResult<()>> setPageNumbers(String id, List<int> pageNumbers);

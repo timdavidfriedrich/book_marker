@@ -1,4 +1,5 @@
 import 'package:core/theme/spacing.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -18,6 +19,13 @@ class const PageNumberField({
   @override
   Widget build(BuildContext context) {
     final controller = useTextEditingController(text: _pages.toPageLabel());
+    // * comparing parsed pages keeps a half typed separator while outside changes still land here
+    useEffect(() {
+      if (!listEquals(controller.text.toPageNumbers(), _pages)) {
+        controller.text = _pages.toPageLabel();
+      }
+      return null;
+    }, [_pages]);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: Spacing.m, vertical: Spacing.s),
       decoration: BoxDecoration(

@@ -65,6 +65,16 @@ class const QuoteRepositoryImpl(
   }
 
   @override
+  Future<AppResult<()>> setQuote(String id, String quote) async {
+    try {
+      await _localDataSource.setQuote(id, quote);
+      return const Success(());
+    } on Object {
+      return const Failure(UnexpectedError());
+    }
+  }
+
+  @override
   Future<AppResult<()>> setNote(String id, String? note) async {
     try {
       await _localDataSource.setNote(id, note);

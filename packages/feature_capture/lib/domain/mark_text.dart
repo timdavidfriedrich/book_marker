@@ -1,6 +1,6 @@
 import 'dart:math' as math;
 
-import 'package:feature_capture/domain/recognized_page.dart';
+import 'package:shared/domain/entities/recognized_word.dart';
 
 const _mergeGapRatio = 0.22;
 const _minVerticalOverlap = 0.55;

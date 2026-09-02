@@ -951,6 +951,12 @@ abstract class AppLocalizations {
   /// **'more'**
   String get quoteDetailMoreLabel;
 
+  /// No description provided for @quoteDetailQuoteHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Write the quote…'**
+  String get quoteDetailQuoteHint;
+
   /// No description provided for @quoteDetailNoteHint.
   ///
   /// In en, this message translates to:
@@ -1112,6 +1118,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'This deletes the recording. This can\'t be undone.'**
   String get voiceNoteDeleteMessage;
+
+  /// No description provided for @quoteEditAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit quote'**
+  String get quoteEditAction;
 
   /// No description provided for @quoteDeleteAction.
   ///

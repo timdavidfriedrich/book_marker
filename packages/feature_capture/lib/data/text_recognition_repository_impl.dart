@@ -11,6 +11,7 @@ import 'package:feature_capture/domain/text_recognition_repository.dart';
 import 'package:feature_capture/domain/word_quality.dart';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 import 'package:injectable/injectable.dart';
+import 'package:shared/domain/entities/recognized_word.dart';
 
 const _edgeMargin = 0.18;
 const _maxPageNumber = 3000;

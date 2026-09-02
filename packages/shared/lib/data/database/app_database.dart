@@ -2,10 +2,12 @@ import 'package:drift/drift.dart';
 import 'package:drift_flutter/drift_flutter.dart';
 import 'package:shared/data/database/converters.dart';
 import 'package:shared/domain/entities/quote_page.dart';
+import 'package:shared/domain/entities/recognized_word.dart';
 
 part 'app_database.g.dart';
 
 const _databaseName = "book_marker";
+const _emptyJsonList = "[]";
 const _statusReading = "reading";
 const _legacyQuotesTable = "bookmarks";
 const _legacyQuoteThemesTable = "theme_marks";
@@ -62,6 +64,12 @@ class Quotes extends Table {
   IntColumn get voiceNoteDurationMs => integer().nullable()();
 
   TextColumn get pages => text().map(const QuotePageListConverter())();
+
+  TextColumn get words =>
+      text().map(const RecognizedWordListConverter()).withDefault(const Constant(_emptyJsonList))();
+
+  TextColumn get markedWordIndexes =>
+      text().map(const IntListConverter()).withDefault(const Constant(_emptyJsonList))();
 
   BoolColumn get isFavorite => boolean().withDefault(const Constant(false))();
 
@@ -144,7 +152,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(driftDatabase(name: _databaseName));
 
   @override
-  int get schemaVersion => 11;
+  int get schemaVersion => 12;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -207,6 +215,10 @@ class AppDatabase extends _$AppDatabase {
       }
       if (from < 11) {
         await migrator.addColumn(books, books.coverPath);
+      }
+      if (from < 12) {
+        await migrator.addColumn(quotes, quotes.words);
+        await migrator.addColumn(quotes, quotes.markedWordIndexes);
       }
     },
   );

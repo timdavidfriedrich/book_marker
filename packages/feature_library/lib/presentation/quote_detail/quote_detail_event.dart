@@ -9,6 +9,10 @@ class const QuoteDetailStarted() extends QuoteDetailEvent;
 
 class const QuoteDetailFavoriteToggled() extends QuoteDetailEvent;
 
+class const QuoteDetailQuoteChanged(
+  final String quote,
+) extends QuoteDetailEvent;
+
 class const QuoteDetailNoteChanged(
   final String? note,
 ) extends QuoteDetailEvent;

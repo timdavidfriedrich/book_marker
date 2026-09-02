@@ -4,7 +4,7 @@ import 'package:core/error/app_error.dart';
 import 'package:core/error/app_result.dart';
 import 'package:feature_capture/domain/mark_text.dart';
 import 'package:feature_capture/domain/recognize_captured_spread_use_case.dart';
-import 'package:feature_capture/domain/recognized_page.dart';
+import 'package:feature_capture/domain/recognized_spread.dart';
 import 'package:feature_capture/domain/save_quote_use_case.dart';
 import 'package:feature_capture/presentation/marking/marking_event.dart';
 import 'package:feature_capture/presentation/marking/marking_state.dart';
@@ -15,12 +15,15 @@ import 'package:shared/domain/entities/highlight_region.dart';
 import 'package:shared/domain/entities/quote.dart';
 import 'package:shared/domain/entities/quote_page.dart';
 import 'package:shared/domain/entities/quote_theme.dart';
+import 'package:shared/domain/entities/recognized_word.dart';
 import 'package:shared/domain/repositories/book_repository.dart';
 import 'package:shared/domain/repositories/theme_repository.dart';
 import 'package:shared/presentation/navigation/marking_arguments.dart';
 import 'package:uuid/uuid.dart';
 
 const _uuid = Uuid();
+// * a word counts as marked when its centre sits inside a stored highlight
+const _highlightTolerance = 0.002;
 
 @injectable
 class MarkingBloc extends Bloc<MarkingEvent, MarkingState> {
@@ -43,6 +46,7 @@ class MarkingBloc extends Bloc<MarkingEvent, MarkingState> {
     on<MarkingVoiceNoteRecorded>(_onVoiceNoteRecorded);
     on<MarkingVoiceNoteCleared>(_onVoiceNoteCleared);
     on<MarkingThemesUpdated>(_onThemesUpdated);
+    on<MarkingThemeMembershipUpdated>(_onThemeMembershipUpdated);
     on<MarkingThemeToggled>(_onThemeToggled);
     on<MarkingThemeCreateRequested>(_onThemeCreateRequested);
     on<MarkingFavoriteToggled>(_onFavoriteToggled);
@@ -56,10 +60,12 @@ class MarkingBloc extends Bloc<MarkingEvent, MarkingState> {
   final MarkingArguments _arguments;
   StreamSubscription<AppResult<List<QuoteTheme>>>? _themeSubscription;
   StreamSubscription<AppResult<List<Book>>>? _bookSubscription;
+  StreamSubscription<AppResult<Map<String, Set<String>>>>? _membershipSubscription;
   List<QuoteTheme> _themes = const [];
   List<Book> _books = const [];
   final Set<String> _selectedThemeIds = {};
   late String _bookId = _arguments.bookId;
+  late final Quote? _editedQuote = _arguments.quote;
 
   Future<void> _onStarted(MarkingStarted event, Emitter<MarkingState> emit) async {
     emit(const MarkingProcessing());
@@ -71,6 +77,12 @@ class MarkingBloc extends Bloc<MarkingEvent, MarkingState> {
     _bookSubscription = _bookRepository.watchBooks().listen(
       (result) => add(MarkingBooksUpdated(result)),
     );
+    if (_editedQuote != null) {
+      await _membershipSubscription?.cancel();
+      _membershipSubscription = _themeRepository.watchThemeMembership().listen(
+        (result) => add(MarkingThemeMembershipUpdated(result)),
+      );
+    }
     var bookTitle = "";
     String? bookCoverImage;
     var bookAuthors = const <String>[];
@@ -79,30 +91,69 @@ class MarkingBloc extends Bloc<MarkingEvent, MarkingState> {
       bookCoverImage = data.coverImage;
       bookAuthors = data.authors;
     }
+    // * a stored quote carries its recognised words, so re-marking never scans the pages again
+    if (_editedQuote case final Quote quote when quote.words.isNotEmpty) {
+      emit(
+        _started(
+          pages: [
+            for (final page in quote.pages)
+              SpreadPage(imagePath: page.photoPath, aspectRatio: page.imageAspectRatio),
+          ],
+          words: quote.words,
+          selectedWordIndexes: Set<int>.from(quote.markedWordIndexes),
+          detectedPageNumbers: const [],
+          bookTitle: bookTitle,
+          bookCoverImage: bookCoverImage,
+          bookAuthors: bookAuthors,
+        ),
+      );
+      return;
+    }
     emit(switch (await _recognizeCapturedSpreadUseCase(_arguments.shots)) {
-      Success(:final data) => MarkingReady(
+      Success(:final data) => _started(
         pages: data.pages,
         words: data.words,
-        bookId: _bookId,
-        books: _books,
+        selectedWordIndexes: _restoredSelection(data.words),
+        detectedPageNumbers: data.detectedPageNumbers,
         bookTitle: bookTitle,
         bookCoverImage: bookCoverImage,
         bookAuthors: bookAuthors,
-        selectedWordIndexes: const {},
-        quoteOverride: null,
-        detectedPageNumbers: data.detectedPageNumbers,
-        pageNumbers: data.detectedPageNumbers,
-        note: null,
-        voiceNotePath: null,
-        voiceNoteDurationMs: null,
-        availableThemes: _themes,
-        selectedThemeIds: Set<String>.from(_selectedThemeIds),
-        isFavorite: false,
-        isSaving: false,
-        saveError: null,
       ),
       Failure(:final error) => MarkingFailure(error: error),
     });
+  }
+
+  MarkingReady _started({
+    required List<SpreadPage> pages,
+    required List<RecognizedWord> words,
+    required Set<int> selectedWordIndexes,
+    required List<int> detectedPageNumbers,
+    required String bookTitle,
+    required String? bookCoverImage,
+    required List<String> bookAuthors,
+  }) {
+    return MarkingReady(
+      pages: pages,
+      words: words,
+      bookId: _bookId,
+      books: _books,
+      bookTitle: bookTitle,
+      bookCoverImage: bookCoverImage,
+      bookAuthors: bookAuthors,
+      selectedWordIndexes: selectedWordIndexes,
+      quoteOverride: _editedQuote?.quote,
+      detectedPageNumbers: detectedPageNumbers,
+      pageNumbers: _editedQuote?.pageNumbers ?? detectedPageNumbers,
+      note: _editedQuote?.note,
+      voiceNotePath: _editedQuote?.voiceNotePath,
+      voiceNoteDurationMs: _editedQuote?.voiceNoteDurationMs,
+      availableThemes: _themes,
+      selectedThemeIds: Set<String>.from(_selectedThemeIds),
+      isFavorite: _editedQuote?.isFavorite ?? false,
+      isEditing: _editedQuote != null,
+      isSaving: false,
+      saveError: null,
+    );
   }
 
   void _onBooksUpdated(MarkingBooksUpdated event, Emitter<MarkingState> emit) {
@@ -117,6 +168,47 @@ class MarkingBloc extends Bloc<MarkingEvent, MarkingState> {
       _bookId = event.bookId;
       emit(_ready(current));
     }
+  }
+
+  void _onThemeMembershipUpdated(
+    MarkingThemeMembershipUpdated event,
+    Emitter<MarkingState> emit,
+  ) {
+    if (_editedQuote case final Quote quote) {
+      if (event.result case Success(:final data)) {
+        _selectedThemeIds
+          ..clear()
+          ..addAll({
+            for (final entry in data.entries)
+              if (entry.value.contains(quote.id)) entry.key,
+          });
+        // * the membership only seeds the selection, from there the sheet owns it
+        unawaited(_membershipSubscription?.cancel());
+        _membershipSubscription = null;
+        if (state case final MarkingReady current) emit(_ready(current));
+      }
+    }
+  }
+
+  Set<int> _restoredSelection(List<RecognizedWord> words) {
+    if (_editedQuote case final Quote quote) {
+      return {
+        for (final (pageIndex, page) in quote.pages.indexed)
+          for (final highlight in page.highlights)
+            for (final (index, word) in words.indexed)
+              if (word.pageIndex == pageIndex && _isMarked(word, highlight)) index,
+      };
+    }
+    return const {};
+  }
+
+  bool _isMarked(RecognizedWord word, HighlightRegion highlight) {
+    final centerX = word.left + word.width / 2;
+    final centerY = word.top + word.height / 2;
+    return centerX >= highlight.left - _highlightTolerance &&
+        centerX <= highlight.left + highlight.width + _highlightTolerance &&
+        centerY >= highlight.top - _highlightTolerance &&
+        centerY <= highlight.top + highlight.height + _highlightTolerance;
   }
 
   void _onThemesUpdated(MarkingThemesUpdated event, Emitter<MarkingState> emit) {
@@ -305,7 +397,13 @@ class MarkingBloc extends Bloc<MarkingEvent, MarkingState> {
           for (final themeId in _selectedThemeIds) {
             await _themeRepository.addQuoteToTheme(themeId: themeId, quoteId: quote.id);
           }
-          emit(const MarkingSaved());
+          if (_editedQuote != null) {
+            for (final theme in _themes) {
+              if (_selectedThemeIds.contains(theme.id)) continue;
+              await _themeRepository.removeQuoteFromTheme(themeId: theme.id, quoteId: quote.id);
+            }
+          }
+          emit(MarkingSaved(isEditing: _editedQuote != null));
         case Failure(:final error):
           emit(_ready(current, saveError: error));
       }
@@ -347,6 +445,7 @@ class MarkingBloc extends Bloc<MarkingEvent, MarkingState> {
       availableThemes: _themes,
       selectedThemeIds: Set<String>.from(_selectedThemeIds),
       isFavorite: isFavorite ?? current.isFavorite,
+      isEditing: current.isEditing,
       isSaving: isSaving,
       saveError: saveError,
     );
@@ -367,7 +466,7 @@ class MarkingBloc extends Bloc<MarkingEvent, MarkingState> {
         ? override
         : joinMarkedWords(state.words, orderedIndexes);
     return Quote(
-      id: _uuid.v4(),
+      id: _editedQuote?.id ?? _uuid.v4(),
       bookId: _bookId,
       pageNumbers: state.pageNumbers,
       quote: quote,
@@ -375,8 +474,10 @@ class MarkingBloc extends Bloc<MarkingEvent, MarkingState> {
       voiceNotePath: state.voiceNotePath,
       voiceNoteDurationMs: state.voiceNoteDurationMs,
       pages: _quotePages(state, orderedIndexes),
+      words: state.words,
+      markedWordIndexes: orderedIndexes,
       isFavorite: state.isFavorite,
-      createdAt: DateTime.now().toUtc(),
+      createdAt: _editedQuote?.createdAt ?? DateTime.now().toUtc(),
     );
   }
 
@@ -395,7 +496,6 @@ class MarkingBloc extends Bloc<MarkingEvent, MarkingState> {
               height: word.height,
             ),
       ];
-      if (highlights.isEmpty) continue;
       pages.add(
         QuotePage(
           photoPath: page.imagePath,
@@ -409,6 +509,7 @@ class MarkingBloc extends Bloc<MarkingEvent, MarkingState> {
 
   @override
   Future<void> close() async {
+    await _membershipSubscription?.cancel();
     await _themeSubscription?.cancel();
     await _bookSubscription?.cancel();
     return super.close();

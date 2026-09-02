@@ -24,6 +24,7 @@ class QuoteDetailBloc extends Bloc<QuoteDetailEvent, QuoteDetailState> {
   ) : super(const QuoteDetailLoading()) {
     on<QuoteDetailStarted>(_onStarted);
     on<QuoteDetailFavoriteToggled>(_onFavoriteToggled);
+    on<QuoteDetailQuoteChanged>(_onQuoteChanged);
     on<QuoteDetailNoteChanged>(_onNoteChanged);
     on<QuoteDetailPageNumbersChanged>(_onPageNumbersChanged);
     on<QuoteDetailVoiceNoteRecorded>(_onVoiceNoteRecorded);
@@ -77,6 +78,21 @@ class QuoteDetailBloc extends Bloc<QuoteDetailEvent, QuoteDetailState> {
     final nextValue = !quote.isFavorite;
     if (await _quoteRepository.setFavorite(quote.id, isFavorite: nextValue) case Success()) {
       _quote = quote.copyWith(isFavorite: nextValue);
+      _emitState(emit);
+    }
+  }
+
+  Future<void> _onQuoteChanged(
+    QuoteDetailQuoteChanged event,
+    Emitter<QuoteDetailState> emit,
+  ) async {
+    final quote = _quote;
+    if (quote == null) return;
+    final trimmed = event.quote.trim();
+    // * an empty field is a step on the way to the next wording, never a quote worth storing
+    if (trimmed.isEmpty || trimmed == quote.quote) return;
+    if (await _quoteRepository.setQuote(quote.id, trimmed) case Success()) {
+      _quote = quote.copyWith(quote: trimmed);
       _emitState(emit);
     }
   }

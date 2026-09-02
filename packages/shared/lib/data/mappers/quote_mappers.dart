@@ -12,6 +12,8 @@ extension LocalQuoteMappers on LocalQuote {
       voiceNotePath: voiceNotePath,
       voiceNoteDurationMs: voiceNoteDurationMs,
       pages: pages,
+      words: words,
+      markedWordIndexes: markedWordIndexes,
       isFavorite: isFavorite,
       createdAt: createdAt,
     );
@@ -29,6 +31,8 @@ extension QuoteMappers on Quote {
       voiceNotePath: voiceNotePath,
       voiceNoteDurationMs: voiceNoteDurationMs,
       pages: pages,
+      words: words,
+      markedWordIndexes: markedWordIndexes,
       isFavorite: isFavorite,
       createdAt: createdAt,
     );
