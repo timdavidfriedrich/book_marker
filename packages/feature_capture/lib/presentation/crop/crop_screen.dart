@@ -20,6 +20,7 @@ import 'package:shared/presentation/widgets/circle_icon_button.dart';
 import 'package:shared/presentation/widgets/loading_indicator.dart';
 
 const _touchTarget = 48.0;
+const _decodeWidth = 1600;
 const _scrimOpacity = 0.55;
 const _sideColumnWidth = 300.0;
 
@@ -62,14 +63,17 @@ class const _Editor({
   @override
   Widget build(BuildContext context) {
     // * a gallery shot decodes for seconds, and the editor is unusable until it is on screen
-    final image = useMemoized(() => FileImage(File(_state.imagePath)), [_state.imagePath]);
+    final image = useMemoized(
+      () => ResizeImage(FileImage(File(_state.imagePath)), width: _decodeWidth),
+      [_state.imagePath],
+    );
     final decoded = useFuture(useMemoized(() => precacheImage(image, context), [image]));
     if (decoded.connectionState != ConnectionState.done) {
       return LoadingIndicator(message: context.s.cropLoadingMessage);
     }
     final photo = MediaFrame(
       aspectRatio: _state.aspectRatio,
-      child: _Photo(state: _state),
+      child: _Photo(state: _state, image: image),
     );
     final hint = Text(
       context.s.cropHint,
@@ -144,6 +148,7 @@ class const _Header() extends StatelessWidget {
 
 class const _Photo({
   required final CropReady _state,
+  required final ImageProvider<Object> _image,
 }) extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -159,7 +164,7 @@ class const _Photo({
                 child: Stack(
                   fit: StackFit.expand,
                   children: [
-                    Image(image: FileImage(File(_state.imagePath)), fit: BoxFit.fill),
+                    Image(image: _image, fit: BoxFit.fill),
                     PageQuadOverlay(
                       quad: _state.quad,
                       lineColor: context.c.primary,

@@ -35,6 +35,7 @@ import 'package:shared/presentation/widgets/sheet_content.dart';
 import 'package:shared/presentation/widgets/voice_note_recorder.dart';
 
 const _highlightPadding = 2.0;
+const _pageCacheWidth = 1600;
 const _legendSampleWidth = 28.0;
 const _legendSampleHeight = 16.0;
 const _highlightFillOpacity = 0.22;
@@ -313,7 +314,13 @@ class const _PhotoPage({
                   final size = pageConstraints.biggest;
                   return Stack(
                     children: [
-                      Positioned.fill(child: Image.file(File(page.imagePath), fit: BoxFit.fill)),
+                      Positioned.fill(
+                        child: Image.file(
+                          File(page.imagePath),
+                          cacheWidth: _pageCacheWidth,
+                          fit: BoxFit.fill,
+                        ),
+                      ),
                       for (final group in words.wordGroups())
                         if (group.number case final int number)
                           for (var member = 0; member < group.indexes.length; member++)

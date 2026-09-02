@@ -6,6 +6,7 @@ import 'package:shared/domain/entities/highlight_region.dart';
 import 'package:shared/presentation/extensions/context_extensions.dart';
 
 const _highlightFillOpacity = 0.3;
+const _cacheWidth = 2000;
 
 class const HighlightImage({
   required final String _imagePath,
@@ -22,7 +23,9 @@ class const HighlightImage({
           final size = constraints.biggest;
           return Stack(
             children: [
-              Positioned.fill(child: Image.file(File(_imagePath), fit: BoxFit.fill)),
+              Positioned.fill(
+                child: Image.file(File(_imagePath), cacheWidth: _cacheWidth, fit: BoxFit.fill),
+              ),
               for (final highlight in _highlights)
                 Positioned(
                   left: highlight.left * size.width,
