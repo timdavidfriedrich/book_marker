@@ -30,6 +30,7 @@ import 'package:shared/presentation/widgets/ink_tap_box.dart';
 import 'package:shared/presentation/widgets/loading_indicator.dart';
 import 'package:shared/presentation/widgets/segmented_toggle.dart';
 
+const _resolutionPresets = [ResolutionPreset.max, ResolutionPreset.veryHigh];
 const _shutterOuter = 88.0;
 const _shutterInner = 60.0;
 const _controlIcon = 56.0;
@@ -63,13 +64,11 @@ class const CaptureScreen({
           return;
         }
         final description = cameras.first;
-        final created = CameraController(
-          description,
-          ResolutionPreset.veryHigh,
-          enableAudio: false,
-          imageFormatGroup: ImageFormatGroup.yuv420,
-        );
-        await created.initialize();
+        final created = await _openCamera(description);
+        if (created == null) {
+          hasError.value = true;
+          return;
+        }
         try {
           await created.startImageStream(
             (image) => detectionCubit.frameReceived(
@@ -557,6 +556,30 @@ class const _ShotStrip() extends StatelessWidget {
       },
     );
   }
+}
+
+// * the sensor's own resolution keeps the page in its native ratio and gives the recogniser
+// * the pixels it crops from, but not every device offers it, so a smaller preset takes over
+Future<CameraController?> _openCamera(CameraDescription description) async {
+  for (final preset in _resolutionPresets) {
+    final camera = CameraController(
+      description,
+      preset,
+      enableAudio: false,
+      imageFormatGroup: ImageFormatGroup.yuv420,
+    );
+    try {
+      await camera.initialize();
+      return camera;
+    } on Object {
+      try {
+        await camera.dispose();
+      } on Object {
+        // camera never opened
+      }
+    }
+  }
+  return null;
 }
 
 // * previewSize is reported in sensor orientation, so the sides are ordered by the device instead
