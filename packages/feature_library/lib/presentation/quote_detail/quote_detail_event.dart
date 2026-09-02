@@ -13,6 +13,8 @@ class const QuoteDetailQuoteChanged(
   final String quote,
 ) extends QuoteDetailEvent;
 
+class const QuoteDetailMarkingSyncRequested() extends QuoteDetailEvent;
+
 class const QuoteDetailNoteChanged(
   final String? note,
 ) extends QuoteDetailEvent;

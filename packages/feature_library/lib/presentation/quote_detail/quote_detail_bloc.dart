@@ -9,10 +9,13 @@ import 'package:injectable/injectable.dart';
 import 'package:shared/domain/entities/book.dart';
 import 'package:shared/domain/entities/quote.dart';
 import 'package:shared/domain/entities/quote_theme.dart';
+import 'package:shared/domain/entities/recognized_word_extensions.dart';
 import 'package:shared/domain/entities/voice_note.dart';
 import 'package:shared/domain/repositories/book_repository.dart';
 import 'package:shared/domain/repositories/quote_repository.dart';
 import 'package:shared/domain/repositories/theme_repository.dart';
+
+const _markingSyncDelay = Duration(milliseconds: 500);
 
 @injectable
 class QuoteDetailBloc extends Bloc<QuoteDetailEvent, QuoteDetailState> {
@@ -25,6 +28,7 @@ class QuoteDetailBloc extends Bloc<QuoteDetailEvent, QuoteDetailState> {
     on<QuoteDetailStarted>(_onStarted);
     on<QuoteDetailFavoriteToggled>(_onFavoriteToggled);
     on<QuoteDetailQuoteChanged>(_onQuoteChanged);
+    on<QuoteDetailMarkingSyncRequested>(_onMarkingSyncRequested);
     on<QuoteDetailNoteChanged>(_onNoteChanged);
     on<QuoteDetailPageNumbersChanged>(_onPageNumbersChanged);
     on<QuoteDetailVoiceNoteRecorded>(_onVoiceNoteRecorded);
@@ -42,6 +46,7 @@ class QuoteDetailBloc extends Bloc<QuoteDetailEvent, QuoteDetailState> {
   final String _quoteId;
   StreamSubscription<AppResult<List<QuoteTheme>>>? _themeSubscription;
   StreamSubscription<AppResult<Map<String, Set<String>>>>? _membershipSubscription;
+  Timer? _markingSyncTimer;
   Quote? _quote;
   Book? _book;
   List<QuoteTheme> _themes = const [];
@@ -93,6 +98,34 @@ class QuoteDetailBloc extends Bloc<QuoteDetailEvent, QuoteDetailState> {
     if (trimmed.isEmpty || trimmed == quote.quote) return;
     if (await _quoteRepository.setQuote(quote.id, trimmed) case Success()) {
       _quote = quote.copyWith(quote: trimmed);
+      _emitState(emit);
+      // * the marked words follow once the typing settles, they cost a full row to rewrite
+      _markingSyncTimer?.cancel();
+      _markingSyncTimer = Timer(
+        _markingSyncDelay,
+        () => add(const QuoteDetailMarkingSyncRequested()),
+      );
+    }
+  }
+
+  Future<void> _onMarkingSyncRequested(
+    QuoteDetailMarkingSyncRequested event,
+    Emitter<QuoteDetailState> emit,
+  ) async {
+    final quote = _quote;
+    if (quote == null) return;
+    // * a rewrite that no longer lines up with the page keeps the marks it was taken from
+    final words = quote.words.applyMarkedText(quote.quote, quote.markedWordIndexes);
+    if (words == null) return;
+    final updated = quote.copyWith(
+      words: words,
+      pages: [
+        for (final (index, page) in quote.pages.indexed)
+          page.copyWith(highlights: words.markedRegionsOn(index, quote.markedWordIndexes)),
+      ],
+    );
+    if (await _quoteRepository.saveQuote(updated) case Success()) {
+      _quote = updated;
       _emitState(emit);
     }
   }
@@ -231,6 +264,7 @@ class QuoteDetailBloc extends Bloc<QuoteDetailEvent, QuoteDetailState> {
 
   @override
   Future<void> close() async {
+    _markingSyncTimer?.cancel();
     await _themeSubscription?.cancel();
     await _membershipSubscription?.cancel();
     return super.close();
