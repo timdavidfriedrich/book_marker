@@ -214,7 +214,6 @@ class const CaptureScreen({
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const _SpanToggle(),
                       const _BookBar(),
                       _CaptureTray(onContinue: continueWithSpread),
                       controls,
@@ -234,8 +233,6 @@ class const CaptureScreen({
           child: Column(
             children: [
               const SizedBox(height: Spacing.s),
-              const _SpanToggle(),
-              const SizedBox(height: Spacing.m),
               Expanded(child: preview),
               const SizedBox(height: Spacing.m),
               const _BookBar(),
@@ -261,20 +258,18 @@ class const _SpanToggle() extends StatelessWidget {
           CaptureReady(:final span) || CaptureEmpty(:final span) => span,
           _ => CaptureSpan.onePage,
         };
-        return Center(
-          child: SegmentedToggle(
-            isExpanded: false,
-            labels: [
-              for (final value in CaptureSpan.values)
-                switch (value) {
-                  CaptureSpan.onePage => context.s.captureModeOnePage,
-                  CaptureSpan.spread => context.s.captureModeSpread,
-                },
-            ],
-            selectedIndex: CaptureSpan.values.indexOf(span),
-            onChanged: (index) => context.read<CaptureBloc>().add(
-              CaptureSpanSelected(CaptureSpan.values[index]),
-            ),
+        return SegmentedToggle(
+          isExpanded: false,
+          labels: [
+            for (final value in CaptureSpan.values)
+              switch (value) {
+                CaptureSpan.onePage => context.s.captureModeOnePage,
+                CaptureSpan.spread => context.s.captureModeSpread,
+              },
+          ],
+          selectedIndex: CaptureSpan.values.indexOf(span),
+          onChanged: (index) => context.read<CaptureBloc>().add(
+            CaptureSpanSelected(CaptureSpan.values[index]),
           ),
         );
       },
@@ -485,15 +480,24 @@ class const _OverlayDot({
 class const _PreviewOverlay() extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return const Align(
-      alignment: Alignment.bottomCenter,
-      child: Padding(
-        padding: EdgeInsets.all(Spacing.m),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [_CaptureModeToggle(), _ShotStrip()],
+    // * both toggles frame what the camera sees, so they ride on the viewfinder itself
+    return const Stack(
+      children: [
+        Align(
+          alignment: Alignment.topCenter,
+          child: Padding(padding: EdgeInsets.all(Spacing.m), child: _SpanToggle()),
         ),
-      ),
+        Align(
+          alignment: Alignment.bottomCenter,
+          child: Padding(
+            padding: EdgeInsets.all(Spacing.m),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [_CaptureModeToggle(), _ShotStrip()],
+            ),
+          ),
+        ),
+      ],
     );
   }
 }
