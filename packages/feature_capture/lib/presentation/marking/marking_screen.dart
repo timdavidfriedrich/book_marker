@@ -131,11 +131,7 @@ class const _Editor({
                 children: [
                   _Header(state: _state),
                   const SizedBox(height: Spacing.m),
-                  Row(
-                    children: [
-                      _ModeToggle(index: mode.value, onChanged: (value) => mode.value = value),
-                    ],
-                  ),
+                  _ModeToggle(index: mode.value, onChanged: (value) => mode.value = value),
                   if (hasUncertainWords) ...[
                     const SizedBox(height: Spacing.s),
                     const _UncertainLegend(),
@@ -159,11 +155,7 @@ class const _Editor({
           const SizedBox(height: Spacing.s),
           _Header(state: _state),
           const SizedBox(height: Spacing.m),
-          Row(
-            children: [
-              _ModeToggle(index: mode.value, onChanged: (value) => mode.value = value),
-            ],
-          ),
+          _ModeToggle(index: mode.value, onChanged: (value) => mode.value = value),
           if (hasUncertainWords) ...[
             const SizedBox(height: Spacing.s),
             const _UncertainLegend(),
@@ -212,7 +204,6 @@ class const _ModeToggle({
   @override
   Widget build(BuildContext context) {
     return SegmentedToggle(
-      isExpanded: false,
       labels: [context.s.markingModeText, context.s.markingModePhoto],
       selectedIndex: _index,
       onChanged: _onChanged,
