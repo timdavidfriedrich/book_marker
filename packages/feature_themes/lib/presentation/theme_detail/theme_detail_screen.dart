@@ -18,7 +18,7 @@ import 'package:shared/presentation/widgets/columned_sliver_list.dart';
 import 'package:shared/presentation/widgets/confirm_dialog.dart';
 import 'package:shared/presentation/widgets/drag_dismiss_sheet.dart';
 import 'package:shared/presentation/widgets/ink_tap_box.dart';
-import 'package:shared/presentation/widgets/loading_indicator.dart';
+import 'package:shared/presentation/widgets/loading_screen.dart';
 import 'package:shared/presentation/widgets/name_input_dialog.dart';
 import 'package:shared/presentation/widgets/pinned_header.dart';
 import 'package:shared/presentation/widgets/quote_card.dart';
@@ -46,7 +46,7 @@ class const ThemeDetailScreen({
         listenWhen: (previous, current) => current is ThemeDetailDeleted,
         listener: (context, state) => context.closeScreen(),
         builder: (context, state) => switch (state) {
-          ThemeDetailLoading() => const LoadingIndicator(),
+          ThemeDetailLoading() => const LoadingScreen(),
           ThemeDetailFailure(:final error) => Center(
             child: Padding(
               padding: const EdgeInsets.all(Spacing.l),

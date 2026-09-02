@@ -23,7 +23,7 @@ import 'package:shared/presentation/navigation/navigation_extensions.dart';
 import 'package:shared/presentation/widgets/circle_icon_button.dart';
 import 'package:shared/presentation/widgets/confirm_dialog.dart';
 import 'package:shared/presentation/widgets/fullscreen_image_viewer.dart';
-import 'package:shared/presentation/widgets/loading_indicator.dart';
+import 'package:shared/presentation/widgets/loading_screen.dart';
 import 'package:shared/presentation/widgets/name_input_dialog.dart';
 import 'package:shared/presentation/widgets/page_number_field.dart';
 import 'package:shared/presentation/widgets/paper_card.dart';
@@ -50,7 +50,7 @@ class const QuoteDetailScreen({
           listenWhen: (previous, current) => current is QuoteDetailDeleted,
           listener: (context, state) => context.closeScreen(),
           builder: (context, state) => switch (state) {
-            QuoteDetailLoading() => const LoadingIndicator(),
+            QuoteDetailLoading() => const LoadingScreen(),
             QuoteDetailFailure(:final error) => Center(
               child: Padding(
                 padding: const EdgeInsets.all(Spacing.l),

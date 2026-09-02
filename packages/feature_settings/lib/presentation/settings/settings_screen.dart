@@ -13,7 +13,7 @@ import 'package:shared/presentation/extensions/screen_layout_extensions.dart';
 import 'package:shared/presentation/navigation/navigation_extensions.dart';
 import 'package:shared/presentation/widgets/circle_icon_button.dart';
 import 'package:shared/presentation/widgets/ink_tap_box.dart';
-import 'package:shared/presentation/widgets/loading_indicator.dart';
+import 'package:shared/presentation/widgets/loading_screen.dart';
 import 'package:shared/presentation/widgets/profile_avatar.dart';
 import 'package:shared/presentation/widgets/segmented_toggle.dart';
 
@@ -28,7 +28,7 @@ class const SettingsScreen({
       body: SafeArea(
         child: BlocBuilder<SettingsBloc, SettingsState>(
           builder: (context, state) => switch (state) {
-            SettingsLoading() => const LoadingIndicator(),
+            SettingsLoading() => const LoadingScreen(),
             SettingsLoaded() => _Content(state: state),
           },
         ),

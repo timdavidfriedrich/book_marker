@@ -23,7 +23,7 @@ import 'package:shared/presentation/widgets/book_cover.dart';
 import 'package:shared/presentation/widgets/circle_icon_button.dart';
 import 'package:shared/presentation/widgets/drag_dismiss_sheet.dart';
 import 'package:shared/presentation/widgets/ink_tap_box.dart';
-import 'package:shared/presentation/widgets/loading_indicator.dart';
+import 'package:shared/presentation/widgets/loading_screen.dart';
 import 'package:shared/presentation/widgets/name_input_dialog.dart';
 import 'package:shared/presentation/widgets/page_dots.dart';
 import 'package:shared/presentation/widgets/page_number_field.dart';
@@ -65,7 +65,9 @@ class const MarkingScreen({
             }
           },
           builder: (context, state) => switch (state) {
-            MarkingProcessing() || MarkingSaved() => const _ProcessingView(),
+            MarkingProcessing() || MarkingSaved() => LoadingScreen(
+              message: context.s.markingProcessingMessage,
+            ),
             MarkingFailure(:final error) => Center(
               child: Padding(
                 padding: const EdgeInsets.all(Spacing.l),
@@ -77,13 +79,6 @@ class const MarkingScreen({
         ),
       ),
     );
-  }
-}
-
-class const _ProcessingView() extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return LoadingIndicator(message: context.s.markingProcessingMessage);
   }
 }
 

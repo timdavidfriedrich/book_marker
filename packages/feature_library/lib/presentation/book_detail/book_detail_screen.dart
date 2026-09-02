@@ -16,7 +16,7 @@ import 'package:shared/presentation/widgets/circle_icon_button.dart';
 import 'package:shared/presentation/widgets/collapsing_header.dart';
 import 'package:shared/presentation/widgets/columned_sliver_list.dart';
 import 'package:shared/presentation/widgets/confirm_dialog.dart';
-import 'package:shared/presentation/widgets/loading_indicator.dart';
+import 'package:shared/presentation/widgets/loading_screen.dart';
 import 'package:shared/presentation/widgets/pinned_header.dart';
 import 'package:shared/presentation/widgets/quote_card.dart';
 import 'package:shared/presentation/widgets/selectable_chip.dart';
@@ -43,7 +43,7 @@ class const BookDetailScreen({
         listenWhen: (previous, current) => current is BookDetailDeleted,
         listener: (context, state) => context.closeScreen(),
         builder: (context, state) => switch (state) {
-          BookDetailLoading() => const LoadingIndicator(),
+          BookDetailLoading() => const LoadingScreen(),
           BookDetailFailure(:final error) => Center(
             child: Padding(
               padding: const EdgeInsets.all(Spacing.l),

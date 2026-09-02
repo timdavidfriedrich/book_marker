@@ -17,7 +17,7 @@ import 'package:shared/presentation/extensions/app_error_extensions.dart';
 import 'package:shared/presentation/extensions/context_extensions.dart';
 import 'package:shared/presentation/navigation/navigation_extensions.dart';
 import 'package:shared/presentation/widgets/circle_icon_button.dart';
-import 'package:shared/presentation/widgets/loading_indicator.dart';
+import 'package:shared/presentation/widgets/loading_screen.dart';
 
 const _touchTarget = 48.0;
 const _decodeWidth = 1600;
@@ -33,7 +33,7 @@ class const CropScreen({
       body: SafeArea(
         child: BlocBuilder<CropBloc, CropState>(
           builder: (context, state) => switch (state) {
-            CropLoading() => LoadingIndicator(message: context.s.cropLoadingMessage),
+            CropLoading() => LoadingScreen(message: context.s.cropLoadingMessage),
             CropFailure(:final error) => _FailureView(error: error),
             CropReady() => _Editor(state: state),
           },
@@ -69,7 +69,7 @@ class const _Editor({
     );
     final decoded = useFuture(useMemoized(() => precacheImage(image, context), [image]));
     if (decoded.connectionState != ConnectionState.done) {
-      return LoadingIndicator(message: context.s.cropLoadingMessage);
+      return LoadingScreen(message: context.s.cropLoadingMessage);
     }
     final photo = MediaFrame(
       aspectRatio: _state.aspectRatio,
