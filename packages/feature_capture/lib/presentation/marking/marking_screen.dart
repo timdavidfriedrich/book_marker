@@ -247,7 +247,13 @@ class const _ReadingText({
   @override
   Widget build(BuildContext context) {
     if (_state.words.isEmpty) {
-      return Center(child: Text(context.s.markingNoTextMessage, textAlign: TextAlign.center));
+      return Center(
+        child: Text(
+          context.s.markingNoTextMessage,
+          textAlign: TextAlign.center,
+          style: context.typography.readingBody.copyWith(color: context.palette.paperTextFaint),
+        ),
+      );
     }
     return SingleChildScrollView(
       child: WordSelectionText(
