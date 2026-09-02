@@ -301,34 +301,42 @@ class const _PhotoPage({
   Widget build(BuildContext context) {
     final page = _state.pages[_pageIndex];
     final words = _state.words;
-    return Center(
-      child: AspectRatio(
-        aspectRatio: page.aspectRatio,
-        child: LayoutBuilder(
-          builder: (context, constraints) {
-            final size = constraints.biggest;
-            return Stack(
-              children: [
-                Positioned.fill(child: Image.file(File(page.imagePath), fit: BoxFit.fill)),
-                for (final group in words.wordGroups())
-                  if (group.number case final int number)
-                    for (var member = 0; member < group.indexes.length; member++)
-                      if (words[group.indexes[member]].pageIndex == _pageIndex)
-                        _UncertainHighlight(
-                          word: words[group.indexes[member]],
-                          number: member == 0 ? number : null,
-                          size: size,
-                          onTap: () => showWordCorrectionSheet(
-                            context,
-                            wordIndex: group.indexes.first,
-                          ),
-                        ),
-                for (final index in _state.selectedWordIndexes)
-                  if (index < words.length && words[index].pageIndex == _pageIndex)
-                    _WordBox(word: words[index], size: size),
-              ],
-            );
-          },
+    // * a page is read at full width, and only what does not fit on screen scrolls
+    return LayoutBuilder(
+      builder: (context, constraints) => SingleChildScrollView(
+        child: ConstrainedBox(
+          constraints: BoxConstraints(minHeight: constraints.maxHeight),
+          child: Center(
+            child: AspectRatio(
+              aspectRatio: page.aspectRatio,
+              child: LayoutBuilder(
+                builder: (context, pageConstraints) {
+                  final size = pageConstraints.biggest;
+                  return Stack(
+                    children: [
+                      Positioned.fill(child: Image.file(File(page.imagePath), fit: BoxFit.fill)),
+                      for (final group in words.wordGroups())
+                        if (group.number case final int number)
+                          for (var member = 0; member < group.indexes.length; member++)
+                            if (words[group.indexes[member]].pageIndex == _pageIndex)
+                              _UncertainHighlight(
+                                word: words[group.indexes[member]],
+                                number: member == 0 ? number : null,
+                                size: size,
+                                onTap: () => showWordCorrectionSheet(
+                                  context,
+                                  wordIndex: group.indexes.first,
+                                ),
+                              ),
+                      for (final index in _state.selectedWordIndexes)
+                        if (index < words.length && words[index].pageIndex == _pageIndex)
+                          _WordBox(word: words[index], size: size),
+                    ],
+                  );
+                },
+              ),
+            ),
+          ),
         ),
       ),
     );

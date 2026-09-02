@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:core/theme/spacing.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -86,37 +88,48 @@ class const _ZoomablePage({
     final controller = useMemoized(TransformationController.new);
     useEffect(() => controller.dispose, [controller]);
 
-    void toggleZoom(TapDownDetails details) {
+    void toggleZoom(TapDownDetails details, double scale) {
       if (controller.value.getMaxScaleOnAxis() > _minScale) {
         controller.value = Matrix4.identity();
         return;
       }
       final position = details.localPosition;
-      const offsetFactor = _doubleTapScale - 1;
+      final offsetFactor = scale - 1;
       controller.value = Matrix4.identity()
         ..translateByDouble(-position.dx * offsetFactor, -position.dy * offsetFactor, 0, 1)
-        ..scaleByDouble(_doubleTapScale, _doubleTapScale, _doubleTapScale, 1);
+        ..scaleByDouble(scale, scale, scale, 1);
     }
 
-    return GestureDetector(
-      onDoubleTapDown: toggleZoom,
-      child: ValueListenableBuilder(
-        valueListenable: controller,
-        builder: (context, matrix, child) => InteractiveViewer(
-          transformationController: controller,
-          panEnabled: matrix.getMaxScaleOnAxis() > _minScale,
-          minScale: _minScale,
-          maxScale: _maxScale,
-          child: child!,
-        ),
-        child: Center(
-          child: HighlightImage(
-            imagePath: _page.photoPath,
-            aspectRatio: _page.imageAspectRatio,
-            highlights: _page.highlights,
+    return LayoutBuilder(
+      builder: (context, constraints) => GestureDetector(
+        onDoubleTapDown: (details) =>
+            toggleZoom(details, _zoomScale(constraints.biggest, _page.imageAspectRatio)),
+        child: ValueListenableBuilder(
+          valueListenable: controller,
+          builder: (context, matrix, child) => InteractiveViewer(
+            transformationController: controller,
+            panEnabled: matrix.getMaxScaleOnAxis() > _minScale,
+            minScale: _minScale,
+            maxScale: _maxScale,
+            child: child!,
+          ),
+          child: Center(
+            child: HighlightImage(
+              imagePath: _page.photoPath,
+              aspectRatio: _page.imageAspectRatio,
+              highlights: _page.highlights,
+            ),
           ),
         ),
       ),
     );
   }
+}
+
+// * a page held back by the viewport sides opens up to the full width, so its print stays
+// * readable, and anything already that wide zooms by a fixed step
+double _zoomScale(Size viewport, double aspectRatio) {
+  final width = math.min(viewport.width, viewport.height * aspectRatio);
+  if (width <= 0 || width >= viewport.width) return _doubleTapScale;
+  return (viewport.width / width).clamp(_minScale, _maxScale);
 }
