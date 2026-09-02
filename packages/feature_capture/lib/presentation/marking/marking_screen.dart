@@ -301,7 +301,6 @@ class const _PhotoPage({
   Widget build(BuildContext context) {
     final page = _state.pages[_pageIndex];
     final words = _state.words;
-    // * a page is read at full width, and only what does not fit on screen scrolls
     return LayoutBuilder(
       builder: (context, constraints) => SingleChildScrollView(
         child: ConstrainedBox(

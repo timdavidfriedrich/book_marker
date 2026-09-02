@@ -126,8 +126,6 @@ class const _ZoomablePage({
   }
 }
 
-// * a page held back by the viewport sides opens up to the full width, so its print stays
-// * readable, and anything already that wide zooms by a fixed step
 double _zoomScale(Size viewport, double aspectRatio) {
   final width = math.min(viewport.width, viewport.height * aspectRatio);
   if (width <= 0 || width >= viewport.width) return _doubleTapScale;

@@ -480,7 +480,6 @@ class const _OverlayDot({
 class const _PreviewOverlay() extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    // * both toggles frame what the camera sees, so they ride on the viewfinder itself
     return const Stack(
       children: [
         Align(
@@ -563,8 +562,6 @@ class const _ShotStrip() extends StatelessWidget {
   }
 }
 
-// * the sensor's own resolution keeps the page in its native ratio and gives the recogniser
-// * the pixels it crops from, but not every device offers it, so a smaller preset takes over
 Future<CameraController?> _openCamera(CameraDescription description) async {
   for (final preset in _resolutionPresets) {
     final camera = CameraController(
@@ -580,14 +577,13 @@ Future<CameraController?> _openCamera(CameraDescription description) async {
       try {
         await camera.dispose();
       } on Object {
-        // camera never opened
+        continue;
       }
     }
   }
   return null;
 }
 
-// * the camera reports no size before it opens, so the frame waits in the usual page ratio
 double _fallbackAspectRatio(BuildContext context) {
   return context.layout.isLandscape ? 1 / _portraitAspectRatio : _portraitAspectRatio;
 }

@@ -1,7 +1,6 @@
 import 'package:core/theme/spacing.dart';
 import 'package:flutter/material.dart';
 
-// * the frame takes the shape of what it shows, so no surface is left framing empty space
 class const MediaFrame({
   required final double _aspectRatio,
   required final Widget _child,
