@@ -1,8 +1,6 @@
 import 'dart:io';
 
 import 'package:core/theme/spacing.dart';
-import 'package:feature_capture/domain/mark_text.dart';
-import 'package:feature_capture/presentation/extensions/recognized_word_extensions.dart';
 import 'package:feature_capture/presentation/marking/marking_bloc.dart';
 import 'package:feature_capture/presentation/marking/marking_event.dart';
 import 'package:feature_capture/presentation/marking/marking_state.dart';
@@ -16,6 +14,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:shared/domain/entities/book.dart';
 import 'package:shared/domain/entities/quote_theme.dart';
 import 'package:shared/domain/entities/recognized_word.dart';
+import 'package:shared/domain/entities/recognized_word_extensions.dart';
 import 'package:shared/presentation/extensions/app_error_extensions.dart';
 import 'package:shared/presentation/extensions/context_extensions.dart';
 import 'package:shared/presentation/extensions/screen_layout_extensions.dart';
@@ -426,8 +425,7 @@ class const _SaveSheet() extends HookWidget {
     final initialState = context.read<MarkingBloc>().state;
     final initialQuote = switch (initialState) {
       MarkingReady(quoteOverride: final String quote) => quote,
-      MarkingReady(:final selectedWordIndexes, :final words) => joinMarkedWords(
-        words,
+      MarkingReady(:final selectedWordIndexes, :final words) => words.joinMarked(
         selectedWordIndexes,
       ),
       _ => "",

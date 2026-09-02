@@ -27,23 +27,6 @@ String? lineBreakStem(String text, String continuation) {
   return text.substring(0, text.length - 1);
 }
 
-String joinMarkedWords(List<RecognizedWord> words, Iterable<int> indexes) {
-  final ordered = indexes.toList()..sort();
-  final buffer = StringBuffer();
-  int? previous;
-  for (final index in ordered) {
-    if (index < 0 || index >= words.length) continue;
-    final text = words[index].text.trim();
-    if (text.isEmpty) continue;
-    if (previous != null && !(previous + 1 == index && words[previous].joinsWithNext)) {
-      buffer.write(" ");
-    }
-    buffer.write(text);
-    previous = index;
-  }
-  return buffer.toString().replaceAll(RegExp(r"\s+"), " ").trim();
-}
-
 List<RecognizedWord> mergeSplitWords(List<RecognizedWord> words) {
   final characterWidth = _medianCharacterWidth(words);
   if (characterWidth <= 0) return words;

@@ -16,6 +16,7 @@ import 'package:shared/domain/entities/quote.dart';
 import 'package:shared/domain/entities/quote_page.dart';
 import 'package:shared/domain/entities/quote_theme.dart';
 import 'package:shared/domain/entities/recognized_word.dart';
+import 'package:shared/domain/entities/recognized_word_extensions.dart';
 import 'package:shared/domain/repositories/book_repository.dart';
 import 'package:shared/domain/repositories/theme_repository.dart';
 import 'package:shared/presentation/navigation/marking_arguments.dart';
@@ -464,7 +465,7 @@ class MarkingBloc extends Bloc<MarkingEvent, MarkingState> {
     final override = state.quoteOverride?.trim();
     final quote = (override != null && override.isNotEmpty)
         ? override
-        : joinMarkedWords(state.words, orderedIndexes);
+        : state.words.joinMarked(orderedIndexes);
     return Quote(
       id: _editedQuote?.id ?? _uuid.v4(),
       bookId: _bookId,
@@ -482,29 +483,14 @@ class MarkingBloc extends Bloc<MarkingEvent, MarkingState> {
   }
 
   List<QuotePage> _quotePages(MarkingReady state, List<int> orderedIndexes) {
-    final selected = [for (final index in orderedIndexes) state.words[index]];
-    final pages = <QuotePage>[];
-    for (final (index, page) in state.pages.indexed) {
-      final highlights = [
-        for (final word in selected)
-          if (word.pageIndex == index)
-            HighlightRegion(
-              text: word.text,
-              left: word.left,
-              top: word.top,
-              width: word.width,
-              height: word.height,
-            ),
-      ];
-      pages.add(
+    return [
+      for (final (index, page) in state.pages.indexed)
         QuotePage(
           photoPath: page.imagePath,
           imageAspectRatio: page.aspectRatio,
-          highlights: highlights,
+          highlights: state.words.markedRegionsOn(index, orderedIndexes),
         ),
-      );
-    }
-    return pages;
+    ];
   }
 
   @override
