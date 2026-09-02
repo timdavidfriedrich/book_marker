@@ -48,7 +48,6 @@ class const LibraryScreen({
   Widget build(BuildContext context) {
     final controller = useTextEditingController();
     return Scaffold(
-      // * resizing would squeeze the short landscape viewport to nothing while typing
       resizeToAvoidBottomInset: !context.layout.isLandscape,
       body: SafeArea(
         bottom: false,
@@ -596,7 +595,6 @@ String _bookMeta(BuildContext context, LibraryBookSummary summary, String? statu
     summary.quoteCount.toQuotesStat(context),
     summary.favoriteCount.toFavoritesStat(context),
   ].joinStats();
-  // * the status reads as its own line under the counts of the book card
   return statusLabel == null ? counts : "$counts\n$statusLabel";
 }
 

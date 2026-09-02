@@ -67,7 +67,6 @@ class const _Content({
   @override
   Widget build(BuildContext context) {
     final theme = _state.theme;
-    // * landscape turns the accent header into a standing pane beside the quotes
     if (context.layout.isLandscape) {
       return Row(
         crossAxisAlignment: CrossAxisAlignment.stretch,

@@ -94,12 +94,10 @@ class QuoteDetailBloc extends Bloc<QuoteDetailEvent, QuoteDetailState> {
     final quote = _quote;
     if (quote == null) return;
     final trimmed = event.quote.trim();
-    // * an empty field is a step on the way to the next wording, never a quote worth storing
     if (trimmed.isEmpty || trimmed == quote.quote) return;
     if (await _quoteRepository.setQuote(quote.id, trimmed) case Success()) {
       _quote = quote.copyWith(quote: trimmed);
       _emitState(emit);
-      // * the marked words follow once the typing settles, they cost a full row to rewrite
       _markingSyncTimer?.cancel();
       _markingSyncTimer = Timer(
         _markingSyncDelay,
@@ -114,7 +112,6 @@ class QuoteDetailBloc extends Bloc<QuoteDetailEvent, QuoteDetailState> {
   ) async {
     final quote = _quote;
     if (quote == null) return;
-    // * a rewrite that no longer lines up with the page keeps the marks it was taken from
     final words = quote.words.applyMarkedText(quote.quote, quote.markedWordIndexes);
     if (words == null) return;
     final updated = quote.copyWith(

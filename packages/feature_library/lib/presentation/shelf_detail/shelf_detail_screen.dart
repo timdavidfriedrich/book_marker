@@ -62,7 +62,6 @@ class const _Content({
   @override
   Widget build(BuildContext context) {
     final shelf = _state.shelf;
-    // * landscape turns the accent header into a standing pane beside the books
     if (context.layout.isLandscape) {
       return Row(
         crossAxisAlignment: CrossAxisAlignment.stretch,

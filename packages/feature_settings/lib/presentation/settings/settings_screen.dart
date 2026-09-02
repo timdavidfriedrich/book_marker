@@ -129,7 +129,6 @@ class const _Content({
         ),
       ],
     ];
-    // * a landscape viewport is too short for one settings column, so the groups sit side by side
     if (layout.isLandscape) {
       return Padding(
         padding: EdgeInsets.fromLTRB(margin, margin, margin, 0),
@@ -162,7 +161,6 @@ class const _Content({
         ),
       );
     }
-    // * a settings list reads badly at full tablet width, so it keeps a centred measure
     return Center(
       child: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: Spacing.contentMaxWidth),

@@ -55,8 +55,6 @@ extension RecognizedWordListExtensions on List<RecognizedWord> {
     return buffer.toString().replaceAll(RegExp(r"\s+"), " ").trim();
   }
 
-  // * carries an edited quote text back onto the marked words, so a fix outlives re-marking;
-  // * null whenever the text no longer lines up with them and the page would be misquoted
   List<RecognizedWord>? applyMarkedText(String text, Iterable<int> markedIndexes) {
     final ordered = [
       for (final index in markedIndexes)
@@ -81,7 +79,6 @@ extension RecognizedWordListExtensions on List<RecognizedWord> {
     for (final (index, chunk) in chunks.indexed) {
       final current = [for (final entry in chunk) this[entry].text].join().trim();
       if (current == tokens[index]) continue;
-      // * a hyphen split word cannot take half of a rewritten token
       if (chunk.length > 1) return null;
       updated[chunk.first] = this[chunk.first].copyWith(
         text: tokens[index],
@@ -92,7 +89,6 @@ extension RecognizedWordListExtensions on List<RecognizedWord> {
     return updated;
   }
 
-  // * the marks a page shows are a projection of the marked words, never a separate truth
   List<HighlightRegion> markedRegionsOn(int pageIndex, Iterable<int> markedIndexes) {
     final ordered = markedIndexes.toList()..sort();
     return [

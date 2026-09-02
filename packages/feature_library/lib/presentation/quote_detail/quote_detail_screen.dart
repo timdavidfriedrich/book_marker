@@ -170,7 +170,6 @@ class const _CitationCard({
   @override
   Widget build(BuildContext context) {
     final controller = useTextEditingController(text: _quote.quote);
-    // * comparing trimmed keeps the space the user just typed while re-marking still lands here
     useEffect(() {
       if (controller.text.trim() != _quote.quote) controller.text = _quote.quote;
       return null;
@@ -450,7 +449,6 @@ Future<void> _showQuoteMenu(BuildContext context, Quote quote) async {
   }
 }
 
-// * re-marking runs the capture flow again on the pages the quote already carries
 Future<void> _editQuote(BuildContext context, Quote quote) async {
   final bloc = context.read<QuoteDetailBloc>();
   await context.pushMarking(

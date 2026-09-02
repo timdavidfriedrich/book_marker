@@ -71,15 +71,13 @@ class const CaptureScreen({
           hasError.value = true;
           return;
         }
-        try {
-          await created.startImageStream(
-            (image) => detectionCubit.frameReceived(
-              image.toCameraFrame(description.sensorOrientation),
-            ),
-          );
-        } on Object {
-          // * without an image stream the preview still works, only live detection is off
-        }
+        await created
+            .startImageStream(
+              (image) => detectionCubit.frameReceived(
+                image.toCameraFrame(description.sensorOrientation),
+              ),
+            )
+            .catchError((Object _) {});
         controller.value = created;
       } on Object {
         hasError.value = true;
@@ -91,12 +89,10 @@ class const CaptureScreen({
       controller.value = null;
       torchOn.value = false;
       if (camera == null) return;
-      try {
-        if (camera.value.isStreamingImages) await camera.stopImageStream();
-        await camera.setFlashMode(FlashMode.off);
-      } on Object {
-        // camera may already be closing
+      if (camera.value.isStreamingImages) {
+        await camera.stopImageStream().catchError((Object _) {});
       }
+      await camera.setFlashMode(FlashMode.off).catchError((Object _) {});
       await camera.dispose();
     }
 
@@ -156,13 +152,11 @@ class const CaptureScreen({
       try {
         final files = await ImagePicker().pickMultiImage();
         if (files.isEmpty) return;
-        // * several picked images are the pages of one quote, so they become a spread
         final span = files.length > 1 ? CaptureSpan.spread : currentSpan();
         if (span != currentSpan()) captureBloc.add(CaptureSpanSelected(span));
         await shutdown();
         for (final file in files) {
           if (!context.mounted) return;
-          // * a gallery photo was never framed by live detection, so its page is marked by hand
           await collect(bookId, file.path, CaptureMode.manual, span);
         }
         if (context.mounted) await initialize();
@@ -199,7 +193,6 @@ class const CaptureScreen({
       onCapture: capture,
       onGallery: pickFromGallery,
     );
-    // * landscape puts the viewfinder next to its controls instead of squeezing both vertically
     if (context.layout.isLandscape) {
       return Scaffold(
         body: SafeArea(
@@ -431,7 +424,6 @@ class const _DetectionOverlay() extends StatelessWidget {
         builder: (context, constraints) {
           if (state.mode != CaptureMode.auto) return const SizedBox.shrink();
           final size = constraints.biggest;
-          // * the cubit reports the upright portrait ratio of the frame
           final aspectRatio = switch (state.frameAspectRatio) {
             final double ratio when context.layout.isLandscape => 1 / ratio,
             final double ratio => ratio,
@@ -542,7 +534,6 @@ class const _ShotStrip() extends StatelessWidget {
                 onReorderItem: (oldIndex, newIndex) => context.read<CaptureBloc>().add(
                   CaptureShotMoved(oldIndex, newIndex),
                 ),
-                // * the default proxy paints an opaque card, which would hide the camera
                 proxyDecorator: (child, index, animation) =>
                     Material(color: Colors.transparent, child: child),
                 itemBuilder: (context, index) => Padding(
@@ -588,7 +579,6 @@ double _fallbackAspectRatio(BuildContext context) {
   return context.layout.isLandscape ? 1 / _portraitAspectRatio : _portraitAspectRatio;
 }
 
-// * previewSize is reported in sensor orientation, so the sides are ordered by the device instead
 double _previewAspectRatio(BuildContext context, CameraController camera) {
   final size = camera.value.previewSize;
   if (size == null) return 1;
@@ -597,7 +587,6 @@ double _previewAspectRatio(BuildContext context, CameraController camera) {
       : size.shortestSide / size.longestSide;
 }
 
-// * the preview is contained in its box, so the detection frame is letterboxed the same way
 Rect? _frameRect(Size size, double? aspectRatio) {
   if (aspectRatio == null) return null;
   if (aspectRatio > size.width / size.height) {

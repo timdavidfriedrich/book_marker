@@ -111,7 +111,6 @@ class const _Editor({
       onPressed: canContinue ? () => _openSaveSheet(context) : null,
       child: Text(context.s.markingContinueButton),
     );
-    // * landscape keeps the recognised page as tall as possible and stacks its tools beside it
     if (context.layout.isLandscape) {
       return Padding(
         padding: const EdgeInsets.all(Spacing.m),
@@ -416,7 +415,6 @@ Future<void> _openSaveSheet(BuildContext context) async {
   );
   if (bloc.state case MarkingSaved(:final isEditing) when context.mounted) {
     context.showToast(context.s.markingSavedMessage);
-    // * an edit returns to the quote it came from, a fresh capture ends in the library
     if (isEditing) {
       context.closeScreen();
       return;
@@ -575,7 +573,6 @@ class const _SaveSheet() extends HookWidget {
                   const SizedBox(height: Spacing.m),
                   header,
                   const SizedBox(height: Spacing.m),
-                  // * a single column stretches every field across a landscape viewport
                   if (context.layout.isLandscape)
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.start,

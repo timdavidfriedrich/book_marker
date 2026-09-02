@@ -8,7 +8,6 @@ extension StatCountExtensions on int {
 
   String toBooksStat(BuildContext context) => context.s.libraryBooksCount(this);
 
-  // * a book without favourites says nothing by counting them
   String? toFavoritesStat(BuildContext context) =>
       this == 0 ? null : context.s.libraryFavoritesCount(this);
 }

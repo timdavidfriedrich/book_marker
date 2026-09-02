@@ -62,7 +62,6 @@ class const _Editor({
 }) extends HookWidget {
   @override
   Widget build(BuildContext context) {
-    // * a gallery shot decodes for seconds, and the editor is unusable until it is on screen
     final image = useMemoized(
       () => ResizeImage(FileImage(File(_state.imagePath)), width: _decodeWidth),
       [_state.imagePath],

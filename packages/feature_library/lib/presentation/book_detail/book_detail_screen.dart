@@ -64,7 +64,6 @@ class const _Content({
   @override
   Widget build(BuildContext context) {
     final book = _state.book;
-    // * landscape turns the header into a standing pane so the quotes keep the full height
     if (context.layout.isLandscape) {
       return Row(
         crossAxisAlignment: CrossAxisAlignment.stretch,
