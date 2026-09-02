@@ -13,6 +13,7 @@ import 'package:feature_capture/presentation/capture/page_detection_state.dart';
 import 'package:feature_capture/presentation/extensions/camera_image_extensions.dart';
 import 'package:feature_capture/presentation/extensions/page_quad_extensions.dart';
 import 'package:feature_capture/presentation/widgets/book_chooser_bar.dart';
+import 'package:feature_capture/presentation/widgets/media_frame.dart';
 import 'package:feature_capture/presentation/widgets/page_corner_dot.dart';
 import 'package:feature_capture/presentation/widgets/page_quad_overlay.dart';
 import 'package:flutter/material.dart';
@@ -31,6 +32,7 @@ import 'package:shared/presentation/widgets/loading_indicator.dart';
 import 'package:shared/presentation/widgets/segmented_toggle.dart';
 
 const _resolutionPresets = [ResolutionPreset.max, ResolutionPreset.veryHigh];
+const _portraitAspectRatio = 3 / 4;
 const _shutterOuter = 88.0;
 const _shutterInner = 60.0;
 const _controlIcon = 56.0;
@@ -391,10 +393,14 @@ class const _Preview({
 }) extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(Spacing.radiusXl),
-      child: Container(
-        color: context.c.surfaceContainerHigh,
+    final camera = _camera;
+    return MediaFrame(
+      aspectRatio: camera == null
+          ? _fallbackAspectRatio(context)
+          : _previewAspectRatio(context, camera),
+      background: context.c.surfaceContainerHigh,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(Spacing.radiusXl),
         child: Stack(
           fit: StackFit.expand,
           children: [
@@ -409,13 +415,8 @@ class const _Preview({
                   ),
                 ),
               )
-            else if (_camera case final CameraController camera)
-              Center(
-                child: AspectRatio(
-                  aspectRatio: _previewAspectRatio(context, camera),
-                  child: CameraPreview(camera),
-                ),
-              )
+            else if (camera != null)
+              CameraPreview(camera)
             else
               const LoadingIndicator(),
             const _DetectionOverlay(),
@@ -580,6 +581,11 @@ Future<CameraController?> _openCamera(CameraDescription description) async {
     }
   }
   return null;
+}
+
+// * the camera reports no size before it opens, so the frame waits in the usual page ratio
+double _fallbackAspectRatio(BuildContext context) {
+  return context.layout.isLandscape ? 1 / _portraitAspectRatio : _portraitAspectRatio;
 }
 
 // * previewSize is reported in sensor orientation, so the sides are ordered by the device instead

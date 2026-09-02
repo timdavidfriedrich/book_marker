@@ -6,6 +6,7 @@ import 'package:feature_capture/presentation/crop/crop_bloc.dart';
 import 'package:feature_capture/presentation/crop/crop_event.dart';
 import 'package:feature_capture/presentation/crop/crop_state.dart';
 import 'package:feature_capture/presentation/extensions/page_quad_extensions.dart';
+import 'package:feature_capture/presentation/widgets/media_frame.dart';
 import 'package:feature_capture/presentation/widgets/page_corner_dot.dart';
 import 'package:feature_capture/presentation/widgets/page_quad_overlay.dart';
 import 'package:flutter/material.dart';
@@ -66,11 +67,9 @@ class const _Editor({
     if (decoded.connectionState != ConnectionState.done) {
       return LoadingIndicator(message: context.s.cropLoadingMessage);
     }
-    final photo = Center(
-      child: AspectRatio(
-        aspectRatio: _state.aspectRatio,
-        child: _Photo(state: _state),
-      ),
+    final photo = MediaFrame(
+      aspectRatio: _state.aspectRatio,
+      child: _Photo(state: _state),
     );
     final hint = Text(
       context.s.cropHint,
