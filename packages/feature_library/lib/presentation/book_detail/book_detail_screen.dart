@@ -29,6 +29,9 @@ const _coverWidth = 96.0;
 const _coverHeight = 128.0;
 const _paneCoverWidth = 88.0;
 const _paneCoverHeight = 118.0;
+const _headerStatsMaxLines = 1;
+const _paneStatsMaxLines = 2;
+const _statSeparator = ", ";
 
 class const BookDetailScreen({
   super.key,
@@ -238,15 +241,7 @@ class const _SidePanel({
                 ],
               ),
               const SizedBox(height: Spacing.m),
-              Wrap(
-                spacing: Spacing.xs,
-                runSpacing: Spacing.xs,
-                children: [
-                  _StatChip(label: context.s.bookDetailQuotesStat(_state.totalCount)),
-                  _StatChip(label: context.s.bookDetailFavoritesStat(_state.favoriteCount)),
-                  _StatChip(label: _book.status.toLabel(context)),
-                ],
-              ),
+              _Stats(state: _state, maxLines: _paneStatsMaxLines),
             ],
           ),
         ),
@@ -319,20 +314,7 @@ class const _Header({
                           ),
                         ),
                         const Spacer(),
-                        SingleChildScrollView(
-                          scrollDirection: Axis.horizontal,
-                          child: Row(
-                            children: [
-                              _StatChip(label: context.s.bookDetailQuotesStat(_state.totalCount)),
-                              const SizedBox(width: Spacing.xs),
-                              _StatChip(
-                                label: context.s.bookDetailFavoritesStat(_state.favoriteCount),
-                              ),
-                              const SizedBox(width: Spacing.xs),
-                              _StatChip(label: _book.status.toLabel(context)),
-                            ],
-                          ),
-                        ),
+                        _Stats(state: _state, maxLines: _headerStatsMaxLines),
                       ],
                     ),
                   ),
@@ -382,18 +364,21 @@ class const _CollapsedHeader({
   }
 }
 
-class const _StatChip({
-  required final String _label,
+class const _Stats({
+  required final BookDetailLoaded _state,
+  required final int _maxLines,
 }) extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: Spacing.s, vertical: Spacing.xxs),
-      decoration: BoxDecoration(
-        color: context.c.surfaceContainerLowest,
-        borderRadius: BorderRadius.circular(Spacing.radiusFull),
-      ),
-      child: Text(_label, style: context.typography.label.copyWith(color: context.c.onSurface)),
+    return Text(
+      [
+        context.s.bookDetailQuotesStat(_state.totalCount),
+        context.s.bookDetailFavoritesStat(_state.favoriteCount),
+        _state.book.status.toLabel(context),
+      ].join(_statSeparator),
+      maxLines: _maxLines,
+      overflow: TextOverflow.ellipsis,
+      style: context.typography.label.copyWith(color: context.c.onSurfaceVariant),
     );
   }
 }
