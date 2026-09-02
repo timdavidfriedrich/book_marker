@@ -290,40 +290,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get libraryShelvesPlaceholder => 'Shelves arrive in the next update.';
 
   @override
-  String libraryBookMeta(int quotes, int favorites) {
-    String _temp0 = intl.Intl.pluralLogic(
-      quotes,
-      locale: localeName,
-      other: '$quotes quotes',
-      one: '1 quote',
-    );
-    String _temp1 = intl.Intl.pluralLogic(
-      favorites,
-      locale: localeName,
-      other: '$favorites favorites',
-      one: '1 favorite',
-    );
-    return '$_temp0, $_temp1';
-  }
-
-  @override
-  String libraryBookMetaWithStatus(int quotes, int favorites, String status) {
-    String _temp0 = intl.Intl.pluralLogic(
-      quotes,
-      locale: localeName,
-      other: '$quotes quotes',
-      one: '1 quote',
-    );
-    String _temp1 = intl.Intl.pluralLogic(
-      favorites,
-      locale: localeName,
-      other: '$favorites favorites',
-      one: '1 favorite',
-    );
-    return '$_temp0, $_temp1,\n$status';
-  }
-
-  @override
   String libraryShelfMeta(int books, int quotes) {
     String _temp0 = intl.Intl.pluralLogic(
       books,
@@ -387,28 +353,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get bookDetailVoiceNoteFilter => 'with voice note';
-
-  @override
-  String bookDetailQuotesStat(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$count quotes',
-      one: '1 quote',
-    );
-    return '$_temp0';
-  }
-
-  @override
-  String bookDetailFavoritesStat(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$count favorites',
-      one: '1 favorite',
-    );
-    return '$_temp0';
-  }
 
   @override
   String get bookDetailEmptyMessage => 'No quotes in this book yet.';
@@ -646,7 +590,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get themesNewThemeHint => 'Theme name';
 
   @override
-  String themeDetailStats(int quotes, int books, int favorites) {
+  String themeDetailQuotesInBooks(int quotes, int books) {
     String _temp0 = intl.Intl.pluralLogic(
       quotes,
       locale: localeName,
@@ -659,13 +603,7 @@ class AppLocalizationsEn extends AppLocalizations {
       other: '$books books',
       one: '1 book',
     );
-    String _temp2 = intl.Intl.pluralLogic(
-      favorites,
-      locale: localeName,
-      other: '$favorites favorites',
-      one: '1 favorite',
-    );
-    return '$_temp0 in $_temp1, $_temp2';
+    return '$_temp0 in $_temp1';
   }
 
   @override
@@ -836,17 +774,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get filterNoResultsMessage => 'Nothing matches this filter.';
-
-  @override
-  String libraryBookMetaStatus(int quotes, String status) {
-    String _temp0 = intl.Intl.pluralLogic(
-      quotes,
-      locale: localeName,
-      other: '$quotes quotes',
-      one: '1 quote',
-    );
-    return '$_temp0,\n$status';
-  }
 
   @override
   String get markingBookFieldLabel => 'book';

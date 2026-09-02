@@ -9,6 +9,7 @@ import 'package:shared/domain/entities/book.dart';
 import 'package:shared/presentation/extensions/app_error_extensions.dart';
 import 'package:shared/presentation/extensions/context_extensions.dart';
 import 'package:shared/presentation/extensions/screen_layout_extensions.dart';
+import 'package:shared/presentation/extensions/stat_label_extensions.dart';
 import 'package:shared/presentation/navigation/navigation_extensions.dart';
 import 'package:shared/presentation/widgets/book_cover.dart';
 import 'package:shared/presentation/widgets/circle_icon_button.dart';
@@ -31,7 +32,6 @@ const _paneCoverWidth = 88.0;
 const _paneCoverHeight = 118.0;
 const _headerStatsMaxLines = 1;
 const _paneStatsMaxLines = 2;
-const _statSeparator = ", ";
 
 class const BookDetailScreen({
   super.key,
@@ -372,10 +372,10 @@ class const _Stats({
   Widget build(BuildContext context) {
     return Text(
       [
-        context.s.bookDetailQuotesStat(_state.totalCount),
-        context.s.bookDetailFavoritesStat(_state.favoriteCount),
+        _state.totalCount.toQuotesStat(context),
+        _state.favoriteCount.toFavoritesStat(context),
         _state.book.status.toLabel(context),
-      ].join(_statSeparator),
+      ].joinStats(),
       maxLines: _maxLines,
       overflow: TextOverflow.ellipsis,
       style: context.typography.label.copyWith(color: context.c.onSurfaceVariant),

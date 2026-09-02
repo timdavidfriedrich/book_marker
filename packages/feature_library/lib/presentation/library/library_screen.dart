@@ -11,6 +11,7 @@ import 'package:shared/presentation/extensions/app_error_extensions.dart';
 import 'package:shared/presentation/extensions/context_extensions.dart';
 import 'package:shared/presentation/extensions/page_number_extensions.dart';
 import 'package:shared/presentation/extensions/screen_layout_extensions.dart';
+import 'package:shared/presentation/extensions/stat_label_extensions.dart';
 import 'package:shared/presentation/navigation/navigation_extensions.dart';
 import 'package:shared/presentation/widgets/book_card.dart';
 import 'package:shared/presentation/widgets/book_cover.dart';
@@ -591,18 +592,12 @@ String _searchHint(BuildContext context, LibraryView view) {
 }
 
 String _bookMeta(BuildContext context, LibraryBookSummary summary, String? statusLabel) {
-  if (summary.favoriteCount == 0) {
-    return statusLabel == null
-        ? context.s.libraryQuotesCount(summary.quoteCount)
-        : context.s.libraryBookMetaStatus(summary.quoteCount, statusLabel);
-  }
-  return statusLabel == null
-      ? context.s.libraryBookMeta(summary.quoteCount, summary.favoriteCount)
-      : context.s.libraryBookMetaWithStatus(
-          summary.quoteCount,
-          summary.favoriteCount,
-          statusLabel,
-        );
+  final counts = [
+    summary.quoteCount.toQuotesStat(context),
+    summary.favoriteCount.toFavoritesStat(context),
+  ].joinStats();
+  // * the status reads as its own line under the counts of the book card
+  return statusLabel == null ? counts : "$counts\n$statusLabel";
 }
 
 String _quoteFilterLabel(

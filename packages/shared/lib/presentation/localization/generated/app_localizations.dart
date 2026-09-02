@@ -555,18 +555,6 @@ abstract class AppLocalizations {
   /// **'Shelves arrive in the next update.'**
   String get libraryShelvesPlaceholder;
 
-  /// No description provided for @libraryBookMeta.
-  ///
-  /// In en, this message translates to:
-  /// **'{quotes, plural, =1{1 quote} other{{quotes} quotes}}, {favorites, plural, =1{1 favorite} other{{favorites} favorites}}'**
-  String libraryBookMeta(int quotes, int favorites);
-
-  /// No description provided for @libraryBookMetaWithStatus.
-  ///
-  /// In en, this message translates to:
-  /// **'{quotes, plural, =1{1 quote} other{{quotes} quotes}}, {favorites, plural, =1{1 favorite} other{{favorites} favorites}},\n{status}'**
-  String libraryBookMetaWithStatus(int quotes, int favorites, String status);
-
   /// No description provided for @libraryShelfMeta.
   ///
   /// In en, this message translates to:
@@ -650,18 +638,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'with voice note'**
   String get bookDetailVoiceNoteFilter;
-
-  /// No description provided for @bookDetailQuotesStat.
-  ///
-  /// In en, this message translates to:
-  /// **'{count, plural, =1{1 quote} other{{count} quotes}}'**
-  String bookDetailQuotesStat(int count);
-
-  /// No description provided for @bookDetailFavoritesStat.
-  ///
-  /// In en, this message translates to:
-  /// **'{count, plural, =1{1 favorite} other{{count} favorites}}'**
-  String bookDetailFavoritesStat(int count);
 
   /// No description provided for @bookDetailEmptyMessage.
   ///
@@ -1029,11 +1005,11 @@ abstract class AppLocalizations {
   /// **'Theme name'**
   String get themesNewThemeHint;
 
-  /// No description provided for @themeDetailStats.
+  /// No description provided for @themeDetailQuotesInBooks.
   ///
   /// In en, this message translates to:
-  /// **'{quotes, plural, =1{1 quote} other{{quotes} quotes}} in {books, plural, =1{1 book} other{{books} books}}, {favorites, plural, =1{1 favorite} other{{favorites} favorites}}'**
-  String themeDetailStats(int quotes, int books, int favorites);
+  /// **'{quotes, plural, =1{1 quote} other{{quotes} quotes}} in {books, plural, =1{1 book} other{{books} books}}'**
+  String themeDetailQuotesInBooks(int quotes, int books);
 
   /// No description provided for @themeDetailAddQuotes.
   ///
@@ -1298,12 +1274,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Nothing matches this filter.'**
   String get filterNoResultsMessage;
-
-  /// No description provided for @libraryBookMetaStatus.
-  ///
-  /// In en, this message translates to:
-  /// **'{quotes, plural, =1{1 quote} other{{quotes} quotes}},\n{status}'**
-  String libraryBookMetaStatus(int quotes, String status);
 
   /// No description provided for @markingBookFieldLabel.
   ///

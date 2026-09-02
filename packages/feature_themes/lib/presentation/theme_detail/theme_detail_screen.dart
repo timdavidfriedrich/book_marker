@@ -7,6 +7,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared/presentation/extensions/app_error_extensions.dart';
 import 'package:shared/presentation/extensions/context_extensions.dart';
 import 'package:shared/presentation/extensions/screen_layout_extensions.dart';
+import 'package:shared/presentation/extensions/stat_label_extensions.dart';
 import 'package:shared/presentation/navigation/navigation_extensions.dart';
 import 'package:shared/presentation/widgets/book_cover.dart';
 import 'package:shared/presentation/widgets/circle_icon_button.dart';
@@ -274,14 +275,7 @@ class const _SidePanel({
                         style: context.t.headlineMedium?.copyWith(color: swatch.onFill),
                       ),
                       const SizedBox(height: Spacing.xs),
-                      Text(
-                        context.s.themeDetailStats(
-                          _state.totalCount,
-                          _state.bookCount,
-                          _state.favoriteCount,
-                        ),
-                        style: context.typography.label.copyWith(color: swatch.onFillVariant),
-                      ),
+                      _Stats(state: _state, color: swatch.onFillVariant),
                     ],
                   ),
                 ),
@@ -291,6 +285,22 @@ class const _SidePanel({
           ),
         ),
       ),
+    );
+  }
+}
+
+class const _Stats({
+  required final ThemeDetailLoaded _state,
+  required final Color _color,
+}) extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      [
+        context.s.themeDetailQuotesInBooks(_state.totalCount, _state.bookCount),
+        _state.favoriteCount.toFavoritesStat(context),
+      ].joinStats(),
+      style: context.typography.label.copyWith(color: _color),
     );
   }
 }
@@ -347,14 +357,7 @@ class const _Header({
                         style: context.t.headlineMedium?.copyWith(color: swatch.onFill),
                       ),
                       const SizedBox(height: Spacing.xs),
-                      Text(
-                        context.s.themeDetailStats(
-                          _state.totalCount,
-                          _state.bookCount,
-                          _state.favoriteCount,
-                        ),
-                        style: context.typography.label.copyWith(color: swatch.onFillVariant),
-                      ),
+                      _Stats(state: _state, color: swatch.onFillVariant),
                     ],
                   ),
                 ),
