@@ -19,9 +19,9 @@ import 'package:shared/presentation/widgets/loading_indicator.dart';
 
 const _resolutionPresets = [ResolutionPreset.max, ResolutionPreset.veryHigh];
 const _portraitAspectRatio = 3 / 4;
-const _shutterOuter = 88.0;
-const _shutterInner = 60.0;
-const _controlIcon = 56.0;
+const _shutterOuter = 128.0;
+const _shutterInner = 100.0;
+const _controlIcon = 64.0;
 const _sideColumnWidth = 300.0;
 const _disabledOpacity = 0.5;
 
