@@ -104,12 +104,6 @@ class AppLocalizationsDe extends AppLocalizations {
   String get captureSelectBookHint => 'Buch auswählen';
 
   @override
-  String get captureNoBooksMessage => 'Füge zuerst ein Buch hinzu, um Seiten zu markieren.';
-
-  @override
-  String get captureAddBookButton => 'Buch hinzufügen';
-
-  @override
   String get captureShutterLabel => 'Seite aufnehmen';
 
   @override
@@ -360,15 +354,6 @@ class AppLocalizationsDe extends AppLocalizations {
   String get bookDetailEmptyMessage => 'Noch keine Zitate in diesem Buch.';
 
   @override
-  String get captureSteadyHint => 'ruhig halten für schärferen Text';
-
-  @override
-  String get captureModeOnePage => 'eine Seite';
-
-  @override
-  String get captureModeSpread => 'Doppelseite';
-
-  @override
   String get captureMarkingInto => 'markiere in';
 
   @override
@@ -387,22 +372,56 @@ class AppLocalizationsDe extends AppLocalizations {
   String get captureLightOff => 'Licht aus';
 
   @override
-  String get captureModeAuto => 'auto';
+  String get cropAdjustHint => 'Ecken anpassen, falls nötig';
 
   @override
-  String get captureModeManual => 'manuell';
+  String get cropUnsureTitle => 'Kanten prüfen';
 
   @override
-  String get cropTitle => 'Seite markieren';
+  String get cropRotateLabel => 'Seite drehen';
 
   @override
-  String get cropHint => 'zieh die Punkte auf die Seitenecken';
+  String get cropAddPageLabel => 'Seite hinzufügen';
+
+  @override
+  String cropPageLabel(int number) {
+    return 'Seite $number';
+  }
+
+  @override
+  String get cropRemovePageButton => 'Seite entfernen';
+
+  @override
+  String get cropRemovePageTitle => 'Seite entfernen?';
+
+  @override
+  String get cropRemovePageMessage => 'Das Foto dieser Seite wird verworfen.';
+
+  @override
+  String get cropCancelTitle => 'Aufnahme verwerfen?';
+
+  @override
+  String get cropCancelMessage => 'Alle aufgenommenen Seiten werden verworfen.';
+
+  @override
+  String get cropCancelConfirmButton => 'Verwerfen';
+
+  @override
+  String get markingAddBookButton => 'Neues Buch hinzufügen';
 
   @override
   String get cropLoadingMessage => 'Seite wird gesucht…';
 
   @override
-  String get cropContinueButton => 'Weiter';
+  String cropContinueButton(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Weiter mit $count Seiten',
+      one: 'Weiter mit 1 Seite',
+    );
+    return '$_temp0';
+  }
 
   @override
   String get addBookQuestionTitle => 'Welches Buch ist das?';
@@ -800,26 +819,6 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get settingsSeedSampleDataButton => 'Beispieldaten laden';
-
-  @override
-  String get captureSpreadHint => 'fotografiere jede Seite, über die das Zitat läuft';
-
-  @override
-  String get captureSpreadShotsHint => 'tippen zum Entfernen · halten zum Sortieren';
-
-  @override
-  String captureSpreadContinueButton(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: 'Weiter mit $count Seiten',
-      one: 'Weiter mit 1 Seite',
-    );
-    return '$_temp0';
-  }
-
-  @override
-  String get captureSpreadRemoveLabel => 'Seite entfernen';
 
   @override
   String get quoteDetailNoPhotoMessage => 'Zu diesem Zitat wurde kein Foto gespeichert.';

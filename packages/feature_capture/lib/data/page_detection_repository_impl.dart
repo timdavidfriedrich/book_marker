@@ -52,15 +52,24 @@ class const PageDetectionRepositoryImpl() implements PageDetectionRepository {
           width: grid.width,
           height: grid.height,
         );
+        final refined = coarse == null
+            ? null
+            : _refiner.refine(
+                luminance: luminance,
+                width: image.width,
+                height: image.height,
+                quad: coarse,
+              );
         return Success(
           PageDetection(
-            quad: coarse == null
-                ? null
-                : _refiner.refine(
-                    luminance: luminance,
-                    width: image.width,
-                    height: image.height,
-                    quad: coarse,
+            quad: refined,
+            confidence: refined == null
+                ? 0
+                : _detector.confidenceOf(
+                    luminance: grid.values,
+                    width: grid.width,
+                    height: grid.height,
+                    quad: refined,
                   ),
             aspectRatio: image.width / image.height,
           ),

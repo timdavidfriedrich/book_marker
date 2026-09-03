@@ -52,6 +52,7 @@ class MarkingBloc extends Bloc<MarkingEvent, MarkingState> {
     on<MarkingThemeCreateRequested>(_onThemeCreateRequested);
     on<MarkingFavoriteToggled>(_onFavoriteToggled);
     on<MarkingSaveRequested>(_onSaveRequested);
+    _bookId = _arguments.bookId;
   }
 
   final RecognizeCapturedSpreadUseCase _recognizeCapturedSpreadUseCase;
@@ -65,7 +66,7 @@ class MarkingBloc extends Bloc<MarkingEvent, MarkingState> {
   List<QuoteTheme> _themes = const [];
   List<Book> _books = const [];
   final Set<String> _selectedThemeIds = {};
-  late String _bookId = _arguments.bookId;
+  String? _bookId;
   late final Quote? _editedQuote = _arguments.quote;
 
   Future<void> _onStarted(MarkingStarted event, Emitter<MarkingState> emit) async {
@@ -87,10 +88,12 @@ class MarkingBloc extends Bloc<MarkingEvent, MarkingState> {
     var bookTitle = "";
     String? bookCoverImage;
     var bookAuthors = const <String>[];
-    if (await _bookRepository.getBook(_bookId) case Success(:final data)) {
-      bookTitle = data.title;
-      bookCoverImage = data.coverImage;
-      bookAuthors = data.authors;
+    if (_bookId case final String bookId) {
+      if (await _bookRepository.getBook(bookId) case Success(:final data)) {
+        bookTitle = data.title;
+        bookCoverImage = data.coverImage;
+        bookAuthors = data.authors;
+      }
     }
     // * a stored quote carries its recognised words, so re-marking never scans the pages again
     if (_editedQuote case final Quote quote when quote.words.isNotEmpty) {
@@ -133,14 +136,15 @@ class MarkingBloc extends Bloc<MarkingEvent, MarkingState> {
     required String? bookCoverImage,
     required List<String> bookAuthors,
   }) {
+    final book = _selectedBook();
     return MarkingReady(
       pages: pages,
       words: words,
       bookId: _bookId,
       books: _books,
-      bookTitle: bookTitle,
-      bookCoverImage: bookCoverImage,
-      bookAuthors: bookAuthors,
+      bookTitle: book?.title ?? bookTitle,
+      bookCoverImage: book?.coverImage ?? bookCoverImage,
+      bookAuthors: book?.authors ?? bookAuthors,
       selectedWordIndexes: selectedWordIndexes,
       quoteOverride: _editedQuote?.quote,
       detectedPageNumbers: detectedPageNumbers,
@@ -160,6 +164,7 @@ class MarkingBloc extends Bloc<MarkingEvent, MarkingState> {
   void _onBooksUpdated(MarkingBooksUpdated event, Emitter<MarkingState> emit) {
     if (event.result case Success(:final data)) {
       _books = data;
+      if (_bookId == null && data.isNotEmpty) _bookId = data.first.id;
       if (state case final MarkingReady current) emit(_ready(current));
     }
   }
@@ -391,22 +396,24 @@ class MarkingBloc extends Bloc<MarkingEvent, MarkingState> {
 
   Future<void> _onSaveRequested(MarkingSaveRequested event, Emitter<MarkingState> emit) async {
     if (state case final MarkingReady current when current.selectedWordIndexes.isNotEmpty) {
-      emit(_ready(current, isSaving: true));
-      final quote = _buildQuote(current);
-      switch (await _saveQuoteUseCase(quote)) {
-        case Success():
-          for (final themeId in _selectedThemeIds) {
-            await _themeRepository.addQuoteToTheme(themeId: themeId, quoteId: quote.id);
-          }
-          if (_editedQuote != null) {
-            for (final theme in _themes) {
-              if (_selectedThemeIds.contains(theme.id)) continue;
-              await _themeRepository.removeQuoteFromTheme(themeId: theme.id, quoteId: quote.id);
+      if (_bookId case final String bookId) {
+        emit(_ready(current, isSaving: true));
+        final quote = _buildQuote(current, bookId);
+        switch (await _saveQuoteUseCase(quote)) {
+          case Success():
+            for (final themeId in _selectedThemeIds) {
+              await _themeRepository.addQuoteToTheme(themeId: themeId, quoteId: quote.id);
             }
-          }
-          emit(MarkingSaved(isEditing: _editedQuote != null));
-        case Failure(:final error):
-          emit(_ready(current, saveError: error));
+            if (_editedQuote != null) {
+              for (final theme in _themes) {
+                if (_selectedThemeIds.contains(theme.id)) continue;
+                await _themeRepository.removeQuoteFromTheme(themeId: theme.id, quoteId: quote.id);
+              }
+            }
+            emit(MarkingSaved(isEditing: _editedQuote != null));
+          case Failure(:final error):
+            emit(_ready(current, saveError: error));
+        }
       }
     }
   }
@@ -459,7 +466,7 @@ class MarkingBloc extends Bloc<MarkingEvent, MarkingState> {
     return null;
   }
 
-  Quote _buildQuote(MarkingReady state) {
+  Quote _buildQuote(MarkingReady state, String bookId) {
     final orderedIndexes = state.selectedWordIndexes.toList()..sort();
     final trimmedNote = state.note?.trim();
     final override = state.quoteOverride?.trim();
@@ -468,7 +475,7 @@ class MarkingBloc extends Bloc<MarkingEvent, MarkingState> {
         : state.words.joinMarked(orderedIndexes);
     return Quote(
       id: _editedQuote?.id ?? _uuid.v4(),
-      bookId: _bookId,
+      bookId: bookId,
       pageNumbers: state.pageNumbers,
       quote: quote,
       note: (trimmedNote == null || trimmedNote.isEmpty) ? null : trimmedNote,

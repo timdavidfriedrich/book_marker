@@ -13,7 +13,7 @@ class const MarkingProcessing() extends MarkingState;
 class const MarkingReady({
   required final List<SpreadPage> pages,
   required final List<RecognizedWord> words,
-  required final String bookId,
+  required final String? bookId,
   required final List<Book> books,
   required final String bookTitle,
   required final String? bookCoverImage,

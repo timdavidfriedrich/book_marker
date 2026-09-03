@@ -102,12 +102,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get captureSelectBookHint => 'Select book';
 
   @override
-  String get captureNoBooksMessage => 'Add a book first to start marking pages.';
-
-  @override
-  String get captureAddBookButton => 'Add book';
-
-  @override
   String get captureShutterLabel => 'Capture page';
 
   @override
@@ -358,15 +352,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get bookDetailEmptyMessage => 'No quotes in this book yet.';
 
   @override
-  String get captureSteadyHint => 'hold steady for sharper text';
-
-  @override
-  String get captureModeOnePage => 'one page';
-
-  @override
-  String get captureModeSpread => 'spread';
-
-  @override
   String get captureMarkingInto => 'marking into';
 
   @override
@@ -385,22 +370,56 @@ class AppLocalizationsEn extends AppLocalizations {
   String get captureLightOff => 'light off';
 
   @override
-  String get captureModeAuto => 'auto';
+  String get cropAdjustHint => 'Adjust corners, if needed';
 
   @override
-  String get captureModeManual => 'manual';
+  String get cropUnsureTitle => 'Check edges';
 
   @override
-  String get cropTitle => 'Mark the page';
+  String get cropRotateLabel => 'Rotate page';
 
   @override
-  String get cropHint => 'drag the dots onto the page corners';
+  String get cropAddPageLabel => 'Add page';
+
+  @override
+  String cropPageLabel(int number) {
+    return 'Page $number';
+  }
+
+  @override
+  String get cropRemovePageButton => 'Remove page';
+
+  @override
+  String get cropRemovePageTitle => 'Remove page?';
+
+  @override
+  String get cropRemovePageMessage => 'The photo of this page is discarded.';
+
+  @override
+  String get cropCancelTitle => 'Discard capture?';
+
+  @override
+  String get cropCancelMessage => 'All captured pages are discarded.';
+
+  @override
+  String get cropCancelConfirmButton => 'Discard';
+
+  @override
+  String get markingAddBookButton => 'Add new book';
 
   @override
   String get cropLoadingMessage => 'Finding the page…';
 
   @override
-  String get cropContinueButton => 'Continue';
+  String cropContinueButton(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Continue with $count pages',
+      one: 'Continue with 1 page',
+    );
+    return '$_temp0';
+  }
 
   @override
   String get addBookQuestionTitle => 'Which book is this?';
@@ -795,26 +814,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settingsSeedSampleDataButton => 'Load sample data';
-
-  @override
-  String get captureSpreadHint => 'photograph every page the quote runs across';
-
-  @override
-  String get captureSpreadShotsHint => 'tap to remove · hold to reorder';
-
-  @override
-  String captureSpreadContinueButton(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: 'Continue with $count pages',
-      one: 'Continue with 1 page',
-    );
-    return '$_temp0';
-  }
-
-  @override
-  String get captureSpreadRemoveLabel => 'Remove page';
 
   @override
   String get quoteDetailNoPhotoMessage => 'No photo was saved with this quote.';

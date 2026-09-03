@@ -267,18 +267,6 @@ abstract class AppLocalizations {
   /// **'Select book'**
   String get captureSelectBookHint;
 
-  /// No description provided for @captureNoBooksMessage.
-  ///
-  /// In en, this message translates to:
-  /// **'Add a book first to start marking pages.'**
-  String get captureNoBooksMessage;
-
-  /// No description provided for @captureAddBookButton.
-  ///
-  /// In en, this message translates to:
-  /// **'Add book'**
-  String get captureAddBookButton;
-
   /// No description provided for @captureShutterLabel.
   ///
   /// In en, this message translates to:
@@ -645,24 +633,6 @@ abstract class AppLocalizations {
   /// **'No quotes in this book yet.'**
   String get bookDetailEmptyMessage;
 
-  /// No description provided for @captureSteadyHint.
-  ///
-  /// In en, this message translates to:
-  /// **'hold steady for sharper text'**
-  String get captureSteadyHint;
-
-  /// No description provided for @captureModeOnePage.
-  ///
-  /// In en, this message translates to:
-  /// **'one page'**
-  String get captureModeOnePage;
-
-  /// No description provided for @captureModeSpread.
-  ///
-  /// In en, this message translates to:
-  /// **'spread'**
-  String get captureModeSpread;
-
   /// No description provided for @captureMarkingInto.
   ///
   /// In en, this message translates to:
@@ -699,29 +669,77 @@ abstract class AppLocalizations {
   /// **'light off'**
   String get captureLightOff;
 
-  /// No description provided for @captureModeAuto.
+  /// No description provided for @cropAdjustHint.
   ///
   /// In en, this message translates to:
-  /// **'auto'**
-  String get captureModeAuto;
+  /// **'Adjust corners, if needed'**
+  String get cropAdjustHint;
 
-  /// No description provided for @captureModeManual.
+  /// No description provided for @cropUnsureTitle.
   ///
   /// In en, this message translates to:
-  /// **'manual'**
-  String get captureModeManual;
+  /// **'Check edges'**
+  String get cropUnsureTitle;
 
-  /// No description provided for @cropTitle.
+  /// No description provided for @cropRotateLabel.
   ///
   /// In en, this message translates to:
-  /// **'Mark the page'**
-  String get cropTitle;
+  /// **'Rotate page'**
+  String get cropRotateLabel;
 
-  /// No description provided for @cropHint.
+  /// No description provided for @cropAddPageLabel.
   ///
   /// In en, this message translates to:
-  /// **'drag the dots onto the page corners'**
-  String get cropHint;
+  /// **'Add page'**
+  String get cropAddPageLabel;
+
+  /// No description provided for @cropPageLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Page {number}'**
+  String cropPageLabel(int number);
+
+  /// No description provided for @cropRemovePageButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove page'**
+  String get cropRemovePageButton;
+
+  /// No description provided for @cropRemovePageTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove page?'**
+  String get cropRemovePageTitle;
+
+  /// No description provided for @cropRemovePageMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'The photo of this page is discarded.'**
+  String get cropRemovePageMessage;
+
+  /// No description provided for @cropCancelTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Discard capture?'**
+  String get cropCancelTitle;
+
+  /// No description provided for @cropCancelMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'All captured pages are discarded.'**
+  String get cropCancelMessage;
+
+  /// No description provided for @cropCancelConfirmButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Discard'**
+  String get cropCancelConfirmButton;
+
+  /// No description provided for @markingAddBookButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Add new book'**
+  String get markingAddBookButton;
 
   /// No description provided for @cropLoadingMessage.
   ///
@@ -732,8 +750,8 @@ abstract class AppLocalizations {
   /// No description provided for @cropContinueButton.
   ///
   /// In en, this message translates to:
-  /// **'Continue'**
-  String get cropContinueButton;
+  /// **'{count, plural, =1{Continue with 1 page} other{Continue with {count} pages}}'**
+  String cropContinueButton(int count);
 
   /// No description provided for @addBookQuestionTitle.
   ///
@@ -1316,30 +1334,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Load sample data'**
   String get settingsSeedSampleDataButton;
-
-  /// No description provided for @captureSpreadHint.
-  ///
-  /// In en, this message translates to:
-  /// **'photograph every page the quote runs across'**
-  String get captureSpreadHint;
-
-  /// No description provided for @captureSpreadShotsHint.
-  ///
-  /// In en, this message translates to:
-  /// **'tap to remove · hold to reorder'**
-  String get captureSpreadShotsHint;
-
-  /// No description provided for @captureSpreadContinueButton.
-  ///
-  /// In en, this message translates to:
-  /// **'{count, plural, =1{Continue with 1 page} other{Continue with {count} pages}}'**
-  String captureSpreadContinueButton(int count);
-
-  /// No description provided for @captureSpreadRemoveLabel.
-  ///
-  /// In en, this message translates to:
-  /// **'Remove page'**
-  String get captureSpreadRemoveLabel;
 
   /// No description provided for @quoteDetailNoPhotoMessage.
   ///

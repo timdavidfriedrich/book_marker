@@ -1,3 +1,3 @@
 class const CropArguments({
-  required final String imagePath,
+  required final List<String> imagePaths,
 });

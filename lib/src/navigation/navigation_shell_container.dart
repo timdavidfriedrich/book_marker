@@ -2,6 +2,8 @@ import 'package:core/theme/spacing.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared/presentation/extensions/context_extensions.dart';
+import 'package:shared/presentation/navigation/capture_arguments.dart';
+import 'package:shared/presentation/navigation/crop_arguments.dart';
 import 'package:shared/presentation/navigation/navigation_extensions.dart';
 import 'package:shared/presentation/widgets/ink_tap_box.dart';
 
@@ -68,7 +70,7 @@ class const _BottomBar({
                   rounded: true,
                   onTap: () => _navigationShell.goBranch(0),
                 ),
-                _CaptureButton(onTap: context.pushCapture),
+                _CaptureButton(onTap: () => _startCapture(context)),
                 _TabItem(
                   label: context.s.navThemesLabel,
                   active: index == 1,
@@ -104,7 +106,7 @@ class const _SideRail({
               onTap: () => _navigationShell.goBranch(0),
             ),
             const SizedBox(height: Spacing.xl),
-            _CaptureButton(onTap: context.pushCapture),
+            _CaptureButton(onTap: () => _startCapture(context)),
             const SizedBox(height: Spacing.xl),
             _TabItem(
               label: context.s.navThemesLabel,
@@ -178,4 +180,10 @@ class const _CaptureButton({
       ),
     );
   }
+}
+
+Future<void> _startCapture(BuildContext context) async {
+  final imagePaths = await context.pushCapture(const CaptureArguments(addsPage: false));
+  if (imagePaths == null || imagePaths.isEmpty || !context.mounted) return;
+  await context.pushCrop(CropArguments(imagePaths: imagePaths));
 }

@@ -20,8 +20,6 @@ import 'package:feature_capture/domain/text_recognition_repository.dart'
     as _i981;
 import 'package:feature_capture/presentation/add_book/add_book_bloc.dart'
     as _i796;
-import 'package:feature_capture/presentation/capture/capture_bloc.dart'
-    as _i360;
 import 'package:feature_capture/presentation/capture/page_detection_cubit.dart'
     as _i1072;
 import 'package:feature_capture/presentation/crop/crop_bloc.dart' as _i975;
@@ -44,8 +42,6 @@ class FeatureCapturePackageModule extends _i526.MicroPackageModule {
         () => const _i921.PageDetectionRepositoryImpl());
     gh.factory<_i796.AddBookBloc>(
         () => _i796.AddBookBloc(gh<_i748.BookRepository>()));
-    gh.factory<_i360.CaptureBloc>(
-        () => _i360.CaptureBloc(gh<_i748.BookRepository>()));
     gh.factory<_i997.SaveQuoteUseCase>(() => _i997.SaveQuoteUseCase(
           gh<_i570.QuoteRepository>(),
           gh<_i748.BookRepository>(),

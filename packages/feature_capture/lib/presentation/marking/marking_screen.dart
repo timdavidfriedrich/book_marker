@@ -105,7 +105,7 @@ class const _Editor({
       title: _state.bookTitle,
       coverImage: _state.bookCoverImage,
       label: context.s.captureMarkingInto,
-      onSwitch: _state.books.isEmpty ? null : () => _showBookPicker(context),
+      onSwitch: () => _showBookPicker(context),
     );
     final continueButton = FilledButton(
       onPressed: canContinue ? () => _openSaveSheet(context) : null,
@@ -487,7 +487,7 @@ class const _SaveSheet() extends HookWidget {
                 title: state.bookTitle,
                 coverImage: state.bookCoverImage,
                 label: context.s.markingBookFieldLabel,
-                onSwitch: state.books.isEmpty ? null : () => _showBookPicker(context),
+                onSwitch: () => _showBookPicker(context),
               );
               final pageField = Align(
                 alignment: Alignment.centerLeft,
@@ -513,7 +513,7 @@ class const _SaveSheet() extends HookWidget {
                   const SizedBox(width: Spacing.s),
                   Expanded(
                     child: FilledButton(
-                      onPressed: state.isSaving
+                      onPressed: state.isSaving || state.bookId == null
                           ? null
                           : () => context.read<MarkingBloc>().add(const MarkingSaveRequested()),
                       child: state.isSaving
@@ -664,12 +664,15 @@ class const _UnsureHint({
 
 Future<void> _showBookPicker(BuildContext context) async {
   final bloc = context.read<MarkingBloc>();
-  await showModalBottomSheet<void>(
+  final addsBook = await showModalBottomSheet<bool>(
     context: context,
     isScrollControlled: true,
     useRootNavigator: true,
     builder: (_) => BlocProvider.value(value: bloc, child: const _BookPickerSheet()),
   );
+  if (addsBook != true || !context.mounted) return;
+  final bookId = await context.pushAddBook();
+  if (bookId != null) bloc.add(MarkingBookChanged(bookId));
 }
 
 class const _BookPickerSheet() extends StatelessWidget {
@@ -694,9 +697,41 @@ class const _BookPickerSheet() extends StatelessWidget {
                 ),
               ),
             ),
+            if (state.books.isNotEmpty) const SizedBox(height: Spacing.xs),
+            const _AddBookRow(),
           ],
         );
       },
+    );
+  }
+}
+
+class const _AddBookRow() extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return InkTapBox(
+      color: context.c.surfaceContainerHigh,
+      radius: Spacing.radiusL,
+      padding: const EdgeInsets.all(Spacing.s),
+      onTap: () => Navigator.of(context).pop(true),
+      child: Row(
+        children: [
+          Container(
+            width: _pickerCoverWidth,
+            height: _pickerCoverHeight,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: context.c.primaryContainer,
+              borderRadius: BorderRadius.circular(Spacing.radiusS),
+            ),
+            child: Icon(Icons.add, size: Spacing.iconM, color: context.c.onPrimaryContainer),
+          ),
+          const SizedBox(width: Spacing.s),
+          Expanded(
+            child: Text(context.s.markingAddBookButton, style: context.t.titleMedium),
+          ),
+        ],
+      ),
     );
   }
 }

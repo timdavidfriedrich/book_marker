@@ -3,6 +3,7 @@ import 'dart:typed_data';
 
 import 'package:shared/domain/entities/page_quad.dart';
 
+const _minGridSize = 32;
 const _thetaBins = 180;
 const _magnitudeLevels = 2048;
 const _closeRadius = 3;
@@ -51,7 +52,7 @@ class const PageQuadDetector() {
     required int width,
     required int height,
   }) {
-    if (width < 32 || height < 32) return null;
+    if (width < _minGridSize || height < _minGridSize) return null;
     final blurred = _blur(_closeText(luminance, width, height), width, height);
     final (:magnitude, :angle) = _gradients(blurred, width, height);
     final threshold = _gradientThreshold(magnitude);
@@ -61,6 +62,42 @@ class const PageQuadDetector() {
     final lines = _houghLines(points, angle, width, height);
     if (lines.length < 4) return null;
     return _bestQuad(lines, magnitude, width, height, threshold);
+  }
+
+  double confidenceOf({
+    required Uint8List luminance,
+    required int width,
+    required int height,
+    required PageQuad quad,
+  }) {
+    if (width < _minGridSize || height < _minGridSize) return 0;
+    final blurred = _blur(_closeText(luminance, width, height), width, height);
+    final magnitude = _gradients(blurred, width, height).magnitude;
+    final threshold = _gradientThreshold(magnitude);
+    if (threshold == null) return 0;
+    final corners = [
+      _pixel(quad.topLeft, width, height),
+      _pixel(quad.topRight, width, height),
+      _pixel(quad.bottomRight, width, height),
+      _pixel(quad.bottomLeft, width, height),
+    ];
+    var weakest = 1.0;
+    for (var index = 0; index < corners.length; index++) {
+      final support = _edgeSupport(
+        corners[index],
+        corners[(index + 1) % corners.length],
+        magnitude,
+        width,
+        height,
+        threshold,
+      );
+      if (support < weakest) weakest = support;
+    }
+    return weakest;
+  }
+
+  PagePoint _pixel(PagePoint point, int width, int height) {
+    return PagePoint(x: point.x * width, y: point.y * height);
   }
 
   Uint8List _closeText(Uint8List luminance, int width, int height) {

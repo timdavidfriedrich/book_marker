@@ -5,8 +5,6 @@ import 'package:feature_capture/presentation/add_book/add_book_bloc.dart';
 import 'package:feature_capture/presentation/add_book/add_book_event.dart';
 import 'package:feature_capture/presentation/add_book/add_book_screen.dart';
 import 'package:feature_capture/presentation/barcode_scanner/barcode_scanner_screen.dart';
-import 'package:feature_capture/presentation/capture/capture_bloc.dart';
-import 'package:feature_capture/presentation/capture/capture_event.dart';
 import 'package:feature_capture/presentation/capture/capture_screen.dart';
 import 'package:feature_capture/presentation/capture/page_detection_cubit.dart';
 import 'package:feature_capture/presentation/crop/crop_bloc.dart';
@@ -41,9 +39,11 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:injectable/injectable.dart';
 import 'package:shared/presentation/extensions/context_extensions.dart';
+import 'package:shared/presentation/navigation/capture_arguments.dart';
 import 'package:shared/presentation/navigation/crop_arguments.dart';
 import 'package:shared/presentation/navigation/marking_arguments.dart';
 import 'package:shared/presentation/navigation/routes.dart';
+import 'package:shared/presentation/widgets/loading_screen.dart';
 
 final _rootNavigatorKey = GlobalKey<NavigatorState>(debugLabel: "root");
 final _libraryNavigatorKey = GlobalKey<NavigatorState>(debugLabel: "library");
@@ -142,16 +142,18 @@ class NavigationRouter {
       GoRoute(
         path: NavigationRoute.capture.path,
         parentNavigatorKey: _rootNavigatorKey,
-        builder: (context, state) => Theme(
-          data: AppTheme.darkOf(context.contrast),
-          child: MultiBlocProvider(
-            providers: [
-              BlocProvider(create: (_) => sl<CaptureBloc>()..add(const CaptureStarted())),
-              BlocProvider(create: (_) => sl<PageDetectionCubit>()),
-            ],
-            child: const CaptureScreen(),
-          ),
-        ),
+        builder: (context, state) {
+          final arguments = state.extra;
+          return Theme(
+            data: AppTheme.darkOf(context.contrast),
+            child: BlocProvider(
+              create: (_) => sl<PageDetectionCubit>(),
+              child: CaptureScreen(
+                addsPage: arguments is CaptureArguments && arguments.addsPage,
+              ),
+            ),
+          );
+        },
         routes: [
           GoRoute(
             path: "add-book",
@@ -184,7 +186,7 @@ class NavigationRouter {
             parentNavigatorKey: _rootNavigatorKey,
             builder: (context, state) {
               final arguments = state.extra;
-              if (arguments is! CropArguments) return const CaptureScreen();
+              if (arguments is! CropArguments) return const LoadingScreen();
               return Theme(
                 data: AppTheme.darkOf(context.contrast),
                 child: BlocProvider(
@@ -199,7 +201,7 @@ class NavigationRouter {
             parentNavigatorKey: _rootNavigatorKey,
             builder: (context, state) {
               final arguments = state.extra;
-              if (arguments is! MarkingArguments) return const CaptureScreen();
+              if (arguments is! MarkingArguments) return const LoadingScreen();
               return BlocProvider(
                 create: (_) => sl<MarkingBloc>(param1: arguments)..add(const MarkingStarted()),
                 child: const MarkingScreen(),

@@ -12,7 +12,8 @@ class const MediaFrame({
   Widget build(BuildContext context) {
     final frame = AspectRatio(aspectRatio: _aspectRatio, child: _child);
     if (_background case final Color background) {
-      return Center(
+      return Align(
+        heightFactor: 1,
         child: DecoratedBox(
           decoration: BoxDecoration(
             color: background,
@@ -22,6 +23,6 @@ class const MediaFrame({
         ),
       );
     }
-    return Center(child: frame);
+    return Align(heightFactor: 1, child: frame);
   }
 }
