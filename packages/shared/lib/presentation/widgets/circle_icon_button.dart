@@ -8,6 +8,7 @@ class const CircleIconButton({
   final Color? _backgroundColor,
   final Color? _foregroundColor,
   final double _size = 44,
+  final double _iconSize = Spacing.iconM,
   final String? _tooltip,
   super.key,
 }) extends StatelessWidget {
@@ -17,7 +18,7 @@ class const CircleIconButton({
       onPressed: _onPressed,
       tooltip: _tooltip,
       icon: Icon(_icon),
-      iconSize: Spacing.iconM,
+      iconSize: _iconSize,
       style: IconButton.styleFrom(
         backgroundColor: _backgroundColor ?? context.c.surfaceContainerHigh,
         foregroundColor: _foregroundColor ?? context.c.onSurface,

@@ -66,6 +66,7 @@ class const AppPalette({
 
 class const AppTypography({
   required final TextStyle readingBody,
+  required final TextStyle readingInput,
   required final TextStyle readingQuote,
   required final TextStyle readingQuoteItalic,
   required final TextStyle label,
@@ -76,6 +77,7 @@ class const AppTypography({
   @override
   AppTypography copyWith({
     TextStyle? readingBody,
+    TextStyle? readingInput,
     TextStyle? readingQuote,
     TextStyle? readingQuoteItalic,
     TextStyle? label,
@@ -85,6 +87,7 @@ class const AppTypography({
   }) {
     return AppTypography(
       readingBody: readingBody ?? this.readingBody,
+      readingInput: readingInput ?? this.readingInput,
       readingQuote: readingQuote ?? this.readingQuote,
       readingQuoteItalic: readingQuoteItalic ?? this.readingQuoteItalic,
       label: label ?? this.label,
@@ -99,6 +102,7 @@ class const AppTypography({
     if (other == null) return this;
     return AppTypography(
       readingBody: TextStyle.lerp(readingBody, other.readingBody, t)!,
+      readingInput: TextStyle.lerp(readingInput, other.readingInput, t)!,
       readingQuote: TextStyle.lerp(readingQuote, other.readingQuote, t)!,
       readingQuoteItalic: TextStyle.lerp(readingQuoteItalic, other.readingQuoteItalic, t)!,
       label: TextStyle.lerp(label, other.label, t)!,

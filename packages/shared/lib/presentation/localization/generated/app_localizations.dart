@@ -117,6 +117,12 @@ abstract class AppLocalizations {
   /// **'Back'**
   String get back;
 
+  /// No description provided for @undo.
+  ///
+  /// In en, this message translates to:
+  /// **'Undo'**
+  String get undo;
+
   /// No description provided for @save.
   ///
   /// In en, this message translates to:
@@ -864,26 +870,56 @@ abstract class AppLocalizations {
   /// No description provided for @markingCorrectionTitle.
   ///
   /// In en, this message translates to:
-  /// **'Unsure word'**
+  /// **'Is this word correct?'**
   String get markingCorrectionTitle;
 
-  /// No description provided for @markingCorrectionHint.
+  /// No description provided for @markingCorrectionFirstWordLabel.
   ///
   /// In en, this message translates to:
-  /// **'compare it with the photo and fix what the scan got wrong'**
-  String get markingCorrectionHint;
+  /// **'first word of the text'**
+  String get markingCorrectionFirstWordLabel;
 
-  /// No description provided for @markingJoinNextButton.
+  /// No description provided for @markingCorrectionLastWordLabel.
   ///
   /// In en, this message translates to:
-  /// **'Join with “{word}” after'**
-  String markingJoinNextButton(String word);
+  /// **'last word of the text'**
+  String get markingCorrectionLastWordLabel;
 
-  /// No description provided for @markingJoinPreviousButton.
+  /// No description provided for @markingCorrectionNoNeighbourLabel.
   ///
   /// In en, this message translates to:
-  /// **'Join with “{word}” before'**
-  String markingJoinPreviousButton(String word);
+  /// **'–'**
+  String get markingCorrectionNoNeighbourLabel;
+
+  /// No description provided for @markingCorrectionJoinPreviousButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Join with the word before'**
+  String get markingCorrectionJoinPreviousButton;
+
+  /// No description provided for @markingCorrectionJoinNextButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Join with the word after'**
+  String get markingCorrectionJoinNextButton;
+
+  /// No description provided for @markingCorrectionUndoJoinButton.
+  ///
+  /// In en, this message translates to:
+  /// **'undo'**
+  String get markingCorrectionUndoJoinButton;
+
+  /// No description provided for @markingCorrectionClearButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear the word'**
+  String get markingCorrectionClearButton;
+
+  /// No description provided for @markingCorrectionAppliedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Word corrected'**
+  String get markingCorrectionAppliedMessage;
 
   /// No description provided for @markingCorrectionApplyButton.
   ///

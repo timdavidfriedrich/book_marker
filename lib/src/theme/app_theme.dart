@@ -565,6 +565,7 @@ abstract final class AppTheme {
   static AppTypography _typography(Color onSurface) {
     return AppTypography(
       readingBody: TextStyle(fontFamily: _serif, fontSize: 17, height: 1.55, color: onSurface),
+      readingInput: TextStyle(fontFamily: _serif, fontSize: 22, height: 1.3, color: onSurface),
       readingQuote: TextStyle(fontFamily: _serif, fontSize: 17, height: 1.4, color: onSurface),
       readingQuoteItalic: TextStyle(
         fontFamily: _serif,

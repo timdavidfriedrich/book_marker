@@ -22,6 +22,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get back => 'Back';
 
   @override
+  String get undo => 'Undo';
+
+  @override
   String get save => 'Save';
 
   @override
@@ -480,20 +483,31 @@ class AppLocalizationsEn extends AppLocalizations {
   String get markingUncertainLegend => '= uncertain words, tap to correct';
 
   @override
-  String get markingCorrectionTitle => 'Unsure word';
+  String get markingCorrectionTitle => 'Is this word correct?';
 
   @override
-  String get markingCorrectionHint => 'compare it with the photo and fix what the scan got wrong';
+  String get markingCorrectionFirstWordLabel => 'first word of the text';
 
   @override
-  String markingJoinNextButton(String word) {
-    return 'Join with “$word” after';
-  }
+  String get markingCorrectionLastWordLabel => 'last word of the text';
 
   @override
-  String markingJoinPreviousButton(String word) {
-    return 'Join with “$word” before';
-  }
+  String get markingCorrectionNoNeighbourLabel => '–';
+
+  @override
+  String get markingCorrectionJoinPreviousButton => 'Join with the word before';
+
+  @override
+  String get markingCorrectionJoinNextButton => 'Join with the word after';
+
+  @override
+  String get markingCorrectionUndoJoinButton => 'undo';
+
+  @override
+  String get markingCorrectionClearButton => 'Clear the word';
+
+  @override
+  String get markingCorrectionAppliedMessage => 'Word corrected';
 
   @override
   String get markingCorrectionApplyButton => 'Apply';

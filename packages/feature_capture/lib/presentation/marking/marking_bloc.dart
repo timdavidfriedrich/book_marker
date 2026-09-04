@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:core/error/app_error.dart';
 import 'package:core/error/app_result.dart';
-import 'package:feature_capture/domain/mark_text.dart';
 import 'package:feature_capture/domain/recognize_captured_spread_use_case.dart';
 import 'package:feature_capture/domain/recognized_spread.dart';
 import 'package:feature_capture/domain/save_quote_use_case.dart';
@@ -40,7 +39,7 @@ class MarkingBloc extends Bloc<MarkingEvent, MarkingState> {
     on<MarkingBookChanged>(_onBookChanged);
     on<MarkingWordsSelected>(_onWordsSelected);
     on<MarkingWordCorrected>(_onWordCorrected);
-    on<MarkingWordsMerged>(_onWordsMerged);
+    on<MarkingWordCorrectionUndone>(_onWordCorrectionUndone);
     on<MarkingPageNumbersChanged>(_onPageNumbersChanged);
     on<MarkingNoteChanged>(_onNoteChanged);
     on<MarkingQuoteEdited>(_onQuoteEdited);
@@ -67,6 +66,8 @@ class MarkingBloc extends Bloc<MarkingEvent, MarkingState> {
   List<Book> _books = const [];
   final Set<String> _selectedThemeIds = {};
   String? _bookId;
+  List<RecognizedWord>? _wordsBeforeCorrection;
+  Set<int>? _selectionBeforeCorrection;
   late final Quote? _editedQuote = _arguments.quote;
 
   Future<void> _onStarted(MarkingStarted event, Emitter<MarkingState> emit) async {
@@ -188,7 +189,6 @@ class MarkingBloc extends Bloc<MarkingEvent, MarkingState> {
             for (final entry in data.entries)
               if (entry.value.contains(quote.id)) entry.key,
           });
-        // * the membership only seeds the selection, from there the sheet owns it
         unawaited(_membershipSubscription?.cancel());
         _membershipSubscription = null;
         if (state case final MarkingReady current) emit(_ready(current));
@@ -268,24 +268,30 @@ class MarkingBloc extends Bloc<MarkingEvent, MarkingState> {
     final text = event.text.trim();
     if (text.isEmpty) return;
     if (state case final MarkingReady current
-        when event.wordIndex >= 0 && event.wordIndex < current.words.length) {
+        when event.startIndex >= 0 &&
+            event.endIndex >= event.startIndex &&
+            event.endIndex < current.words.length) {
       final source = current.words;
-      final indexes = <int>[event.wordIndex];
+      final indexes = [
+        for (var index = event.startIndex; index <= event.endIndex; index++) index,
+      ];
       while (source[indexes.last].joinsWithNext && indexes.last + 1 < source.length) {
         indexes.add(indexes.last + 1);
       }
       final words = [
-        ...source.sublist(0, event.wordIndex),
+        ...source.sublist(0, event.startIndex),
         _corrected(source, indexes, text),
         ...source.sublist(indexes.last + 1),
       ];
+      _wordsBeforeCorrection = source;
+      _selectionBeforeCorrection = current.selectedWordIndexes;
       emit(
         _ready(
           current,
           words: words,
           selectedWordIndexes: _remapSelection(
             current.selectedWordIndexes,
-            event.wordIndex,
+            event.startIndex,
             indexes.length - 1,
           ),
         ),
@@ -320,21 +326,15 @@ class MarkingBloc extends Bloc<MarkingEvent, MarkingState> {
     );
   }
 
-  void _onWordsMerged(MarkingWordsMerged event, Emitter<MarkingState> emit) {
-    if (state case final MarkingReady current
-        when event.wordIndex >= 0 && event.wordIndex + 1 < current.words.length) {
-      final words = applyJoins(current.words, {event.wordIndex});
-      emit(
-        _ready(
-          current,
-          words: words,
-          selectedWordIndexes: _remapSelection(
-            current.selectedWordIndexes,
-            event.wordIndex,
-            current.words.length - words.length,
-          ),
-        ),
-      );
+  void _onWordCorrectionUndone(MarkingWordCorrectionUndone event, Emitter<MarkingState> emit) {
+    if (_wordsBeforeCorrection case final List<RecognizedWord> restored) {
+      if (state case final MarkingReady current) {
+        emit(
+          _ready(current, words: restored, selectedWordIndexes: _selectionBeforeCorrection),
+        );
+      }
+      _wordsBeforeCorrection = null;
+      _selectionBeforeCorrection = null;
     }
   }
 
