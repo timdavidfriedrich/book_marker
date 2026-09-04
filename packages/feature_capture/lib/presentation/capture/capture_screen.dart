@@ -1,23 +1,24 @@
 import 'dart:async';
 
 import 'package:camera/camera.dart';
+import 'package:core/error/app_result.dart';
 import 'package:core/theme/spacing.dart';
+import 'package:feature_capture/presentation/capture/camera_cubit.dart';
+import 'package:feature_capture/presentation/capture/camera_state.dart';
 import 'package:feature_capture/presentation/capture/page_detection_cubit.dart';
 import 'package:feature_capture/presentation/capture/page_detection_state.dart';
-import 'package:feature_capture/presentation/extensions/camera_image_extensions.dart';
 import 'package:feature_capture/presentation/widgets/media_frame.dart';
 import 'package:feature_capture/presentation/widgets/page_quad_overlay.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:image_picker/image_picker.dart';
+import 'package:shared/presentation/extensions/app_error_extensions.dart';
 import 'package:shared/presentation/extensions/context_extensions.dart';
 import 'package:shared/presentation/navigation/navigation_extensions.dart';
 import 'package:shared/presentation/widgets/circle_icon_button.dart';
 import 'package:shared/presentation/widgets/ink_tap_box.dart';
 import 'package:shared/presentation/widgets/loading_indicator.dart';
 
-const _resolutionPresets = [ResolutionPreset.max, ResolutionPreset.veryHigh];
 const _portraitAspectRatio = 3 / 4;
 const _shutterOuter = 128.0;
 const _shutterInner = 100.0;
@@ -31,164 +32,100 @@ class const CaptureScreen({
 }) extends HookWidget {
   @override
   Widget build(BuildContext context) {
-    final controller = useState<CameraController?>(null);
-    final hasError = useState(false);
-    final torchOn = useState(false);
+    final cameraCubit = context.read<CameraCubit>();
     final detectionCubit = context.read<PageDetectionCubit>();
 
-    Future<void> initialize() async {
-      if (controller.value != null) return;
-      try {
-        final cameras = await availableCameras();
-        if (cameras.isEmpty) {
-          hasError.value = true;
-          return;
-        }
-        final description = cameras.first;
-        final created = await _openCamera(description);
-        if (created == null) {
-          hasError.value = true;
-          return;
-        }
-        await created
-            .startImageStream(
-              (image) => detectionCubit.frameReceived(
-                image.toCameraFrame(description.sensorOrientation),
-              ),
-            )
-            .catchError((Object _) {});
-        controller.value = created;
-      } on Object {
-        hasError.value = true;
-      }
-    }
+    useEffect(() {
+      unawaited(cameraCubit.start());
+      final subscription = cameraCubit.frames.listen(detectionCubit.frameReceived);
+      return subscription.cancel;
+    }, const []);
 
-    Future<void> shutdown() async {
-      final camera = controller.value;
-      controller.value = null;
-      torchOn.value = false;
-      if (camera == null) return;
-      if (camera.value.isStreamingImages) {
-        await camera.stopImageStream().catchError((Object _) {});
+    Future<void> closeWithResult(Future<AppResult<List<String>>?> Function() action) async {
+      final result = await action();
+      if (result == null || !context.mounted) return;
+      switch (result) {
+        case Success(:final data):
+          context.closeScreenWithResult(data);
+        case Failure(:final error):
+          context.showToast(error.toMessage(context));
       }
-      await camera.setFlashMode(FlashMode.off).catchError((Object _) {});
-      await camera.dispose();
     }
 
     Future<void> toggleTorch() async {
-      final camera = controller.value;
-      if (camera == null) return;
-      final next = !torchOn.value;
-      try {
-        await camera.setFlashMode(next ? FlashMode.torch : FlashMode.off);
-        torchOn.value = next;
-      } on Object {
-        if (context.mounted) context.showToast(context.s.errorUnexpected);
+      final result = await cameraCubit.toggleTorch();
+      if (result case Failure(:final error) when context.mounted) {
+        context.showToast(error.toMessage(context));
       }
     }
 
-    Future<void> capture() async {
-      final camera = controller.value;
-      if (camera == null) return;
-      try {
-        if (camera.value.isStreamingImages) await camera.stopImageStream();
-        final file = await camera.takePicture();
-        await shutdown();
-        if (!context.mounted) return;
-        context.closeScreenWithResult([file.path]);
-      } on Object {
-        if (context.mounted) context.showToast(context.s.errorUnexpected);
-      }
-    }
-
-    Future<void> pickFromGallery() async {
-      try {
-        final files = await ImagePicker().pickMultiImage();
-        if (files.isEmpty) return;
-        await shutdown();
-        if (!context.mounted) return;
-        context.closeScreenWithResult([for (final file in files) file.path]);
-      } on Object {
-        if (context.mounted) context.showToast(context.s.errorUnexpected);
-      }
-    }
-
-    useEffect(() {
-      unawaited(initialize());
-      return () {
-        final camera = controller.value;
-        controller.value = null;
-        unawaited(camera?.setFlashMode(FlashMode.off).catchError((Object _) {}));
-        unawaited(camera?.dispose() ?? Future<void>.value());
-      };
-    }, const []);
-
-    final preview = _Preview(
-      camera: hasError.value ? null : controller.value,
-      unavailable: hasError.value,
-    );
-    final controls = _Controls(
-      isReady: controller.value != null,
-      torchOn: torchOn.value,
-      onToggleTorch: toggleTorch,
-      onCapture: capture,
-      onGallery: pickFromGallery,
-    );
-    if (context.layout.isLandscape) {
-      return Scaffold(
-        body: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.all(Spacing.m),
-            child: Row(
-              children: [
-                Expanded(child: preview),
-                const SizedBox(width: Spacing.m),
-                SizedBox(
-                  width: _sideColumnWidth,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      _Header(addsPage: _addsPage),
-                      controls,
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      );
-    }
-    return Scaffold(
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: Spacing.l),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Flexible(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
+    return BlocBuilder<CameraCubit, CameraState>(
+      builder: (context, state) {
+        final preview = _Preview(state: state);
+        final controls = _Controls(
+          isReady: state is CameraReady,
+          torchOn: state is CameraReady && state.isTorchOn,
+          onToggleTorch: toggleTorch,
+          onCapture: () => closeWithResult(cameraCubit.capture),
+          onGallery: () => closeWithResult(cameraCubit.pickImages),
+        );
+        if (context.layout.isLandscape) {
+          return Scaffold(
+            body: SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.all(Spacing.m),
+                child: Row(
                   children: [
-                    const SizedBox(height: Spacing.s),
-                    _Header(addsPage: _addsPage),
-                    const SizedBox(height: Spacing.m),
-                    Flexible(child: preview),
+                    Expanded(child: preview),
+                    const SizedBox(width: Spacing.m),
+                    SizedBox(
+                      width: _sideColumnWidth,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          _Header(addsPage: _addsPage),
+                          controls,
+                        ],
+                      ),
+                    ),
                   ],
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: Spacing.xl),
-                child: controls,
+            ),
+          );
+        }
+        return Scaffold(
+          body: SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: Spacing.l),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Flexible(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        const SizedBox(height: Spacing.s),
+                        _Header(addsPage: _addsPage),
+                        const SizedBox(height: Spacing.m),
+                        Flexible(child: preview),
+                      ],
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: Spacing.xl),
+                    child: controls,
+                  ),
+                  const SizedBox.shrink(),
+                ],
               ),
-              const SizedBox.shrink(),
-            ],
+            ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 }
@@ -210,12 +147,14 @@ class const _Header({
 }
 
 class const _Preview({
-  required final CameraController? _camera,
-  required final bool _unavailable,
+  required final CameraState _state,
 }) extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final camera = _camera;
+    final camera = switch (_state) {
+      CameraReady(:final controller) => controller,
+      _ => null,
+    };
     return MediaFrame(
       aspectRatio: camera == null
           ? _fallbackAspectRatio(context)
@@ -226,7 +165,7 @@ class const _Preview({
         child: Stack(
           fit: StackFit.expand,
           children: [
-            if (_unavailable)
+            if (_state is CameraUnavailable)
               Center(
                 child: Padding(
                   padding: const EdgeInsets.all(Spacing.l),
@@ -367,28 +306,6 @@ class const _ShutterButton({
       ),
     );
   }
-}
-
-Future<CameraController?> _openCamera(CameraDescription description) async {
-  for (final preset in _resolutionPresets) {
-    final camera = CameraController(
-      description,
-      preset,
-      enableAudio: false,
-      imageFormatGroup: ImageFormatGroup.yuv420,
-    );
-    try {
-      await camera.initialize();
-      return camera;
-    } on Object {
-      try {
-        await camera.dispose();
-      } on Object {
-        continue;
-      }
-    }
-  }
-  return null;
 }
 
 double _fallbackAspectRatio(BuildContext context) {

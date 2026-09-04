@@ -43,7 +43,6 @@ class VoiceNoteRepositoryImpl() implements VoiceNoteRepository {
       final durationMs = _recordingTime.elapsedMilliseconds;
       final path = await _recorder.stop();
       if (path == null) return const Success(null);
-      // * a press too short to hold any speech leaves nothing worth keeping on disk
       if (durationMs < _minDurationMs) {
         await File(path).delete();
         return const Success(null);

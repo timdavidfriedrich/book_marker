@@ -23,6 +23,5 @@ enum ScreenLayout {
 
   bool get isLandscape => this == phoneLandscape || this == tabletLandscape;
 
-  // * everything but the phone in portrait has room for a rethought, wider layout
   bool get isWide => this != phonePortrait;
 }

@@ -1,8 +1,8 @@
 import 'dart:io';
 
 import 'package:core/theme/spacing.dart';
-import 'package:feature_capture/domain/crop_page.dart';
 import 'package:flutter/material.dart';
+import 'package:shared/domain/entities/crop_page.dart';
 import 'package:shared/presentation/extensions/context_extensions.dart';
 import 'package:shared/presentation/widgets/circle_icon_button.dart';
 import 'package:shared/presentation/widgets/ink_tap_box.dart';

@@ -67,7 +67,6 @@ class const VoiceNoteRecorder({
     }, [isRecording]);
 
     useEffect(() {
-      // * leaving the screen mid-recording must not keep the microphone open
       return () => unawaited(cubit.stopRecording());
     }, [cubit]);
 
@@ -117,7 +116,6 @@ class const VoiceNoteRecorder({
           animation: flood,
           builder: (context, child) {
             final progress = flood.value;
-            // * the pill only turns red once it carries a recording
             final surface = hasNote ? context.c.tertiaryContainer : context.c.surfaceContainerHigh;
             final restForeground = hasNote
                 ? context.c.onTertiaryContainer

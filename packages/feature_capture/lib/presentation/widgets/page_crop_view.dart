@@ -1,13 +1,13 @@
 import 'dart:io';
 
 import 'package:core/theme/spacing.dart';
-import 'package:feature_capture/domain/crop_page.dart';
 import 'package:feature_capture/presentation/extensions/page_quad_extensions.dart';
 import 'package:feature_capture/presentation/widgets/page_corner_dot.dart';
 import 'package:feature_capture/presentation/widgets/page_quad_overlay.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:shared/domain/entities/crop_page.dart';
 import 'package:shared/domain/entities/page_quad.dart';
 import 'package:shared/presentation/extensions/context_extensions.dart';
 import 'package:shared/presentation/widgets/loading_indicator.dart';
@@ -187,7 +187,6 @@ class const _CornerMagnifier({
   }
 }
 
-// * the lens parks in whichever top corner is further away, so the finger never covers it
 Offset _lensCenter(Offset focus, Size size) {
   if (size.width < _magnifierSize + _magnifierInset * 2) {
     return Offset(size.width / 2, _magnifierEdge);

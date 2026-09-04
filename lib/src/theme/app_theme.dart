@@ -107,7 +107,6 @@ const _darkHighFillBlend = 0.87;
 const _darkHighOnFillBlend = 0.94;
 const _darkHighOnFillVariantBlend = 0.75;
 
-// * a solid this dark disappears on a dark surface, so it is lifted before the swatch is derived
 const _darkSolidMinLuminance = 0.03;
 const _darkSolidLift = 0.72;
 

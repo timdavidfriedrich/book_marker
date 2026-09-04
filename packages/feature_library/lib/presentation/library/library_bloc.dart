@@ -189,7 +189,6 @@ class LibraryBloc extends Bloc<LibraryEvent, LibraryState> {
       if (query.isNotEmpty && !_matchesQuote(quote, book, query)) continue;
       results.add(LibraryQuoteResult(quote: quote, book: book));
     }
-    // * favourites lead the quote list, the rest follow newest first
     results.sort((a, b) {
       if (a.quote.isFavorite != b.quote.isFavorite) return a.quote.isFavorite ? -1 : 1;
       return b.quote.createdAt.compareTo(a.quote.createdAt);

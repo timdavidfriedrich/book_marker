@@ -1,10 +1,10 @@
 import 'package:core/error/app_error.dart';
 import 'package:core/error/app_result.dart';
 import 'package:feature_capture/domain/mark_text.dart';
-import 'package:feature_capture/domain/recognize_captured_page_use_case.dart';
-import 'package:feature_capture/domain/recognized_spread.dart';
+import 'package:feature_capture/domain/use_cases/recognize_captured_page_use_case.dart';
 import 'package:injectable/injectable.dart';
 import 'package:shared/domain/entities/captured_shot.dart';
+import 'package:shared/domain/entities/recognized_spread.dart';
 import 'package:shared/domain/entities/recognized_word.dart';
 
 @injectable

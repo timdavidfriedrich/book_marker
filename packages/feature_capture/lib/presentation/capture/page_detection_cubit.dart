@@ -1,9 +1,9 @@
 import 'package:core/error/app_result.dart';
-import 'package:feature_capture/domain/camera_frame.dart';
-import 'package:feature_capture/domain/page_detection_repository.dart';
+import 'package:feature_capture/domain/repositories/page_detection_repository.dart';
 import 'package:feature_capture/presentation/capture/page_detection_state.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
+import 'package:shared/domain/entities/camera_frame.dart';
 import 'package:shared/domain/entities/page_quad.dart';
 
 const _detectionIntervalMs = 120;

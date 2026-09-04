@@ -4,7 +4,6 @@ import 'package:shared/presentation/widgets/hatch_painter.dart';
 import 'package:shared/presentation/widgets/ink_tap_box.dart';
 
 const _hatchOpacity = 0.35;
-// * app bar buttons all share one diameter
 const profileAvatarSize = 44.0;
 
 class const ProfileAvatar({

@@ -94,7 +94,6 @@ class const WordSelectionText({
 
     extendCallback.value = extendTo;
 
-    // * the drag target reaches past the pointer so the scroll already starts near the viewport edge
     void dragTo(Offset globalPosition) {
       dragPosition.value = globalPosition;
       extendTo(globalPosition);
@@ -108,7 +107,6 @@ class const WordSelectionText({
       autoScroller?.stopAutoScroll();
     }
 
-    // * a pointer on a handle belongs to the handle drag, never to a tap or a fresh long press
     _Handle? handleAt(Offset globalPosition) {
       final render = _paragraphOf(paragraphKey);
       if (render == null || selectedGroups.isEmpty) return null;

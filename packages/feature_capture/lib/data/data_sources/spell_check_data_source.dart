@@ -1,8 +1,8 @@
 import 'dart:ui';
 
-import 'package:feature_capture/domain/spell_check_report.dart';
 import 'package:flutter/services.dart';
 import 'package:injectable/injectable.dart';
+import 'package:shared/domain/entities/spell_check_report.dart';
 
 const _candidateLanguages = ["de", "en", "fr", "es", "it", "nl", "pt"];
 const _sampleLength = 400;

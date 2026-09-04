@@ -11,7 +11,6 @@ Future<bool> showConfirmDialog(
 }) async {
   final result = await showDialog<bool>(
     context: context,
-    // * a dialog stretched across a landscape viewport reads badly, so it keeps a phone measure
     builder: (dialogContext) => Center(
       child: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: Spacing.dialogMaxWidth),

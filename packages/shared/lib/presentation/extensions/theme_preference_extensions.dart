@@ -11,7 +11,6 @@ extension ThemePreferenceExtensions on ThemePreference {
 }
 
 extension ContrastPreferenceExtensions on ContrastPreference {
-  // * null leaves the choice to the platform accessibility setting
   ContrastLevel? toContrastLevel() => switch (this) {
     ContrastPreference.system => null,
     ContrastPreference.standard => ContrastLevel.standard,

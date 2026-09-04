@@ -3,15 +3,15 @@ import 'dart:ui' as ui;
 
 import 'package:core/error/app_error.dart';
 import 'package:core/error/app_result.dart';
-import 'package:feature_capture/data/spell_check_data_source.dart';
+import 'package:feature_capture/data/data_sources/spell_check_data_source.dart';
 import 'package:feature_capture/domain/mark_text.dart';
-import 'package:feature_capture/domain/recognized_page.dart';
-import 'package:feature_capture/domain/spell_check_report.dart';
-import 'package:feature_capture/domain/text_recognition_repository.dart';
+import 'package:feature_capture/domain/repositories/text_recognition_repository.dart';
 import 'package:feature_capture/domain/word_quality.dart';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 import 'package:injectable/injectable.dart';
+import 'package:shared/domain/entities/recognized_page.dart';
 import 'package:shared/domain/entities/recognized_word.dart';
+import 'package:shared/domain/entities/spell_check_report.dart';
 
 const _edgeMargin = 0.18;
 const _maxPageNumber = 3000;

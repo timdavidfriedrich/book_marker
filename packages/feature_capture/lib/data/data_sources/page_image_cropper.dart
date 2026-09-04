@@ -3,6 +3,8 @@ import 'dart:math' as math;
 import 'dart:typed_data';
 import 'dart:ui' as ui;
 
+import 'package:feature_capture/data/data_sources/jpeg_encoder_data_source.dart';
+import 'package:injectable/injectable.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared/domain/entities/page_quad.dart';
 import 'package:uuid/uuid.dart';
@@ -12,26 +14,43 @@ const _minOutputSize = 64;
 const _equationCount = 8;
 const _epsilon = 1e-9;
 const _outwardPadding = 0.01;
+const _jpegQuality = 85;
+const _decodeHeadroom = 1.15;
 
-class const PageImageCropper() {
+@injectable
+class const PageImageCropper(
+  final JpegEncoderDataSource _jpegEncoderDataSource,
+) {
   Future<String?> crop({
     required String imagePath,
     required PageQuad quad,
     required int maxSize,
   }) async {
-    final image = await _decodeImage(imagePath);
+    final buffer = await ui.ImmutableBuffer.fromUint8List(
+      await File(imagePath).readAsBytes(),
+    );
+    final descriptor = await ui.ImageDescriptor.encoded(buffer);
+    final ({int width, int height}) output;
+    final ui.Image image;
+    try {
+      final extent = _quadExtent(_cornersInPixels(quad, descriptor.width, descriptor.height));
+      output = _outputSize(extent, maxSize);
+      image = await _decode(descriptor, _decodeWidth(descriptor.width, extent, output));
+    } finally {
+      descriptor.dispose();
+      buffer.dispose();
+    }
     try {
       final corners = _cornersInPixels(quad, image.width, image.height);
-      final (:width, :height) = _outputSize(corners, maxSize);
-      final transform = _transform(corners, width.toDouble(), height.toDouble());
+      final transform = _transform(corners, output.width.toDouble(), output.height.toDouble());
       if (transform == null) return null;
       final recorder = ui.PictureRecorder();
       ui.Canvas(recorder)
         ..transform(transform)
-        ..drawImage(image, ui.Offset.zero, ui.Paint()..filterQuality = ui.FilterQuality.medium);
+        ..drawImage(image, ui.Offset.zero, ui.Paint()..filterQuality = ui.FilterQuality.high);
       final picture = recorder.endRecording();
       try {
-        return await _writeImage(await picture.toImage(width, height));
+        return await _writeImage(await picture.toImage(output.width, output.height));
       } finally {
         picture.dispose();
       }
@@ -40,8 +59,8 @@ class const PageImageCropper() {
     }
   }
 
-  Future<ui.Image> _decodeImage(String imagePath) async {
-    final codec = await ui.instantiateImageCodec(await File(imagePath).readAsBytes());
+  Future<ui.Image> _decode(ui.ImageDescriptor descriptor, int targetWidth) async {
+    final codec = await descriptor.instantiateCodec(targetWidth: targetWidth);
     try {
       return (await codec.getNextFrame()).image;
     } finally {
@@ -51,11 +70,20 @@ class const PageImageCropper() {
 
   Future<String?> _writeImage(ui.Image image) async {
     try {
-      final data = await image.toByteData(format: ui.ImageByteFormat.png);
+      final data = await image.toByteData(format: ui.ImageByteFormat.rawRgba);
       if (data == null) return null;
+      final pixels = data.buffer.asUint8List();
+      final width = image.width;
+      final height = image.height;
+      final encoded = await _jpegEncoderDataSource.encode(
+        pixels: pixels,
+        width: width,
+        height: height,
+        quality: _jpegQuality,
+      );
       final directory = await getTemporaryDirectory();
-      final file = File("${directory.path}/page_${_uuid.v4()}.png");
-      await file.writeAsBytes(data.buffer.asUint8List());
+      final file = File("${directory.path}/page_${_uuid.v4()}.jpg");
+      await file.writeAsBytes(encoded);
       return file.path;
     } finally {
       image.dispose();
@@ -78,15 +106,31 @@ class const PageImageCropper() {
     ];
   }
 
-  ({int width, int height}) _outputSize(List<ui.Offset> corners, int maxSize) {
-    final width = math.max((corners[0] - corners[1]).distance, (corners[3] - corners[2]).distance);
-    final height = math.max((corners[0] - corners[3]).distance, (corners[1] - corners[2]).distance);
-    final longest = math.max(width, height);
+  ({double width, double height}) _quadExtent(List<ui.Offset> corners) {
+    return (
+      width: math.max((corners[0] - corners[1]).distance, (corners[3] - corners[2]).distance),
+      height: math.max((corners[0] - corners[3]).distance, (corners[1] - corners[2]).distance),
+    );
+  }
+
+  ({int width, int height}) _outputSize(({double width, double height}) extent, int maxSize) {
+    final longest = math.max(extent.width, extent.height);
     final scale = longest > maxSize ? maxSize / longest : 1.0;
     return (
-      width: math.max(_minOutputSize, (width * scale).round()),
-      height: math.max(_minOutputSize, (height * scale).round()),
+      width: math.max(_minOutputSize, (extent.width * scale).round()),
+      height: math.max(_minOutputSize, (extent.height * scale).round()),
     );
+  }
+
+  int _decodeWidth(
+    int sourceWidth,
+    ({double width, double height}) extent,
+    ({int width, int height}) output,
+  ) {
+    final needed =
+        math.max(output.width / extent.width, output.height / extent.height) * _decodeHeadroom;
+    if (needed >= 1) return sourceWidth;
+    return math.max(_minOutputSize, (sourceWidth * needed).round());
   }
 
   Float64List? _transform(List<ui.Offset> corners, double width, double height) {

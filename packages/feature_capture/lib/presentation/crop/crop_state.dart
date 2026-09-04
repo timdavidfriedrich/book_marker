@@ -1,5 +1,5 @@
 import 'package:core/error/app_error.dart';
-import 'package:feature_capture/domain/crop_page.dart';
+import 'package:shared/domain/entities/crop_page.dart';
 
 sealed class CropState {
   const CropState();

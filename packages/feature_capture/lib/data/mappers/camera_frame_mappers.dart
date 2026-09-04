@@ -1,7 +1,7 @@
 import 'package:camera/camera.dart';
-import 'package:feature_capture/domain/camera_frame.dart';
+import 'package:shared/domain/entities/camera_frame.dart';
 
-extension CameraImageExtensions on CameraImage {
+extension CameraImageMappers on CameraImage {
   CameraFrame toCameraFrame(int rotationDegrees) {
     final plane = planes.first;
     return CameraFrame(

@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 
+
 class const CameraFrame({
   required final Uint8List bytes,
   required final int width,

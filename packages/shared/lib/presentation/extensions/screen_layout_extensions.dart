@@ -11,7 +11,6 @@ extension ScreenLayoutExtensions on ScreenLayout {
     ScreenLayout.tabletLandscape => Spacing.xxxl,
   };
 
-  // * cards grow in height with their content, so they are laid out in columns of equal width
   int get cardColumns => switch (this) {
     ScreenLayout.phonePortrait => 1,
     ScreenLayout.phoneLandscape => 2,
@@ -28,7 +27,6 @@ extension ScreenLayoutExtensions on ScreenLayout {
 
   double get tileAspectRatio => isLandscape ? 1.1 : 0.92;
 
-  // * a half sheet leaves nothing readable in a landscape viewport
   double sheetSize(double portraitFraction) =>
       isLandscape ? _landscapeSheetFraction : portraitFraction;
 }

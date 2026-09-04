@@ -18,7 +18,6 @@ class const NavigationShellContainer({
 }) extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    // * in landscape the vertical space is scarce, so the tabs move to a rail beside the content
     if (context.layout.isLandscape) {
       return Scaffold(
         // * the branches keep their own inset handling; resizing here would shrink them twice

@@ -1,7 +1,7 @@
 import 'package:core/error/app_error.dart';
-import 'package:feature_capture/domain/recognized_spread.dart';
 import 'package:shared/domain/entities/book.dart';
 import 'package:shared/domain/entities/quote_theme.dart';
+import 'package:shared/domain/entities/recognized_spread.dart';
 import 'package:shared/domain/entities/recognized_word.dart';
 
 sealed class MarkingState {

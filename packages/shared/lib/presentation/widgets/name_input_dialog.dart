@@ -11,7 +11,6 @@ Future<String?> showNameInputDialog(
 }) {
   return showDialog<String>(
     context: context,
-    // * a dialog stretched across a landscape viewport reads badly, so it keeps a phone measure
     builder: (_) => Center(
       child: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: Spacing.dialogMaxWidth),
@@ -38,8 +37,6 @@ class const _NameInputDialog({
       child: Text(context.s.save),
     );
     return Dialog(
-      // * the keyboard leaves little height in landscape, so the dialog scrolls and pairs its
-      // * actions instead of stacking them
       child: SingleChildScrollView(
         padding: const EdgeInsets.all(Spacing.l),
         child: Column(

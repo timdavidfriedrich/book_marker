@@ -1,13 +1,12 @@
 import 'package:core/error/app_result.dart';
-import 'package:feature_capture/domain/captured_page.dart';
-import 'package:feature_capture/domain/page_detection_repository.dart';
-import 'package:feature_capture/domain/text_recognition_repository.dart';
+import 'package:feature_capture/domain/repositories/page_detection_repository.dart';
+import 'package:feature_capture/domain/repositories/text_recognition_repository.dart';
 import 'package:injectable/injectable.dart';
+import 'package:shared/domain/entities/captured_page.dart';
 import 'package:shared/domain/entities/page_quad.dart';
 
 const _fullFrameTolerance = 0.02;
-const _recognitionSize = 2600;
-const _storedSize = 1600;
+const _pageSize = 2300;
 
 @injectable
 class RecognizeCapturedPageUseCase {
@@ -21,17 +20,13 @@ class RecognizeCapturedPageUseCase {
     required PageQuad? pageQuad,
   }) async {
     final quad = pageQuad ?? await _detect(imagePath);
-    if (quad == null || _coversFullFrame(quad)) return _recognize(imagePath, imagePath);
-    // * a large crop is recognised, a smaller one is kept, so quality and storage are separate
-    final recognitionPath = await _crop(imagePath, quad, _recognitionSize);
-    final storedPath = recognitionPath == null ? null : await _crop(imagePath, quad, _storedSize);
-    if (recognitionPath == null || storedPath == null) return _recognize(imagePath, imagePath);
-    return _recognize(recognitionPath, storedPath);
+    if (quad == null || _coversFullFrame(quad)) return _recognize(imagePath);
+    return _recognize(await _crop(imagePath, quad, _pageSize) ?? imagePath);
   }
 
-  Future<AppResult<CapturedPage>> _recognize(String recognitionPath, String storedPath) async {
-    return switch (await _textRecognitionRepository.recognizePage(recognitionPath)) {
-      Success(:final data) => Success(CapturedPage(imagePath: storedPath, page: data)),
+  Future<AppResult<CapturedPage>> _recognize(String imagePath) async {
+    return switch (await _textRecognitionRepository.recognizePage(imagePath)) {
+      Success(:final data) => Success(CapturedPage(imagePath: imagePath, page: data)),
       Failure(:final error) => Failure(error),
     };
   }

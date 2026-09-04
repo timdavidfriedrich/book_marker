@@ -1,12 +1,12 @@
 import 'package:core/error/app_error.dart';
 import 'package:core/error/app_result.dart';
-import 'package:feature_capture/domain/crop_page.dart';
-import 'package:feature_capture/domain/page_detection_repository.dart';
+import 'package:feature_capture/domain/repositories/page_detection_repository.dart';
 import 'package:feature_capture/presentation/crop/crop_event.dart';
 import 'package:feature_capture/presentation/crop/crop_state.dart';
 import 'package:feature_capture/presentation/extensions/page_quad_extensions.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
+import 'package:shared/domain/entities/crop_page.dart';
 import 'package:shared/domain/entities/page_quad.dart';
 import 'package:shared/presentation/navigation/crop_arguments.dart';
 
@@ -115,7 +115,6 @@ class CropBloc extends Bloc<CropEvent, CropState> {
     emit(_ready());
   }
 
-  // * a page is identified by its file path, so the same photo never enters the strip twice
   List<String> _unknownPaths(List<String> imagePaths) {
     return [
       for (final imagePath in imagePaths.toSet())

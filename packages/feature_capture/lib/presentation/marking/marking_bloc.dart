@@ -2,9 +2,8 @@ import 'dart:async';
 
 import 'package:core/error/app_error.dart';
 import 'package:core/error/app_result.dart';
-import 'package:feature_capture/domain/recognize_captured_spread_use_case.dart';
-import 'package:feature_capture/domain/recognized_spread.dart';
-import 'package:feature_capture/domain/save_quote_use_case.dart';
+import 'package:feature_capture/domain/use_cases/recognize_captured_spread_use_case.dart';
+import 'package:feature_capture/domain/use_cases/save_quote_use_case.dart';
 import 'package:feature_capture/presentation/marking/marking_event.dart';
 import 'package:feature_capture/presentation/marking/marking_state.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -14,6 +13,7 @@ import 'package:shared/domain/entities/highlight_region.dart';
 import 'package:shared/domain/entities/quote.dart';
 import 'package:shared/domain/entities/quote_page.dart';
 import 'package:shared/domain/entities/quote_theme.dart';
+import 'package:shared/domain/entities/recognized_spread.dart';
 import 'package:shared/domain/entities/recognized_word.dart';
 import 'package:shared/domain/entities/recognized_word_extensions.dart';
 import 'package:shared/domain/repositories/book_repository.dart';
@@ -22,7 +22,6 @@ import 'package:shared/presentation/navigation/marking_arguments.dart';
 import 'package:uuid/uuid.dart';
 
 const _uuid = Uuid();
-// * a word counts as marked when its centre sits inside a stored highlight
 const _highlightTolerance = 0.002;
 
 @injectable
@@ -96,7 +95,6 @@ class MarkingBloc extends Bloc<MarkingEvent, MarkingState> {
         bookAuthors = data.authors;
       }
     }
-    // * a stored quote carries its recognised words, so re-marking never scans the pages again
     if (_editedQuote case final Quote quote when quote.words.isNotEmpty) {
       emit(
         _started(

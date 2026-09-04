@@ -5,6 +5,7 @@ import 'package:feature_capture/presentation/add_book/add_book_bloc.dart';
 import 'package:feature_capture/presentation/add_book/add_book_event.dart';
 import 'package:feature_capture/presentation/add_book/add_book_screen.dart';
 import 'package:feature_capture/presentation/barcode_scanner/barcode_scanner_screen.dart';
+import 'package:feature_capture/presentation/capture/camera_cubit.dart';
 import 'package:feature_capture/presentation/capture/capture_screen.dart';
 import 'package:feature_capture/presentation/capture/page_detection_cubit.dart';
 import 'package:feature_capture/presentation/crop/crop_bloc.dart';
@@ -146,8 +147,11 @@ class NavigationRouter {
           final arguments = state.extra;
           return Theme(
             data: AppTheme.darkOf(context.contrast),
-            child: BlocProvider(
-              create: (_) => sl<PageDetectionCubit>(),
+            child: MultiBlocProvider(
+              providers: [
+                BlocProvider(create: (_) => sl<CameraCubit>()),
+                BlocProvider(create: (_) => sl<PageDetectionCubit>()),
+              ],
               child: CaptureScreen(
                 addsPage: arguments is CaptureArguments && arguments.addsPage,
               ),

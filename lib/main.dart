@@ -27,7 +27,6 @@ class const App({
     return MultiBlocProvider(
       providers: [
         BlocProvider(create: (_) => sl<AppSettingsCubit>()..start()),
-        // * one shared player keeps a single voice note audible across all screens
         BlocProvider(create: (_) => sl<VoiceNoteCubit>()),
       ],
       child: BlocBuilder<AppSettingsCubit, UserSettings>(

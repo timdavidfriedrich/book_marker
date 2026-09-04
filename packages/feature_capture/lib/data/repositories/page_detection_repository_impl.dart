@@ -5,25 +5,26 @@ import 'dart:ui' as ui;
 
 import 'package:core/error/app_error.dart';
 import 'package:core/error/app_result.dart';
-import 'package:feature_capture/data/page_image_cropper.dart';
-import 'package:feature_capture/data/page_quad_detector.dart';
-import 'package:feature_capture/data/page_quad_refiner.dart';
-import 'package:feature_capture/domain/camera_frame.dart';
-import 'package:feature_capture/domain/page_detection.dart';
-import 'package:feature_capture/domain/page_detection_repository.dart';
+import 'package:feature_capture/data/data_sources/page_image_cropper.dart';
+import 'package:feature_capture/data/data_sources/page_quad_detector.dart';
+import 'package:feature_capture/data/data_sources/page_quad_refiner.dart';
+import 'package:feature_capture/domain/repositories/page_detection_repository.dart';
 import 'package:injectable/injectable.dart';
+import 'package:shared/domain/entities/camera_frame.dart';
+import 'package:shared/domain/entities/page_detection.dart';
 import 'package:shared/domain/entities/page_quad.dart';
 
 const _detector = PageQuadDetector();
 const _refiner = PageQuadRefiner();
-const _cropper = PageImageCropper();
 const _frameAnalysisSize = 180;
 const _stillAnalysisSize = 320;
 const _stillWidth = 960;
 const _rgbaBytesPerPixel = 4;
 
 @Injectable(as: PageDetectionRepository)
-class const PageDetectionRepositoryImpl() implements PageDetectionRepository {
+class const PageDetectionRepositoryImpl(
+  final PageImageCropper _pageImageCropper,
+) implements PageDetectionRepository {
   @override
   Future<AppResult<PageQuad?>> detectInFrame(CameraFrame frame) async {
     try {
@@ -89,7 +90,7 @@ class const PageDetectionRepositoryImpl() implements PageDetectionRepository {
     required int maxSize,
   }) async {
     try {
-      final croppedPath = await _cropper.crop(
+      final croppedPath = await _pageImageCropper.crop(
         imagePath: imagePath,
         quad: quad,
         maxSize: maxSize,

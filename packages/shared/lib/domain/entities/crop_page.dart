@@ -15,7 +15,6 @@ class const CropPage({
 
   double get displayAspectRatio => quarterTurns.isEven ? aspectRatio : 1 / aspectRatio;
 
-  // * every page reserves the upright footprint, so a landscape one keeps the layout in place
   double get portraitAspectRatio => aspectRatio < 1 ? aspectRatio : 1 / aspectRatio;
 
   // * the corner roles carry the turns, so the perspective crop already writes an upright page
