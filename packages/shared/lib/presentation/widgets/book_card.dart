@@ -1,3 +1,4 @@
+import 'package:core/theme/corner_radii.dart';
 import 'package:core/theme/spacing.dart';
 import 'package:flutter/material.dart';
 import 'package:shared/presentation/extensions/context_extensions.dart';
@@ -7,6 +8,8 @@ import 'package:shared/presentation/widgets/count_badge.dart';
 import 'package:shared/presentation/widgets/ink_tap_box.dart';
 
 const _featuredQuoteMaxLines = 3;
+const _cardRadius = Spacing.radiusXl;
+const _cardPadding = Spacing.m;
 
 class const BookCard({
   required final String _title,
@@ -23,8 +26,8 @@ class const BookCard({
     return InkTapBox(
       onTap: _onTap,
       color: context.c.surfaceContainerLow,
-      radius: Spacing.radiusXl,
-      padding: const EdgeInsets.all(Spacing.m),
+      radius: _cardRadius,
+      padding: const EdgeInsets.all(_cardPadding),
       child: Column(
         children: [
           Row(
@@ -56,7 +59,9 @@ class const BookCard({
               padding: const EdgeInsets.all(Spacing.s),
               decoration: BoxDecoration(
                 color: context.c.surfaceContainerLowest,
-                borderRadius: BorderRadius.circular(Spacing.radiusL),
+                borderRadius: BorderRadius.circular(
+                  CornerRadii.nested(_cardRadius, _cardPadding),
+                ),
               ),
               child: Text.rich(
                 TextSpan(

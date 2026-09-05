@@ -1,3 +1,4 @@
+import 'package:core/theme/corner_radii.dart';
 import 'package:core/theme/spacing.dart';
 import 'package:flutter/material.dart';
 import 'package:shared/presentation/extensions/context_extensions.dart';
@@ -8,6 +9,8 @@ const _coverWidth = 36.0;
 const _coverHeight = 48.0;
 const _switchSize = 30.0;
 const _titleMaxLines = 2;
+const _fieldRadius = Spacing.radiusL;
+const _fieldPadding = Spacing.s;
 
 class const BookPickerField({
   required final String _title,
@@ -21,8 +24,8 @@ class const BookPickerField({
     return InkTapBox(
       onTap: _onTap,
       color: context.c.surfaceContainer,
-      radius: Spacing.radiusL,
-      padding: const EdgeInsets.all(Spacing.s),
+      radius: _fieldRadius,
+      padding: const EdgeInsets.all(_fieldPadding),
       child: Row(
         children: [
           BookCover(
@@ -30,7 +33,7 @@ class const BookPickerField({
             image: _coverImage,
             width: _coverWidth,
             height: _coverHeight,
-            radius: Spacing.radiusS,
+            radius: CornerRadii.nested(_fieldRadius, _fieldPadding),
           ),
           const SizedBox(width: Spacing.s),
           Expanded(

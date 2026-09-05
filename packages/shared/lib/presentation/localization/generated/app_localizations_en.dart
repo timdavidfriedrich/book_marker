@@ -513,23 +513,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get markingNewThemeChip => '+ new';
 
   @override
-  String quoteDetailPhotoMeta(String pages, String date) {
-    return 'p.$pages, shot $date';
-  }
-
-  @override
-  String quoteDetailShotMeta(String date) {
-    return 'shot $date';
-  }
-
-  @override
   String get quoteDetailNotePlaceholder => 'Add a note — coming soon.';
 
   @override
   String get quoteDetailFavoriteLabel => 'favorite';
 
   @override
-  String get quoteDetailShareLabel => 'share';
+  String get quoteDetailShareButton => 'Share quote';
 
   @override
   String quoteShareBody(String quote, String source) {
@@ -798,7 +788,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get markingBookPickerTitle => 'Choose book';
 
   @override
-  String get quoteDetailAddThemeChip => '+ add';
+  String get quoteDetailAddThemeChip => '+ theme';
 
   @override
   String get quoteDetailThemePickerTitle => 'Themes';
@@ -813,17 +803,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsSeedSampleDataButton => 'Load sample data';
 
   @override
-  String get quoteDetailNoPhotoMessage => 'No photo was saved with this quote.';
-
-  @override
   String get showMore => 'show more';
 
   @override
   String get showLess => 'show less';
-
-  @override
-  String get quoteDetailSourceLabel => 'source';
-
-  @override
-  String get quoteDetailNotesLabel => 'my thoughts';
 }

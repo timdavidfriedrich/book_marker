@@ -3,10 +3,8 @@ import 'package:feature_capture/domain/uncertain_ranges.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:shared/presentation/extensions/context_extensions.dart';
+import 'package:shared/presentation/widgets/quote_paper_card.dart';
 
-const _quoteMark = "“";
-const _quoteMarkSize = 48.0;
-const _quoteMarkRise = 7.0;
 const _quoteLineHeight = 1.55;
 const _quoteMaxLines = 8;
 
@@ -21,49 +19,26 @@ class const QuoteEditCard({
     final controller = _useUncertainTextController(_text);
     // * the controller tracks its own edits, so the bloc only resyncs once both agree on the text
     if (controller.text == _text) controller.uncertainRanges = _uncertainRanges;
-    return Stack(
-      clipBehavior: Clip.none,
-      children: [
-        Container(
-          width: double.infinity,
-          padding: const EdgeInsets.fromLTRB(Spacing.l, Spacing.xl, Spacing.l, Spacing.l),
-          decoration: BoxDecoration(
-            color: context.palette.paperFill,
-            borderRadius: BorderRadius.circular(Spacing.radiusL),
-          ),
-          child: TextField(
-            controller: controller,
-            minLines: 1,
-            maxLines: _quoteMaxLines,
-            textCapitalization: TextCapitalization.sentences,
-            style: context.typography.readingQuoteItalic.copyWith(
-              color: context.palette.paperText,
-              height: _quoteLineHeight,
-            ),
-            onChanged: _onChanged,
-            decoration: const InputDecoration(
-              isDense: true,
-              filled: false,
-              border: InputBorder.none,
-              enabledBorder: InputBorder.none,
-              focusedBorder: InputBorder.none,
-              contentPadding: EdgeInsets.zero,
-            ),
-          ),
+    return QuotePaperCard(
+      child: TextField(
+        controller: controller,
+        minLines: 1,
+        maxLines: _quoteMaxLines,
+        textCapitalization: TextCapitalization.sentences,
+        style: context.typography.readingQuoteItalic.copyWith(
+          color: context.palette.paperText,
+          height: _quoteLineHeight,
         ),
-        Positioned(
-          left: Spacing.l,
-          top: -_quoteMarkRise,
-          child: Text(
-            _quoteMark,
-            style: context.typography.readingQuote.copyWith(
-              color: context.c.outlineVariant,
-              fontSize: _quoteMarkSize,
-              height: 1,
-            ),
-          ),
+        onChanged: _onChanged,
+        decoration: const InputDecoration(
+          isDense: true,
+          filled: false,
+          border: InputBorder.none,
+          enabledBorder: InputBorder.none,
+          focusedBorder: InputBorder.none,
+          contentPadding: EdgeInsets.zero,
         ),
-      ],
+      ),
     );
   }
 }

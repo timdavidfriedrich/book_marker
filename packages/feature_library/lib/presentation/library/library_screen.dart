@@ -1,4 +1,5 @@
 import 'package:core/error/app_error.dart';
+import 'package:core/theme/corner_radii.dart';
 import 'package:core/theme/spacing.dart';
 import 'package:feature_library/presentation/extensions/book_status_extensions.dart';
 import 'package:feature_library/presentation/library/library_bloc.dart';
@@ -40,6 +41,8 @@ const _shelfPreviewWidth = 84.0;
 const _shelfPreviewHeight = 64.0;
 const _shelfMarkSize = 56.0;
 const _newShelfIconSize = 44.0;
+const _shelfCardRadius = Spacing.radiusXl;
+const _shelfCardPadding = Spacing.m;
 
 class const LibraryScreen({
   super.key,
@@ -460,8 +463,8 @@ class const _ShelfCard({
     final swatch = context.palette.resolve(shelf.accent);
     return InkTapBox(
       color: swatch.fill,
-      radius: Spacing.radiusXl,
-      padding: const EdgeInsets.all(Spacing.m),
+      radius: _shelfCardRadius,
+      padding: const EdgeInsets.all(_shelfCardPadding),
       onTap: () => context.pushShelfDetail(shelf.id),
       child: Row(
         children: [
@@ -505,7 +508,7 @@ class const _ShelfCard({
                         image: book.coverImage,
                         width: 40,
                         height: 56,
-                        radius: Spacing.radiusS,
+                        radius: CornerRadii.nested(_shelfCardRadius, _shelfCardPadding),
                       ),
                     ),
                 ],

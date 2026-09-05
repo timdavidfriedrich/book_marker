@@ -21,6 +21,7 @@ const _floodDuration = Duration(milliseconds: 280);
 const _pulseDuration = Duration(milliseconds: 1400);
 const _pulseMaxScale = 1.75;
 const _pulseOpacity = 0.4;
+const _pillRadius = BorderRadius.all(Radius.circular(Spacing.radiusFull));
 
 Future<void> _confirmDelete(
   BuildContext context,
@@ -44,6 +45,7 @@ class const VoiceNoteRecorder({
   required final int? _durationMs,
   required final void Function(String path, int durationMs) _onRecorded,
   required final VoidCallback _onCleared,
+  final BorderRadiusGeometry _borderRadius = _pillRadius,
   super.key,
 }) extends HookWidget {
   @override
@@ -124,12 +126,9 @@ class const VoiceNoteRecorder({
             final fill = Color.lerp(context.c.tertiary, context.c.onTertiary, progress)!;
             final onFill = Color.lerp(context.c.onTertiary, context.c.tertiary, progress)!;
             return DecoratedBox(
-              decoration: BoxDecoration(
-                color: surface,
-                borderRadius: BorderRadius.circular(Spacing.radiusFull),
-              ),
+              decoration: BoxDecoration(color: surface, borderRadius: _borderRadius),
               child: ClipRRect(
-                borderRadius: BorderRadius.circular(Spacing.radiusFull),
+                borderRadius: _borderRadius,
                 child: CustomPaint(
                   painter: _FloodPainter(
                     origin: origin.value,

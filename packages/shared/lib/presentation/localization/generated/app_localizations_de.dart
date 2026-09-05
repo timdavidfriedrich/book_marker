@@ -515,23 +515,13 @@ class AppLocalizationsDe extends AppLocalizations {
   String get markingNewThemeChip => '+ neu';
 
   @override
-  String quoteDetailPhotoMeta(String pages, String date) {
-    return 'S.$pages, aufgenommen $date';
-  }
-
-  @override
-  String quoteDetailShotMeta(String date) {
-    return 'aufgenommen $date';
-  }
-
-  @override
   String get quoteDetailNotePlaceholder => 'Notiz hinzufügen — bald verfügbar.';
 
   @override
   String get quoteDetailFavoriteLabel => 'Favorit';
 
   @override
-  String get quoteDetailShareLabel => 'teilen';
+  String get quoteDetailShareButton => 'Zitat teilen';
 
   @override
   String quoteShareBody(String quote, String source) {
@@ -802,7 +792,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get markingBookPickerTitle => 'Buch wählen';
 
   @override
-  String get quoteDetailAddThemeChip => '+ hinzufügen';
+  String get quoteDetailAddThemeChip => '+ Thema';
 
   @override
   String get quoteDetailThemePickerTitle => 'Themen';
@@ -817,17 +807,8 @@ class AppLocalizationsDe extends AppLocalizations {
   String get settingsSeedSampleDataButton => 'Beispieldaten laden';
 
   @override
-  String get quoteDetailNoPhotoMessage => 'Zu diesem Zitat wurde kein Foto gespeichert.';
-
-  @override
   String get showMore => 'mehr anzeigen';
 
   @override
   String get showLess => 'weniger anzeigen';
-
-  @override
-  String get quoteDetailSourceLabel => 'Quelle';
-
-  @override
-  String get quoteDetailNotesLabel => 'meine Gedanken';
 }

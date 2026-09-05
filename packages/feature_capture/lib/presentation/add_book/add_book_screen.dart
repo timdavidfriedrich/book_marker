@@ -1,3 +1,4 @@
+import 'package:core/theme/corner_radii.dart';
 import 'package:core/theme/spacing.dart';
 import 'package:feature_capture/presentation/add_book/add_book_bloc.dart';
 import 'package:feature_capture/presentation/add_book/add_book_event.dart';
@@ -20,6 +21,8 @@ import 'package:shared/presentation/widgets/sheet_drag_handle.dart';
 
 const _sheetInitialSize = 0.5;
 const _sheetExpandedSize = 0.95;
+const _tileRadius = Spacing.radiusL;
+const _tilePadding = Spacing.s;
 
 class const AddBookScreen({
   super.key,
@@ -197,10 +200,10 @@ class const _OwnedTile({
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(Spacing.s),
+      padding: const EdgeInsets.all(_tilePadding),
       decoration: BoxDecoration(
         color: context.c.secondaryContainer,
-        borderRadius: BorderRadius.circular(Spacing.radiusL),
+        borderRadius: BorderRadius.circular(_tileRadius),
       ),
       child: Row(
         children: [
@@ -209,7 +212,7 @@ class const _OwnedTile({
             image: _book.coverImage,
             width: 44,
             height: 56,
-            radius: Spacing.radiusS,
+            radius: CornerRadii.nested(_tileRadius, _tilePadding),
           ),
           const SizedBox(width: Spacing.s),
           Expanded(
@@ -278,10 +281,10 @@ class const _CatalogueTile({
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(Spacing.s),
+      padding: const EdgeInsets.all(_tilePadding),
       decoration: BoxDecoration(
         color: context.c.surfaceContainerHigh,
-        borderRadius: BorderRadius.circular(Spacing.radiusL),
+        borderRadius: BorderRadius.circular(_tileRadius),
       ),
       child: Row(
         children: [
@@ -290,7 +293,7 @@ class const _CatalogueTile({
             image: _book.coverImage,
             width: 44,
             height: 56,
-            radius: Spacing.radiusS,
+            radius: CornerRadii.nested(_tileRadius, _tilePadding),
           ),
           const SizedBox(width: Spacing.s),
           Expanded(

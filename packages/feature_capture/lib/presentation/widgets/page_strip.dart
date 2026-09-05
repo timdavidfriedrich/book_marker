@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:core/theme/corner_radii.dart';
 import 'package:core/theme/spacing.dart';
 import 'package:flutter/material.dart';
 import 'package:shared/domain/entities/crop_page.dart';
@@ -18,6 +19,13 @@ const _dragScale = 1.15;
 const _dragShadowBlur = 16.0;
 const _dragShadowOffset = 6.0;
 const _dragShadowOpacity = 0.45;
+
+BorderRadiusGeometry _pageRadius(int index) => CornerRadii.grouped(
+  outer: Spacing.radiusM,
+  isFirst: index == 0,
+  isLast: false,
+  axis: Axis.horizontal,
+);
 
 class const PageStrip({
   required final List<CropPage> _pages,
@@ -47,7 +55,11 @@ class const PageStrip({
                     onReorderItem: _onMove,
                     proxyDecorator: (child, index, animation) => AnimatedBuilder(
                       animation: animation,
-                      builder: (context, _) => _FloatingPage(lift: animation.value, child: child),
+                      builder: (context, _) => _FloatingPage(
+                        lift: animation.value,
+                        borderRadius: _pageRadius(index),
+                        child: child,
+                      ),
                     ),
                     itemBuilder: (context, index) => Padding(
                       key: ValueKey(_pages[index].imagePath),
@@ -59,6 +71,7 @@ class const PageStrip({
                           page: _pages[index],
                           index: index,
                           selected: index == _selectedIndex,
+                          borderRadius: _pageRadius(index),
                           onSelect: () => _onSelect(index),
                         ),
                       ),
@@ -66,7 +79,7 @@ class const PageStrip({
                   ),
                 ),
                 const SizedBox(width: Spacing.xxxs),
-                _AddButton(onTap: _onAdd),
+                _AddButton(onTap: _onAdd, isOnly: _pages.isEmpty),
               ],
             ),
           ),
@@ -84,6 +97,7 @@ class const PageStrip({
 
 class const _FloatingPage({
   required final double _lift,
+  required final BorderRadiusGeometry _borderRadius,
   required final Widget _child,
 }) extends StatelessWidget {
   @override
@@ -93,7 +107,7 @@ class const _FloatingPage({
       scale: 1 + (_dragScale - 1) * lift,
       child: DecoratedBox(
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(Spacing.radiusM),
+          borderRadius: _borderRadius,
           boxShadow: [
             BoxShadow(
               color: context.c.scrim.withValues(alpha: _dragShadowOpacity * lift),
@@ -112,6 +126,7 @@ class const _PageThumbnail({
   required final CropPage _page,
   required final int _index,
   required final bool _selected,
+  required final BorderRadiusGeometry _borderRadius,
   required final VoidCallback _onSelect,
 }) extends StatelessWidget {
   @override
@@ -131,7 +146,7 @@ class const _PageThumbnail({
           selected: _selected,
           child: InkTapBox(
             onTap: _onSelect,
-            radius: Spacing.radiusM,
+            shape: RoundedRectangleBorder(borderRadius: _borderRadius),
             child: Stack(
               children: [
                 SizedBox(
@@ -152,7 +167,7 @@ class const _PageThumbnail({
                   Positioned.fill(
                     child: DecoratedBox(
                       decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(Spacing.radiusM),
+                        borderRadius: _borderRadius,
                         border: Border.all(
                           color: context.c.primary,
                           width: Spacing.borderWidthMedium,
@@ -188,6 +203,7 @@ class const _PageThumbnail({
 
 class const _AddButton({
   required final VoidCallback? _onTap,
+  required final bool _isOnly,
 }) extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -196,7 +212,14 @@ class const _AddButton({
       child: InkTapBox(
         onTap: _onTap,
         color: context.c.surfaceContainerHigh,
-        radius: Spacing.radiusM,
+        shape: RoundedRectangleBorder(
+          borderRadius: CornerRadii.grouped(
+            outer: Spacing.radiusM,
+            isFirst: _isOnly,
+            isLast: true,
+            axis: Axis.horizontal,
+          ),
+        ),
         child: SizedBox(
           width: _thumbnailWidth,
           height: _thumbnailHeight,

@@ -12,6 +12,7 @@ abstract final class Spacing {
   static const double xxxl = 48;
   static const double xxxxl = 64;
 
+  static const double radiusXs = 4;
   static const double radiusS = 8;
   static const double radiusM = 12;
   static const double radiusL = 16;

@@ -915,18 +915,6 @@ abstract class AppLocalizations {
   /// **'+ new'**
   String get markingNewThemeChip;
 
-  /// No description provided for @quoteDetailPhotoMeta.
-  ///
-  /// In en, this message translates to:
-  /// **'p.{pages}, shot {date}'**
-  String quoteDetailPhotoMeta(String pages, String date);
-
-  /// No description provided for @quoteDetailShotMeta.
-  ///
-  /// In en, this message translates to:
-  /// **'shot {date}'**
-  String quoteDetailShotMeta(String date);
-
   /// No description provided for @quoteDetailNotePlaceholder.
   ///
   /// In en, this message translates to:
@@ -939,11 +927,11 @@ abstract class AppLocalizations {
   /// **'favorite'**
   String get quoteDetailFavoriteLabel;
 
-  /// No description provided for @quoteDetailShareLabel.
+  /// No description provided for @quoteDetailShareButton.
   ///
   /// In en, this message translates to:
-  /// **'share'**
-  String get quoteDetailShareLabel;
+  /// **'Share quote'**
+  String get quoteDetailShareButton;
 
   /// No description provided for @quoteShareBody.
   ///
@@ -1314,7 +1302,7 @@ abstract class AppLocalizations {
   /// No description provided for @quoteDetailAddThemeChip.
   ///
   /// In en, this message translates to:
-  /// **'+ add'**
+  /// **'+ theme'**
   String get quoteDetailAddThemeChip;
 
   /// No description provided for @quoteDetailThemePickerTitle.
@@ -1341,12 +1329,6 @@ abstract class AppLocalizations {
   /// **'Load sample data'**
   String get settingsSeedSampleDataButton;
 
-  /// No description provided for @quoteDetailNoPhotoMessage.
-  ///
-  /// In en, this message translates to:
-  /// **'No photo was saved with this quote.'**
-  String get quoteDetailNoPhotoMessage;
-
   /// No description provided for @showMore.
   ///
   /// In en, this message translates to:
@@ -1358,18 +1340,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'show less'**
   String get showLess;
-
-  /// No description provided for @quoteDetailSourceLabel.
-  ///
-  /// In en, this message translates to:
-  /// **'source'**
-  String get quoteDetailSourceLabel;
-
-  /// No description provided for @quoteDetailNotesLabel.
-  ///
-  /// In en, this message translates to:
-  /// **'my thoughts'**
-  String get quoteDetailNotesLabel;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

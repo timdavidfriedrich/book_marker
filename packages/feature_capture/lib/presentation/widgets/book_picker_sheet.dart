@@ -1,3 +1,4 @@
+import 'package:core/theme/corner_radii.dart';
 import 'package:core/theme/spacing.dart';
 import 'package:feature_capture/presentation/marking/marking_bloc.dart';
 import 'package:feature_capture/presentation/marking/marking_event.dart';
@@ -13,6 +14,8 @@ import 'package:shared/presentation/widgets/sheet_content.dart';
 
 const _coverWidth = 36.0;
 const _coverHeight = 48.0;
+const _rowRadius = Spacing.radiusL;
+const _rowPadding = Spacing.s;
 
 Future<void> showBookPickerSheet(BuildContext context) async {
   final bloc = context.read<MarkingBloc>();
@@ -63,8 +66,8 @@ class const _AddBookRow() extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkTapBox(
       color: context.c.surfaceContainerHigh,
-      radius: Spacing.radiusL,
-      padding: const EdgeInsets.all(Spacing.s),
+      radius: _rowRadius,
+      padding: const EdgeInsets.all(_rowPadding),
       onTap: () => Navigator.of(context).pop(true),
       child: Row(
         children: [
@@ -74,7 +77,9 @@ class const _AddBookRow() extends StatelessWidget {
             alignment: Alignment.center,
             decoration: BoxDecoration(
               color: context.c.primaryContainer,
-              borderRadius: BorderRadius.circular(Spacing.radiusS),
+              borderRadius: BorderRadius.circular(
+                CornerRadii.nested(_rowRadius, _rowPadding),
+              ),
             ),
             child: Icon(Icons.add, size: Spacing.iconM, color: context.c.onPrimaryContainer),
           ),
@@ -97,8 +102,8 @@ class const _BookPickerRow({
     final authors = _book.authors.isEmpty ? context.s.bookAuthorsUnknown : _book.authors.join(", ");
     return InkTapBox(
       color: _selected ? context.c.secondaryContainer : context.c.surfaceContainerHigh,
-      radius: Spacing.radiusL,
-      padding: const EdgeInsets.all(Spacing.s),
+      radius: _rowRadius,
+      padding: const EdgeInsets.all(_rowPadding),
       onTap: () {
         context.read<MarkingBloc>().add(MarkingBookChanged(_book.id));
         Navigator.of(context).pop();
@@ -110,7 +115,7 @@ class const _BookPickerRow({
             image: _book.coverImage,
             width: _coverWidth,
             height: _coverHeight,
-            radius: Spacing.radiusS,
+            radius: CornerRadii.nested(_rowRadius, _rowPadding),
           ),
           const SizedBox(width: Spacing.s),
           Expanded(

@@ -1,3 +1,4 @@
+import 'package:core/theme/corner_radii.dart';
 import 'package:core/theme/spacing.dart';
 import 'package:feature_themes/presentation/theme_detail/theme_detail_bloc.dart';
 import 'package:feature_themes/presentation/theme_detail/theme_detail_event.dart';
@@ -36,6 +37,8 @@ const _paneMarkSize = 104.0;
 const _headerHeight = 196.0;
 const _chipHeight = 32.0;
 const _chipsHeight = Spacing.m + _chipHeight + Spacing.m;
+const _addRowRadius = Spacing.radiusL;
+const _addRowPadding = Spacing.s;
 
 class const ThemeDetailScreen({
   super.key,
@@ -561,8 +564,8 @@ class const _AddQuoteRow({
   Widget build(BuildContext context) {
     return InkTapBox(
       color: _selected ? context.c.secondaryContainer : context.c.surfaceContainerHigh,
-      radius: Spacing.radiusL,
-      padding: const EdgeInsets.all(Spacing.s),
+      radius: _addRowRadius,
+      padding: const EdgeInsets.all(_addRowPadding),
       onTap: () => context.read<ThemeDetailBloc>().add(ThemeDetailQuoteToggled(_item.quote.id)),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -572,7 +575,7 @@ class const _AddQuoteRow({
             image: _item.book.coverImage,
             width: 40,
             height: 52,
-            radius: Spacing.radiusS,
+            radius: CornerRadii.nested(_addRowRadius, _addRowPadding),
           ),
           const SizedBox(width: Spacing.s),
           Expanded(
