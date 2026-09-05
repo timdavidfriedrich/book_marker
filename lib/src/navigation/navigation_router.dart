@@ -43,6 +43,7 @@ import 'package:shared/presentation/extensions/context_extensions.dart';
 import 'package:shared/presentation/navigation/capture_arguments.dart';
 import 'package:shared/presentation/navigation/crop_arguments.dart';
 import 'package:shared/presentation/navigation/marking_arguments.dart';
+import 'package:shared/presentation/navigation/route_change_observer.dart';
 import 'package:shared/presentation/navigation/routes.dart';
 import 'package:shared/presentation/widgets/loading_screen.dart';
 
@@ -56,6 +57,7 @@ const _sheetBarrier = Color(0x8A000000);
 class NavigationRouter {
   late final GoRouter router = GoRouter(
     navigatorKey: _rootNavigatorKey,
+    observers: [sl<RouteChangeObserver>()],
     initialLocation: NavigationRoute.library.path,
     redirect: (context, state) => state.uri.path == "/" ? NavigationRoute.library.path : null,
     routes: [

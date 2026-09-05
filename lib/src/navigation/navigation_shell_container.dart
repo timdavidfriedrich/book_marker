@@ -1,10 +1,14 @@
+import 'dart:async';
+
 import 'package:core/theme/spacing.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared/presentation/extensions/context_extensions.dart';
 import 'package:shared/presentation/navigation/capture_arguments.dart';
 import 'package:shared/presentation/navigation/crop_arguments.dart';
 import 'package:shared/presentation/navigation/navigation_extensions.dart';
+import 'package:shared/presentation/voice_note_cubit.dart';
 import 'package:shared/presentation/widgets/ink_tap_box.dart';
 
 const _markerSize = 30.0;
@@ -67,14 +71,14 @@ class const _BottomBar({
                   label: context.s.navLibraryLabel,
                   active: index == 0,
                   rounded: true,
-                  onTap: () => _navigationShell.goBranch(0),
+                  onTap: () => _goBranch(context, _navigationShell, 0),
                 ),
                 _CaptureButton(onTap: () => _startCapture(context)),
                 _TabItem(
                   label: context.s.navThemesLabel,
                   active: index == 1,
                   rounded: false,
-                  onTap: () => _navigationShell.goBranch(1),
+                  onTap: () => _goBranch(context, _navigationShell, 1),
                 ),
               ],
             ),
@@ -102,7 +106,7 @@ class const _SideRail({
               label: context.s.navLibraryLabel,
               active: index == 0,
               rounded: true,
-              onTap: () => _navigationShell.goBranch(0),
+              onTap: () => _goBranch(context, _navigationShell, 0),
             ),
             const SizedBox(height: Spacing.xl),
             _CaptureButton(onTap: () => _startCapture(context)),
@@ -111,7 +115,7 @@ class const _SideRail({
               label: context.s.navThemesLabel,
               active: index == 1,
               rounded: false,
-              onTap: () => _navigationShell.goBranch(1),
+              onTap: () => _goBranch(context, _navigationShell, 1),
             ),
           ],
         ),
@@ -179,6 +183,11 @@ class const _CaptureButton({
       ),
     );
   }
+}
+
+void _goBranch(BuildContext context, StatefulNavigationShell navigationShell, int index) {
+  unawaited(context.read<VoiceNoteCubit>().stopPlaybackOnLeave());
+  navigationShell.goBranch(index);
 }
 
 Future<void> _startCapture(BuildContext context) async {

@@ -5,15 +5,20 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
 import 'package:shared/domain/entities/voice_note.dart';
 import 'package:shared/domain/repositories/voice_note_repository.dart';
+import 'package:shared/presentation/navigation/route_change_observer.dart';
 import 'package:shared/presentation/voice_note_state.dart';
 
 const _tickInterval = Duration(milliseconds: 200);
 
 @injectable
 class VoiceNoteCubit extends Cubit<VoiceNoteState> {
-  VoiceNoteCubit(this._voiceNoteRepository) : super(const VoiceNoteIdle());
+  VoiceNoteCubit(this._voiceNoteRepository, this._routeChangeObserver)
+    : super(const VoiceNoteIdle()) {
+    _routeChangeObserver.addRouteListener(_onRouteChanged);
+  }
 
   final VoiceNoteRepository _voiceNoteRepository;
+  final RouteChangeObserver _routeChangeObserver;
   final Stopwatch _recordingTime = Stopwatch();
   Timer? _ticker;
   StreamSubscription<AppResult<Duration>>? _positionSubscription;
@@ -94,6 +99,11 @@ class VoiceNoteCubit extends Cubit<VoiceNoteState> {
     });
   }
 
+  Future<void> stopPlaybackOnLeave() async {
+    if (state is! VoiceNotePlaying) return;
+    await discardPlayback();
+  }
+
   Future<void> discardPlayback() async {
     _position = Duration.zero;
     _playingPath = null;
@@ -101,6 +111,8 @@ class VoiceNoteCubit extends Cubit<VoiceNoteState> {
     if (isClosed) return;
     emit(const VoiceNoteIdle());
   }
+
+  void _onRouteChanged() => unawaited(stopPlaybackOnLeave());
 
   void _onPosition(AppResult<Duration> result) {
     if (result case Success(data: final position)) {
@@ -118,6 +130,7 @@ class VoiceNoteCubit extends Cubit<VoiceNoteState> {
 
   @override
   Future<void> close() async {
+    _routeChangeObserver.removeRouteListener(_onRouteChanged);
     _ticker?.cancel();
     await _positionSubscription?.cancel();
     await _finishedSubscription?.cancel();
