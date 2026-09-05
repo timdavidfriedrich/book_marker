@@ -3,10 +3,8 @@ import 'dart:io';
 import 'package:core/theme/spacing.dart';
 import 'package:flutter/material.dart';
 import 'package:shared/presentation/extensions/context_extensions.dart';
-import 'package:shared/presentation/widgets/hatch_painter.dart';
 
 const _remoteScheme = "http";
-const _hatchOpacity = 0.35;
 const _monogramSizeRatio = 0.44;
 
 class const BookCover({
@@ -19,49 +17,47 @@ class const BookCover({
 }) extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final placeholder = _CoverPlaceholder(title: _title, width: _width);
     return ClipRRect(
       borderRadius: BorderRadius.circular(_radius),
       child: SizedBox(
         width: _width,
         height: _height,
         child: switch (_image) {
-          null => _placeholder(context),
+          null => placeholder,
           final image when image.startsWith(_remoteScheme) => Image.network(
             image,
             fit: BoxFit.cover,
-            errorBuilder: (context, error, stackTrace) => _placeholder(context),
+            errorBuilder: (context, error, stackTrace) => placeholder,
           ),
           final image => Image.file(
             File(image),
             fit: BoxFit.cover,
-            errorBuilder: (context, error, stackTrace) => _placeholder(context),
+            errorBuilder: (context, error, stackTrace) => placeholder,
           ),
         },
       ),
     );
   }
+}
 
-  Widget _placeholder(BuildContext context) {
+class const _CoverPlaceholder({
+  required final String _title,
+  required final double _width,
+}) extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
     final trimmed = _title.trim();
-    return DecoratedBox(
-      decoration: BoxDecoration(color: context.c.surfaceContainerHighest),
-      child: Stack(
-        fit: StackFit.expand,
-        children: [
-          CustomPaint(
-            painter: HatchPainter(color: context.c.outline.withValues(alpha: _hatchOpacity)),
-            size: Size(_width, _height),
+    return ColoredBox(
+      color: context.c.surfaceContainerHighest,
+      child: Center(
+        child: Text(
+          trimmed.isEmpty ? "" : trimmed.substring(0, 1).toUpperCase(),
+          style: context.t.headlineSmall?.copyWith(
+            color: context.c.onSurfaceVariant,
+            fontSize: _width * _monogramSizeRatio,
           ),
-          Center(
-            child: Text(
-              trimmed.isEmpty ? "" : trimmed.substring(0, 1).toUpperCase(),
-              style: context.t.headlineSmall?.copyWith(
-                color: context.c.onSurfaceVariant,
-                fontSize: _width * _monogramSizeRatio,
-              ),
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }
