@@ -573,12 +573,6 @@ abstract class AppLocalizations {
   /// **'themes'**
   String get navThemesLabel;
 
-  /// No description provided for @profileYouLabel.
-  ///
-  /// In en, this message translates to:
-  /// **'you'**
-  String get profileYouLabel;
-
   /// No description provided for @pageShortLabel.
   ///
   /// In en, this message translates to:
@@ -1305,17 +1299,23 @@ abstract class AppLocalizations {
   /// **'German'**
   String get settingsLanguageGerman;
 
+  /// No description provided for @settingsLanguageSystemValue.
+  ///
+  /// In en, this message translates to:
+  /// **'System ({language})'**
+  String settingsLanguageSystemValue(String language);
+
   /// No description provided for @settingsAboutLabel.
   ///
   /// In en, this message translates to:
-  /// **'About'**
+  /// **'About this app'**
   String get settingsAboutLabel;
 
   /// No description provided for @settingsVersionLabel.
   ///
   /// In en, this message translates to:
-  /// **'Version {version}'**
-  String settingsVersionLabel(String version);
+  /// **'Version'**
+  String get settingsVersionLabel;
 
   /// No description provided for @filterNoResultsMessage.
   ///

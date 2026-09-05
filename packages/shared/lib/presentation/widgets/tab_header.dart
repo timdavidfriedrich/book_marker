@@ -3,14 +3,14 @@ import 'package:flutter/material.dart';
 import 'package:shared/presentation/extensions/context_extensions.dart';
 import 'package:shared/presentation/extensions/screen_layout_extensions.dart';
 import 'package:shared/presentation/navigation/navigation_extensions.dart';
-import 'package:shared/presentation/widgets/profile_avatar.dart';
+import 'package:shared/presentation/widgets/circle_icon_button.dart';
 
-const tabHeaderHeight = profileAvatarSize + Spacing.m + Spacing.s;
+const tabHeaderHeight = circleIconButtonSize + Spacing.m + Spacing.s;
 
 class const TabHeader({
   required final String _title,
   final Widget? _center,
-  final double _contentHeight = profileAvatarSize,
+  final double _contentHeight = circleIconButtonSize,
   super.key,
 }) extends StatelessWidget {
   @override
@@ -43,7 +43,12 @@ class const TabHeader({
                 const SizedBox(width: Spacing.m),
               ] else
                 Expanded(child: title),
-              ProfileAvatar(onTap: context.pushSettings),
+              CircleIconButton(
+                icon: Icons.person_outline,
+                foregroundColor: context.c.onSurfaceVariant,
+                tooltip: context.s.settingsTitle,
+                onPressed: context.pushSettings,
+              ),
             ],
           ),
         ),

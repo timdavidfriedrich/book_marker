@@ -2,12 +2,14 @@ import 'package:core/theme/spacing.dart';
 import 'package:flutter/material.dart';
 import 'package:shared/presentation/extensions/context_extensions.dart';
 
+const circleIconButtonSize = 44.0;
+
 class const CircleIconButton({
   required final IconData _icon,
   required final VoidCallback? _onPressed,
   final Color? _backgroundColor,
   final Color? _foregroundColor,
-  final double _size = 44,
+  final double _size = circleIconButtonSize,
   final double _iconSize = Spacing.iconM,
   final String? _tooltip,
   super.key,

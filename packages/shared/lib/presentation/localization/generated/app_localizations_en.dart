@@ -315,9 +315,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get navThemesLabel => 'themes';
 
   @override
-  String get profileYouLabel => 'you';
-
-  @override
   String pageShortLabel(String pages) {
     return 'p.$pages';
   }
@@ -789,12 +786,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsLanguageGerman => 'German';
 
   @override
-  String get settingsAboutLabel => 'About';
+  String settingsLanguageSystemValue(String language) {
+    return 'System ($language)';
+  }
 
   @override
-  String settingsVersionLabel(String version) {
-    return 'Version $version';
-  }
+  String get settingsAboutLabel => 'About this app';
+
+  @override
+  String get settingsVersionLabel => 'Version';
 
   @override
   String get filterNoResultsMessage => 'Nothing matches this filter.';
