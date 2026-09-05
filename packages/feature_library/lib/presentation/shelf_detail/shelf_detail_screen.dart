@@ -22,6 +22,7 @@ import 'package:shared/presentation/widgets/loading_screen.dart';
 import 'package:shared/presentation/widgets/name_input_dialog.dart';
 import 'package:shared/presentation/widgets/sheet_action_tile.dart';
 import 'package:shared/presentation/widgets/sheet_content.dart';
+import 'package:shared/presentation/widgets/sheet_drag_handle.dart';
 
 const _sheetCollapsedSize = 0.6;
 const _sheetExpandedSize = 0.95;
@@ -466,16 +467,7 @@ class const _AddBooksSheet() extends StatelessWidget {
               controller: scrollController,
               padding: const EdgeInsets.fromLTRB(Spacing.l, Spacing.s, Spacing.l, Spacing.l),
               children: [
-                Center(
-                  child: Container(
-                    width: 44,
-                    height: 5,
-                    decoration: BoxDecoration(
-                      color: context.c.outline,
-                      borderRadius: BorderRadius.circular(Spacing.radiusFull),
-                    ),
-                  ),
-                ),
+                const SheetDragHandle(),
                 const SizedBox(height: Spacing.m),
                 Text(context.s.shelfAddBooksTitle, style: context.t.headlineSmall),
                 const SizedBox(height: Spacing.m),

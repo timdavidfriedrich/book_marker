@@ -10,9 +10,8 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:shared/domain/entities/recognized_word_extensions.dart';
 import 'package:shared/presentation/extensions/context_extensions.dart';
 import 'package:shared/presentation/widgets/circle_icon_button.dart';
+import 'package:shared/presentation/widgets/sheet_drag_handle.dart';
 
-const _handleWidth = 44.0;
-const _handleHeight = 5.0;
 const _fieldActionSize = 30.0;
 const _fieldActionIconSize = 16.0;
 
@@ -106,7 +105,7 @@ class const _WordCorrectionSheet({
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              const _DragHandle(),
+              const SheetDragHandle(),
               const SizedBox(height: Spacing.s),
               _Header(onClose: () => Navigator.of(context).pop()),
               const SizedBox(height: Spacing.l),
@@ -144,22 +143,6 @@ class const _WordCorrectionSheet({
 }
 
 String _joined(String head, String tail) => "${lineBreakStem(head, tail) ?? head}$tail";
-
-class const _DragHandle() extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Container(
-        width: _handleWidth,
-        height: _handleHeight,
-        decoration: BoxDecoration(
-          color: context.c.outline,
-          borderRadius: BorderRadius.circular(Spacing.radiusFull),
-        ),
-      ),
-    );
-  }
-}
 
 class const _Header({
   required final VoidCallback _onClose,

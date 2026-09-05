@@ -357,12 +357,6 @@ class AppLocalizationsDe extends AppLocalizations {
   String get bookDetailEmptyMessage => 'Noch keine Zitate in diesem Buch.';
 
   @override
-  String get captureMarkingInto => 'markiere in';
-
-  @override
-  String get captureSwitchButton => 'wechseln';
-
-  @override
   String get captureGalleryLabel => 'aus Galerie';
 
   @override
@@ -459,27 +453,19 @@ class AppLocalizationsDe extends AppLocalizations {
   String get markingContinueButton => 'Weiter';
 
   @override
-  String markingSaveSheetTitle(String book) {
-    return 'In $book speichern';
-  }
+  String get markingSaveSheetTitle => 'Zitat speichern';
 
   @override
   String get pageFieldLabel => 'Seite';
 
   @override
-  String get pageFieldHint => '42–43';
+  String get pageFieldHint => 'Ergänzen';
 
   @override
-  String get pageAutoLabel => 'auto';
-
-  @override
-  String get markingNoteHint => 'Notiz hinzufügen';
+  String get markingNoteHint => 'Notiz schreiben…';
 
   @override
   String get voiceNoteHint => 'Sprachnotiz hinzufügen';
-
-  @override
-  String get markingDoneButton => 'Fertig';
 
   @override
   String get markingUncertainLegend => '= unsichere Wörter, zum Korrigieren tippen';
@@ -519,8 +505,8 @@ class AppLocalizationsDe extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count Wörter könnten falsch erkannt sein — prüf das Zitat',
-      one: '1 Wort könnte falsch erkannt sein — prüf das Zitat',
+      other: '$count Wörter könnten falsch erkannt sein',
+      one: '1 Wort könnte falsch erkannt sein',
     );
     return '$_temp0';
   }
@@ -811,9 +797,6 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get filterNoResultsMessage => 'Zu diesem Filter passt nichts.';
-
-  @override
-  String get markingBookFieldLabel => 'Buch';
 
   @override
   String get markingBookPickerTitle => 'Buch wählen';

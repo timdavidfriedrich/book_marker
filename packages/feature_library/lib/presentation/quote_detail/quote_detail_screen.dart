@@ -526,6 +526,7 @@ class const _ThemeChips({
           SelectableChip(
             label: context.s.quoteDetailAddThemeChip,
             selected: false,
+            outlined: true,
             onTap: () => _showThemePicker(context),
           ),
         ],
@@ -573,6 +574,7 @@ class const _ThemePickerSheet() extends StatelessWidget {
                     SelectableChip(
                       label: context.s.markingNewThemeChip,
                       selected: false,
+                      outlined: true,
                       onTap: () => _promptNewTheme(context),
                     ),
                   ],

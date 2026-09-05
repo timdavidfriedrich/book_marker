@@ -355,12 +355,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get bookDetailEmptyMessage => 'No quotes in this book yet.';
 
   @override
-  String get captureMarkingInto => 'marking into';
-
-  @override
-  String get captureSwitchButton => 'switch';
-
-  @override
   String get captureGalleryLabel => 'from gallery';
 
   @override
@@ -457,27 +451,19 @@ class AppLocalizationsEn extends AppLocalizations {
   String get markingContinueButton => 'Continue';
 
   @override
-  String markingSaveSheetTitle(String book) {
-    return 'Save to $book';
-  }
+  String get markingSaveSheetTitle => 'Save this quote';
 
   @override
-  String get pageFieldLabel => 'page';
+  String get pageFieldLabel => 'Page';
 
   @override
-  String get pageFieldHint => '42–43';
+  String get pageFieldHint => 'Add';
 
   @override
-  String get pageAutoLabel => 'auto';
-
-  @override
-  String get markingNoteHint => 'add a note';
+  String get markingNoteHint => 'write a note…';
 
   @override
   String get voiceNoteHint => 'add voice note';
-
-  @override
-  String get markingDoneButton => 'Done';
 
   @override
   String get markingUncertainLegend => '= uncertain words, tap to correct';
@@ -517,8 +503,8 @@ class AppLocalizationsEn extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: '$count words may be misread — check the quote',
-      one: '1 word may be misread — check the quote',
+      other: '$count words may be misread',
+      one: '1 word may be misread',
     );
     return '$_temp0';
   }
@@ -807,9 +793,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get filterNoResultsMessage => 'Nothing matches this filter.';
-
-  @override
-  String get markingBookFieldLabel => 'book';
 
   @override
   String get markingBookPickerTitle => 'Choose book';

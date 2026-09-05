@@ -1,11 +1,15 @@
 import 'package:shared/domain/entities/highlight_region.dart';
 import 'package:shared/domain/entities/recognized_word.dart';
 
+final _whitespaceRun = RegExp(r"\s+");
+
 class const WordGroup({
   required final List<int> indexes,
   required final String text,
   required final int? number,
 });
+
+typedef MarkedQuote = ({String text, List<(int, int)> uncertainRanges});
 
 extension RecognizedWordListExtensions on List<RecognizedWord> {
   List<WordGroup> wordGroups() {
@@ -38,21 +42,47 @@ extension RecognizedWordListExtensions on List<RecognizedWord> {
     return null;
   }
 
-  String joinMarked(Iterable<int> indexes) {
+  String joinMarked(Iterable<int> indexes) => markedQuote(indexes).text;
+
+  // * the ranges index into the returned text, so both are built by one walk and cannot drift
+  MarkedQuote markedQuote(Iterable<int> indexes) {
     final ordered = indexes.toList()..sort();
     final buffer = StringBuffer();
+    final uncertainRanges = <(int, int)>[];
     int? previous;
+    var offset = 0;
+    var groupStart = 0;
+    var groupIsUncertain = false;
+    var hasGroup = false;
+    void closeGroup() {
+      if (hasGroup && groupIsUncertain) uncertainRanges.add((groupStart, offset));
+      hasGroup = false;
+      groupIsUncertain = false;
+    }
+
     for (final index in ordered) {
       if (index < 0 || index >= length) continue;
-      final text = this[index].text.trim();
+      final word = this[index];
+      final text = word.text.trim().replaceAll(_whitespaceRun, " ");
       if (text.isEmpty) continue;
-      if (previous != null && !(previous + 1 == index && this[previous].joinsWithNext)) {
-        buffer.write(" ");
+      final joinsPrevious =
+          previous != null && previous + 1 == index && this[previous].joinsWithNext;
+      if (!joinsPrevious) {
+        closeGroup();
+        if (previous != null) {
+          buffer.write(" ");
+          offset += 1;
+        }
+        groupStart = offset;
+        hasGroup = true;
       }
       buffer.write(text);
+      offset += text.length;
+      groupIsUncertain = groupIsUncertain || word.isUncertain;
       previous = index;
     }
-    return buffer.toString().replaceAll(RegExp(r"\s+"), " ").trim();
+    closeGroup();
+    return (text: buffer.toString(), uncertainRanges: uncertainRanges);
   }
 
   List<RecognizedWord>? applyMarkedText(String text, Iterable<int> markedIndexes) {

@@ -7,6 +7,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:shared/domain/entities/recognized_spread.dart';
 import 'package:shared/domain/entities/recognized_word.dart';
 import 'package:shared/presentation/extensions/context_extensions.dart';
+import 'package:shared/presentation/widgets/dashed_border_painter.dart';
 import 'package:shared/presentation/widgets/ink_tap_box.dart';
 
 const _rowHeight = 68.0;
@@ -22,8 +23,6 @@ const _markOpacity = 0.22;
 const _markPadding = 2.0;
 const _glowBlur = 12.0;
 const _glowOpacity = 0.22;
-const _dashLength = 4.0;
-const _dashGap = 3.0;
 const _placeholderTextScale = 0.9;
 
 typedef _Bounds = ({double left, double top, double width, double height});
@@ -235,7 +234,7 @@ class const _NeighbourPreview({
       );
     }
     return CustomPaint(
-      painter: _DashedBorderPainter(color: context.c.outline),
+      painter: DashedBorderPainter(color: context.c.outline),
       child: Center(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: Spacing.xs),
@@ -443,33 +442,4 @@ class const _JoinArrows({
       ],
     );
   }
-}
-
-class const _DashedBorderPainter({
-  required final Color _color,
-}) extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = _color
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = Spacing.borderWidthThin;
-    final path = Path()
-      ..addRRect(
-        RRect.fromRectAndRadius(Offset.zero & size, const Radius.circular(Spacing.radiusM)),
-      );
-    for (final metric in path.computeMetrics()) {
-      var start = 0.0;
-      while (start < metric.length) {
-        canvas.drawPath(
-          metric.extractPath(start, math.min(start + _dashLength, metric.length)),
-          paint,
-        );
-        start += _dashLength + _dashGap;
-      }
-    }
-  }
-
-  @override
-  bool shouldRepaint(_DashedBorderPainter oldDelegate) => oldDelegate._color != _color;
 }

@@ -16,6 +16,7 @@ import 'package:shared/presentation/widgets/drag_dismiss_sheet.dart';
 import 'package:shared/presentation/widgets/ink_tap_box.dart';
 import 'package:shared/presentation/widgets/loading_indicator.dart';
 import 'package:shared/presentation/widgets/section_label.dart';
+import 'package:shared/presentation/widgets/sheet_drag_handle.dart';
 
 const _sheetInitialSize = 0.5;
 const _sheetExpandedSize = 0.95;
@@ -69,14 +70,7 @@ class const _Sheet({
           return Column(
             children: [
               const SizedBox(height: Spacing.s),
-              Container(
-                width: 44,
-                height: 5,
-                decoration: BoxDecoration(
-                  color: context.c.outline,
-                  borderRadius: BorderRadius.circular(Spacing.radiusFull),
-                ),
-              ),
+              const SheetDragHandle(),
               Expanded(
                 child: ListView(
                   controller: _scrollController,

@@ -639,18 +639,6 @@ abstract class AppLocalizations {
   /// **'No quotes in this book yet.'**
   String get bookDetailEmptyMessage;
 
-  /// No description provided for @captureMarkingInto.
-  ///
-  /// In en, this message translates to:
-  /// **'marking into'**
-  String get captureMarkingInto;
-
-  /// No description provided for @captureSwitchButton.
-  ///
-  /// In en, this message translates to:
-  /// **'switch'**
-  String get captureSwitchButton;
-
   /// No description provided for @captureGalleryLabel.
   ///
   /// In en, this message translates to:
@@ -822,31 +810,25 @@ abstract class AppLocalizations {
   /// No description provided for @markingSaveSheetTitle.
   ///
   /// In en, this message translates to:
-  /// **'Save to {book}'**
-  String markingSaveSheetTitle(String book);
+  /// **'Save this quote'**
+  String get markingSaveSheetTitle;
 
   /// No description provided for @pageFieldLabel.
   ///
   /// In en, this message translates to:
-  /// **'page'**
+  /// **'Page'**
   String get pageFieldLabel;
 
   /// No description provided for @pageFieldHint.
   ///
   /// In en, this message translates to:
-  /// **'42–43'**
+  /// **'Add'**
   String get pageFieldHint;
-
-  /// No description provided for @pageAutoLabel.
-  ///
-  /// In en, this message translates to:
-  /// **'auto'**
-  String get pageAutoLabel;
 
   /// No description provided for @markingNoteHint.
   ///
   /// In en, this message translates to:
-  /// **'add a note'**
+  /// **'write a note…'**
   String get markingNoteHint;
 
   /// No description provided for @voiceNoteHint.
@@ -854,12 +836,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'add voice note'**
   String get voiceNoteHint;
-
-  /// No description provided for @markingDoneButton.
-  ///
-  /// In en, this message translates to:
-  /// **'Done'**
-  String get markingDoneButton;
 
   /// No description provided for @markingUncertainLegend.
   ///
@@ -930,7 +906,7 @@ abstract class AppLocalizations {
   /// No description provided for @markingUnsureWordsLabel.
   ///
   /// In en, this message translates to:
-  /// **'{count, plural, =1{1 word may be misread — check the quote} other{{count} words may be misread — check the quote}}'**
+  /// **'{count, plural, =1{1 word may be misread} other{{count} words may be misread}}'**
   String markingUnsureWordsLabel(int count);
 
   /// No description provided for @markingNewThemeChip.
@@ -1328,12 +1304,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Nothing matches this filter.'**
   String get filterNoResultsMessage;
-
-  /// No description provided for @markingBookFieldLabel.
-  ///
-  /// In en, this message translates to:
-  /// **'book'**
-  String get markingBookFieldLabel;
 
   /// No description provided for @markingBookPickerTitle.
   ///

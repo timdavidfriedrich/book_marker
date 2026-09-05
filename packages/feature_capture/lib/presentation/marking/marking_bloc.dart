@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:core/error/app_error.dart';
 import 'package:core/error/app_result.dart';
+import 'package:feature_capture/domain/uncertain_ranges.dart';
 import 'package:feature_capture/domain/use_cases/recognize_captured_spread_use_case.dart';
 import 'package:feature_capture/domain/use_cases/save_quote_use_case.dart';
 import 'package:feature_capture/presentation/marking/marking_event.dart';
@@ -65,12 +66,15 @@ class MarkingBloc extends Bloc<MarkingEvent, MarkingState> {
   List<Book> _books = const [];
   final Set<String> _selectedThemeIds = {};
   String? _bookId;
+  String? _quoteOverride;
+  List<(int, int)> _uncertainRanges = const [];
   List<RecognizedWord>? _wordsBeforeCorrection;
   Set<int>? _selectionBeforeCorrection;
   late final Quote? _editedQuote = _arguments.quote;
 
   Future<void> _onStarted(MarkingStarted event, Emitter<MarkingState> emit) async {
     emit(const MarkingProcessing());
+    _quoteOverride = _editedQuote?.quote;
     await _themeSubscription?.cancel();
     _themeSubscription = _themeRepository.watchThemes().listen(
       (result) => add(MarkingThemesUpdated(result)),
@@ -136,6 +140,7 @@ class MarkingBloc extends Bloc<MarkingEvent, MarkingState> {
     required List<String> bookAuthors,
   }) {
     final book = _selectedBook();
+    final quote = _quoteWithRanges(words, selectedWordIndexes);
     return MarkingReady(
       pages: pages,
       words: words,
@@ -145,8 +150,8 @@ class MarkingBloc extends Bloc<MarkingEvent, MarkingState> {
       bookCoverImage: book?.coverImage ?? bookCoverImage,
       bookAuthors: book?.authors ?? bookAuthors,
       selectedWordIndexes: selectedWordIndexes,
-      quoteOverride: _editedQuote?.quote,
-      detectedPageNumbers: detectedPageNumbers,
+      quote: quote.text,
+      uncertainQuoteRanges: quote.uncertainRanges,
       pageNumbers: _editedQuote?.pageNumbers ?? detectedPageNumbers,
       note: _editedQuote?.note,
       voiceNotePath: _editedQuote?.voiceNotePath,
@@ -241,11 +246,12 @@ class MarkingBloc extends Bloc<MarkingEvent, MarkingState> {
 
   void _onWordsSelected(MarkingWordsSelected event, Emitter<MarkingState> emit) {
     if (state case final MarkingReady current) {
+      _quoteOverride = null;
+      _uncertainRanges = const [];
       emit(
         _ready(
           current,
           selectedWordIndexes: _withJoinedNeighbours(event.wordIndexes, current.words),
-          keepQuote: false,
         ),
       );
     }
@@ -363,7 +369,13 @@ class MarkingBloc extends Bloc<MarkingEvent, MarkingState> {
 
   void _onQuoteEdited(MarkingQuoteEdited event, Emitter<MarkingState> emit) {
     if (state case final MarkingReady current) {
-      emit(_ready(current, quoteOverride: event.quote, keepQuote: false));
+      _uncertainRanges = remapUncertainRanges(
+        current.uncertainQuoteRanges,
+        previous: current.quote,
+        next: event.quote,
+      );
+      _quoteOverride = event.quote;
+      emit(_ready(current));
     }
   }
 
@@ -420,8 +432,6 @@ class MarkingBloc extends Bloc<MarkingEvent, MarkingState> {
     MarkingReady current, {
     List<RecognizedWord>? words,
     Set<int>? selectedWordIndexes,
-    String? quoteOverride,
-    bool keepQuote = true,
     List<int>? pageNumbers,
     String? note,
     bool keepNote = true,
@@ -433,17 +443,20 @@ class MarkingBloc extends Bloc<MarkingEvent, MarkingState> {
     AppError? saveError,
   }) {
     final book = _selectedBook();
+    final currentWords = words ?? current.words;
+    final currentSelection = selectedWordIndexes ?? current.selectedWordIndexes;
+    final quote = _quoteWithRanges(currentWords, currentSelection);
     return MarkingReady(
       pages: current.pages,
-      words: words ?? current.words,
+      words: currentWords,
       bookId: _bookId,
       books: _books,
       bookTitle: book?.title ?? current.bookTitle,
       bookCoverImage: book == null ? current.bookCoverImage : book.coverImage,
       bookAuthors: book?.authors ?? current.bookAuthors,
-      selectedWordIndexes: selectedWordIndexes ?? current.selectedWordIndexes,
-      quoteOverride: keepQuote ? current.quoteOverride : quoteOverride,
-      detectedPageNumbers: current.detectedPageNumbers,
+      selectedWordIndexes: currentSelection,
+      quote: quote.text,
+      uncertainQuoteRanges: quote.uncertainRanges,
       pageNumbers: pageNumbers ?? current.pageNumbers,
       note: keepNote ? current.note : note,
       voiceNotePath: keepVoiceNote ? current.voiceNotePath : voiceNotePath,
@@ -464,18 +477,23 @@ class MarkingBloc extends Bloc<MarkingEvent, MarkingState> {
     return null;
   }
 
+  MarkedQuote _quoteWithRanges(List<RecognizedWord> words, Set<int> selectedWordIndexes) {
+    final marked = words.markedQuote(selectedWordIndexes);
+    if (_quoteOverride case final String override when override != marked.text) {
+      return (text: override, uncertainRanges: _uncertainRanges);
+    }
+    return marked;
+  }
+
   Quote _buildQuote(MarkingReady state, String bookId) {
     final orderedIndexes = state.selectedWordIndexes.toList()..sort();
     final trimmedNote = state.note?.trim();
-    final override = state.quoteOverride?.trim();
-    final quote = (override != null && override.isNotEmpty)
-        ? override
-        : state.words.joinMarked(orderedIndexes);
+    final trimmedQuote = state.quote.trim();
     return Quote(
       id: _editedQuote?.id ?? _uuid.v4(),
       bookId: bookId,
       pageNumbers: state.pageNumbers,
-      quote: quote,
+      quote: trimmedQuote.isEmpty ? state.words.joinMarked(orderedIndexes) : trimmedQuote,
       note: (trimmedNote == null || trimmedNote.isEmpty) ? null : trimmedNote,
       voiceNotePath: state.voiceNotePath,
       voiceNoteDurationMs: state.voiceNoteDurationMs,
