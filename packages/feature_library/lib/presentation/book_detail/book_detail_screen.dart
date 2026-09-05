@@ -398,7 +398,7 @@ Future<void> _showBookMenu(BuildContext context, BookStatus status) async {
     context,
     title: context.s.bookDeleteTitle,
     message: context.s.bookDeleteMessage,
-    confirmLabel: context.s.commonDelete,
+    confirmLabel: context.s.bookDeleteAction,
     destructive: true,
   );
   if (confirmed) bloc.add(const BookDetailDeleteRequested());

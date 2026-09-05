@@ -425,6 +425,7 @@ Future<void> _showThemeMenu(BuildContext context, ThemeDetailLoaded state) async
         context,
         title: context.s.themeRenameTitle,
         hint: context.s.themesNewThemeHint,
+        confirmLabel: context.s.commonRename,
         initialValue: state.theme.name,
       );
       if (name != null && name.trim().isNotEmpty) bloc.add(ThemeDetailRenameRequested(name));
@@ -435,7 +436,7 @@ Future<void> _showThemeMenu(BuildContext context, ThemeDetailLoaded state) async
         context,
         title: context.s.themeDeleteTitle,
         message: context.s.themeDeleteMessage,
-        confirmLabel: context.s.commonDelete,
+        confirmLabel: context.s.themeDeleteAction,
         destructive: true,
       );
       if (confirmed) bloc.add(const ThemeDetailDeleteRequested());

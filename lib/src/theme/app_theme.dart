@@ -220,6 +220,8 @@ final _darkHighContrastPalette = AppPalette(
 
 const _status = StatusColors(uncertain: _sky);
 
+const _buttonHeight = 56.0;
+
 abstract final class AppTheme {
   const AppTheme._();
 
@@ -332,8 +334,21 @@ abstract final class AppTheme {
           foregroundColor: colorScheme.onPrimary,
           disabledBackgroundColor: colorScheme.primary.withValues(alpha: 0.4),
           textStyle: textTheme.labelLarge,
-          minimumSize: const Size.fromHeight(56),
+          minimumSize: const Size.fromHeight(_buttonHeight),
           padding: const EdgeInsets.symmetric(horizontal: Spacing.l),
+          shape: const StadiumBorder(),
+        ),
+      ),
+      outlinedButtonTheme: OutlinedButtonThemeData(
+        style: OutlinedButton.styleFrom(
+          backgroundColor: colorScheme.surfaceContainerHigh,
+          foregroundColor: colorScheme.onSurface,
+          disabledForegroundColor: colorScheme.onSurfaceVariant,
+          disabledBackgroundColor: colorScheme.surfaceContainerHigh.withValues(alpha: 0.4),
+          textStyle: textTheme.labelLarge,
+          minimumSize: const Size.fromHeight(_buttonHeight),
+          padding: const EdgeInsets.symmetric(horizontal: Spacing.l),
+          side: BorderSide.none,
           shape: const StadiumBorder(),
         ),
       ),

@@ -557,6 +557,7 @@ Future<void> _promptNewShelf(BuildContext context) async {
     context,
     title: context.s.libraryNewShelfTitle,
     hint: context.s.libraryNewShelfHint,
+    confirmLabel: context.s.libraryNewShelfButton,
   );
   if (name != null && name.trim().isNotEmpty) bloc.add(LibraryShelfCreateRequested(name));
 }

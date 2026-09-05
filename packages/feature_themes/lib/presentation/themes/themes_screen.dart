@@ -148,6 +148,7 @@ Future<void> _promptNewTheme(BuildContext context) async {
     context,
     title: context.s.themesNewThemeTitle,
     hint: context.s.themesNewThemeHint,
+    confirmLabel: context.s.themesNewThemeButton,
   );
   if (name != null && name.trim().isNotEmpty) bloc.add(ThemesCreateRequested(name));
 }

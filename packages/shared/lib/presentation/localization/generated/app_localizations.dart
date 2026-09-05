@@ -726,7 +726,7 @@ abstract class AppLocalizations {
   /// No description provided for @cropCancelConfirmButton.
   ///
   /// In en, this message translates to:
-  /// **'Discard'**
+  /// **'Discard capture'**
   String get cropCancelConfirmButton;
 
   /// No description provided for @markingAddBookButton.
@@ -1023,6 +1023,12 @@ abstract class AppLocalizations {
   /// **'Theme name'**
   String get themesNewThemeHint;
 
+  /// No description provided for @themesNewThemeButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Create theme'**
+  String get themesNewThemeButton;
+
   /// No description provided for @themeDetailQuotesInBooks.
   ///
   /// In en, this message translates to:
@@ -1053,6 +1059,12 @@ abstract class AppLocalizations {
   /// **'Rename theme'**
   String get themeRenameTitle;
 
+  /// No description provided for @themeDeleteAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete theme'**
+  String get themeDeleteAction;
+
   /// No description provided for @themeDeleteTitle.
   ///
   /// In en, this message translates to:
@@ -1070,6 +1082,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Rename shelf'**
   String get shelfRenameTitle;
+
+  /// No description provided for @shelfDeleteAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete shelf'**
+  String get shelfDeleteAction;
 
   /// No description provided for @shelfDeleteTitle.
   ///
@@ -1100,6 +1118,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'This deletes the book and all its quotes. This can\'t be undone.'**
   String get bookDeleteMessage;
+
+  /// No description provided for @voiceNoteDeleteAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete voice note'**
+  String get voiceNoteDeleteAction;
 
   /// No description provided for @voiceNoteDeleteTitle.
   ///
@@ -1154,6 +1178,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Shelf name'**
   String get libraryNewShelfHint;
+
+  /// No description provided for @libraryNewShelfButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Create shelf'**
+  String get libraryNewShelfButton;
 
   /// No description provided for @shelfDetailStats.
   ///

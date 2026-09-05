@@ -51,7 +51,7 @@ Future<void> _deleteQuote(BuildContext context) async {
     context,
     title: context.s.quoteDeleteTitle,
     message: context.s.quoteDeleteMessage,
-    confirmLabel: context.s.commonDelete,
+    confirmLabel: context.s.quoteDeleteAction,
     destructive: true,
   );
   if (confirmed) bloc.add(const QuoteDetailDeleteRequested());

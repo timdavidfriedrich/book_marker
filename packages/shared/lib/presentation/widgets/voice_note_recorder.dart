@@ -32,7 +32,7 @@ Future<void> _confirmDelete(
     context,
     title: context.s.voiceNoteDeleteTitle,
     message: context.s.voiceNoteDeleteMessage,
-    confirmLabel: context.s.commonDelete,
+    confirmLabel: context.s.voiceNoteDeleteAction,
     destructive: true,
   );
   if (!confirmed) return;

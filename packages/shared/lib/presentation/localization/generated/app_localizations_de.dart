@@ -401,7 +401,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get cropCancelMessage => 'Alle aufgenommenen Seiten werden verworfen.';
 
   @override
-  String get cropCancelConfirmButton => 'Verwerfen';
+  String get cropCancelConfirmButton => 'Aufnahme verwerfen';
 
   @override
   String get markingAddBookButton => 'Neues Buch hinzufügen';
@@ -601,6 +601,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get themesNewThemeHint => 'Themenname';
 
   @override
+  String get themesNewThemeButton => 'Thema erstellen';
+
+  @override
   String themeDetailQuotesInBooks(int quotes, int books) {
     String _temp0 = intl.Intl.pluralLogic(
       quotes,
@@ -630,6 +633,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get themeRenameTitle => 'Thema umbenennen';
 
   @override
+  String get themeDeleteAction => 'Thema löschen';
+
+  @override
   String get themeDeleteTitle => 'Thema löschen?';
 
   @override
@@ -637,6 +643,9 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get shelfRenameTitle => 'Regal umbenennen';
+
+  @override
+  String get shelfDeleteAction => 'Regal löschen';
 
   @override
   String get shelfDeleteTitle => 'Regal löschen?';
@@ -653,6 +662,9 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get bookDeleteMessage =>
       'Damit werden das Buch und alle seine Zitate gelöscht. Das kann nicht rückgängig gemacht werden.';
+
+  @override
+  String get voiceNoteDeleteAction => 'Sprachnotiz löschen';
 
   @override
   String get voiceNoteDeleteTitle => 'Sprachnotiz löschen?';
@@ -682,6 +694,9 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get libraryNewShelfHint => 'Regalname';
+
+  @override
+  String get libraryNewShelfButton => 'Regal erstellen';
 
   @override
   String shelfDetailStats(int books, int quotes) {

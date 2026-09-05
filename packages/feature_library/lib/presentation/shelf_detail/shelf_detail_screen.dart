@@ -360,6 +360,7 @@ Future<void> _showShelfMenu(BuildContext context, ShelfDetailLoaded state) async
         context,
         title: context.s.shelfRenameTitle,
         hint: context.s.libraryNewShelfHint,
+        confirmLabel: context.s.commonRename,
         initialValue: state.shelf.name,
       );
       if (name != null && name.trim().isNotEmpty) bloc.add(ShelfDetailRenameRequested(name));
@@ -370,7 +371,7 @@ Future<void> _showShelfMenu(BuildContext context, ShelfDetailLoaded state) async
         context,
         title: context.s.shelfDeleteTitle,
         message: context.s.shelfDeleteMessage,
-        confirmLabel: context.s.commonDelete,
+        confirmLabel: context.s.shelfDeleteAction,
         destructive: true,
       );
       if (confirmed) bloc.add(const ShelfDetailDeleteRequested());

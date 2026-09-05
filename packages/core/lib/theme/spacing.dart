@@ -36,7 +36,7 @@ abstract final class Spacing {
   static const double sideRailWidth = 96;
   static const double detailPaneWidth = 340;
   static const double searchFieldMaxWidth = 420;
-  static const double dialogMaxWidth = 420;
+  static const double dialogMaxWidth = 360;
 
   static const double elevationXs = 0.5;
   static const double elevationS = 1;
