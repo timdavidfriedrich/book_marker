@@ -343,10 +343,14 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get bookDetailFavoritesFilter => 'favorites';
+  String bookDetailFavoritesFilter(int count) {
+    return 'favorites $count';
+  }
 
   @override
-  String get bookDetailVoiceNoteFilter => 'with voice note';
+  String bookDetailVoiceNoteFilter(int count) {
+    return 'with voice note $count';
+  }
 
   @override
   String get bookDetailEmptyMessage => 'No quotes in this book yet.';
@@ -597,23 +601,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get themesNewThemeButton => 'Create theme';
-
-  @override
-  String themeDetailQuotesInBooks(int quotes, int books) {
-    String _temp0 = intl.Intl.pluralLogic(
-      quotes,
-      locale: localeName,
-      other: '$quotes quotes',
-      one: '1 quote',
-    );
-    String _temp1 = intl.Intl.pluralLogic(
-      books,
-      locale: localeName,
-      other: '$books books',
-      one: '1 book',
-    );
-    return '$_temp0 in $_temp1';
-  }
 
   @override
   String get themeDetailAddQuotes => 'Add quotes to this theme';

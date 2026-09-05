@@ -618,14 +618,14 @@ abstract class AppLocalizations {
   /// No description provided for @bookDetailFavoritesFilter.
   ///
   /// In en, this message translates to:
-  /// **'favorites'**
-  String get bookDetailFavoritesFilter;
+  /// **'favorites {count}'**
+  String bookDetailFavoritesFilter(int count);
 
   /// No description provided for @bookDetailVoiceNoteFilter.
   ///
   /// In en, this message translates to:
-  /// **'with voice note'**
-  String get bookDetailVoiceNoteFilter;
+  /// **'with voice note {count}'**
+  String bookDetailVoiceNoteFilter(int count);
 
   /// No description provided for @bookDetailEmptyMessage.
   ///
@@ -1022,12 +1022,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Create theme'**
   String get themesNewThemeButton;
-
-  /// No description provided for @themeDetailQuotesInBooks.
-  ///
-  /// In en, this message translates to:
-  /// **'{quotes, plural, =1{1 quote} other{{quotes} quotes}} in {books, plural, =1{1 book} other{{books} books}}'**
-  String themeDetailQuotesInBooks(int quotes, int books);
 
   /// No description provided for @themeDetailAddQuotes.
   ///

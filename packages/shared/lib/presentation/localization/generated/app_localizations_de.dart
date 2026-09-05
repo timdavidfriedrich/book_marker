@@ -217,7 +217,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String libraryFilterReading(int count) {
-    return 'Lese ich gerade $count';
+    return 'Am Lesen $count';
   }
 
   @override
@@ -280,7 +280,7 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
-  String get libraryStatusReading => 'Lese ich gerade';
+  String get libraryStatusReading => 'am Lesen';
 
   @override
   String get libraryStatusPaused => 'Pausiert';
@@ -345,10 +345,14 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
-  String get bookDetailFavoritesFilter => 'Favoriten';
+  String bookDetailFavoritesFilter(int count) {
+    return 'Favoriten $count';
+  }
 
   @override
-  String get bookDetailVoiceNoteFilter => 'mit Sprachnotiz';
+  String bookDetailVoiceNoteFilter(int count) {
+    return 'mit Sprachnotiz $count';
+  }
 
   @override
   String get bookDetailEmptyMessage => 'Noch keine Zitate in diesem Buch.';
@@ -555,7 +559,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get bookDetailMarkFinished => 'Als Abgeschlossen markieren';
 
   @override
-  String get bookDetailMarkReading => 'Als „Lese ich gerade“ markieren';
+  String get bookDetailMarkReading => 'Als „am Lesen“ markieren';
 
   @override
   String get bookDetailMarkPaused => 'Als Pausiert markieren';
@@ -599,23 +603,6 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get themesNewThemeButton => 'Thema erstellen';
-
-  @override
-  String themeDetailQuotesInBooks(int quotes, int books) {
-    String _temp0 = intl.Intl.pluralLogic(
-      quotes,
-      locale: localeName,
-      other: '$quotes Zitate',
-      one: '1 Zitat',
-    );
-    String _temp1 = intl.Intl.pluralLogic(
-      books,
-      locale: localeName,
-      other: '$books Büchern',
-      one: '1 Buch',
-    );
-    return '$_temp0 in $_temp1';
-  }
 
   @override
   String get themeDetailAddQuotes => 'Zitate hinzufügen';

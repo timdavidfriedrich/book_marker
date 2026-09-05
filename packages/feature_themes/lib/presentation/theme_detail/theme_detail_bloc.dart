@@ -181,7 +181,6 @@ class ThemeDetailBloc extends Bloc<ThemeDetailEvent, ThemeDetailState> {
         memberIds: _memberIds,
         totalCount: memberItems.length,
         favoriteCount: memberItems.where((item) => item.quote.isFavorite).length,
-        bookCount: memberItems.map((item) => item.book.id).toSet().length,
         filter: _filter,
       ),
     );

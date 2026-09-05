@@ -331,8 +331,8 @@ class const _BookCards({
           final featured = summary.featuredQuote;
           return BookCard(
             title: book.title,
-            meta: _bookMeta(context, summary, book.status.toSummaryLabel(context)),
-            count: summary.quoteCount,
+            meta: _bookMeta(context, summary),
+            statusChip: book.status.toSummaryChip(context),
             coverImage: book.coverImage,
             featuredQuote: featured == null ? null : "“${featured.quote}”",
             featuredPages: featured?.pageNumbers ?? const [],
@@ -594,13 +594,10 @@ String _searchHint(BuildContext context, LibraryView view) {
   };
 }
 
-String _bookMeta(BuildContext context, LibraryBookSummary summary, String? statusLabel) {
-  final counts = [
-    summary.quoteCount.toQuotesStat(context),
-    summary.favoriteCount.toFavoritesStat(context),
-  ].joinStats();
-  return statusLabel == null ? counts : "$counts\n$statusLabel";
-}
+String _bookMeta(BuildContext context, LibraryBookSummary summary) => [
+  summary.quoteCount.toQuotesStat(context),
+  summary.favoriteCount.toFavoritesStat(context),
+].joinStats();
 
 String _quoteFilterLabel(
   BuildContext context,

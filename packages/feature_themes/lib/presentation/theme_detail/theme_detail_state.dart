@@ -23,7 +23,6 @@ class const ThemeDetailLoaded({
   required final Set<String> memberIds,
   required final int totalCount,
   required final int favoriteCount,
-  required final int bookCount,
   required final ThemeDetailFilter filter,
 }) extends ThemeDetailState;
 

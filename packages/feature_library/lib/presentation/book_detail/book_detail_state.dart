@@ -15,6 +15,7 @@ class const BookDetailLoaded({
   required final List<Quote> quotes,
   required final int totalCount,
   required final int favoriteCount,
+  required final int voiceNoteCount,
   required final BookDetailFilter filter,
 }) extends BookDetailState;
 

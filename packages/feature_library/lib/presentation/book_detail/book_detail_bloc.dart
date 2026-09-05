@@ -110,6 +110,7 @@ class BookDetailBloc extends Bloc<BookDetailEvent, BookDetailState> {
         quotes: visible,
         totalCount: _quotes.length,
         favoriteCount: _quotes.where((quote) => quote.isFavorite).length,
+        voiceNoteCount: _quotes.where((quote) => quote.voiceNotePath != null).length,
         filter: _filter,
       ),
     );

@@ -9,7 +9,6 @@ import 'package:shared/domain/entities/book.dart';
 import 'package:shared/presentation/extensions/app_error_extensions.dart';
 import 'package:shared/presentation/extensions/context_extensions.dart';
 import 'package:shared/presentation/extensions/screen_layout_extensions.dart';
-import 'package:shared/presentation/extensions/stat_label_extensions.dart';
 import 'package:shared/presentation/navigation/navigation_extensions.dart';
 import 'package:shared/presentation/widgets/book_cover.dart';
 import 'package:shared/presentation/widgets/circle_icon_button.dart';
@@ -23,15 +22,14 @@ import 'package:shared/presentation/widgets/selectable_chip.dart';
 import 'package:shared/presentation/widgets/sheet_action_tile.dart';
 import 'package:shared/presentation/widgets/sheet_content.dart';
 
-const _headerHeight = 224.0;
 const _chipHeight = 32.0;
+const _headerHeight = 224.0 + Spacing.s;
 const _chipsHeight = Spacing.m + _chipHeight + Spacing.m;
 const _coverWidth = 96.0;
 const _coverHeight = 128.0;
+const _headerInfoHeight = _coverHeight + Spacing.s;
 const _paneCoverWidth = 88.0;
 const _paneCoverHeight = 118.0;
-const _headerStatsMaxLines = 1;
-const _paneStatsMaxLines = 2;
 
 class const BookDetailScreen({
   super.key,
@@ -68,7 +66,7 @@ class const _Content({
       return Row(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          _SidePanel(book: book, state: _state),
+          _SidePanel(book: book),
           Expanded(
             child: SafeArea(
               left: false,
@@ -83,7 +81,7 @@ class const _Content({
         CollapsingHeader(
           expandedHeight: _headerHeight,
           backgroundColor: context.c.surfaceContainerLow,
-          expanded: _Header(book: book, state: _state),
+          expanded: _Header(book: book),
           collapsed: _CollapsedHeader(book: book),
         ),
         _QuoteSlivers(state: _state),
@@ -172,7 +170,6 @@ class const _QuoteSlivers({
 
 class const _SidePanel({
   required final Book _book,
-  required final BookDetailLoaded _state,
 }) extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -240,7 +237,7 @@ class const _SidePanel({
                 ],
               ),
               const SizedBox(height: Spacing.m),
-              _Stats(state: _state, maxLines: _paneStatsMaxLines),
+              _book.status.toChip(context),
             ],
           ),
         ),
@@ -251,7 +248,6 @@ class const _SidePanel({
 
 class const _Header({
   required final Book _book,
-  required final BookDetailLoaded _state,
 }) extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -281,7 +277,7 @@ class const _Header({
             ),
             const SizedBox(height: Spacing.m),
             SizedBox(
-              height: _coverHeight,
+              height: _headerInfoHeight,
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -312,8 +308,8 @@ class const _Header({
                             color: context.c.onSurfaceVariant,
                           ),
                         ),
-                        const Spacer(),
-                        _Stats(state: _state, maxLines: _headerStatsMaxLines),
+                        const SizedBox(height: Spacing.m),
+                        _book.status.toChip(context),
                       ],
                     ),
                   ),
@@ -363,24 +359,6 @@ class const _CollapsedHeader({
   }
 }
 
-class const _Stats({
-  required final BookDetailLoaded _state,
-  required final int _maxLines,
-}) extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Text(
-      [
-        _state.totalCount.toQuotesStat(context),
-        _state.favoriteCount.toFavoritesStat(context),
-        _state.book.status.toLabel(context),
-      ].joinStats(),
-      maxLines: _maxLines,
-      overflow: TextOverflow.ellipsis,
-      style: context.typography.label.copyWith(color: context.c.onSurfaceVariant),
-    );
-  }
-}
 
 Future<void> _showBookMenu(BuildContext context, BookStatus status) async {
   final bloc = context.read<BookDetailBloc>();
@@ -435,7 +413,7 @@ class const _BookMenu({
 String _filterLabel(BuildContext context, BookDetailFilter filter, BookDetailLoaded state) {
   return switch (filter) {
     BookDetailFilter.all => context.s.bookDetailAllFilter(state.totalCount),
-    BookDetailFilter.favorites => context.s.bookDetailFavoritesFilter,
-    BookDetailFilter.withVoiceNote => context.s.bookDetailVoiceNoteFilter,
+    BookDetailFilter.favorites => context.s.bookDetailFavoritesFilter(state.favoriteCount),
+    BookDetailFilter.withVoiceNote => context.s.bookDetailVoiceNoteFilter(state.voiceNoteCount),
   };
 }

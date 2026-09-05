@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:shared/presentation/extensions/context_extensions.dart';
 import 'package:shared/presentation/extensions/page_number_extensions.dart';
 import 'package:shared/presentation/widgets/book_cover.dart';
-import 'package:shared/presentation/widgets/count_badge.dart';
 import 'package:shared/presentation/widgets/ink_tap_box.dart';
 
 const _featuredQuoteMaxLines = 3;
@@ -14,7 +13,7 @@ const _cardPadding = Spacing.m;
 class const BookCard({
   required final String _title,
   required final String _meta,
-  required final int _count,
+  final Widget? _statusChip,
   final String? _coverImage,
   final String? _featuredQuote,
   final List<int> _featuredPages = const [],
@@ -31,6 +30,7 @@ class const BookCard({
       child: Column(
         children: [
           Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               BookCover(title: _title, image: _coverImage, width: 56, height: 72),
               const SizedBox(width: Spacing.m),
@@ -46,11 +46,13 @@ class const BookCard({
                         color: context.c.onSurfaceVariant,
                       ),
                     ),
+                    if (_statusChip case final Widget chip) ...[
+                      const SizedBox(height: Spacing.xxxs),
+                      chip,
+                    ],
                   ],
                 ),
               ),
-              const SizedBox(width: Spacing.s),
-              CountBadge(count: _count),
             ],
           ),
           if (_featuredQuote case final String quote) ...[

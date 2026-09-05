@@ -142,7 +142,6 @@ class const _BookSlivers({
           return BookCard(
             title: item.book.title,
             meta: context.s.libraryQuotesCount(item.quoteCount),
-            count: item.quoteCount,
             coverImage: item.book.coverImage,
             onTap: () => context.pushBookDetail(item.book.id),
           );
