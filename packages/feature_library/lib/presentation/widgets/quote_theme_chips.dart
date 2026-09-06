@@ -25,11 +25,9 @@ class const QuoteThemeChips({
         children: [
           for (final theme in _themes)
             if (_selected.contains(theme.id))
-              SelectableChip(
-                label: theme.name,
+              _ThemeChip(
+                theme: theme,
                 selected: true,
-                selectedColor: context.c.secondary,
-                selectedTextColor: context.c.onSecondary,
                 onTap: () => context.read<QuoteDetailBloc>().add(QuoteDetailThemeToggled(theme.id)),
               ),
           SelectableChip(
@@ -40,6 +38,24 @@ class const QuoteThemeChips({
           ),
         ],
       ),
+    );
+  }
+}
+
+class const _ThemeChip({
+  required final QuoteTheme _theme,
+  required final bool _selected,
+  required final VoidCallback _onTap,
+}) extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final swatch = context.palette.resolve(_theme.accent);
+    return SelectableChip(
+      label: _theme.name,
+      selected: _selected,
+      selectedColor: swatch.solid,
+      selectedTextColor: swatch.onSolid,
+      onTap: _onTap,
     );
   }
 }
@@ -71,11 +87,9 @@ class const _ThemePickerSheet() extends StatelessWidget {
                   runSpacing: Spacing.xs,
                   children: [
                     for (final theme in state.themes)
-                      SelectableChip(
-                        label: theme.name,
+                      _ThemeChip(
+                        theme: theme,
                         selected: state.selectedThemeIds.contains(theme.id),
-                        selectedColor: context.c.secondary,
-                        selectedTextColor: context.c.onSecondary,
                         onTap: () => context.read<QuoteDetailBloc>().add(
                           QuoteDetailThemeToggled(theme.id),
                         ),
