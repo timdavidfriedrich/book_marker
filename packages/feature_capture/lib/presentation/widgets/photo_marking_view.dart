@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:shared/domain/entities/recognized_spread.dart';
 import 'package:shared/domain/entities/recognized_word.dart';
-import 'package:shared/domain/entities/recognized_word_extensions.dart';
+import 'package:shared/domain/extensions/recognized_word_extensions.dart';
 import 'package:shared/presentation/extensions/context_extensions.dart';
 import 'package:shared/presentation/widgets/ink_tap_box.dart';
 import 'package:shared/presentation/widgets/page_dots.dart';

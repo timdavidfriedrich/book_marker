@@ -3,7 +3,7 @@ import 'package:shared/domain/entities/book.dart';
 import 'package:shared/domain/entities/quote_theme.dart';
 import 'package:shared/domain/entities/recognized_spread.dart';
 import 'package:shared/domain/entities/recognized_word.dart';
-import 'package:shared/domain/entities/recognized_word_extensions.dart';
+import 'package:shared/domain/extensions/recognized_word_extensions.dart';
 
 sealed class MarkingState {
   const MarkingState();

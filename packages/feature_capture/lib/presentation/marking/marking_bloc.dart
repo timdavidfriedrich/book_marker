@@ -16,7 +16,7 @@ import 'package:shared/domain/entities/quote_page.dart';
 import 'package:shared/domain/entities/quote_theme.dart';
 import 'package:shared/domain/entities/recognized_spread.dart';
 import 'package:shared/domain/entities/recognized_word.dart';
-import 'package:shared/domain/entities/recognized_word_extensions.dart';
+import 'package:shared/domain/extensions/recognized_word_extensions.dart';
 import 'package:shared/domain/repositories/book_repository.dart';
 import 'package:shared/domain/repositories/theme_repository.dart';
 import 'package:shared/presentation/navigation/routes.dart';

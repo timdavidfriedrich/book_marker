@@ -1,7 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:injectable/injectable.dart';
-import 'package:shared/data/mappers/isbn_extensions.dart';
 import 'package:shared/data/models/remote_open_library_book.dart';
+import 'package:shared/domain/extensions/isbn_extensions.dart';
 
 const _endpoint = "https://openlibrary.org/search.json";
 const _fields = "title,author_name,isbn,cover_i";

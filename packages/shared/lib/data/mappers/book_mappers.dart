@@ -1,8 +1,8 @@
 import 'package:shared/data/database/app_database.dart';
-import 'package:shared/data/mappers/isbn_extensions.dart';
 import 'package:shared/data/models/remote_google_book.dart';
 import 'package:shared/data/models/remote_open_library_book.dart';
 import 'package:shared/domain/entities/book.dart';
+import 'package:shared/domain/extensions/isbn_extensions.dart';
 
 const _isbn13Type = "ISBN_13";
 const _isbn10Type = "ISBN_10";

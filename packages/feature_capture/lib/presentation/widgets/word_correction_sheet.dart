@@ -7,7 +7,7 @@ import 'package:feature_capture/presentation/widgets/word_join_row.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:shared/domain/entities/recognized_word_extensions.dart';
+import 'package:shared/domain/extensions/recognized_word_extensions.dart';
 import 'package:shared/presentation/extensions/context_extensions.dart';
 import 'package:shared/presentation/widgets/circle_icon_button.dart';
 import 'package:shared/presentation/widgets/sheet_drag_handle.dart';

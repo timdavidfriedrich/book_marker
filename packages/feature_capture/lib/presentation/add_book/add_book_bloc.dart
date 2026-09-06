@@ -7,6 +7,7 @@ import 'package:feature_capture/presentation/add_book/add_book_state.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
 import 'package:shared/domain/entities/book.dart';
+import 'package:shared/domain/extensions/book_extensions.dart';
 import 'package:shared/domain/repositories/book_repository.dart';
 
 const _minCatalogueQueryLength = 3;
@@ -50,6 +51,7 @@ class AddBookBloc extends Bloc<AddBookEvent, AddBookState> {
   void _onBooksUpdated(AddBookBooksUpdated event, Emitter<AddBookState> emit) {
     if (event.result case Success(:final data)) {
       _libraryBooks = data;
+      _catalogue = _withoutOwned(_catalogue);
       _emitState(emit);
     }
   }
@@ -84,8 +86,7 @@ class AddBookBloc extends Bloc<AddBookEvent, AddBookState> {
     _isCatalogueLoading = false;
     switch (result) {
       case Success(:final data):
-        final ownedIds = _libraryBooks.map((book) => book.id).toSet();
-        _catalogue = data.where((book) => !ownedIds.contains(book.id)).toList();
+        _catalogue = _withoutOwned(data);
         _emitState(emit, catalogueError: null);
       case Failure(:final error):
         _lastSearched = "";
@@ -103,15 +104,16 @@ class AddBookBloc extends Bloc<AddBookEvent, AddBookState> {
     }
   }
 
+  // * a catalogue hit never carries the id of the copy already saved, so an edition already in
+  // * the library is recognised by its ISBN and offered for selection instead of being added twice
+  List<Book> _withoutOwned(List<Book> books) =>
+      books.where((book) => !_libraryBooks.any(book.isSameBookAs)).toList();
+
   void _emitState(Emitter<AddBookState> emit, {AppError? catalogueError}) {
-    final trimmed = _query.trim().toLowerCase();
+    final trimmed = _query.trim();
     final matches = trimmed.isEmpty
         ? _libraryBooks
-        : _libraryBooks.where((book) {
-            final haystack = "${book.title} ${book.authors.join(" ")} ${book.isbn ?? ""}"
-                .toLowerCase();
-            return haystack.contains(trimmed);
-          }).toList();
+        : _libraryBooks.where((book) => book.matchesQuery(trimmed)).toList();
     emit(
       AddBookLoaded(
         query: _query,

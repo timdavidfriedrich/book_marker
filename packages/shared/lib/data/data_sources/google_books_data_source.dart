@@ -1,8 +1,8 @@
 import 'package:core/config/build_config.dart';
 import 'package:dio/dio.dart';
 import 'package:injectable/injectable.dart';
-import 'package:shared/data/mappers/isbn_extensions.dart';
 import 'package:shared/data/models/remote_google_book.dart';
+import 'package:shared/domain/extensions/isbn_extensions.dart';
 
 const _endpoint = "https://www.googleapis.com/books/v1/volumes";
 const _fields = "items(volumeInfo(title,authors,industryIdentifiers,imageLinks))";
