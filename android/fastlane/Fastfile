@@ -1,0 +1,245 @@
+# Commonplace - Android release automation.
+#
+#   bundle exec fastlane android internal      build + ship to internal testing
+#   bundle exec fastlane android beta          build + ship to open testing
+#   bundle exec fastlane android production    build + staged production rollout
+#   bundle exec fastlane android doctor        check the setup without building
+#
+# See docs/RELEASING.md for first-time setup.
+
+default_platform(:android)
+
+REPO_ROOT    = File.expand_path("../..", __dir__)
+PUBSPEC      = File.join(REPO_ROOT, "pubspec.yaml")
+DART_DEFINES = File.join(REPO_ROOT, "dart_defines.json")
+AAB          = File.join(REPO_ROOT, "build", "app", "outputs", "bundle", "release", "app-release.aab")
+KEY_PROPS    = File.expand_path("../key.properties", __dir__)
+
+# --------------------------------------------------------------------- helpers
+
+def flutter(*args)
+  bin = File.exist?(File.join(REPO_ROOT, ".fvmrc")) ? ["fvm", "flutter"] : ["flutter"]
+  Dir.chdir(REPO_ROOT) { sh(*bin, *args) }
+end
+
+# pubspec `version: 1.2.3+45` -> ["1.2.3", 45]
+def pubspec_version
+  line = File.read(PUBSPEC)[/^version:\s*(\S+)/, 1]
+  UI.user_error!("No `version:` in pubspec.yaml") if line.nil?
+  name, code = line.split("+")
+  [name, code.to_i]
+end
+
+def write_pubspec_version(name, code)
+  body = File.read(PUBSPEC).sub(/^version:\s*\S+/, "version: #{name}+#{code}")
+  File.write(PUBSPEC, body)
+  UI.success("pubspec version -> #{name}+#{code}")
+end
+
+def play_key_path
+  path = ENV["PLAY_STORE_JSON_KEY"] || File.expand_path("play-store-key.json", __dir__)
+  File.expand_path(path, REPO_ROOT)
+end
+
+platform :android do
+  # ------------------------------------------------------------------- checks
+
+  desc "Verify everything needed for a release is in place"
+  lane :doctor do
+    ok = true
+    checks = {
+      "android/key.properties (upload keystore)" => File.exist?(KEY_PROPS),
+      "dart_defines.json (build-time secrets)"   => File.exist?(DART_DEFINES),
+      "Play service account JSON"                => File.exist?(play_key_path),
+    }
+    checks.each do |label, present|
+      present ? UI.success("  ok      #{label}") : UI.error("  MISSING #{label}")
+      ok &&= present
+    end
+
+    if File.exist?(KEY_PROPS)
+      required = %w[storePassword keyPassword keyAlias storeFile]
+      props = File.readlines(KEY_PROPS).grep(/=/).map { |l| l.split("=", 2).first.strip }
+      missing = required - props
+      UI.error("  key.properties missing keys: #{missing.join(', ')}") unless missing.empty?
+      ok &&= missing.empty?
+
+      store = File.readlines(KEY_PROPS).grep(/^storeFile=/).first&.split("=", 2)&.last&.strip
+      if store && !File.exist?(File.expand_path(store))
+        UI.error("  keystore not found at #{store}")
+        ok = false
+      end
+    end
+
+    name, code = pubspec_version
+    UI.message("  version #{name} (versionCode #{code})")
+    UI.user_error!("Setup incomplete - see docs/RELEASING.md") unless ok
+    UI.success("Ready to release.")
+  end
+
+  desc "Static analysis (and tests, if any exist)"
+  lane :check do
+    flutter("analyze")
+    test_dirs = Dir.glob(File.join(REPO_ROOT, "{test,packages/*/test}"))
+    if test_dirs.empty?
+      UI.important("No test directories - skipping `flutter test`.")
+    else
+      flutter("test")
+    end
+  end
+
+  # ------------------------------------------------------------------ version
+
+  desc "Bump the version. `type:` build (default), patch, minor or major."
+  lane :bump do |options|
+    name, code = pubspec_version
+    major, minor, patch = name.split(".").map(&:to_i)
+
+    case options[:type] || "build"
+    when "build"  then nil
+    when "patch"  then patch += 1
+    when "minor"  then minor += 1; patch = 0
+    when "major"  then major += 1; minor = 0; patch = 0
+    else UI.user_error!("Unknown bump type #{options[:type]}")
+    end
+
+    write_pubspec_version("#{major}.#{minor}.#{patch}", code + 1)
+  end
+
+  desc "Set versionCode to one above the highest already on Play"
+  lane :sync_version_code do
+    name, current = pubspec_version
+    highest = %w[internal alpha beta production].flat_map do |track|
+      google_play_track_version_codes(track: track)
+    rescue StandardError
+      []
+    end.max || 0
+
+    if highest >= current
+      write_pubspec_version(name, highest + 1)
+    else
+      UI.success("versionCode #{current} is already ahead of Play (#{highest})")
+    end
+  end
+
+  # -------------------------------------------------------------------- build
+
+  desc "Build a signed release App Bundle"
+  lane :build_aab do
+    UI.user_error!("android/key.properties missing - see docs/RELEASING.md") unless File.exist?(KEY_PROPS)
+    UI.user_error!("dart_defines.json missing - copy dart_defines.example.json") unless File.exist?(DART_DEFINES)
+
+    flutter("build", "appbundle", "--release", "--dart-define-from-file=dart_defines.json")
+    UI.user_error!("Expected bundle at #{AAB}") unless File.exist?(AAB)
+    UI.success("Built #{AAB}")
+  end
+
+  # ------------------------------------------------------------------ shipping
+
+  desc "Upload to a track without building (internal by default)"
+  lane :upload do |options|
+    track = options[:track] || "internal"
+    upload_to_play_store(
+      track: track,
+      aab: AAB,
+      release_status: options[:release_status] || "completed",
+      rollout: options[:rollout],
+      validate_only: options[:validate_only] || false,
+      skip_upload_apk: true,
+      skip_upload_metadata: options[:metadata] ? false : true,
+      skip_upload_images: true,
+      skip_upload_screenshots: true,
+      skip_upload_changelogs: options[:metadata] ? false : true,
+    )
+  end
+
+  desc "Build and ship to internal testing"
+  lane :internal do
+    build_aab
+    upload(track: "internal")
+    UI.success("Shipped #{pubspec_version.join('+')} to internal testing")
+  end
+
+  desc "Build and ship to closed testing (alpha)"
+  lane :alpha do
+    build_aab
+    upload(track: "alpha")
+  end
+
+  desc "Build and ship to open testing (beta)"
+  lane :beta do
+    build_aab
+    upload(track: "beta", metadata: true)
+  end
+
+  desc "Build and ship to production. `rollout:` a fraction, e.g. 0.1 for 10%."
+  lane :production do |options|
+    rollout = (options[:rollout] || "0.1").to_s
+    UI.user_error!("rollout must be between 0 and 1") unless rollout.to_f.between?(0, 1)
+
+    check
+    build_aab
+    upload(
+      track: "production",
+      metadata: true,
+      rollout: rollout,
+      release_status: rollout.to_f < 1.0 ? "inProgress" : "completed",
+    )
+    UI.success("Production rollout at #{(rollout.to_f * 100).round}%")
+  end
+
+  desc "Move an existing build between tracks, e.g. from:internal to:beta"
+  lane :promote do |options|
+    from = options[:from] || "internal"
+    to   = options[:to]   || "beta"
+    code = google_play_track_version_codes(track: from).max
+    UI.user_error!("Nothing on the #{from} track") if code.nil?
+
+    upload_to_play_store(
+      track: from,
+      track_promote_to: to,
+      version_code: code,
+      skip_upload_apk: true,
+      skip_upload_aab: true,
+      skip_upload_metadata: true,
+      skip_upload_images: true,
+      skip_upload_screenshots: true,
+      skip_upload_changelogs: true,
+    )
+    UI.success("Promoted versionCode #{code}: #{from} -> #{to}")
+  end
+
+  desc "Increase the staged production rollout, e.g. rollout:0.5"
+  lane :rollout do |options|
+    UI.user_error!("Pass rollout:<0..1>") unless options[:rollout]
+    upload_to_play_store(
+      track: "production",
+      rollout: options[:rollout].to_s,
+      skip_upload_apk: true,
+      skip_upload_aab: true,
+      skip_upload_metadata: true,
+      skip_upload_images: true,
+      skip_upload_screenshots: true,
+      skip_upload_changelogs: true,
+    )
+  end
+
+  desc "Push store listing text and changelogs only - no binary"
+  lane :metadata do
+    upload_to_play_store(
+      skip_upload_apk: true,
+      skip_upload_aab: true,
+      skip_upload_metadata: false,
+      skip_upload_changelogs: false,
+      skip_upload_images: false,
+      skip_upload_screenshots: false,
+    )
+  end
+
+  desc "Dry run - build and validate against Play without publishing"
+  lane :validate do
+    build_aab
+    upload(track: "internal", validate_only: true)
+    UI.success("Validated - nothing was published")
+  end
+end

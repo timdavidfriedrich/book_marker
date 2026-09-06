@@ -1,0 +1,29 @@
+Commonplace is a quote keeper for people who read physical books.
+
+For centuries, readers kept a commonplace book: one notebook for every passage
+worth remembering, gathered from everything they read. Commonplace is that
+notebook, for the books on your shelf.
+
+CAPTURE A PASSAGE
+Photograph the page. Commonplace recognises the text on your device, and you
+drag to select exactly the passage you want. No retyping, no dictation, no
+squinting at a keyboard with a book held open in one hand.
+
+BUILD A LIBRARY
+Add a book by scanning its barcode or searching by title. Quotes are filed
+under the book they came from, so a passage always keeps its source.
+
+GROUP BY THEME
+A quote can belong to more than one book's worth of thinking. Collect passages
+across your whole library into themes, and watch an idea assemble itself from
+a dozen different authors.
+
+ADD YOUR OWN VOICE
+Attach a short voice note to any quote, for the thought you had while reading
+it rather than the words on the page.
+
+MADE TO BE READ
+Typography chosen for long passages, a warm paper palette, light and dark
+themes, and a high-contrast mode. Available in English and German.
+
+Everything stays on your device.

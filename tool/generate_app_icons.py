@@ -212,9 +212,19 @@ def build_store(colors: dict[str, str]) -> None:
     art = Image.open(SRC / "glyph.png").convert("RGBA")
     out_img = Image.new("RGBA", art.size, bg)
     out_img.alpha_composite(art)
+    icon512 = out_img.resize((512, 512), Image.LANCZOS).convert("RGB")
     out = GENERATED / "play_store_512.png"
-    out_img.resize((512, 512), Image.LANCZOS).convert("RGB").save(out)
-    print(f"  store    {out.relative_to(ROOT)}  (matches the iOS composition)")
+    icon512.save(out)
+
+    # supply uploads whatever sits here, so keep it in step with the artwork.
+    for locale in ("en-US", "de-DE"):
+        listing = (ROOT / "android" / "fastlane" / "metadata" / "android"
+                   / locale / "images")
+        if listing.parent.exists():
+            listing.mkdir(parents=True, exist_ok=True)
+            icon512.save(listing / "icon.png")
+
+    print(f"  store    {out.relative_to(ROOT)} + Play listing images")
 
 
 def main() -> None:

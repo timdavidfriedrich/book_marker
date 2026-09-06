@@ -1,0 +1,116 @@
+# Commonplace - iOS release automation.
+#
+# BLOCKED until the Apple Developer Program membership is active. Signing,
+# TestFlight and App Store submission all require a paid account; a free Apple
+# ID can only build and run on an attached device for 7 days at a time.
+#
+# Working today:
+#   bundle exec fastlane ios doctor       report what is still missing
+#   bundle exec fastlane ios build_dev    unsigned build, proves the app compiles
+#
+# Ready once enrolled:
+#   bundle exec fastlane ios certificates sync signing via match
+#   bundle exec fastlane ios beta         build + upload to TestFlight
+#   bundle exec fastlane ios release      build + submit for review
+
+default_platform(:ios)
+
+REPO_ROOT    = File.expand_path("../..", __dir__)
+DART_DEFINES = File.join(REPO_ROOT, "dart_defines.json")
+IPA          = File.join(REPO_ROOT, "build", "ios", "ipa", "Commonplace.ipa")
+
+def flutter(*args)
+  bin = File.exist?(File.join(REPO_ROOT, ".fvmrc")) ? ["fvm", "flutter"] : ["flutter"]
+  Dir.chdir(REPO_ROOT) { sh(*bin, *args) }
+end
+
+def require_paid_account!
+  return if ENV["APPLE_ID"]
+
+  UI.user_error!(<<~MSG)
+    This lane needs an Apple Developer Program membership (99 USD/year).
+
+    Once enrolled:
+      1. Enrol at https://developer.apple.com/programs/
+      2. Create the app record in App Store Connect for
+         de.timdavidfriedrich.bookMarker
+      3. export APPLE_ID="you@example.com"
+      4. Create a private git repo for certificates and set its URL in
+         ios/fastlane/Matchfile
+      5. bundle exec fastlane ios certificates
+
+    Until then use `fastlane ios build_dev`, which needs no account.
+  MSG
+end
+
+platform :ios do
+  desc "Report what iOS release automation still needs"
+  lane :doctor do
+    checks = {
+      "dart_defines.json"                 => File.exist?(DART_DEFINES),
+      "CocoaPods installed (see README)"   => File.exist?(File.join(REPO_ROOT, "ios", "Pods")),
+      "APPLE_ID set in the environment"    => !ENV["APPLE_ID"].nil?,
+      "Matchfile points at a real repo"    => File.read(File.expand_path("Matchfile", __dir__)).include?("github.com") &&
+                                              !File.read(File.expand_path("Matchfile", __dir__)).include?("REPLACE_ME"),
+    }
+    checks.each { |l, ok| ok ? UI.success("  ok      #{l}") : UI.error("  MISSING #{l}") }
+
+    unless ENV["APPLE_ID"]
+      UI.important("")
+      UI.important("No Apple Developer Program membership configured.")
+      UI.important("Everything below `build_dev` is scaffolding until that exists.")
+    end
+  end
+
+  desc "Unsigned release build - verifies the app compiles, needs no account"
+  lane :build_dev do
+    UI.user_error!("dart_defines.json missing") unless File.exist?(DART_DEFINES)
+    flutter("build", "ios", "--release", "--no-codesign",
+            "--dart-define-from-file=dart_defines.json")
+    UI.success("Built build/ios/iphoneos/Runner.app (unsigned)")
+  end
+
+  desc "Sync signing certificates and profiles via match"
+  lane :certificates do
+    require_paid_account!
+    match(type: "appstore", readonly: is_ci)
+  end
+
+  desc "Build a signed IPA"
+  lane :build_ipa do
+    require_paid_account!
+    certificates
+    flutter("build", "ipa", "--release",
+            "--dart-define-from-file=dart_defines.json",
+            "--export-options-plist=ios/ExportOptions.plist")
+    UI.success("Built #{IPA}")
+  end
+
+  desc "Build and upload to TestFlight"
+  lane :beta do
+    require_paid_account!
+    build_ipa
+    upload_to_testflight(
+      ipa: IPA,
+      skip_waiting_for_build_processing: true,
+      changelog: File.read(File.expand_path("metadata/en-US/release_notes.txt", __dir__)).strip,
+    )
+  end
+
+  desc "Build and submit to the App Store for review"
+  lane :release do
+    require_paid_account!
+    build_ipa
+    upload_to_app_store(
+      ipa: IPA,
+      submit_for_review: true,
+      automatic_release: false,
+      force: true,
+      precheck_include_in_app_purchases: false,
+      submission_information: {
+        add_id_info_uses_idfa: false,
+        export_compliance_uses_encryption: false,
+      },
+    )
+  end
+end

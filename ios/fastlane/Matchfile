@@ -1,0 +1,7 @@
+# Certificates and profiles live in a PRIVATE git repo, encrypted by match.
+# Create an empty private repo, put its URL here, then run:
+#   bundle exec fastlane ios certificates
+git_url("REPLACE_ME: git@github.com:timdavidfriedrich/commonplace-certificates.git")
+storage_mode("git")
+type("appstore")
+app_identifier(["de.timdavidfriedrich.bookMarker"])

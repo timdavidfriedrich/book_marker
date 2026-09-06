@@ -54,3 +54,14 @@ packages/*/build/
 
 # Local build-time secrets (Google Books API key etc.)
 dart_defines.json
+
+# fastlane
+**/fastlane/report.xml
+**/fastlane/Preview.html
+**/fastlane/test_output/
+**/fastlane/screenshots/**/*.png
+/vendor/bundle/
+.bundle/
+
+# Play Console service account credential - NEVER commit
+**/fastlane/play-store-key.json

@@ -1,0 +1,8 @@
+app_identifier("de.timdavidfriedrich.bookMarker")
+
+# Set these in the environment rather than committing them:
+#   APPLE_ID          the Apple account email used for App Store Connect
+#   ITC_TEAM_ID       App Store Connect team (only if the account has several)
+apple_id(ENV["APPLE_ID"])
+team_id("9FZKQNB4TR")
+itc_team_id(ENV["ITC_TEAM_ID"])

@@ -1,0 +1,15 @@
+# Copy to android/key.properties and fill in. Never commit the real file.
+#
+# Generate the upload keystore first. keytool does not create the directory,
+# so make it yourself or the command fails after prompting for everything:
+#
+#   mkdir -p ~/keys && chmod 700 ~/keys
+#   keytool -genkey -v -keystore ~/keys/commonplace-upload.jks \
+#     -keyalg RSA -keysize 2048 -validity 10000 -alias upload
+#
+# Back the .jks up somewhere durable. With Play App Signing an upload key can be
+# reset if lost, but that means a support round-trip - avoid it.
+storePassword=
+keyPassword=
+keyAlias=upload
+storeFile=/Users/you/keys/commonplace-upload.jks
