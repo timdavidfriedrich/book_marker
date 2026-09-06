@@ -7,11 +7,13 @@ import 'package:shared/presentation/extensions/context_extensions.dart';
 import 'package:shared/presentation/extensions/page_number_extensions.dart';
 
 const _fieldWidth = 88.0;
+const _defaultBorderRadius = BorderRadius.all(Radius.circular(Spacing.radiusL));
 final _allowedCharacters = RegExp(r"[0-9,;\-– ]");
 
 class const PageNumberField({
   required final List<int> _pages,
   required final ValueChanged<List<int>> _onChanged,
+  final BorderRadiusGeometry _borderRadius = _defaultBorderRadius,
   super.key,
 }) extends HookWidget {
   @override
@@ -28,7 +30,7 @@ class const PageNumberField({
       padding: const EdgeInsets.symmetric(horizontal: Spacing.l, vertical: Spacing.s),
       decoration: BoxDecoration(
         color: context.c.surfaceContainer,
-        borderRadius: BorderRadius.circular(Spacing.radiusL),
+        borderRadius: _borderRadius,
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,

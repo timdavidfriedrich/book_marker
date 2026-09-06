@@ -10,12 +10,14 @@ const _coverHeight = 48.0;
 const _switchSize = 30.0;
 const _titleMaxLines = 2;
 const _fieldRadius = Spacing.radiusL;
+const _defaultBorderRadius = BorderRadius.all(Radius.circular(_fieldRadius));
 const _fieldPadding = Spacing.s;
 
 class const BookPickerField({
   required final String _title,
   required final String? _coverImage,
   required final VoidCallback _onTap,
+  final BorderRadiusGeometry _borderRadius = _defaultBorderRadius,
   super.key,
 }) extends StatelessWidget {
   @override
@@ -24,7 +26,7 @@ class const BookPickerField({
     return InkTapBox(
       onTap: _onTap,
       color: context.c.surfaceContainer,
-      radius: _fieldRadius,
+      shape: RoundedRectangleBorder(borderRadius: _borderRadius),
       padding: const EdgeInsets.all(_fieldPadding),
       child: Row(
         children: [

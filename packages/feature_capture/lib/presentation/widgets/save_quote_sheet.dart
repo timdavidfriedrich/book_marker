@@ -1,3 +1,4 @@
+import 'package:core/theme/corner_radii.dart';
 import 'package:core/theme/spacing.dart';
 import 'package:core/theme/theme_extensions.dart';
 import 'package:feature_capture/presentation/marking/marking_bloc.dart';
@@ -24,6 +25,7 @@ const _sheetMaxSize = 0.95;
 const _closeButtonSize = 36.0;
 const _actionButtonSize = 56.0;
 const _fieldGap = Spacing.xxxs;
+const _groupRadius = Spacing.radiusL;
 const _noteMinLines = 1;
 const _noteMaxLines = 4;
 
@@ -93,10 +95,10 @@ class const _Form({
         _UnsureHint(count: unsureCount),
       ],
     ];
-    final sourceBlock = <Widget>[
-      _SourceRow(state: _state),
-      const SizedBox(height: Spacing.s),
+    final sourceBlock = <Widget>[_SourceRow(state: _state)];
+    final annotationBlock = <Widget>[
       VoiceNoteRecorder(
+        borderRadius: CornerRadii.grouped(outer: _groupRadius, isFirst: true, isLast: false),
         path: _state.voiceNotePath,
         durationMs: _state.voiceNoteDurationMs,
         onRecorded: (path, durationMs) => context.read<MarkingBloc>().add(
@@ -104,8 +106,9 @@ class const _Form({
         ),
         onCleared: () => context.read<MarkingBloc>().add(const MarkingVoiceNoteCleared()),
       ),
+      const SizedBox(height: _fieldGap),
+      _NoteField(initialText: _state.note ?? ""),
     ];
-    final note = _NoteField(initialText: _state.note ?? "");
     final tailBlock = <Widget>[
       _ThemeChips(themes: _state.availableThemes, selected: _state.selectedThemeIds),
       const SizedBox(height: Spacing.m),
@@ -133,7 +136,7 @@ class const _Form({
                       children: [
                         ...quoteBlock,
                         const SizedBox(height: Spacing.m),
-                        note,
+                        ...annotationBlock,
                       ],
                     ),
                   ),
@@ -143,7 +146,7 @@ class const _Form({
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
                         ...sourceBlock,
-                        const SizedBox(height: Spacing.s),
+                        const SizedBox(height: Spacing.m),
                         ...tailBlock,
                       ],
                     ),
@@ -154,9 +157,9 @@ class const _Form({
               ...quoteBlock,
               const SizedBox(height: Spacing.m),
               ...sourceBlock,
-              const SizedBox(height: Spacing.s),
-              note,
-              const SizedBox(height: Spacing.s),
+              const SizedBox(height: Spacing.m),
+              ...annotationBlock,
+              const SizedBox(height: Spacing.m),
               ...tailBlock,
             ],
           ],
@@ -201,12 +204,24 @@ class const _SourceRow({
             child: BookPickerField(
               title: _state.bookTitle,
               coverImage: _state.bookCoverImage,
+              borderRadius: CornerRadii.grouped(
+                outer: _groupRadius,
+                isFirst: true,
+                isLast: false,
+                axis: Axis.horizontal,
+              ),
               onTap: () => showBookPickerSheet(context),
             ),
           ),
           const SizedBox(width: _fieldGap),
           PageNumberField(
             pages: _state.pageNumbers,
+            borderRadius: CornerRadii.grouped(
+              outer: _groupRadius,
+              isFirst: false,
+              isLast: true,
+              axis: Axis.horizontal,
+            ),
             onChanged: (pages) => context.read<MarkingBloc>().add(
               MarkingPageNumbersChanged(pages),
             ),
@@ -248,7 +263,7 @@ class const _NoteField({
       padding: const EdgeInsets.symmetric(horizontal: Spacing.m, vertical: Spacing.s),
       decoration: BoxDecoration(
         color: context.c.surfaceContainerHigh,
-        borderRadius: BorderRadius.circular(Spacing.radiusL),
+        borderRadius: CornerRadii.grouped(outer: _groupRadius, isFirst: false, isLast: true),
       ),
       child: TextField(
         controller: controller,
@@ -285,11 +300,9 @@ class const _ThemeChips({
       runSpacing: Spacing.xs,
       children: [
         for (final theme in _themes)
-          SelectableChip(
-            label: theme.name,
+          _ThemeChip(
+            theme: theme,
             selected: _selected.contains(theme.id),
-            selectedColor: context.c.secondary,
-            selectedTextColor: context.c.onSecondary,
             onTap: () => context.read<MarkingBloc>().add(MarkingThemeToggled(theme.id)),
           ),
         SelectableChip(
@@ -299,6 +312,24 @@ class const _ThemeChips({
           onTap: () => _promptNewTheme(context),
         ),
       ],
+    );
+  }
+}
+
+class const _ThemeChip({
+  required final QuoteTheme _theme,
+  required final bool _selected,
+  required final VoidCallback _onTap,
+}) extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final swatch = context.palette.resolve(_theme.accent);
+    return SelectableChip(
+      label: _theme.name,
+      selected: _selected,
+      selectedColor: swatch.solid,
+      selectedTextColor: swatch.onSolid,
+      onTap: _onTap,
     );
   }
 }
