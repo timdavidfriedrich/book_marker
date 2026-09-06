@@ -33,7 +33,7 @@ class const App({
         builder: (context, settings) {
           final contrast = settings.contrastPreference.toContrastLevel();
           return MaterialApp.router(
-            routerConfig: sl<NavigationRouter>().router,
+            routerConfig: sl<NavigationRouter>().config,
             onGenerateTitle: (context) => context.s.appTitle,
             theme: AppTheme.lightOf(contrast ?? ContrastLevel.standard),
             darkTheme: AppTheme.darkOf(contrast ?? ContrastLevel.standard),

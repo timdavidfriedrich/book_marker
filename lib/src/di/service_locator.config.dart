@@ -35,7 +35,7 @@ extension GetItInjectableX on _i174.GetIt {
     await _i949.FeatureLibraryPackageModule().init(gh);
     await _i322.FeatureThemesPackageModule().init(gh);
     await _i924.FeatureSettingsPackageModule().init(gh);
-    gh.singleton<_i837.NavigationRouter>(() => _i837.NavigationRouter());
+    gh.lazySingleton<_i837.NavigationRouter>(() => _i837.NavigationRouter());
     gh.factory<_i296.AppSettingsCubit>(
       () => _i296.AppSettingsCubit(gh<_i0.SettingsRepository>()),
     );

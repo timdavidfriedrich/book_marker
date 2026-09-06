@@ -49,8 +49,8 @@ class SharedPackageModule extends _i526.MicroPackageModule {
   _i687.FutureOr<void> init(_i526.GetItHelper gh) {
     final databaseModule = _$DatabaseModule();
     gh.lazySingleton<_i50.AppDatabase>(() => databaseModule.appDatabase());
-    gh.lazySingleton<_i533.RouteChangeObserver>(
-        () => _i533.RouteChangeObserver());
+    gh.lazySingleton<_i533.RouteChangeNotifier>(
+        () => _i533.RouteChangeNotifier());
     gh.factory<_i697.BookRemoteDataSource>(
         () => _i697.BookRemoteDataSourceImpl(gh<_i361.Dio>()));
     gh.factory<_i814.ThemeLocalDataSource>(
@@ -77,7 +77,7 @@ class SharedPackageModule extends _i526.MicroPackageModule {
     gh.factory<_i88.VoiceNoteRepository>(() => _i908.VoiceNoteRepositoryImpl());
     gh.factory<_i610.VoiceNoteCubit>(() => _i610.VoiceNoteCubit(
           gh<_i88.VoiceNoteRepository>(),
-          gh<_i533.RouteChangeObserver>(),
+          gh<_i533.RouteChangeNotifier>(),
         ));
     gh.factory<_i640.ThemeRepository>(
         () => _i308.ThemeRepositoryImpl(gh<_i814.ThemeLocalDataSource>()));

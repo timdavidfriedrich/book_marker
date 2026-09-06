@@ -6,8 +6,8 @@ import 'package:shared/domain/entities/captured_shot.dart';
 import 'package:shared/domain/entities/page_quad.dart';
 import 'package:shared/domain/entities/quote.dart';
 import 'package:shared/presentation/extensions/context_extensions.dart';
-import 'package:shared/presentation/navigation/marking_arguments.dart';
 import 'package:shared/presentation/navigation/navigation_extensions.dart';
+import 'package:shared/presentation/navigation/routes.dart';
 import 'package:shared/presentation/widgets/confirm_dialog.dart';
 import 'package:shared/presentation/widgets/sheet_action_tile.dart';
 import 'package:shared/presentation/widgets/sheet_content.dart';
@@ -32,8 +32,8 @@ Future<void> showQuoteMenu(BuildContext context, Quote quote) async {
 
 Future<void> _editQuote(BuildContext context, Quote quote) async {
   final bloc = context.read<QuoteDetailBloc>();
-  await context.pushMarking(
-    MarkingArguments(
+  await context.appRouter.push(
+    Marking(
       shots: [
         for (final page in quote.pages)
           CapturedShot(imagePath: page.photoPath, pageQuad: fullFramePageQuad),

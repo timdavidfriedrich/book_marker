@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:shared/presentation/extensions/context_extensions.dart';
 import 'package:shared/presentation/extensions/screen_layout_extensions.dart';
 import 'package:shared/presentation/navigation/navigation_extensions.dart';
+import 'package:shared/presentation/navigation/routes.dart';
 import 'package:shared/presentation/widgets/circle_icon_button.dart';
 
 const tabHeaderHeight = circleIconButtonSize + Spacing.m + Spacing.s;
@@ -47,7 +48,7 @@ class const TabHeader({
                 icon: Icons.person_outline,
                 foregroundColor: context.c.onSurfaceVariant,
                 tooltip: context.s.settingsTitle,
-                onPressed: context.pushSettings,
+                onPressed: () => context.appRouter.push(const Settings()),
               ),
             ],
           ),

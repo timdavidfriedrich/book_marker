@@ -12,9 +12,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared/domain/entities/captured_shot.dart';
 import 'package:shared/presentation/extensions/app_error_extensions.dart';
 import 'package:shared/presentation/extensions/context_extensions.dart';
-import 'package:shared/presentation/navigation/capture_arguments.dart';
-import 'package:shared/presentation/navigation/marking_arguments.dart';
 import 'package:shared/presentation/navigation/navigation_extensions.dart';
+import 'package:shared/presentation/navigation/routes.dart';
 import 'package:shared/presentation/widgets/circle_icon_button.dart';
 import 'package:shared/presentation/widgets/confirm_dialog.dart';
 import 'package:shared/presentation/widgets/ink_tap_box.dart';
@@ -256,7 +255,7 @@ Future<void> _cancel(BuildContext context) async {
     confirmLabel: context.s.cropCancelConfirmButton,
     destructive: true,
   );
-  if (confirmed && context.mounted) context.goLibrary();
+  if (confirmed && context.mounted) await context.goToShell();
 }
 
 Future<void> _removePage(BuildContext context, int index) async {
@@ -273,14 +272,16 @@ Future<void> _removePage(BuildContext context, int index) async {
 
 Future<void> _addPages(BuildContext context) async {
   final bloc = context.read<CropBloc>();
-  final imagePaths = await context.pushCapture(const CaptureArguments(addsPage: true));
+  final imagePaths = await context.appRouter.pushForResult<List<String>>(
+    const Capture(addsPage: true),
+  );
   if (imagePaths == null || imagePaths.isEmpty) return;
   bloc.add(CropPagesAdded(imagePaths));
 }
 
 Future<void> _continue(BuildContext context, CropReady state) async {
-  await context.pushMarking(
-    MarkingArguments(
+  await context.appRouter.push(
+    Marking(
       shots: [
         for (final page in state.pages)
           CapturedShot(imagePath: page.imagePath, pageQuad: page.sourceQuad),

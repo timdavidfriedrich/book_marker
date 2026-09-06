@@ -1,14 +1,8 @@
-import 'dart:async';
-
 import 'package:core/theme/spacing.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:go_router/go_router.dart';
 import 'package:shared/presentation/extensions/context_extensions.dart';
-import 'package:shared/presentation/navigation/capture_arguments.dart';
-import 'package:shared/presentation/navigation/crop_arguments.dart';
 import 'package:shared/presentation/navigation/navigation_extensions.dart';
-import 'package:shared/presentation/voice_note_cubit.dart';
+import 'package:shared/presentation/navigation/routes.dart';
 import 'package:shared/presentation/widgets/ink_tap_box.dart';
 
 const _markerSize = 30.0;
@@ -17,7 +11,9 @@ const _captureDotSize = 28.0;
 const _barMaxWidth = 520.0;
 
 class const NavigationShellContainer({
-  required final StatefulNavigationShell _navigationShell,
+  required final int _activeBranch,
+  required final Widget _branchContent,
+  required final ValueChanged<int> _onBranchSelected,
   super.key,
 }) extends StatelessWidget {
   @override
@@ -28,13 +24,13 @@ class const NavigationShellContainer({
         resizeToAvoidBottomInset: false,
         body: Row(
           children: [
-            _SideRail(navigationShell: _navigationShell),
+            _SideRail(activeBranch: _activeBranch, onBranchSelected: _onBranchSelected),
             // * the rail already sits inside the left inset, so the content must not repeat it
             Expanded(
               child: MediaQuery.removePadding(
                 context: context,
                 removeLeft: true,
-                child: _navigationShell,
+                child: _branchContent,
               ),
             ),
           ],
@@ -42,18 +38,21 @@ class const NavigationShellContainer({
       );
     }
     return Scaffold(
-      body: _navigationShell,
-      bottomNavigationBar: _BottomBar(navigationShell: _navigationShell),
+      body: _branchContent,
+      bottomNavigationBar: _BottomBar(
+        activeBranch: _activeBranch,
+        onBranchSelected: _onBranchSelected,
+      ),
     );
   }
 }
 
 class const _BottomBar({
-  required final StatefulNavigationShell _navigationShell,
+  required final int _activeBranch,
+  required final ValueChanged<int> _onBranchSelected,
 }) extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final index = _navigationShell.currentIndex;
     return SafeArea(
       top: false,
       // * heightFactor keeps the bar shrink-wrapped; a bare Center would eat the whole body
@@ -69,16 +68,16 @@ class const _BottomBar({
               children: [
                 _TabItem(
                   label: context.s.navLibraryLabel,
-                  active: index == 0,
+                  active: _activeBranch == 0,
                   rounded: true,
-                  onTap: () => _goBranch(context, _navigationShell, 0),
+                  onTap: () => _onBranchSelected(0),
                 ),
                 _CaptureButton(onTap: () => _startCapture(context)),
                 _TabItem(
                   label: context.s.navThemesLabel,
-                  active: index == 1,
+                  active: _activeBranch == 1,
                   rounded: false,
-                  onTap: () => _goBranch(context, _navigationShell, 1),
+                  onTap: () => _onBranchSelected(1),
                 ),
               ],
             ),
@@ -90,11 +89,11 @@ class const _BottomBar({
 }
 
 class const _SideRail({
-  required final StatefulNavigationShell _navigationShell,
+  required final int _activeBranch,
+  required final ValueChanged<int> _onBranchSelected,
 }) extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final index = _navigationShell.currentIndex;
     return SafeArea(
       right: false,
       child: SizedBox(
@@ -104,18 +103,18 @@ class const _SideRail({
           children: [
             _TabItem(
               label: context.s.navLibraryLabel,
-              active: index == 0,
+              active: _activeBranch == 0,
               rounded: true,
-              onTap: () => _goBranch(context, _navigationShell, 0),
+              onTap: () => _onBranchSelected(0),
             ),
             const SizedBox(height: Spacing.xl),
             _CaptureButton(onTap: () => _startCapture(context)),
             const SizedBox(height: Spacing.xl),
             _TabItem(
               label: context.s.navThemesLabel,
-              active: index == 1,
+              active: _activeBranch == 1,
               rounded: false,
-              onTap: () => _goBranch(context, _navigationShell, 1),
+              onTap: () => _onBranchSelected(1),
             ),
           ],
         ),
@@ -185,13 +184,9 @@ class const _CaptureButton({
   }
 }
 
-void _goBranch(BuildContext context, StatefulNavigationShell navigationShell, int index) {
-  unawaited(context.read<VoiceNoteCubit>().stopPlaybackOnLeave());
-  navigationShell.goBranch(index);
-}
-
 Future<void> _startCapture(BuildContext context) async {
-  final imagePaths = await context.pushCapture(const CaptureArguments(addsPage: false));
-  if (imagePaths == null || imagePaths.isEmpty || !context.mounted) return;
-  await context.pushCrop(CropArguments(imagePaths: imagePaths));
+  final router = context.appRouter;
+  final imagePaths = await router.pushForResult<List<String>>(const Capture(addsPage: false));
+  if (imagePaths == null || imagePaths.isEmpty) return;
+  await router.push(Crop(imagePaths: imagePaths));
 }

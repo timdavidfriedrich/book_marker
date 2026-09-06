@@ -11,6 +11,7 @@ import 'package:shared/presentation/extensions/app_error_extensions.dart';
 import 'package:shared/presentation/extensions/context_extensions.dart';
 import 'package:shared/presentation/extensions/screen_layout_extensions.dart';
 import 'package:shared/presentation/navigation/navigation_extensions.dart';
+import 'package:shared/presentation/navigation/routes.dart';
 import 'package:shared/presentation/widgets/book_cover.dart';
 import 'package:shared/presentation/widgets/circle_icon_button.dart';
 import 'package:shared/presentation/widgets/drag_dismiss_sheet.dart';
@@ -369,7 +370,7 @@ class const _PillButton({
 
 Future<void> _scanBarcode(BuildContext context, TextEditingController controller) async {
   final addBookBloc = context.read<AddBookBloc>();
-  final code = await context.pushBarcodeScanner();
+  final code = await context.appRouter.pushForResult<String>(const BarcodeScanner());
   if (code == null) return;
   controller.text = code;
   addBookBloc.add(AddBookQueryChanged(code));

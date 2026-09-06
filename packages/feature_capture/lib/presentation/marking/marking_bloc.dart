@@ -19,7 +19,7 @@ import 'package:shared/domain/entities/recognized_word.dart';
 import 'package:shared/domain/entities/recognized_word_extensions.dart';
 import 'package:shared/domain/repositories/book_repository.dart';
 import 'package:shared/domain/repositories/theme_repository.dart';
-import 'package:shared/presentation/navigation/marking_arguments.dart';
+import 'package:shared/presentation/navigation/routes.dart';
 import 'package:uuid/uuid.dart';
 
 const _uuid = Uuid();
@@ -32,7 +32,7 @@ class MarkingBloc extends Bloc<MarkingEvent, MarkingState> {
     this._saveQuoteUseCase,
     this._bookRepository,
     this._themeRepository,
-    @factoryParam this._arguments,
+    @factoryParam this._route,
   ) : super(const MarkingProcessing()) {
     on<MarkingStarted>(_onStarted);
     on<MarkingBooksUpdated>(_onBooksUpdated);
@@ -51,14 +51,14 @@ class MarkingBloc extends Bloc<MarkingEvent, MarkingState> {
     on<MarkingThemeCreateRequested>(_onThemeCreateRequested);
     on<MarkingFavoriteToggled>(_onFavoriteToggled);
     on<MarkingSaveRequested>(_onSaveRequested);
-    _bookId = _arguments.bookId;
+    _bookId = _route.bookId;
   }
 
   final RecognizeCapturedSpreadUseCase _recognizeCapturedSpreadUseCase;
   final SaveQuoteUseCase _saveQuoteUseCase;
   final BookRepository _bookRepository;
   final ThemeRepository _themeRepository;
-  final MarkingArguments _arguments;
+  final Marking _route;
   StreamSubscription<AppResult<List<QuoteTheme>>>? _themeSubscription;
   StreamSubscription<AppResult<List<Book>>>? _bookSubscription;
   StreamSubscription<AppResult<Map<String, Set<String>>>>? _membershipSubscription;
@@ -70,7 +70,7 @@ class MarkingBloc extends Bloc<MarkingEvent, MarkingState> {
   List<(int, int)> _uncertainRanges = const [];
   List<RecognizedWord>? _wordsBeforeCorrection;
   Set<int>? _selectionBeforeCorrection;
-  late final Quote? _editedQuote = _arguments.quote;
+  late final Quote? _editedQuote = _route.quote;
 
   Future<void> _onStarted(MarkingStarted event, Emitter<MarkingState> emit) async {
     emit(const MarkingProcessing());
@@ -116,7 +116,7 @@ class MarkingBloc extends Bloc<MarkingEvent, MarkingState> {
       );
       return;
     }
-    emit(switch (await _recognizeCapturedSpreadUseCase(_arguments.shots)) {
+    emit(switch (await _recognizeCapturedSpreadUseCase(_route.shots)) {
       Success(:final data) => _started(
         pages: data.pages,
         words: data.words,

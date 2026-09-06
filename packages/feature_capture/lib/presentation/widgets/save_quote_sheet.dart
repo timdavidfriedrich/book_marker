@@ -45,7 +45,7 @@ Future<void> showSaveQuoteSheet(BuildContext context) async {
       context.closeScreen();
       return;
     }
-    context.goLibrary();
+    await context.goToShell();
   }
 }
 

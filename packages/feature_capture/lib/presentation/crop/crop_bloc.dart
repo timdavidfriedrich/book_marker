@@ -8,7 +8,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
 import 'package:shared/domain/entities/crop_page.dart';
 import 'package:shared/domain/entities/page_quad.dart';
-import 'package:shared/presentation/navigation/crop_arguments.dart';
+import 'package:shared/presentation/navigation/routes.dart';
 
 const _defaultInset = 0.08;
 const _defaultQuad = PageQuad(
@@ -22,7 +22,7 @@ const _defaultQuad = PageQuad(
 class CropBloc extends Bloc<CropEvent, CropState> {
   CropBloc(
     this._pageDetectionRepository,
-    @factoryParam this._arguments,
+    @factoryParam this._route,
   ) : super(const CropLoading()) {
     on<CropStarted>(_onStarted);
     on<CropPagesAdded>(_onPagesAdded);
@@ -34,18 +34,18 @@ class CropBloc extends Bloc<CropEvent, CropState> {
   }
 
   final PageDetectionRepository _pageDetectionRepository;
-  final CropArguments _arguments;
+  final Crop _route;
   List<CropPage> _pages = const [];
   int _selectedIndex = 0;
   bool _hasAdjusted = false;
 
   Future<void> _onStarted(CropStarted event, Emitter<CropState> emit) async {
     emit(const CropLoading());
-    if (_arguments.imagePaths.isEmpty) {
+    if (_route.imagePaths.isEmpty) {
       emit(const CropFailure(error: UnexpectedError()));
       return;
     }
-    switch (await _detect(_unknownPaths(_arguments.imagePaths))) {
+    switch (await _detect(_unknownPaths(_route.imagePaths))) {
       case Failure(:final error):
         emit(CropFailure(error: error));
       case Success(:final data):

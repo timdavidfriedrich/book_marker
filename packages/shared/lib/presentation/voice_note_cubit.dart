@@ -12,13 +12,13 @@ const _tickInterval = Duration(milliseconds: 200);
 
 @injectable
 class VoiceNoteCubit extends Cubit<VoiceNoteState> {
-  VoiceNoteCubit(this._voiceNoteRepository, this._routeChangeObserver)
+  VoiceNoteCubit(this._voiceNoteRepository, this._routeChanges)
     : super(const VoiceNoteIdle()) {
-    _routeChangeObserver.addRouteListener(_onRouteChanged);
+    _routeChanges.addRouteListener(_onRouteChanged);
   }
 
   final VoiceNoteRepository _voiceNoteRepository;
-  final RouteChangeObserver _routeChangeObserver;
+  final RouteChangeNotifier _routeChanges;
   final Stopwatch _recordingTime = Stopwatch();
   Timer? _ticker;
   StreamSubscription<AppResult<Duration>>? _positionSubscription;
@@ -130,7 +130,7 @@ class VoiceNoteCubit extends Cubit<VoiceNoteState> {
 
   @override
   Future<void> close() async {
-    _routeChangeObserver.removeRouteListener(_onRouteChanged);
+    _routeChanges.removeRouteListener(_onRouteChanged);
     _ticker?.cancel();
     await _positionSubscription?.cancel();
     await _finishedSubscription?.cancel();

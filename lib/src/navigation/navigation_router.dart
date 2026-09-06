@@ -37,229 +37,137 @@ import 'package:feature_themes/presentation/themes/themes_event.dart';
 import 'package:feature_themes/presentation/themes/themes_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:go_router/go_router.dart';
 import 'package:injectable/injectable.dart';
+import 'package:kaisel/kaisel.dart';
 import 'package:shared/presentation/extensions/context_extensions.dart';
-import 'package:shared/presentation/navigation/capture_arguments.dart';
-import 'package:shared/presentation/navigation/crop_arguments.dart';
-import 'package:shared/presentation/navigation/marking_arguments.dart';
 import 'package:shared/presentation/navigation/route_change_observer.dart';
 import 'package:shared/presentation/navigation/routes.dart';
-import 'package:shared/presentation/widgets/loading_screen.dart';
-
-final _rootNavigatorKey = GlobalKey<NavigatorState>(debugLabel: "root");
-final _libraryNavigatorKey = GlobalKey<NavigatorState>(debugLabel: "library");
-final _themesNavigatorKey = GlobalKey<NavigatorState>(debugLabel: "themes");
 
 const _sheetBarrier = Color(0x8A000000);
+const _sheetTransition = Duration(milliseconds: 280);
 
-// * go_router 18 looks for material_ui's MaterialApp, never finds this app's flutter/material one
-// * and falls back to NoTransitionPage, which drops predictive back on every route
-MaterialPage<void> _materialPage(GoRouterState state, Widget child) => MaterialPage<void>(
-  key: state.pageKey,
-  name: state.name ?? state.path,
-  arguments: <String, String>{...state.pathParameters, ...state.uri.queryParameters},
-  restorationId: state.pageKey.value,
-  child: child,
-);
+@lazySingleton
+class NavigationRouter() {
+  late final KaiselRouterConfig<AppRoute> config = KaiselRouterConfig<AppRoute>(
+    initial: const MainShell(),
+    builder: (context, route) => _AppPage(route: route),
+    pageWrapper: _wrapPage,
+    observers: () => [RouteChangeObserver(notifier: sl<RouteChangeNotifier>())],
+  );
+}
 
-@singleton
-class NavigationRouter {
-  late final GoRouter router = GoRouter(
-    navigatorKey: _rootNavigatorKey,
-    observers: [sl<RouteChangeObserver>()],
-    initialLocation: NavigationRoute.library.path,
-    redirect: (context, state) => state.uri.path == "/" ? NavigationRoute.library.path : null,
-    routes: [
-      StatefulShellRoute.indexedStack(
-        pageBuilder: (context, state, navigationShell) =>
-            _materialPage(state, NavigationShellContainer(navigationShell: navigationShell)),
-        branches: [
-          StatefulShellBranch(
-            navigatorKey: _libraryNavigatorKey,
-            routes: [
-              GoRoute(
-                path: NavigationRoute.library.path,
-                pageBuilder: (context, state) => _materialPage(
-                  state,
-                  BlocProvider(
-                    create: (_) => sl<LibraryBloc>()..add(const LibraryStarted()),
-                    child: const LibraryScreen(),
-                  ),
-                ),
-              ),
-            ],
-          ),
-          StatefulShellBranch(
-            navigatorKey: _themesNavigatorKey,
-            routes: [
-              GoRoute(
-                path: NavigationRoute.themes.path,
-                pageBuilder: (context, state) => _materialPage(
-                  state,
-                  BlocProvider(
-                    create: (_) => sl<ThemesBloc>()..add(const ThemesStarted()),
-                    child: const ThemesScreen(),
-                  ),
-                ),
-              ),
-            ],
-          ),
+class const _AppPage({
+  required final AppRoute _route,
+}) extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) => switch (_route) {
+    MainShell() => const _AppShell(),
+    BookDetail(:final bookId) => BlocProvider(
+      create: (_) => sl<BookDetailBloc>(param1: bookId)..add(const BookDetailStarted()),
+      child: const BookDetailScreen(),
+    ),
+    QuoteDetail(:final quoteId) => Theme(
+      data: AppTheme.darkOf(context.contrast),
+      child: BlocProvider(
+        create: (_) => sl<QuoteDetailBloc>(param1: quoteId)..add(const QuoteDetailStarted()),
+        child: const QuoteDetailScreen(),
+      ),
+    ),
+    ShelfDetail(:final shelfId) => BlocProvider(
+      create: (_) => sl<ShelfDetailBloc>(param1: shelfId)..add(const ShelfDetailStarted()),
+      child: const ShelfDetailScreen(),
+    ),
+    ThemeDetail(:final themeId) => BlocProvider(
+      create: (_) => sl<ThemeDetailBloc>(param1: themeId)..add(const ThemeDetailStarted()),
+      child: const ThemeDetailScreen(),
+    ),
+    Settings() => BlocProvider(
+      create: (_) => sl<SettingsBloc>()..add(const SettingsStarted()),
+      child: const SettingsScreen(),
+    ),
+    Capture(:final addsPage) => Theme(
+      data: AppTheme.darkOf(context.contrast),
+      child: MultiBlocProvider(
+        providers: [
+          BlocProvider(create: (_) => sl<CameraCubit>()),
+          BlocProvider(create: (_) => sl<PageDetectionCubit>()),
         ],
+        child: CaptureScreen(addsPage: addsPage),
       ),
-      GoRoute(
-        path: NavigationRoute.libraryBook.path,
-        parentNavigatorKey: _rootNavigatorKey,
-        pageBuilder: (context, state) => _materialPage(
-          state,
-          BlocProvider(
-            create: (_) =>
-                sl<BookDetailBloc>(param1: state.pathParameters[parameterId])
-                  ..add(const BookDetailStarted()),
-            child: const BookDetailScreen(),
-          ),
-        ),
+    ),
+    AddBook() => BlocProvider(
+      create: (_) => sl<AddBookBloc>()..add(const AddBookStarted()),
+      child: const AddBookScreen(),
+    ),
+    BarcodeScanner() => const BarcodeScannerScreen(),
+    final Crop crop => Theme(
+      data: AppTheme.darkOf(context.contrast),
+      child: BlocProvider(
+        create: (_) => sl<CropBloc>(param1: crop)..add(const CropStarted()),
+        child: const CropScreen(),
       ),
-      GoRoute(
-        path: NavigationRoute.libraryQuote.path,
-        parentNavigatorKey: _rootNavigatorKey,
-        pageBuilder: (context, state) => _materialPage(
-          state,
-          Theme(
-            data: AppTheme.darkOf(context.contrast),
-            child: BlocProvider(
-              create: (_) =>
-                  sl<QuoteDetailBloc>(param1: state.pathParameters[parameterId])
-                    ..add(const QuoteDetailStarted()),
-              child: const QuoteDetailScreen(),
-            ),
-          ),
-        ),
-      ),
-      GoRoute(
-        path: NavigationRoute.libraryShelf.path,
-        parentNavigatorKey: _rootNavigatorKey,
-        pageBuilder: (context, state) => _materialPage(
-          state,
-          BlocProvider(
-            create: (_) =>
-                sl<ShelfDetailBloc>(param1: state.pathParameters[parameterId])
-                  ..add(const ShelfDetailStarted()),
-            child: const ShelfDetailScreen(),
-          ),
-        ),
-      ),
-      GoRoute(
-        path: NavigationRoute.themeDetail.path,
-        parentNavigatorKey: _rootNavigatorKey,
-        pageBuilder: (context, state) => _materialPage(
-          state,
-          BlocProvider(
-            create: (_) =>
-                sl<ThemeDetailBloc>(param1: state.pathParameters[parameterId])
-                  ..add(const ThemeDetailStarted()),
-            child: const ThemeDetailScreen(),
-          ),
-        ),
-      ),
-      GoRoute(
-        path: NavigationRoute.settings.path,
-        parentNavigatorKey: _rootNavigatorKey,
-        pageBuilder: (context, state) => _materialPage(
-          state,
-          BlocProvider(
-            create: (_) => sl<SettingsBloc>()..add(const SettingsStarted()),
-            child: const SettingsScreen(),
-          ),
-        ),
-      ),
-      GoRoute(
-        path: NavigationRoute.capture.path,
-        parentNavigatorKey: _rootNavigatorKey,
-        pageBuilder: (context, state) {
-          final arguments = state.extra;
-          return _materialPage(
-            state,
-            Theme(
-              data: AppTheme.darkOf(context.contrast),
-              child: MultiBlocProvider(
-                providers: [
-                  BlocProvider(create: (_) => sl<CameraCubit>()),
-                  BlocProvider(create: (_) => sl<PageDetectionCubit>()),
-                ],
-                child: CaptureScreen(
-                  addsPage: arguments is CaptureArguments && arguments.addsPage,
-                ),
-              ),
-            ),
-          );
-        },
-        routes: [
-          GoRoute(
-            path: "add-book",
-            parentNavigatorKey: _rootNavigatorKey,
-            pageBuilder: (context, state) => CustomTransitionPage<String>(
-              opaque: false,
-              barrierColor: _sheetBarrier,
-              barrierDismissible: true,
-              transitionsBuilder: (context, animation, secondaryAnimation, child) =>
-                  SlideTransition(
-                    position: Tween(
-                      begin: const Offset(0, 1),
-                      end: Offset.zero,
-                    ).animate(CurvedAnimation(parent: animation, curve: Curves.easeOutCubic)),
-                    child: child,
-                  ),
-              child: BlocProvider(
-                create: (_) => sl<AddBookBloc>()..add(const AddBookStarted()),
-                child: const AddBookScreen(),
-              ),
-            ),
-          ),
-          GoRoute(
-            path: "scan",
-            parentNavigatorKey: _rootNavigatorKey,
-            pageBuilder: (context, state) => _materialPage(state, const BarcodeScannerScreen()),
-          ),
-          GoRoute(
-            path: "crop",
-            parentNavigatorKey: _rootNavigatorKey,
-            pageBuilder: (context, state) {
-              final arguments = state.extra;
-              if (arguments is! CropArguments) {
-                return _materialPage(state, const LoadingScreen());
-              }
-              return _materialPage(
-                state,
-                Theme(
-                  data: AppTheme.darkOf(context.contrast),
-                  child: BlocProvider(
-                    create: (_) => sl<CropBloc>(param1: arguments)..add(const CropStarted()),
-                    child: const CropScreen(),
-                  ),
-                ),
-              );
-            },
-          ),
-          GoRoute(
-            path: "quote",
-            parentNavigatorKey: _rootNavigatorKey,
-            pageBuilder: (context, state) {
-              final arguments = state.extra;
-              if (arguments is! MarkingArguments) {
-                return _materialPage(state, const LoadingScreen());
-              }
-              return _materialPage(
-                state,
-                BlocProvider(
-                  create: (_) => sl<MarkingBloc>(param1: arguments)..add(const MarkingStarted()),
-                  child: const MarkingScreen(),
-                ),
-              );
-            },
-          ),
-        ],
-      ),
-    ],
+    ),
+    final Marking marking => BlocProvider(
+      create: (_) => sl<MarkingBloc>(param1: marking)..add(const MarkingStarted()),
+      child: const MarkingScreen(),
+    ),
+  };
+}
+
+class const _AppShell() extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) => KaiselShell<TabRoute>(
+    branchInitials: const [LibraryTab(), ThemesTab()],
+    pageBuilder: (context, route) => _TabPage(route: route),
+    chromeBuilder: (context, activeBranch, branchContent, switchBranch) => NavigationShellContainer(
+      activeBranch: activeBranch,
+      branchContent: branchContent,
+      onBranchSelected: switchBranch,
+    ),
+  );
+}
+
+class const _TabPage({
+  required final TabRoute _route,
+}) extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) => switch (_route) {
+    LibraryTab() => BlocProvider(
+      create: (_) => sl<LibraryBloc>()..add(const LibraryStarted()),
+      child: const LibraryScreen(),
+    ),
+    ThemesTab() => BlocProvider(
+      create: (_) => sl<ThemesBloc>()..add(const ThemesStarted()),
+      child: const ThemesScreen(),
+    ),
+  };
+}
+
+// * MaterialPage carries Flutter's predictive back transition, so only the sheet opts out
+Page<Object?> _wrapPage(KaiselPageWrapperContext<AppRoute> page) => switch (page.route) {
+  AddBook() => _SheetPage(child: page.child, key: page.key),
+  _ => MaterialPage<Object?>(child: page.child, key: page.key),
+};
+
+class const _SheetPage({
+  required final Widget _child,
+  required super.key,
+}) extends Page<Object?> {
+  @override
+  Route<Object?> createRoute(BuildContext context) => PageRouteBuilder<Object?>(
+    settings: this,
+    opaque: false,
+    barrierColor: _sheetBarrier,
+    barrierDismissible: true,
+    transitionDuration: _sheetTransition,
+    reverseTransitionDuration: _sheetTransition,
+    pageBuilder: (context, animation, secondaryAnimation) => _child,
+    transitionsBuilder: (context, animation, secondaryAnimation, child) => SlideTransition(
+      position: Tween(
+        begin: const Offset(0, 1),
+        end: Offset.zero,
+      ).animate(CurvedAnimation(parent: animation, curve: Curves.easeOutCubic)),
+      child: child,
+    ),
   );
 }

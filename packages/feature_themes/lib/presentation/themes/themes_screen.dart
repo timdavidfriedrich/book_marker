@@ -8,6 +8,7 @@ import 'package:shared/presentation/extensions/app_error_extensions.dart';
 import 'package:shared/presentation/extensions/context_extensions.dart';
 import 'package:shared/presentation/extensions/screen_layout_extensions.dart';
 import 'package:shared/presentation/navigation/navigation_extensions.dart';
+import 'package:shared/presentation/navigation/routes.dart';
 import 'package:shared/presentation/widgets/collection_mark.dart';
 import 'package:shared/presentation/widgets/ink_tap_box.dart';
 import 'package:shared/presentation/widgets/loading_indicator.dart';
@@ -85,7 +86,7 @@ class const _ThemeTile({
       color: swatch.fill,
       radius: Spacing.radiusXl,
       padding: const EdgeInsets.all(Spacing.l),
-      onTap: () => context.pushThemeDetail(_summary.theme.id),
+      onTap: () => context.appRouter.push(ThemeDetail(themeId: _summary.theme.id)),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

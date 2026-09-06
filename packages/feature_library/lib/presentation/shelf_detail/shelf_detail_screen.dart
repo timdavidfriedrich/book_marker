@@ -9,6 +9,7 @@ import 'package:shared/presentation/extensions/app_error_extensions.dart';
 import 'package:shared/presentation/extensions/context_extensions.dart';
 import 'package:shared/presentation/extensions/screen_layout_extensions.dart';
 import 'package:shared/presentation/navigation/navigation_extensions.dart';
+import 'package:shared/presentation/navigation/routes.dart';
 import 'package:shared/presentation/widgets/book_card.dart';
 import 'package:shared/presentation/widgets/book_cover.dart';
 import 'package:shared/presentation/widgets/circle_icon_button.dart';
@@ -143,7 +144,7 @@ class const _BookSlivers({
             title: item.book.title,
             meta: context.s.libraryQuotesCount(item.quoteCount),
             coverImage: item.book.coverImage,
-            onTap: () => context.pushBookDetail(item.book.id),
+            onTap: () => context.appRouter.push(BookDetail(bookId: item.book.id)),
           );
         },
       ),

@@ -9,6 +9,7 @@ import 'package:shared/presentation/extensions/app_error_extensions.dart';
 import 'package:shared/presentation/extensions/context_extensions.dart';
 import 'package:shared/presentation/extensions/screen_layout_extensions.dart';
 import 'package:shared/presentation/navigation/navigation_extensions.dart';
+import 'package:shared/presentation/navigation/routes.dart';
 import 'package:shared/presentation/widgets/book_cover.dart';
 import 'package:shared/presentation/widgets/circle_icon_button.dart';
 import 'package:shared/presentation/widgets/collapsing_header.dart';
@@ -193,7 +194,7 @@ class const _QuoteSlivers({
                       ? null
                       : Duration(milliseconds: voiceNoteMs),
                   voiceNotePath: item.quote.voiceNotePath,
-                  onTap: () => context.pushQuoteDetail(item.quote.id),
+                  onTap: () => context.appRouter.push(QuoteDetail(quoteId: item.quote.id)),
                 );
               },
             ),

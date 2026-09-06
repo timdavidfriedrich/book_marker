@@ -8,6 +8,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared/domain/entities/book.dart';
 import 'package:shared/presentation/extensions/context_extensions.dart';
 import 'package:shared/presentation/navigation/navigation_extensions.dart';
+import 'package:shared/presentation/navigation/routes.dart';
 import 'package:shared/presentation/widgets/book_cover.dart';
 import 'package:shared/presentation/widgets/ink_tap_box.dart';
 import 'package:shared/presentation/widgets/sheet_content.dart';
@@ -26,7 +27,7 @@ Future<void> showBookPickerSheet(BuildContext context) async {
     builder: (_) => BlocProvider.value(value: bloc, child: const _BookPickerSheet()),
   );
   if (addsBook != true || !context.mounted) return;
-  final bookId = await context.pushAddBook();
+  final bookId = await context.appRouter.pushForResult<String>(const AddBook());
   if (bookId != null) bloc.add(MarkingBookChanged(bookId));
 }
 

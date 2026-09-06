@@ -14,6 +14,7 @@ import 'package:shared/presentation/extensions/page_number_extensions.dart';
 import 'package:shared/presentation/extensions/screen_layout_extensions.dart';
 import 'package:shared/presentation/extensions/stat_label_extensions.dart';
 import 'package:shared/presentation/navigation/navigation_extensions.dart';
+import 'package:shared/presentation/navigation/routes.dart';
 import 'package:shared/presentation/widgets/book_card.dart';
 import 'package:shared/presentation/widgets/book_cover.dart';
 import 'package:shared/presentation/widgets/collection_mark.dart';
@@ -336,7 +337,7 @@ class const _BookCards({
             coverImage: book.coverImage,
             featuredQuote: featured == null ? null : "“${featured.quote}”",
             featuredPages: featured?.pageNumbers ?? const [],
-            onTap: () => context.pushBookDetail(book.id),
+            onTap: () => context.appRouter.push(BookDetail(bookId: book.id)),
           );
         },
       ),
@@ -372,7 +373,7 @@ class const _QuoteCards({
             hasVoiceNote: quote.voiceNotePath != null,
             voiceNoteDuration: voiceNoteMs == null ? null : Duration(milliseconds: voiceNoteMs),
             voiceNotePath: quote.voiceNotePath,
-            onTap: () => context.pushQuoteDetail(quote.id),
+            onTap: () => context.appRouter.push(QuoteDetail(quoteId: quote.id)),
           );
         },
       ),
@@ -465,7 +466,7 @@ class const _ShelfCard({
       color: swatch.fill,
       radius: _shelfCardRadius,
       padding: const EdgeInsets.all(_shelfCardPadding),
-      onTap: () => context.pushShelfDetail(shelf.id),
+      onTap: () => context.appRouter.push(ShelfDetail(shelfId: shelf.id)),
       child: Row(
         children: [
           CollectionMark(
