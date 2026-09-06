@@ -3,17 +3,17 @@
 <plist version="1.0">
 <dict>
 	<key>NSCameraUsageDescription</key>
-	<string>Book Marker uses the camera to photograph book pages and scan book barcodes.</string>
+	<string>Commonplace uses the camera to photograph book pages and scan book barcodes.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>Book Marker lets you pick a photo of a book page from your library to mark.</string>
+	<string>Commonplace lets you pick a photo of a book page from your library to mark.</string>
 	<key>NSMicrophoneUsageDescription</key>
-	<string>Book Marker records short voice notes for your marks.</string>
+	<string>Commonplace records short voice notes for your marks.</string>
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
-	<string>Book Marker</string>
+	<string>Commonplace</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -21,7 +21,7 @@
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
-	<string>book_marker</string>
+	<string>Commonplace</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
