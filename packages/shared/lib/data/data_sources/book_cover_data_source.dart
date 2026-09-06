@@ -7,6 +7,8 @@ import 'package:path_provider/path_provider.dart';
 const _coversFolder = "book_covers";
 const _coverExtension = ".jpg";
 const _emptyCoverMessage = "empty cover response";
+const _placeholderCoverMessage = "cover placeholder response";
+const _minimumCoverBytes = 2048;
 const _coverTimeout = Duration(seconds: 10);
 
 abstract class BookCoverDataSource {
@@ -33,6 +35,8 @@ class const BookCoverDataSourceImpl(
     );
     final bytes = response.data;
     if (bytes == null || bytes.isEmpty) throw const FormatException(_emptyCoverMessage);
+    // * an unknown ISBN still answers 200, with a tiny grey "no cover" image instead of a cover
+    if (bytes.length < _minimumCoverBytes) throw const FormatException(_placeholderCoverMessage);
     final documentsDirectory = await getApplicationDocumentsDirectory();
     final targetDirectory = Directory("${documentsDirectory.path}/$_coversFolder");
     if (!targetDirectory.existsSync()) {

@@ -213,6 +213,18 @@ abstract class AppLocalizations {
   /// **'Not found.'**
   String get errorNotFound;
 
+  /// No description provided for @errorRateLimit.
+  ///
+  /// In en, this message translates to:
+  /// **'The book catalogue is temporarily unavailable. Please try again later.'**
+  String get errorRateLimit;
+
+  /// No description provided for @errorServiceUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'The book catalogue did not respond. Please try again.'**
+  String get errorServiceUnavailable;
+
   /// No description provided for @errorUnexpected.
   ///
   /// In en, this message translates to:

@@ -21,6 +21,8 @@
   "errorValidation": "The data received is invalid.",
   "errorMicrophonePermission": "Allow microphone access to record a voice note.",
   "errorNotFound": "Not found.",
+  "errorRateLimit": "The book catalogue is temporarily unavailable. Please try again later.",
+  "errorServiceUnavailable": "The book catalogue did not respond. Please try again.",
   "errorUnexpected": "An unexpected error occurred.",
   "libraryTitle": "Library",
   "libraryEmptyMessage": "No quotes yet. Take a photo of a book page to get started.",

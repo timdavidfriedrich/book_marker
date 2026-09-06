@@ -73,6 +73,14 @@ class AppLocalizationsDe extends AppLocalizations {
   String get errorNotFound => 'Nicht gefunden.';
 
   @override
+  String get errorRateLimit =>
+      'Der Buchkatalog ist vorübergehend nicht verfügbar. Bitte später erneut versuchen.';
+
+  @override
+  String get errorServiceUnavailable =>
+      'Der Buchkatalog hat nicht geantwortet. Bitte erneut versuchen.';
+
+  @override
   String get errorUnexpected => 'Ein unerwarteter Fehler ist aufgetreten.';
 
   @override

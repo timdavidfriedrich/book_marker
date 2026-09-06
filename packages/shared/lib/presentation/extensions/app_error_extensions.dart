@@ -9,6 +9,8 @@ extension AppErrorExtensions on AppError {
     AuthError() => context.s.errorAuth,
     ValidationError() => context.s.errorValidation,
     NotFoundError() => context.s.errorNotFound,
+    RateLimitError() => context.s.errorRateLimit,
+    ServiceUnavailableError() => context.s.errorServiceUnavailable,
     MicrophonePermissionError() => context.s.errorMicrophonePermission,
     UnexpectedError() => context.s.errorUnexpected,
   };

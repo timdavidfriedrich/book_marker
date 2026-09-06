@@ -21,6 +21,8 @@
   "errorValidation": "Die empfangenen Daten sind ungültig.",
   "errorMicrophonePermission": "Erlaube den Mikrofonzugriff, um eine Sprachnotiz aufzunehmen.",
   "errorNotFound": "Nicht gefunden.",
+  "errorRateLimit": "Der Buchkatalog ist vorübergehend nicht verfügbar. Bitte später erneut versuchen.",
+  "errorServiceUnavailable": "Der Buchkatalog hat nicht geantwortet. Bitte erneut versuchen.",
   "errorUnexpected": "Ein unerwarteter Fehler ist aufgetreten.",
   "libraryTitle": "Bibliothek",
   "libraryEmptyMessage": "Noch keine Zitate. Fotografiere eine Buchseite, um zu beginnen.",

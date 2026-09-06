@@ -14,6 +14,10 @@ class const ValidationError() extends AppError;
 
 class const NotFoundError() extends AppError;
 
+class const RateLimitError() extends AppError;
+
+class const ServiceUnavailableError() extends AppError;
+
 class const MicrophonePermissionError() extends AppError;
 
 class const UnexpectedError([

@@ -9,9 +9,12 @@ import 'package:dio/dio.dart' as _i361;
 import 'package:injectable/injectable.dart' as _i526;
 import 'package:shared/data/data_sources/book_cover_data_source.dart' as _i510;
 import 'package:shared/data/data_sources/book_local_data_source.dart' as _i315;
-import 'package:shared/data/data_sources/book_remote_data_source.dart' as _i697;
+import 'package:shared/data/data_sources/google_books_data_source.dart'
+    as _i357;
 import 'package:shared/data/data_sources/image_storage_data_source.dart'
     as _i47;
+import 'package:shared/data/data_sources/open_library_data_source.dart'
+    as _i492;
 import 'package:shared/data/data_sources/quote_local_data_source.dart' as _i516;
 import 'package:shared/data/data_sources/settings_local_data_source.dart'
     as _i115;
@@ -51,8 +54,6 @@ class SharedPackageModule extends _i526.MicroPackageModule {
     gh.lazySingleton<_i50.AppDatabase>(() => databaseModule.appDatabase());
     gh.lazySingleton<_i533.RouteChangeNotifier>(
         () => _i533.RouteChangeNotifier());
-    gh.factory<_i697.BookRemoteDataSource>(
-        () => _i697.BookRemoteDataSourceImpl(gh<_i361.Dio>()));
     gh.factory<_i814.ThemeLocalDataSource>(
         () => _i814.ThemeLocalDataSourceImpl(gh<_i50.AppDatabase>()));
     gh.factory<_i315.BookLocalDataSource>(
@@ -65,11 +66,16 @@ class SharedPackageModule extends _i526.MicroPackageModule {
         () => const _i47.ImageStorageDataSourceImpl());
     gh.factory<_i510.BookCoverDataSource>(
         () => _i510.BookCoverDataSourceImpl(gh<_i361.Dio>()));
+    gh.factory<_i492.OpenLibraryDataSource>(
+        () => _i492.OpenLibraryDataSourceImpl(gh<_i361.Dio>()));
+    gh.factory<_i357.GoogleBooksDataSource>(
+        () => _i357.GoogleBooksDataSourceImpl(gh<_i361.Dio>()));
     gh.factory<_i1026.ShelfLocalDataSource>(
         () => _i1026.ShelfLocalDataSourceImpl(gh<_i50.AppDatabase>()));
     gh.factory<_i748.BookRepository>(() => _i245.BookRepositoryImpl(
           gh<_i315.BookLocalDataSource>(),
-          gh<_i697.BookRemoteDataSource>(),
+          gh<_i357.GoogleBooksDataSource>(),
+          gh<_i492.OpenLibraryDataSource>(),
           gh<_i510.BookCoverDataSource>(),
         ));
     gh.factory<_i0.SettingsRepository>(() =>
