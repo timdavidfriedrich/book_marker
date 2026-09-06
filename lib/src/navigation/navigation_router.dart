@@ -53,6 +53,16 @@ final _themesNavigatorKey = GlobalKey<NavigatorState>(debugLabel: "themes");
 
 const _sheetBarrier = Color(0x8A000000);
 
+// * go_router 18 looks for material_ui's MaterialApp, never finds this app's flutter/material one
+// * and falls back to NoTransitionPage, which drops predictive back on every route
+MaterialPage<void> _materialPage(GoRouterState state, Widget child) => MaterialPage<void>(
+  key: state.pageKey,
+  name: state.name ?? state.path,
+  arguments: <String, String>{...state.pathParameters, ...state.uri.queryParameters},
+  restorationId: state.pageKey.value,
+  child: child,
+);
+
 @singleton
 class NavigationRouter {
   late final GoRouter router = GoRouter(
@@ -62,17 +72,20 @@ class NavigationRouter {
     redirect: (context, state) => state.uri.path == "/" ? NavigationRoute.library.path : null,
     routes: [
       StatefulShellRoute.indexedStack(
-        builder: (context, state, navigationShell) =>
-            NavigationShellContainer(navigationShell: navigationShell),
+        pageBuilder: (context, state, navigationShell) =>
+            _materialPage(state, NavigationShellContainer(navigationShell: navigationShell)),
         branches: [
           StatefulShellBranch(
             navigatorKey: _libraryNavigatorKey,
             routes: [
               GoRoute(
                 path: NavigationRoute.library.path,
-                builder: (context, state) => BlocProvider(
-                  create: (_) => sl<LibraryBloc>()..add(const LibraryStarted()),
-                  child: const LibraryScreen(),
+                pageBuilder: (context, state) => _materialPage(
+                  state,
+                  BlocProvider(
+                    create: (_) => sl<LibraryBloc>()..add(const LibraryStarted()),
+                    child: const LibraryScreen(),
+                  ),
                 ),
               ),
             ],
@@ -82,9 +95,12 @@ class NavigationRouter {
             routes: [
               GoRoute(
                 path: NavigationRoute.themes.path,
-                builder: (context, state) => BlocProvider(
-                  create: (_) => sl<ThemesBloc>()..add(const ThemesStarted()),
-                  child: const ThemesScreen(),
+                pageBuilder: (context, state) => _materialPage(
+                  state,
+                  BlocProvider(
+                    create: (_) => sl<ThemesBloc>()..add(const ThemesStarted()),
+                    child: const ThemesScreen(),
+                  ),
                 ),
               ),
             ],
@@ -94,68 +110,86 @@ class NavigationRouter {
       GoRoute(
         path: NavigationRoute.libraryBook.path,
         parentNavigatorKey: _rootNavigatorKey,
-        builder: (context, state) => BlocProvider(
-          create: (_) =>
-              sl<BookDetailBloc>(param1: state.pathParameters[parameterId])
-                ..add(const BookDetailStarted()),
-          child: const BookDetailScreen(),
+        pageBuilder: (context, state) => _materialPage(
+          state,
+          BlocProvider(
+            create: (_) =>
+                sl<BookDetailBloc>(param1: state.pathParameters[parameterId])
+                  ..add(const BookDetailStarted()),
+            child: const BookDetailScreen(),
+          ),
         ),
       ),
       GoRoute(
         path: NavigationRoute.libraryQuote.path,
         parentNavigatorKey: _rootNavigatorKey,
-        builder: (context, state) => Theme(
-          data: AppTheme.darkOf(context.contrast),
-          child: BlocProvider(
-            create: (_) =>
-                sl<QuoteDetailBloc>(param1: state.pathParameters[parameterId])
-                  ..add(const QuoteDetailStarted()),
-            child: const QuoteDetailScreen(),
+        pageBuilder: (context, state) => _materialPage(
+          state,
+          Theme(
+            data: AppTheme.darkOf(context.contrast),
+            child: BlocProvider(
+              create: (_) =>
+                  sl<QuoteDetailBloc>(param1: state.pathParameters[parameterId])
+                    ..add(const QuoteDetailStarted()),
+              child: const QuoteDetailScreen(),
+            ),
           ),
         ),
       ),
       GoRoute(
         path: NavigationRoute.libraryShelf.path,
         parentNavigatorKey: _rootNavigatorKey,
-        builder: (context, state) => BlocProvider(
-          create: (_) =>
-              sl<ShelfDetailBloc>(param1: state.pathParameters[parameterId])
-                ..add(const ShelfDetailStarted()),
-          child: const ShelfDetailScreen(),
+        pageBuilder: (context, state) => _materialPage(
+          state,
+          BlocProvider(
+            create: (_) =>
+                sl<ShelfDetailBloc>(param1: state.pathParameters[parameterId])
+                  ..add(const ShelfDetailStarted()),
+            child: const ShelfDetailScreen(),
+          ),
         ),
       ),
       GoRoute(
         path: NavigationRoute.themeDetail.path,
         parentNavigatorKey: _rootNavigatorKey,
-        builder: (context, state) => BlocProvider(
-          create: (_) =>
-              sl<ThemeDetailBloc>(param1: state.pathParameters[parameterId])
-                ..add(const ThemeDetailStarted()),
-          child: const ThemeDetailScreen(),
+        pageBuilder: (context, state) => _materialPage(
+          state,
+          BlocProvider(
+            create: (_) =>
+                sl<ThemeDetailBloc>(param1: state.pathParameters[parameterId])
+                  ..add(const ThemeDetailStarted()),
+            child: const ThemeDetailScreen(),
+          ),
         ),
       ),
       GoRoute(
         path: NavigationRoute.settings.path,
         parentNavigatorKey: _rootNavigatorKey,
-        builder: (context, state) => BlocProvider(
-          create: (_) => sl<SettingsBloc>()..add(const SettingsStarted()),
-          child: const SettingsScreen(),
+        pageBuilder: (context, state) => _materialPage(
+          state,
+          BlocProvider(
+            create: (_) => sl<SettingsBloc>()..add(const SettingsStarted()),
+            child: const SettingsScreen(),
+          ),
         ),
       ),
       GoRoute(
         path: NavigationRoute.capture.path,
         parentNavigatorKey: _rootNavigatorKey,
-        builder: (context, state) {
+        pageBuilder: (context, state) {
           final arguments = state.extra;
-          return Theme(
-            data: AppTheme.darkOf(context.contrast),
-            child: MultiBlocProvider(
-              providers: [
-                BlocProvider(create: (_) => sl<CameraCubit>()),
-                BlocProvider(create: (_) => sl<PageDetectionCubit>()),
-              ],
-              child: CaptureScreen(
-                addsPage: arguments is CaptureArguments && arguments.addsPage,
+          return _materialPage(
+            state,
+            Theme(
+              data: AppTheme.darkOf(context.contrast),
+              child: MultiBlocProvider(
+                providers: [
+                  BlocProvider(create: (_) => sl<CameraCubit>()),
+                  BlocProvider(create: (_) => sl<PageDetectionCubit>()),
+                ],
+                child: CaptureScreen(
+                  addsPage: arguments is CaptureArguments && arguments.addsPage,
+                ),
               ),
             ),
           );
@@ -185,19 +219,24 @@ class NavigationRouter {
           GoRoute(
             path: "scan",
             parentNavigatorKey: _rootNavigatorKey,
-            builder: (context, state) => const BarcodeScannerScreen(),
+            pageBuilder: (context, state) => _materialPage(state, const BarcodeScannerScreen()),
           ),
           GoRoute(
             path: "crop",
             parentNavigatorKey: _rootNavigatorKey,
-            builder: (context, state) {
+            pageBuilder: (context, state) {
               final arguments = state.extra;
-              if (arguments is! CropArguments) return const LoadingScreen();
-              return Theme(
-                data: AppTheme.darkOf(context.contrast),
-                child: BlocProvider(
-                  create: (_) => sl<CropBloc>(param1: arguments)..add(const CropStarted()),
-                  child: const CropScreen(),
+              if (arguments is! CropArguments) {
+                return _materialPage(state, const LoadingScreen());
+              }
+              return _materialPage(
+                state,
+                Theme(
+                  data: AppTheme.darkOf(context.contrast),
+                  child: BlocProvider(
+                    create: (_) => sl<CropBloc>(param1: arguments)..add(const CropStarted()),
+                    child: const CropScreen(),
+                  ),
                 ),
               );
             },
@@ -205,12 +244,17 @@ class NavigationRouter {
           GoRoute(
             path: "quote",
             parentNavigatorKey: _rootNavigatorKey,
-            builder: (context, state) {
+            pageBuilder: (context, state) {
               final arguments = state.extra;
-              if (arguments is! MarkingArguments) return const LoadingScreen();
-              return BlocProvider(
-                create: (_) => sl<MarkingBloc>(param1: arguments)..add(const MarkingStarted()),
-                child: const MarkingScreen(),
+              if (arguments is! MarkingArguments) {
+                return _materialPage(state, const LoadingScreen());
+              }
+              return _materialPage(
+                state,
+                BlocProvider(
+                  create: (_) => sl<MarkingBloc>(param1: arguments)..add(const MarkingStarted()),
+                  child: const MarkingScreen(),
+                ),
               );
             },
           ),
