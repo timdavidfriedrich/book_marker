@@ -1,0 +1,24 @@
+### Append-only log of cloud OCR requests. The source of truth for rate limits.
+###
+### Server-only: never added to the `powersync` publication. The device sees the
+### denormalised counters on `entitlements` instead.
+###
+### `status` drives the admission protocol: a row is inserted as `reserved`
+### inside the advisory-locked transaction, then flipped to `completed` or
+### `failed` once the provider responds. Counting includes `reserved`, so an
+### in-flight scan holds its slot.
+class: OcrUsage
+table: ocr_usage
+
+fields:
+  id: UuidValue, defaultModel=random, defaultPersist=random
+  ownerId: UuidValue
+  createdAt: DateTime
+  engine: String
+  status: String, default='reserved'
+  inputTokens: int?
+  outputTokens: int?
+
+indexes:
+  ocr_usage_owner_time_idx:
+    fields: ownerId, createdAt

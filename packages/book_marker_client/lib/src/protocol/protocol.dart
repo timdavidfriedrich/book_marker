@@ -16,8 +16,14 @@ import 'package:serverpod_auth_core_client/serverpod_auth_core_client.dart'
 import 'package:serverpod_auth_idp_client/serverpod_auth_idp_client.dart'
     as _iaic;
 import 'package:serverpod_client/serverpod_client.dart' as _isc;
+import 'entitlements/account_blocked_exception.dart' as _i42k8jky;
+import 'entitlements/entitlement.dart' as _id6kwse3;
+import 'entitlements/ocr_usage.dart' as _i13b5r7e;
 import 'greetings/greeting.dart' as _izw8z7ou;
 import 'sync/sync_probe.dart' as _i8t4kps3;
+export 'entitlements/account_blocked_exception.dart';
+export 'entitlements/entitlement.dart';
+export 'entitlements/ocr_usage.dart';
 export 'greetings/greeting.dart';
 export 'sync/sync_probe.dart';
 export 'client.dart';
@@ -56,11 +62,32 @@ class Protocol extends _isc.SerializationManager {
       }
     }
 
+    if (t == _i42k8jky.AccountBlockedException) {
+      return _i42k8jky.AccountBlockedException.fromJson(data) as T;
+    }
+    if (t == _id6kwse3.Entitlement) {
+      return _id6kwse3.Entitlement.fromJson(data) as T;
+    }
+    if (t == _i13b5r7e.OcrUsage) {
+      return _i13b5r7e.OcrUsage.fromJson(data) as T;
+    }
     if (t == _izw8z7ou.Greeting) {
       return _izw8z7ou.Greeting.fromJson(data) as T;
     }
     if (t == _i8t4kps3.SyncProbe) {
       return _i8t4kps3.SyncProbe.fromJson(data) as T;
+    }
+    if (t == _isc.getType<_i42k8jky.AccountBlockedException?>()) {
+      return (data != null
+              ? _i42k8jky.AccountBlockedException.fromJson(data)
+              : null)
+          as T;
+    }
+    if (t == _isc.getType<_id6kwse3.Entitlement?>()) {
+      return (data != null ? _id6kwse3.Entitlement.fromJson(data) : null) as T;
+    }
+    if (t == _isc.getType<_i13b5r7e.OcrUsage?>()) {
+      return (data != null ? _i13b5r7e.OcrUsage.fromJson(data) : null) as T;
     }
     if (t == _isc.getType<_izw8z7ou.Greeting?>()) {
       return (data != null ? _izw8z7ou.Greeting.fromJson(data) : null) as T;
@@ -79,6 +106,9 @@ class Protocol extends _isc.SerializationManager {
 
   static String? getClassNameForType(Type type) {
     return switch (type) {
+      _i42k8jky.AccountBlockedException => 'AccountBlockedException',
+      _id6kwse3.Entitlement => 'Entitlement',
+      _i13b5r7e.OcrUsage => 'OcrUsage',
       _izw8z7ou.Greeting => 'Greeting',
       _i8t4kps3.SyncProbe => 'SyncProbe',
       _ => null,
@@ -95,6 +125,12 @@ class Protocol extends _isc.SerializationManager {
     }
 
     switch (data) {
+      case _i42k8jky.AccountBlockedException():
+        return 'AccountBlockedException';
+      case _id6kwse3.Entitlement():
+        return 'Entitlement';
+      case _i13b5r7e.OcrUsage():
+        return 'OcrUsage';
       case _izw8z7ou.Greeting():
         return 'Greeting';
       case _i8t4kps3.SyncProbe():
@@ -120,6 +156,15 @@ class Protocol extends _isc.SerializationManager {
     var dataClassName = data['className'];
     if (dataClassName is! String) {
       return super.deserializeByClassName(data);
+    }
+    if (dataClassName == 'AccountBlockedException') {
+      return deserialize<_i42k8jky.AccountBlockedException>(data['data']);
+    }
+    if (dataClassName == 'Entitlement') {
+      return deserialize<_id6kwse3.Entitlement>(data['data']);
+    }
+    if (dataClassName == 'OcrUsage') {
+      return deserialize<_i13b5r7e.OcrUsage>(data['data']);
     }
     if (dataClassName == 'Greeting') {
       return deserialize<_izw8z7ou.Greeting>(data['data']);

@@ -1,13 +1,13 @@
-emailIdp:
+appleIdp:
   - login:
-  - startRegistration:
-  - verifyRegistrationCode:
-  - finishRegistration:
-  - startPasswordReset:
-  - verifyPasswordResetCode:
-  - finishPasswordReset:
+  - hasAccount:
+googleIdp:
+  - login:
+  - loginWithCode:
   - hasAccount:
 jwtRefresh:
   - refreshAccessToken:
+powerSync:
+  - createToken:
 greeting:
   - hello:

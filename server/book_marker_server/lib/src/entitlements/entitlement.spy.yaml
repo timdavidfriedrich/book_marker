@@ -1,0 +1,35 @@
+### Per-user plan, account status and cloud-OCR usage.
+###
+### Server-owned: the device may only READ this. `SyncEndpoint.upload` rejects
+### any write to it, and the sync stream is one-way in practice.
+###
+### Limits are deliberately NOT stored here - they come from app_config.yaml at
+### check time, so changing a limit applies to every existing user at once
+### rather than only to accounts created afterwards.
+class: Entitlement
+table: entitlements
+
+fields:
+  ### UUID, not the default bigint serial: PowerSync requires a text id.
+  id: UuidValue, defaultModel=random, defaultPersist=random
+  ownerId: UuidValue
+  plan: String, default='free'
+  status: String, default='active'
+  blockedReason: String?
+  blockedAt: DateTime?
+  usedDay: int, default=0
+  usedWeek: int, default=0
+  usedMonth: int, default=0
+  updatedAt: DateTime
+  ### Purchase fields, unused until phase 6. Nullable and present from the start
+  ### so enabling purchases is not a migration on a database with real users.
+  store: String?
+  productId: String?
+  purchaseToken: String?
+  purchasedAt: DateTime?
+  refundedAt: DateTime?
+
+indexes:
+  entitlements_owner_idx:
+    fields: ownerId
+    unique: true

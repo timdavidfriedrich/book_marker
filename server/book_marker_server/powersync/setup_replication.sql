@@ -28,7 +28,7 @@ ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT SELECT ON TABLES TO powersync_ro
 --      ALTER PUBLICATION powersync ADD TABLE books;
 --    and drop the probe:
 --      ALTER PUBLICATION powersync DROP TABLE sync_probes;
-CREATE PUBLICATION powersync FOR TABLE sync_probes;
+CREATE PUBLICATION powersync FOR TABLE sync_probes, entitlements;
 
 -- 3. PowerSync's bucket storage lives in its own database. It will NOT create
 --    this for you.

@@ -1045,6 +1045,38 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.7"
+  serverpod_auth_core_client:
+    dependency: transitive
+    description:
+      name: serverpod_auth_core_client
+      sha256: "6dd96110deead0021136539c529b63e15a3527cd4c895b5081b170b75f4f7b64"
+      url: "https://pub.dev"
+    source: hosted
+    version: "4.0.0-rc.2"
+  serverpod_auth_idp_client:
+    dependency: transitive
+    description:
+      name: serverpod_auth_idp_client
+      sha256: "07b714535ef1ea1fec5f40763f8ac75e07b72d480d14844d26446dc3ece92045"
+      url: "https://pub.dev"
+    source: hosted
+    version: "4.0.0-rc.2"
+  serverpod_client:
+    dependency: transitive
+    description:
+      name: serverpod_client
+      sha256: "420fdc4ce9172ea1bd8d0ecf7d3a638d2666cc885538abf11ccf5e8c6ba26220"
+      url: "https://pub.dev"
+    source: hosted
+    version: "4.0.0-rc.2"
+  serverpod_serialization:
+    dependency: transitive
+    description:
+      name: serverpod_serialization
+      sha256: b170a4cb0f5c3b5a6de0b68302a5cc3feee260f18da1794821a95d0afa190ef3
+      url: "https://pub.dev"
+    source: hosted
+    version: "4.0.0-rc.2"
   share_plus:
     dependency: transitive
     description:

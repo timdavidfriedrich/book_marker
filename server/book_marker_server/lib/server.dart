@@ -1,12 +1,62 @@
 import 'dart:io';
 
 import 'package:serverpod_auth_idp_server/core.dart';
-import 'package:serverpod_auth_idp_server/providers/email.dart';
+import 'package:serverpod_auth_idp_server/providers/apple.dart';
+import 'package:serverpod_auth_idp_server/providers/google.dart';
 import 'package:serverpod_cloud_storage/serverpod_cloud_storage.dart';
 
 import 'src/cache_busting.dart';
+import 'src/domain/entitlements.dart';
 import 'src/generated/serverpod.dart';
 import 'src/web/routes/app_config_route.dart';
+
+const _entitlements = Entitlements();
+
+/// Google and Apple only, deliberately. No passwords are stored anywhere, which
+/// removes the credential-breach surface entirely, and no identity data leaves
+/// this server. Adding the email provider later means taking on an SMTP service
+/// and password hashes - read the plan before doing it.
+///
+/// Apple ships alongside Google because App Store review requires Sign in with
+/// Apple wherever another social sign-in is offered.
+///
+/// A provider is only registered when its credentials are present, so a machine
+/// without OAuth setup can still run migrations and boot the server. Production
+/// refuses to start instead, because silently having no way to sign in is worse
+/// than crashing.
+List<IdentityProviderBuilder> _identityProviders(final Serverpod pod) {
+  final hasGoogle = pod.getPassword('googleClientSecret') != null;
+  final hasApple = pod.getPassword('appleServiceIdentifier') != null;
+
+  if (pod.runMode == ServerpodRunMode.production && !(hasGoogle && hasApple)) {
+    throw StateError(
+      'Production requires both identity providers. Missing: '
+      '${[if (!hasGoogle) 'googleClientSecret', if (!hasApple) 'apple* keys'].join(', ')} '
+      'in config/passwords.yaml.',
+    );
+  }
+
+  return [
+    if (hasGoogle)
+      GoogleIdpConfigFromPasswords(
+        onAfterGoogleAccountCreated: (session, authUser, _, {transaction}) =>
+            _entitlements.createForUser(
+              session,
+              authUser.id,
+              transaction: transaction,
+            ),
+      ),
+    if (hasApple)
+      AppleIdpConfigFromPasswords(
+        onAfterAppleAccountCreated: (session, authUser, _, {transaction}) =>
+            _entitlements.createForUser(
+              session,
+              authUser.id,
+              transaction: transaction,
+            ),
+      ),
+  ];
+}
 
 /// The starting point of the Serverpod server.
 void run(List<String> args) async {
@@ -22,17 +72,7 @@ void run(List<String> args) async {
       // Use JWT for authentication keys towards the server.
       JwtConfigFromPasswords(),
     ],
-    identityProviderBuilders: [
-      // Configure the email identity provider for email/password authentication.
-      // The default setup works with Serverpod Cloud without configuration. In
-      // development the verification codes are logged to the console, and in
-      // staging and production they are sent through the Serverpod Cloud email
-      // service. If you want to use a custom provider for sending emails, use
-      // `EmailIdpConfigFromPasswords`.
-      ServerpodCloudEmailIdpConfig(
-        appDisplayName: 'book_marker',
-      ),
-    ],
+    identityProviderBuilders: _identityProviders(pod),
   );
 
   // Serve all files in the web/static relative directory under /web.

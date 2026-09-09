@@ -1,0 +1,7 @@
+### Thrown when a suspended account attempts an action that needs the server.
+### The client must render this differently from "locked" (missing master key):
+### one means contact support, the other means enter your passphrase.
+exception: AccountBlockedException
+
+fields:
+  reason: String?

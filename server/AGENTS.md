@@ -9,14 +9,21 @@ PowerSync service. Implements the plan at
 ```
 server/
 ├── pubspec.yaml            pub workspace root for the SERVER side only
-├── book_marker_server/     the backend
-└── book_marker_client/     generated client, consumed by the Flutter app
+└── book_marker_server/     the backend
+
+packages/book_marker_client/    generated client, member of the APP workspace
 ```
 
-`book_marker_client` is deliberately **not** a member of this workspace. It joins
-the Flutter app's workspace at the repository root instead, so the server's large
-dependency tree stays out of the app's resolution. The server does not depend on
-the client, so nothing breaks.
+The generated client lives under `packages/`, not here. It is consumed by the
+Flutter app, so it resolves with the app; keeping the server in its own workspace
+keeps the server's large dependency tree out of the app's resolution. The server
+does not depend on the client, so nothing breaks.
+
+Pub also forbids the arrangement the other way round: a workspace member cannot
+sit below a stray `pubspec.yaml` (this `server/pubspec.yaml`), so the client
+could not have stayed here and joined the app workspace.
+
+Its output path is `config/generator.yaml` → `client_package_path`.
 
 There is no `book_marker_flutter`. The real app is the Flutter project at the
 repository root, and it is run with **`fvm flutter run`**, never by
@@ -70,8 +77,8 @@ The Serverpod MCP server is not configured in this repo; use the CLI.
 - `dart test` in `book_marker_server` — tests need no Docker; `config/test.yaml`
   points at an embedded Postgres.
 
-NEVER edit generated code: `lib/src/generated/` and the whole `book_marker_client`
-package are rewritten by the generator. Change `.spy.yaml` models, the endpoints,
+NEVER edit generated code: `lib/src/generated/` and the whole
+`packages/book_marker_client` package are rewritten by the generator. Change `.spy.yaml` models, the endpoints,
 or `lib/server.dart`.
 
 Migrations are the one exception: a generated `migration.sql` MAY be hand-edited

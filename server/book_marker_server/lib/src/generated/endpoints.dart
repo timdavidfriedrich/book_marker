@@ -15,24 +15,38 @@ import 'package:serverpod_auth_core_server/serverpod_auth_core_server.dart'
     as _iacs;
 import 'package:serverpod_auth_idp_server/serverpod_auth_idp_server.dart'
     as _iais;
-import '../auth/email_idp_endpoint.dart' as _iuc1hd5t;
+import '../auth/apple_idp_endpoint.dart' as _ilq63su8;
+import '../auth/google_idp_endpoint.dart' as _i71axiz0;
 import '../auth/jwt_refresh_endpoint.dart' as _inwq3ztq;
+import '../endpoints/power_sync_endpoint.dart' as _i61fa217;
 import '../greetings/greeting_endpoint.dart' as _il624ik7;
 
 class Endpoints extends _is.EndpointDispatch {
   @override
   void initializeEndpoints(_is.Server server) {
     var endpoints = <String, _is.Endpoint>{
-      'emailIdp': _iuc1hd5t.EmailIdpEndpoint()
+      'appleIdp': _ilq63su8.AppleIdpEndpoint()
         ..initialize(
           server,
-          'emailIdp',
+          'appleIdp',
+          null,
+        ),
+      'googleIdp': _i71axiz0.GoogleIdpEndpoint()
+        ..initialize(
+          server,
+          'googleIdp',
           null,
         ),
       'jwtRefresh': _inwq3ztq.JwtRefreshEndpoint()
         ..initialize(
           server,
           'jwtRefresh',
+          null,
+        ),
+      'powerSync': _i61fa217.PowerSyncEndpoint()
+        ..initialize(
+          server,
+          'powerSync',
           null,
         ),
       'greeting': _il624ik7.GreetingEndpoint()
@@ -42,22 +56,37 @@ class Endpoints extends _is.EndpointDispatch {
           null,
         ),
     };
-    connectors['emailIdp'] = _is.EndpointConnector(
-      name: 'emailIdp',
-      endpoint: endpoints['emailIdp']!,
+    connectors['appleIdp'] = _is.EndpointConnector(
+      name: 'appleIdp',
+      endpoint: endpoints['appleIdp']!,
       methodConnectors: {
         'login': _is.MethodConnector(
           name: 'login',
           params: {
-            'email': _is.ParameterDescription(
-              name: 'email',
+            'identityToken': _is.ParameterDescription(
+              name: 'identityToken',
               type: _is.getType<String>(),
               nullable: false,
             ),
-            'password': _is.ParameterDescription(
-              name: 'password',
+            'authorizationCode': _is.ParameterDescription(
+              name: 'authorizationCode',
               type: _is.getType<String>(),
               nullable: false,
+            ),
+            'isNativeApplePlatformSignIn': _is.ParameterDescription(
+              name: 'isNativeApplePlatformSignIn',
+              type: _is.getType<bool>(),
+              nullable: false,
+            ),
+            'firstName': _is.ParameterDescription(
+              name: 'firstName',
+              type: _is.getType<String?>(),
+              nullable: true,
+            ),
+            'lastName': _is.ParameterDescription(
+              name: 'lastName',
+              type: _is.getType<String?>(),
+              nullable: true,
             ),
           },
           call:
@@ -65,149 +94,14 @@ class Endpoints extends _is.EndpointDispatch {
                 _is.Session session,
                 Map<String, dynamic> params,
               ) async =>
-                  (endpoints['emailIdp'] as _iuc1hd5t.EmailIdpEndpoint).login(
+                  (endpoints['appleIdp'] as _ilq63su8.AppleIdpEndpoint).login(
                     session,
-                    email: params['email'],
-                    password: params['password'],
-                  ),
-        ),
-        'startRegistration': _is.MethodConnector(
-          name: 'startRegistration',
-          params: {
-            'email': _is.ParameterDescription(
-              name: 'email',
-              type: _is.getType<String>(),
-              nullable: false,
-            ),
-          },
-          call:
-              (
-                _is.Session session,
-                Map<String, dynamic> params,
-              ) async => (endpoints['emailIdp'] as _iuc1hd5t.EmailIdpEndpoint)
-                  .startRegistration(
-                    session,
-                    email: params['email'],
-                  ),
-        ),
-        'verifyRegistrationCode': _is.MethodConnector(
-          name: 'verifyRegistrationCode',
-          params: {
-            'accountRequestId': _is.ParameterDescription(
-              name: 'accountRequestId',
-              type: _is.getType<_is.UuidValue>(),
-              nullable: false,
-            ),
-            'verificationCode': _is.ParameterDescription(
-              name: 'verificationCode',
-              type: _is.getType<String>(),
-              nullable: false,
-            ),
-          },
-          call:
-              (
-                _is.Session session,
-                Map<String, dynamic> params,
-              ) async => (endpoints['emailIdp'] as _iuc1hd5t.EmailIdpEndpoint)
-                  .verifyRegistrationCode(
-                    session,
-                    accountRequestId: params['accountRequestId'],
-                    verificationCode: params['verificationCode'],
-                  ),
-        ),
-        'finishRegistration': _is.MethodConnector(
-          name: 'finishRegistration',
-          params: {
-            'registrationToken': _is.ParameterDescription(
-              name: 'registrationToken',
-              type: _is.getType<String>(),
-              nullable: false,
-            ),
-            'password': _is.ParameterDescription(
-              name: 'password',
-              type: _is.getType<String>(),
-              nullable: false,
-            ),
-          },
-          call:
-              (
-                _is.Session session,
-                Map<String, dynamic> params,
-              ) async => (endpoints['emailIdp'] as _iuc1hd5t.EmailIdpEndpoint)
-                  .finishRegistration(
-                    session,
-                    registrationToken: params['registrationToken'],
-                    password: params['password'],
-                  ),
-        ),
-        'startPasswordReset': _is.MethodConnector(
-          name: 'startPasswordReset',
-          params: {
-            'email': _is.ParameterDescription(
-              name: 'email',
-              type: _is.getType<String>(),
-              nullable: false,
-            ),
-          },
-          call:
-              (
-                _is.Session session,
-                Map<String, dynamic> params,
-              ) async => (endpoints['emailIdp'] as _iuc1hd5t.EmailIdpEndpoint)
-                  .startPasswordReset(
-                    session,
-                    email: params['email'],
-                  ),
-        ),
-        'verifyPasswordResetCode': _is.MethodConnector(
-          name: 'verifyPasswordResetCode',
-          params: {
-            'passwordResetRequestId': _is.ParameterDescription(
-              name: 'passwordResetRequestId',
-              type: _is.getType<_is.UuidValue>(),
-              nullable: false,
-            ),
-            'verificationCode': _is.ParameterDescription(
-              name: 'verificationCode',
-              type: _is.getType<String>(),
-              nullable: false,
-            ),
-          },
-          call:
-              (
-                _is.Session session,
-                Map<String, dynamic> params,
-              ) async => (endpoints['emailIdp'] as _iuc1hd5t.EmailIdpEndpoint)
-                  .verifyPasswordResetCode(
-                    session,
-                    passwordResetRequestId: params['passwordResetRequestId'],
-                    verificationCode: params['verificationCode'],
-                  ),
-        ),
-        'finishPasswordReset': _is.MethodConnector(
-          name: 'finishPasswordReset',
-          params: {
-            'finishPasswordResetToken': _is.ParameterDescription(
-              name: 'finishPasswordResetToken',
-              type: _is.getType<String>(),
-              nullable: false,
-            ),
-            'newPassword': _is.ParameterDescription(
-              name: 'newPassword',
-              type: _is.getType<String>(),
-              nullable: false,
-            ),
-          },
-          call:
-              (
-                _is.Session session,
-                Map<String, dynamic> params,
-              ) async => (endpoints['emailIdp'] as _iuc1hd5t.EmailIdpEndpoint)
-                  .finishPasswordReset(
-                    session,
-                    finishPasswordResetToken:
-                        params['finishPasswordResetToken'],
-                    newPassword: params['newPassword'],
+                    identityToken: params['identityToken'],
+                    authorizationCode: params['authorizationCode'],
+                    isNativeApplePlatformSignIn:
+                        params['isNativeApplePlatformSignIn'],
+                    firstName: params['firstName'],
+                    lastName: params['lastName'],
                   ),
         ),
         'hasAccount': _is.MethodConnector(
@@ -217,7 +111,79 @@ class Endpoints extends _is.EndpointDispatch {
               (
                 _is.Session session,
                 Map<String, dynamic> params,
-              ) async => (endpoints['emailIdp'] as _iuc1hd5t.EmailIdpEndpoint)
+              ) async => (endpoints['appleIdp'] as _ilq63su8.AppleIdpEndpoint)
+                  .hasAccount(session),
+        ),
+      },
+    );
+    connectors['googleIdp'] = _is.EndpointConnector(
+      name: 'googleIdp',
+      endpoint: endpoints['googleIdp']!,
+      methodConnectors: {
+        'login': _is.MethodConnector(
+          name: 'login',
+          params: {
+            'idToken': _is.ParameterDescription(
+              name: 'idToken',
+              type: _is.getType<String>(),
+              nullable: false,
+            ),
+            'accessToken': _is.ParameterDescription(
+              name: 'accessToken',
+              type: _is.getType<String?>(),
+              nullable: true,
+            ),
+          },
+          call:
+              (
+                _is.Session session,
+                Map<String, dynamic> params,
+              ) async =>
+                  (endpoints['googleIdp'] as _i71axiz0.GoogleIdpEndpoint).login(
+                    session,
+                    idToken: params['idToken'],
+                    accessToken: params['accessToken'],
+                  ),
+        ),
+        'loginWithCode': _is.MethodConnector(
+          name: 'loginWithCode',
+          params: {
+            'code': _is.ParameterDescription(
+              name: 'code',
+              type: _is.getType<String>(),
+              nullable: false,
+            ),
+            'codeVerifier': _is.ParameterDescription(
+              name: 'codeVerifier',
+              type: _is.getType<String>(),
+              nullable: false,
+            ),
+            'redirectUri': _is.ParameterDescription(
+              name: 'redirectUri',
+              type: _is.getType<String>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _is.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['googleIdp'] as _i71axiz0.GoogleIdpEndpoint)
+                  .loginWithCode(
+                    session,
+                    code: params['code'],
+                    codeVerifier: params['codeVerifier'],
+                    redirectUri: params['redirectUri'],
+                  ),
+        ),
+        'hasAccount': _is.MethodConnector(
+          name: 'hasAccount',
+          params: {},
+          call:
+              (
+                _is.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['googleIdp'] as _i71axiz0.GoogleIdpEndpoint)
                   .hasAccount(session),
         ),
       },
@@ -245,6 +211,22 @@ class Endpoints extends _is.EndpointDispatch {
                         session,
                         refreshToken: params['refreshToken'],
                       ),
+        ),
+      },
+    );
+    connectors['powerSync'] = _is.EndpointConnector(
+      name: 'powerSync',
+      endpoint: endpoints['powerSync']!,
+      methodConnectors: {
+        'createToken': _is.MethodConnector(
+          name: 'createToken',
+          params: {},
+          call:
+              (
+                _is.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['powerSync'] as _i61fa217.PowerSyncEndpoint)
+                  .createToken(session),
         ),
       },
     );

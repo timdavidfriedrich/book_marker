@@ -31,6 +31,12 @@ sync_config:
         auto_subscribe: true
         query: SELECT * FROM sync_probes WHERE owner_id = auth.user_id()
 
+      # Server-owned, read-only on the device. Carries plan, account status
+      # and usage counters so the app can show remaining quota offline.
+      entitlements:
+        auto_subscribe: true
+        query: SELECT * FROM entitlements WHERE owner_id = auth.user_id()
+
       # Phase 4 - uncomment each as its table lands. Every stream is scoped to
       # the authenticated user; there is no cross-user query anywhere.
       # library:
@@ -51,9 +57,6 @@ sync_config:
       # theme_quotes:
       #   auto_subscribe: true
       #   query: SELECT * FROM theme_quotes WHERE owner_id = auth.user_id()
-      # entitlements:
-      #   auto_subscribe: true
-      #   query: SELECT * FROM entitlements WHERE owner_id = auth.user_id()
 
 client_auth:
   # PowerSync validates tokens that Serverpod signed, against this static key.

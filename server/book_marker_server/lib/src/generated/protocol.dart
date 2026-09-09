@@ -17,8 +17,14 @@ import 'package:serverpod_auth_core_server/serverpod_auth_core_server.dart'
     as _iacs;
 import 'package:serverpod_auth_idp_server/serverpod_auth_idp_server.dart'
     as _iais;
+import 'entitlements/account_blocked_exception.dart' as _i42k8jky;
+import 'entitlements/entitlement.dart' as _id6kwse3;
+import 'entitlements/ocr_usage.dart' as _i13b5r7e;
 import 'greetings/greeting.dart' as _izw8z7ou;
 import 'sync/sync_probe.dart' as _i8t4kps3;
+export 'entitlements/account_blocked_exception.dart';
+export 'entitlements/entitlement.dart';
+export 'entitlements/ocr_usage.dart';
 export 'greetings/greeting.dart';
 export 'sync/sync_probe.dart';
 
@@ -30,6 +36,200 @@ class Protocol extends _is.DatabaseSerializationManager {
   static final Protocol _instance = Protocol._().._registerHostProtocols();
 
   static List<_isp.TableDefinition> get targetTableDefinitions => [
+    _isp.TableDefinition(
+      name: 'entitlements',
+      dartName: 'Entitlement',
+      schema: 'public',
+      module: 'book_marker',
+      columns: [
+        _isp.ColumnDefinition(
+          name: 'id',
+          columnType: _isp.ColumnType.uuid,
+          isNullable: false,
+          dartType: 'UuidValue',
+          columnDefault: 'random',
+        ),
+        _isp.ColumnDefinition(
+          name: 'ownerId',
+          columnType: _isp.ColumnType.uuid,
+          isNullable: false,
+          dartType: 'UuidValue',
+        ),
+        _isp.ColumnDefinition(
+          name: 'plan',
+          columnType: _isp.ColumnType.text,
+          isNullable: false,
+          dartType: 'String',
+          columnDefault: '\'free\'',
+        ),
+        _isp.ColumnDefinition(
+          name: 'status',
+          columnType: _isp.ColumnType.text,
+          isNullable: false,
+          dartType: 'String',
+          columnDefault: '\'active\'',
+        ),
+        _isp.ColumnDefinition(
+          name: 'blockedReason',
+          columnType: _isp.ColumnType.text,
+          isNullable: true,
+          dartType: 'String?',
+        ),
+        _isp.ColumnDefinition(
+          name: 'blockedAt',
+          columnType: _isp.ColumnType.timestampWithoutTimeZone,
+          isNullable: true,
+          dartType: 'DateTime?',
+        ),
+        _isp.ColumnDefinition(
+          name: 'usedDay',
+          columnType: _isp.ColumnType.bigint,
+          isNullable: false,
+          dartType: 'int',
+          columnDefault: '0',
+        ),
+        _isp.ColumnDefinition(
+          name: 'usedWeek',
+          columnType: _isp.ColumnType.bigint,
+          isNullable: false,
+          dartType: 'int',
+          columnDefault: '0',
+        ),
+        _isp.ColumnDefinition(
+          name: 'usedMonth',
+          columnType: _isp.ColumnType.bigint,
+          isNullable: false,
+          dartType: 'int',
+          columnDefault: '0',
+        ),
+        _isp.ColumnDefinition(
+          name: 'updatedAt',
+          columnType: _isp.ColumnType.timestampWithoutTimeZone,
+          isNullable: false,
+          dartType: 'DateTime',
+        ),
+        _isp.ColumnDefinition(
+          name: 'store',
+          columnType: _isp.ColumnType.text,
+          isNullable: true,
+          dartType: 'String?',
+        ),
+        _isp.ColumnDefinition(
+          name: 'productId',
+          columnType: _isp.ColumnType.text,
+          isNullable: true,
+          dartType: 'String?',
+        ),
+        _isp.ColumnDefinition(
+          name: 'purchaseToken',
+          columnType: _isp.ColumnType.text,
+          isNullable: true,
+          dartType: 'String?',
+        ),
+        _isp.ColumnDefinition(
+          name: 'purchasedAt',
+          columnType: _isp.ColumnType.timestampWithoutTimeZone,
+          isNullable: true,
+          dartType: 'DateTime?',
+        ),
+        _isp.ColumnDefinition(
+          name: 'refundedAt',
+          columnType: _isp.ColumnType.timestampWithoutTimeZone,
+          isNullable: true,
+          dartType: 'DateTime?',
+        ),
+      ],
+      foreignKeys: [],
+      indexes: [
+        _isp.IndexDefinition(
+          indexName: 'entitlements_owner_idx',
+          tableSpace: null,
+          elements: [
+            _isp.IndexElementDefinition(
+              type: _isp.IndexElementDefinitionType.column,
+              definition: 'ownerId',
+            ),
+          ],
+          type: 'btree',
+          isUnique: true,
+          isPrimary: false,
+        ),
+      ],
+      managed: true,
+    ),
+    _isp.TableDefinition(
+      name: 'ocr_usage',
+      dartName: 'OcrUsage',
+      schema: 'public',
+      module: 'book_marker',
+      columns: [
+        _isp.ColumnDefinition(
+          name: 'id',
+          columnType: _isp.ColumnType.uuid,
+          isNullable: false,
+          dartType: 'UuidValue',
+          columnDefault: 'random',
+        ),
+        _isp.ColumnDefinition(
+          name: 'ownerId',
+          columnType: _isp.ColumnType.uuid,
+          isNullable: false,
+          dartType: 'UuidValue',
+        ),
+        _isp.ColumnDefinition(
+          name: 'createdAt',
+          columnType: _isp.ColumnType.timestampWithoutTimeZone,
+          isNullable: false,
+          dartType: 'DateTime',
+        ),
+        _isp.ColumnDefinition(
+          name: 'engine',
+          columnType: _isp.ColumnType.text,
+          isNullable: false,
+          dartType: 'String',
+        ),
+        _isp.ColumnDefinition(
+          name: 'status',
+          columnType: _isp.ColumnType.text,
+          isNullable: false,
+          dartType: 'String',
+          columnDefault: '\'reserved\'',
+        ),
+        _isp.ColumnDefinition(
+          name: 'inputTokens',
+          columnType: _isp.ColumnType.bigint,
+          isNullable: true,
+          dartType: 'int?',
+        ),
+        _isp.ColumnDefinition(
+          name: 'outputTokens',
+          columnType: _isp.ColumnType.bigint,
+          isNullable: true,
+          dartType: 'int?',
+        ),
+      ],
+      foreignKeys: [],
+      indexes: [
+        _isp.IndexDefinition(
+          indexName: 'ocr_usage_owner_time_idx',
+          tableSpace: null,
+          elements: [
+            _isp.IndexElementDefinition(
+              type: _isp.IndexElementDefinitionType.column,
+              definition: 'ownerId',
+            ),
+            _isp.IndexElementDefinition(
+              type: _isp.IndexElementDefinitionType.column,
+              definition: 'createdAt',
+            ),
+          ],
+          type: 'btree',
+          isUnique: false,
+          isPrimary: false,
+        ),
+      ],
+      managed: true,
+    ),
     _isp.TableDefinition(
       name: 'sync_probes',
       dartName: 'SyncProbe',
@@ -112,11 +312,32 @@ class Protocol extends _is.DatabaseSerializationManager {
       }
     }
 
+    if (t == _i42k8jky.AccountBlockedException) {
+      return _i42k8jky.AccountBlockedException.fromJson(data) as T;
+    }
+    if (t == _id6kwse3.Entitlement) {
+      return _id6kwse3.Entitlement.fromJson(data) as T;
+    }
+    if (t == _i13b5r7e.OcrUsage) {
+      return _i13b5r7e.OcrUsage.fromJson(data) as T;
+    }
     if (t == _izw8z7ou.Greeting) {
       return _izw8z7ou.Greeting.fromJson(data) as T;
     }
     if (t == _i8t4kps3.SyncProbe) {
       return _i8t4kps3.SyncProbe.fromJson(data) as T;
+    }
+    if (t == _is.getType<_i42k8jky.AccountBlockedException?>()) {
+      return (data != null
+              ? _i42k8jky.AccountBlockedException.fromJson(data)
+              : null)
+          as T;
+    }
+    if (t == _is.getType<_id6kwse3.Entitlement?>()) {
+      return (data != null ? _id6kwse3.Entitlement.fromJson(data) : null) as T;
+    }
+    if (t == _is.getType<_i13b5r7e.OcrUsage?>()) {
+      return (data != null ? _i13b5r7e.OcrUsage.fromJson(data) : null) as T;
     }
     if (t == _is.getType<_izw8z7ou.Greeting?>()) {
       return (data != null ? _izw8z7ou.Greeting.fromJson(data) : null) as T;
@@ -138,6 +359,9 @@ class Protocol extends _is.DatabaseSerializationManager {
 
   static String? getClassNameForType(Type type) {
     return switch (type) {
+      _i42k8jky.AccountBlockedException => 'AccountBlockedException',
+      _id6kwse3.Entitlement => 'Entitlement',
+      _i13b5r7e.OcrUsage => 'OcrUsage',
       _izw8z7ou.Greeting => 'Greeting',
       _i8t4kps3.SyncProbe => 'SyncProbe',
       _ => null,
@@ -154,6 +378,12 @@ class Protocol extends _is.DatabaseSerializationManager {
     }
 
     switch (data) {
+      case _i42k8jky.AccountBlockedException():
+        return 'AccountBlockedException';
+      case _id6kwse3.Entitlement():
+        return 'Entitlement';
+      case _i13b5r7e.OcrUsage():
+        return 'OcrUsage';
       case _izw8z7ou.Greeting():
         return 'Greeting';
       case _i8t4kps3.SyncProbe():
@@ -183,6 +413,15 @@ class Protocol extends _is.DatabaseSerializationManager {
     var dataClassName = data['className'];
     if (dataClassName is! String) {
       return super.deserializeByClassName(data);
+    }
+    if (dataClassName == 'AccountBlockedException') {
+      return deserialize<_i42k8jky.AccountBlockedException>(data['data']);
+    }
+    if (dataClassName == 'Entitlement') {
+      return deserialize<_id6kwse3.Entitlement>(data['data']);
+    }
+    if (dataClassName == 'OcrUsage') {
+      return deserialize<_i13b5r7e.OcrUsage>(data['data']);
     }
     if (dataClassName == 'Greeting') {
       return deserialize<_izw8z7ou.Greeting>(data['data']);
@@ -231,6 +470,10 @@ class Protocol extends _is.DatabaseSerializationManager {
       }
     }
     switch (t) {
+      case _id6kwse3.Entitlement:
+        return _id6kwse3.Entitlement.t;
+      case _i13b5r7e.OcrUsage:
+        return _i13b5r7e.OcrUsage.t;
       case _i8t4kps3.SyncProbe:
         return _i8t4kps3.SyncProbe.t;
     }
