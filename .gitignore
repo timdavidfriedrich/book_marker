@@ -65,3 +65,15 @@ dart_defines.json
 
 # Play Console service account credential - NEVER commit
 **/fastlane/play-store-key.json
+
+# Server (Serverpod + PowerSync)
+server/.env
+server/**/.env
+server/**/config/passwords.yaml
+server/**/.serverpod/
+server/**/.dart_tool/
+server/**/.claude/
+server/**/.cursor/
+server/**/.agents/
+server/**/.dart_skills/
+server/**/.mcp.json

@@ -1,0 +1,52 @@
+# Production configuration.
+#
+# Hosts are the Docker service names on the compose network - Postgres, Redis
+# and PowerSync are never published to the host, so there is nothing to reach
+# them by except their names. Caddy (in the separate global-gateway project)
+# reaches this server over the shared external `global-proxy` network.
+
+apiServer:
+  port: 8080
+  publicHost: book-marker-api.timdavidfriedrich.de
+  publicPort: 443
+  publicScheme: https
+
+# Insights stays off the internet. It is reachable over Tailscale only, by
+# exec'ing into the container or via an SSH tunnel - it is deliberately absent
+# from the Caddyfile.
+insightsServer:
+  port: 8081
+  publicHost: book-marker-api.timdavidfriedrich.de
+  publicPort: 8081
+  publicScheme: https
+
+# The web server serves nothing in this deployment. The Flutter app is a mobile
+# app, not a web app.
+webServer:
+  port: 8082
+  publicHost: book-marker-api.timdavidfriedrich.de
+  publicPort: 443
+  publicScheme: https
+
+database:
+  host: postgres
+  port: 5432
+  name: book_marker
+  user: postgres
+  # * plaintext inside the compose network only; nothing crosses a host boundary
+  requireSsl: false
+
+redis:
+  enabled: true
+  host: redis
+  port: 6379
+
+maxRequestSize: 4194304 # 4 MB. Guards the server; the real bound is the client
+# normalising every cloud-OCR upload to 2300 px / q85 (~565 KB) before sending,
+# with maxImageBytes (2 MB) in app_config.yaml as the contract between the two.
+# See "Upload size is guaranteed, not assumed" in the plan.
+
+sessionLogs:
+  consoleEnabled: true
+  consoleLogFormat: json
+  persistentEnabled: true

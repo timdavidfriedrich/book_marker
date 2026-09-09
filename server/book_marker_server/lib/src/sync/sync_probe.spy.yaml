@@ -1,0 +1,18 @@
+### Temporary table used to verify the PowerSync replication path end to end.
+### Delete this together with its sync stream once the real synced tables land
+### in phase 4.
+class: SyncProbe
+table: sync_probes
+
+fields:
+  ### UUID, not the default bigint serial. PowerSync requires a text id, and the
+  ### app mints ids client-side while offline, so the database must never assign
+  ### them. Every synced model needs this line.
+  id: UuidValue, defaultModel=random, defaultPersist=random
+  ownerId: String
+  note: String
+  updatedAt: DateTime
+
+indexes:
+  sync_probes_owner_idx:
+    fields: ownerId

@@ -1,0 +1,37 @@
+# Runtime configuration - the single source of truth for every value you might
+# want to change in production without a deploy or an app release.
+#
+# The server reads this to ENFORCE. The app reads the same values (via
+# ConfigEndpoint) to DISPLAY. Keeping one copy is what stops the two drifting.
+#
+# Served unauthenticated, so it must work before sign-in. NOTHING SECRET GOES
+# HERE - API keys live in config/passwords.yaml. Treat every value in this file
+# as though it were already visible in a decompiled APK.
+#
+# Edit on the host and the change applies on the next request; the file is
+# mounted into the container, not baked into the image.
+
+version: 1
+
+plans:
+  free:
+    ocrPerDay: 3
+    ocrPerWeek: 10
+    ocrPerMonth: 20
+    maxImageBytes: 2097152
+    attachmentsEnabled: false
+  premium:
+    ocrPerDay: 50
+    ocrPerWeek: 250
+    ocrPerMonth: 500
+    maxImageBytes: 2097152
+    attachmentsEnabled: true
+
+recognition:
+  provider: gemini
+  cloudEnabledByDefault: true
+
+client:
+  minSupportedVersion: "0.1.0"
+  maintenanceMode: false
+  maintenanceMessage: null

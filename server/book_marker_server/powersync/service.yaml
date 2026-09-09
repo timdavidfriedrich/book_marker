@@ -1,0 +1,68 @@
+# PowerSync service configuration.
+#
+# Values marked !env come from the compose environment, which reads .env.
+# Nothing secret belongs in this file - it is committed.
+
+replication:
+  connections:
+    - type: postgresql
+      uri: !env PS_SOURCE_URI
+      # * the connection never leaves the docker network; TLS would be theatre here
+      sslmode: disable
+
+storage:
+  # Postgres bucket storage, so no MongoDB is needed. This points at a SEPARATE
+  # database (powersync_storage) that must be created by hand once - PowerSync
+  # will not create it for you.
+  type: postgresql
+  uri: !env PS_STORAGE_URI
+  sslmode: disable
+
+port: 8080
+
+sync_config:
+  content: |
+    config:
+      edition: 3
+    streams:
+      # Phase 1 only: proves replication works before the real tables exist.
+      # Remove together with the SyncProbe model in phase 4.
+      probe:
+        auto_subscribe: true
+        query: SELECT * FROM sync_probes WHERE owner_id = auth.user_id()
+
+      # Phase 4 - uncomment each as its table lands. Every stream is scoped to
+      # the authenticated user; there is no cross-user query anywhere.
+      # library:
+      #   auto_subscribe: true
+      #   query: SELECT * FROM books WHERE owner_id = auth.user_id()
+      # quotes:
+      #   auto_subscribe: true
+      #   query: SELECT * FROM quotes WHERE owner_id = auth.user_id()
+      # shelves:
+      #   auto_subscribe: true
+      #   query: SELECT * FROM shelves WHERE owner_id = auth.user_id()
+      # themes:
+      #   auto_subscribe: true
+      #   query: SELECT * FROM themes WHERE owner_id = auth.user_id()
+      # shelf_books:
+      #   auto_subscribe: true
+      #   query: SELECT * FROM shelf_books WHERE owner_id = auth.user_id()
+      # theme_quotes:
+      #   auto_subscribe: true
+      #   query: SELECT * FROM theme_quotes WHERE owner_id = auth.user_id()
+      # entitlements:
+      #   auto_subscribe: true
+      #   query: SELECT * FROM entitlements WHERE owner_id = auth.user_id()
+
+client_auth:
+  # PowerSync validates tokens that Serverpod signed, against this static key.
+  # It never contacts an identity provider.
+  audience: [powersync]
+  jwks:
+    keys:
+      - kty: RSA
+        n: !env PS_JWK_N
+        e: !env PS_JWK_E
+        alg: RS256
+        kid: !env PS_JWK_KID

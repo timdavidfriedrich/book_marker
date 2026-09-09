@@ -1,0 +1,10 @@
+name: book_marker_client
+description: Generated Serverpod client for the Book Marker backend.
+publish_to: none
+
+environment:
+  sdk: '^3.12.2'
+
+dependencies:
+  serverpod_auth_idp_client: 4.0.0-rc.2
+  serverpod_client: 4.0.0-rc.2

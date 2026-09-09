@@ -1,0 +1,133 @@
+# Production stack for the Book Marker backend.
+#
+#   cd /home/informaten/workspaces/book-marker/server
+#   docker compose -f docker-compose.prod.yaml up -d --build
+#
+# Nothing here publishes a port. Postgres, Redis and PowerSync are reachable
+# only inside the `internal` network; Caddy (global-gateway project) reaches
+# serverpod and powersync over the shared external `global-proxy` network, by
+# their aliases. This is why the host's occupied :8080 does not matter.
+#
+# Build context is this directory, because Dockerfile does `COPY pubspec.lock`
+# and `COPY book_marker_server`.
+
+name: book-marker
+
+x-server-image: &server-image
+  build:
+    context: .
+    dockerfile: book_marker_server/Dockerfile
+  image: book-marker-server:latest
+  volumes:
+    # passwords.yaml is gitignored, so it is never in the image. Mounted at
+    # runtime from the host, where it is placed once by hand.
+    - ./book_marker_server/config/passwords.yaml:/app/config/passwords.yaml:ro
+    # Runtime configuration - edited on the host, no rebuild, no deploy.
+    - ./book_marker_server/app_config.yaml:/app/app_config.yaml:ro
+
+services:
+  postgres:
+    image: ghcr.io/serverpod/postgres:16
+    restart: unless-stopped
+    # * wal_level=logical is what lets PowerSync consume a replication slot
+    command: ["postgres", "-c", "wal_level=logical"]
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_DB: book_marker
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks: [internal]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d book_marker"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    command: ["redis-server", "--requirepass", "${REDIS_PASSWORD:?set REDIS_PASSWORD in .env}"]
+    networks: [internal]
+    healthcheck:
+      test: ["CMD", "redis-cli", "--no-auth-warning", "-a", "${REDIS_PASSWORD}", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  # One-shot. Applies pending migrations, then exits. Everything else waits for
+  # it to finish successfully, so the server never boots against an old schema.
+  migrate:
+    <<: *server-image
+    restart: "no"
+    # The Dockerfile's ENTRYPOINT is shell-form and ignores `command:`, so it has
+    # to be replaced outright to pass --apply-migrations.
+    entrypoint:
+      ["./bin/server", "--mode=production", "--role=maintenance", "--apply-migrations"]
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks: [internal]
+
+  serverpod:
+    <<: *server-image
+    restart: unless-stopped
+    environment:
+      runmode: production
+      serverid: default
+      logging: normal
+      role: monolith
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+    networks:
+      internal:
+      global-proxy:
+        aliases: [book-marker-serverpod]
+
+  powersync:
+    image: journeyapps/powersync-service:latest
+    restart: unless-stopped
+    command: ["start", "-r", "unified"]
+    depends_on:
+      postgres:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+    volumes:
+      - ./book_marker_server/powersync:/config:ro
+    environment:
+      POWERSYNC_CONFIG_PATH: /config/service.yaml
+      PS_SOURCE_URI: ${PS_SOURCE_URI:?set PS_SOURCE_URI in .env}
+      PS_STORAGE_URI: ${PS_STORAGE_URI:?set PS_STORAGE_URI in .env}
+      PS_JWK_N: ${PS_JWK_N:?set PS_JWK_N in .env}
+      PS_JWK_E: ${PS_JWK_E:-AQAB}
+      PS_JWK_KID: ${PS_JWK_KID:?set PS_JWK_KID in .env}
+      PS_PORT: "8080"
+      NODE_OPTIONS: --max-old-space-size=1000
+    networks:
+      internal:
+      global-proxy:
+        aliases: [book-marker-powersync]
+    healthcheck:
+      test:
+        - CMD
+        - node
+        - -e
+        - "fetch('http://localhost:8080/probes/liveness').then(r => r.ok ? process.exit(0) : process.exit(1)).catch(() => process.exit(1))"
+      interval: 10s
+      timeout: 3s
+      retries: 15
+
+volumes:
+  postgres_data:
+
+networks:
+  internal:
+  # Owned by the global-gateway project; Caddy lives here too.
+  global-proxy:
+    external: true
