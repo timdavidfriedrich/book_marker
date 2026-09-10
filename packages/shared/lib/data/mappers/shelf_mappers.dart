@@ -1,7 +1,7 @@
 import 'package:core/theme/mark_defaults.dart';
-import 'package:shared/data/database/app_database.dart';
 import 'package:shared/data/mappers/accent_mappers.dart';
 import 'package:shared/data/mappers/collection_symbol_mappers.dart';
+import 'package:shared/data/models/local_shelf.dart';
 import 'package:shared/domain/entities/shelf.dart';
 
 extension LocalShelfMappers on LocalShelf {

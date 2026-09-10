@@ -10,8 +10,7 @@ class const AesGcmFieldCipher(
   final MasterKeyStore _keyStore,
 ) implements FieldCipher {
   @override
-  Future<String> encrypt(String plaintext) async =>
-      encryptWithKey(await _requireKey(), plaintext);
+  Future<String> encrypt(String plaintext) async => encryptWithKey(await _requireKey(), plaintext);
 
   @override
   Future<String> decrypt(String ciphertext) async =>

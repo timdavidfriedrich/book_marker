@@ -8,6 +8,7 @@ import 'package:shared/data/data_sources/book_cover_data_source.dart';
 import 'package:shared/data/data_sources/book_local_data_source.dart';
 import 'package:shared/data/data_sources/google_books_data_source.dart';
 import 'package:shared/data/data_sources/open_library_data_source.dart';
+import 'package:shared/data/data_sources/shelf_local_data_source.dart';
 import 'package:shared/data/mappers/book_mappers.dart';
 import 'package:shared/data/models/remote_google_book.dart';
 import 'package:shared/data/models/remote_open_library_book.dart';
@@ -84,6 +85,7 @@ class const BookRepositoryImpl(
   final GoogleBooksDataSource _googleBooksDataSource,
   final OpenLibraryDataSource _openLibraryDataSource,
   final BookCoverDataSource _coverDataSource,
+  final ShelfLocalDataSource _shelfLocalDataSource,
 ) implements BookRepository {
   @override
   Stream<AppResult<List<Book>>> watchBooks() async* {
@@ -215,6 +217,9 @@ class const BookRepositoryImpl(
       if (await _localDataSource.readBook(id) case final row?) {
         if (row.coverPath case final path?) await _coverDataSource.deleteCover(path);
       }
+      // * no foreign key cascades from a PowerSync view, so the shelf links go
+      // * here or they outlive the book and sync as orphans
+      await _shelfLocalDataSource.removeBookEverywhere(id);
       await _localDataSource.deleteBook(id);
       return const Success(());
     } on Object {

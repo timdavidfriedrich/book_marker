@@ -95,6 +95,7 @@ class const ShelfRepositoryImpl(
   @override
   Future<AppResult<()>> deleteShelf(String id) async {
     try {
+      await _localDataSource.removeAllBooks(id);
       await _localDataSource.deleteShelf(id);
       return const Success(());
     } on Object {

@@ -1,143 +1,160 @@
 import 'package:drift/drift.dart';
-import 'package:drift_flutter/drift_flutter.dart';
-import 'package:shared/data/database/converters.dart';
-import 'package:shared/domain/entities/quote_page.dart';
-import 'package:shared/domain/entities/recognized_word.dart';
+import 'package:drift_sqlite_async/drift_sqlite_async.dart';
+import 'package:sqlite_async/sqlite_async.dart';
 
 part 'app_database.g.dart';
 
-const _databaseName = "book_marker";
-const _emptyJsonList = "[]";
-const _statusReading = "reading";
-const _legacyQuotesTable = "bookmarks";
-const _legacyQuoteThemesTable = "theme_marks";
-const _legacyQuoteIdColumn = "bookmark_id";
-const _legacyVoiceNotePathColumn = "voice_path";
-const _legacyVoiceNoteDurationColumn = "voice_duration_ms";
-// * the single photo of a legacy quote becomes the first page of its page list
-const _legacySinglePageExpression =
-    "json_array(json_object("
-    "'photoPath', photo_path, "
-    "'imageAspectRatio', image_aspect_ratio, "
-    "'highlights', json(highlights)))";
-const _legacyPageNumbersExpression =
-    "case when page_number is null then json_array() else json_array(page_number) end";
-
-@DataClassName("LocalBook")
+// * PowerSync owns every table here. Drift only maps over the views it creates,
+// * which is why the migration strategy is empty and the schema version never
+// * moves: creating or altering anything from this side would fight the sync
+// * engine for ownership of the same tables.
+@DataClassName("BookRow")
 class Books extends Table {
   TextColumn get id => text()();
 
-  TextColumn get title => text()();
+  TextColumn get ownerId => text()();
 
-  TextColumn get authors => text().map(const StringListConverter())();
+  TextColumn get status => text()();
 
-  TextColumn get isbn => text().nullable()();
+  TextColumn get createdAt => text()();
 
-  TextColumn get thumbnailUrl => text().nullable()();
+  TextColumn get lastUsedAt => text()();
 
-  TextColumn get coverPath => text().nullable()();
+  TextColumn get updatedAt => text()();
 
-  TextColumn get status => text().withDefault(const Constant(_statusReading))();
+  IntColumn get keyVersion => integer()();
 
-  DateTimeColumn get createdAt => dateTime()();
+  TextColumn get titleCipher => text()();
 
-  DateTimeColumn get lastUsedAt => dateTime()();
+  TextColumn get authorsCipher => text()();
+
+  TextColumn get isbnCipher => text().nullable()();
+
+  TextColumn get coverCipher => text().nullable()();
 
   @override
   Set<Column<Object>> get primaryKey => {id};
 }
 
-@DataClassName("LocalQuote")
+@DataClassName("QuoteRow")
 class Quotes extends Table {
   TextColumn get id => text()();
 
-  TextColumn get bookId => text().references(Books, #id, onDelete: KeyAction.cascade)();
+  TextColumn get ownerId => text()();
 
-  TextColumn get pageNumbers => text().map(const IntListConverter())();
+  TextColumn get bookId => text()();
 
-  TextColumn get quote => text()();
+  IntColumn get isFavorite => integer()();
 
-  TextColumn get note => text().nullable()();
+  TextColumn get createdAt => text()();
 
-  TextColumn get voiceNotePath => text().nullable()();
+  TextColumn get updatedAt => text()();
 
-  IntColumn get voiceNoteDurationMs => integer().nullable()();
+  IntColumn get keyVersion => integer()();
 
-  TextColumn get pages => text().map(const QuotePageListConverter())();
+  TextColumn get quoteCipher => text()();
 
-  TextColumn get words =>
-      text().map(const RecognizedWordListConverter()).withDefault(const Constant(_emptyJsonList))();
+  TextColumn get noteCipher => text().nullable()();
 
-  TextColumn get markedWordIndexes =>
-      text().map(const IntListConverter()).withDefault(const Constant(_emptyJsonList))();
+  TextColumn get pageNumbersCipher => text()();
 
-  BoolColumn get isFavorite => boolean().withDefault(const Constant(false))();
+  TextColumn get pagesCipher => text()();
 
-  DateTimeColumn get createdAt => dateTime()();
+  TextColumn get wordsCipher => text()();
 
-  @override
-  Set<Column<Object>> get primaryKey => {id};
-}
+  TextColumn get markedWordIndexesCipher => text()();
 
-@DataClassName("LocalTheme")
-class Themes extends Table {
-  TextColumn get id => text()();
-
-  TextColumn get name => text()();
-
-  TextColumn get accent => text().nullable()();
-
-  TextColumn get symbol => text().nullable()();
-
-  DateTimeColumn get createdAt => dateTime()();
+  TextColumn get voiceNoteCipher => text().nullable()();
 
   @override
   Set<Column<Object>> get primaryKey => {id};
 }
 
-@DataClassName("LocalThemeQuote")
-class ThemeQuotes extends Table {
-  TextColumn get themeId => text().references(Themes, #id, onDelete: KeyAction.cascade)();
-
-  TextColumn get quoteId => text().references(Quotes, #id, onDelete: KeyAction.cascade)();
-
-  @override
-  Set<Column<Object>> get primaryKey => {themeId, quoteId};
-}
-
-@DataClassName("LocalShelf")
+@DataClassName("ShelfRow")
 class Shelves extends Table {
   TextColumn get id => text()();
 
-  TextColumn get name => text()();
+  TextColumn get ownerId => text()();
 
   TextColumn get accent => text().nullable()();
 
   TextColumn get symbol => text().nullable()();
 
-  DateTimeColumn get createdAt => dateTime()();
+  TextColumn get createdAt => text()();
+
+  TextColumn get updatedAt => text()();
+
+  IntColumn get keyVersion => integer()();
+
+  TextColumn get nameCipher => text()();
 
   @override
   Set<Column<Object>> get primaryKey => {id};
 }
 
-@DataClassName("LocalShelfBook")
-class ShelfBooks extends Table {
-  TextColumn get shelfId => text().references(Shelves, #id, onDelete: KeyAction.cascade)();
+@DataClassName("ThemeRow")
+class Themes extends Table {
+  TextColumn get id => text()();
 
-  TextColumn get bookId => text().references(Books, #id, onDelete: KeyAction.cascade)();
+  TextColumn get ownerId => text()();
+
+  TextColumn get accent => text().nullable()();
+
+  TextColumn get symbol => text().nullable()();
+
+  TextColumn get createdAt => text()();
+
+  TextColumn get updatedAt => text()();
+
+  IntColumn get keyVersion => integer()();
+
+  TextColumn get nameCipher => text()();
 
   @override
-  Set<Column<Object>> get primaryKey => {shelfId, bookId};
+  Set<Column<Object>> get primaryKey => {id};
+}
+
+// * the join tables gained an id, because PowerSync cannot sync a composite
+// * primary key. The pair stays unique through an index on the server side
+@DataClassName("ShelfBookRow")
+class ShelfBooks extends Table {
+  TextColumn get id => text()();
+
+  TextColumn get ownerId => text()();
+
+  TextColumn get shelfId => text()();
+
+  TextColumn get bookId => text()();
+
+  TextColumn get updatedAt => text()();
+
+  @override
+  Set<Column<Object>> get primaryKey => {id};
+}
+
+@DataClassName("ThemeQuoteRow")
+class ThemeQuotes extends Table {
+  TextColumn get id => text()();
+
+  TextColumn get ownerId => text()();
+
+  TextColumn get themeId => text()();
+
+  TextColumn get quoteId => text()();
+
+  TextColumn get updatedAt => text()();
+
+  @override
+  Set<Column<Object>> get primaryKey => {id};
 }
 
 @DataClassName("LocalAppConfigCache")
 class AppConfigCacheTable extends Table {
-  IntColumn get id => integer().withDefault(const Constant(0))();
+  TextColumn get id => text()();
 
   IntColumn get version => integer()();
 
-  DateTimeColumn get fetchedAt => dateTime()();
+  TextColumn get fetchedAt => text()();
 
   TextColumn get payload => text()();
 
@@ -147,7 +164,7 @@ class AppConfigCacheTable extends Table {
 
 @DataClassName("LocalSettings")
 class SettingsTable extends Table {
-  IntColumn get id => integer().withDefault(const Constant(0))();
+  TextColumn get id => text()();
 
   TextColumn get displayName => text().nullable()();
 
@@ -174,80 +191,23 @@ class SettingsTable extends Table {
   ],
 )
 class AppDatabase extends _$AppDatabase {
-  AppDatabase() : super(driftDatabase(name: _databaseName));
+  AppDatabase(SqliteConnection connection) : super(SqliteAsyncDriftConnection(connection));
+
+  // * ON CONFLICT is not allowed on a view and every PowerSync table is one,
+  // * so insertOnConflictUpdate fails at prepare time. INSERT OR REPLACE works:
+  // * SQLite passes the conflict clause into the INSTEAD OF trigger, which is
+  // * where the row is actually written.
+  Future<void> upsert<T extends Table, D>(TableInfo<T, D> table, Insertable<D> row) =>
+      into(table).insert(row, mode: InsertMode.insertOrReplace);
 
   @override
-  int get schemaVersion => 13;
+  int get schemaVersion => 1;
 
+  // * both no-ops on purpose. PowerSync created these tables and owns their
+  // * shape; the v1 to v12 chain this replaced is gone with the app unreleased
   @override
   MigrationStrategy get migration => MigrationStrategy(
-    onCreate: (migrator) => migrator.createAll(),
-    onUpgrade: (migrator, from, to) async {
-      if (from < 6) {
-        await migrator.renameTable(quotes, _legacyQuotesTable);
-        if (from >= 2) {
-          await migrator.renameTable(themeQuotes, _legacyQuoteThemesTable);
-          await migrator.renameColumn(themeQuotes, _legacyQuoteIdColumn, themeQuotes.quoteId);
-        }
-        if (from >= 3) {
-          await migrator.renameColumn(quotes, _legacyVoiceNotePathColumn, quotes.voiceNotePath);
-          await migrator.renameColumn(
-            quotes,
-            _legacyVoiceNoteDurationColumn,
-            quotes.voiceNoteDurationMs,
-          );
-        }
-      }
-      if (from < 2) {
-        await migrator.addColumn(books, books.status);
-        await migrator.addColumn(quotes, quotes.note);
-        await migrator.createTable(themes);
-        await migrator.createTable(themeQuotes);
-        await migrator.createTable(shelves);
-        await migrator.createTable(shelfBooks);
-      }
-      if (from < 3) {
-        await migrator.addColumn(quotes, quotes.voiceNotePath);
-        await migrator.addColumn(quotes, quotes.voiceNoteDurationMs);
-      }
-      if (from < 4) {
-        await migrator.addColumn(themes, themes.accent);
-        await migrator.addColumn(shelves, shelves.accent);
-      }
-      if (from < 5) {
-        await migrator.createTable(settingsTable);
-      }
-      if (from < 8) {
-        await migrator.alterTable(
-          TableMigration(
-            quotes,
-            newColumns: [if (from < 7) quotes.pages, quotes.pageNumbers],
-            columnTransformer: {
-              if (from < 7)
-                quotes.pages: const CustomExpression<String>(_legacySinglePageExpression),
-              quotes.pageNumbers: const CustomExpression<String>(_legacyPageNumbersExpression),
-            },
-          ),
-        );
-      }
-      if (from < 9) {
-        await migrator.addColumn(themes, themes.symbol);
-        await migrator.addColumn(shelves, shelves.symbol);
-      }
-      if (from < 10) {
-        await migrator.addColumn(settingsTable, settingsTable.themePreference);
-        await migrator.addColumn(settingsTable, settingsTable.contrastPreference);
-      }
-      if (from < 11) {
-        await migrator.addColumn(books, books.coverPath);
-      }
-      if (from < 12) {
-        await migrator.addColumn(quotes, quotes.words);
-        await migrator.addColumn(quotes, quotes.markedWordIndexes);
-      }
-      if (from < 13) {
-        await migrator.createTable(appConfigCacheTable);
-      }
-    },
+    onCreate: (migrator) async {},
+    onUpgrade: (migrator, from, to) async {},
   );
 }

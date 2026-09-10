@@ -1,9 +1,9 @@
 import 'package:shared/data/database/app_database.dart';
+import 'package:shared/data/database/sync_schema.dart';
+import 'package:shared/data/database/timestamp_codec.dart';
 import 'package:shared/data/models/remote_app_config.dart';
 import 'package:shared/domain/entities/app_config.dart';
 import 'package:shared/domain/entities/plan_limits.dart';
-
-const _cacheRowId = 0;
 
 extension RemoteAppConfigMappers on RemoteAppConfig {
   AppConfig toAppConfig() {
@@ -20,9 +20,9 @@ extension RemoteAppConfigMappers on RemoteAppConfig {
 
   LocalAppConfigCache toLocalAppConfigCache(DateTime fetchedAt) {
     return LocalAppConfigCache(
-      id: _cacheRowId,
+      id: appConfigCacheRowId,
       version: version,
-      fetchedAt: fetchedAt,
+      fetchedAt: encodeTimestamp(fetchedAt),
       payload: toJson(),
     );
   }

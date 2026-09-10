@@ -5,9 +5,12 @@ import 'package:shared/data/data_sources/book_local_data_source.dart';
 import 'package:shared/data/data_sources/quote_local_data_source.dart';
 import 'package:shared/data/data_sources/shelf_local_data_source.dart';
 import 'package:shared/data/data_sources/theme_local_data_source.dart';
-import 'package:shared/data/database/app_database.dart';
 import 'package:shared/data/mappers/accent_mappers.dart';
 import 'package:shared/data/mappers/collection_symbol_mappers.dart';
+import 'package:shared/data/models/local_book.dart';
+import 'package:shared/data/models/local_quote.dart';
+import 'package:shared/data/models/local_shelf.dart';
+import 'package:shared/data/models/local_theme.dart';
 
 // * Dev-only: seeds example books/quotes/themes/shelves, triggered from the debug
 // * section of the settings screen. To remove: delete this file together with
@@ -181,6 +184,7 @@ class const SampleDataSeeder(
       authors: [author],
       isbn: isbn,
       thumbnailUrl: "$_coverEndpoint$isbn$_coverParameters",
+      coverPath: null,
       status: status,
       createdAt: createdAt,
       lastUsedAt: createdAt,
@@ -202,6 +206,8 @@ class const SampleDataSeeder(
       pageNumbers: [page],
       quote: quote,
       note: note,
+      voiceNotePath: null,
+      voiceNoteDurationMs: null,
       pages: const [],
       words: const [],
       markedWordIndexes: const [],

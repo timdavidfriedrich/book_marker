@@ -3,7 +3,7 @@
 part of 'app_database.dart';
 
 // ignore_for_file: type=lint
-class $BooksTable extends Books with TableInfo<$BooksTable, LocalBook> {
+class $BooksTable extends Books with TableInfo<$BooksTable, BookRow> {
   @override
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
@@ -17,54 +17,16 @@ class $BooksTable extends Books with TableInfo<$BooksTable, LocalBook> {
     type: DriftSqlType.string,
     requiredDuringInsert: true,
   );
-  static const VerificationMeta _titleMeta = const VerificationMeta('title');
+  static const VerificationMeta _ownerIdMeta = const VerificationMeta(
+    'ownerId',
+  );
   @override
-  late final GeneratedColumn<String> title = GeneratedColumn<String>(
-    'title',
+  late final GeneratedColumn<String> ownerId = GeneratedColumn<String>(
+    'owner_id',
     aliasedName,
     false,
     type: DriftSqlType.string,
     requiredDuringInsert: true,
-  );
-  @override
-  late final GeneratedColumnWithTypeConverter<List<String>, String> authors =
-      GeneratedColumn<String>(
-        'authors',
-        aliasedName,
-        false,
-        type: DriftSqlType.string,
-        requiredDuringInsert: true,
-      ).withConverter<List<String>>($BooksTable.$converterauthors);
-  static const VerificationMeta _isbnMeta = const VerificationMeta('isbn');
-  @override
-  late final GeneratedColumn<String> isbn = GeneratedColumn<String>(
-    'isbn',
-    aliasedName,
-    true,
-    type: DriftSqlType.string,
-    requiredDuringInsert: false,
-  );
-  static const VerificationMeta _thumbnailUrlMeta = const VerificationMeta(
-    'thumbnailUrl',
-  );
-  @override
-  late final GeneratedColumn<String> thumbnailUrl = GeneratedColumn<String>(
-    'thumbnail_url',
-    aliasedName,
-    true,
-    type: DriftSqlType.string,
-    requiredDuringInsert: false,
-  );
-  static const VerificationMeta _coverPathMeta = const VerificationMeta(
-    'coverPath',
-  );
-  @override
-  late final GeneratedColumn<String> coverPath = GeneratedColumn<String>(
-    'cover_path',
-    aliasedName,
-    true,
-    type: DriftSqlType.string,
-    requiredDuringInsert: false,
   );
   static const VerificationMeta _statusMeta = const VerificationMeta('status');
   @override
@@ -73,42 +35,109 @@ class $BooksTable extends Books with TableInfo<$BooksTable, LocalBook> {
     aliasedName,
     false,
     type: DriftSqlType.string,
-    requiredDuringInsert: false,
-    defaultValue: const Constant(_statusReading),
+    requiredDuringInsert: true,
   );
   static const VerificationMeta _createdAtMeta = const VerificationMeta(
     'createdAt',
   );
   @override
-  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+  late final GeneratedColumn<String> createdAt = GeneratedColumn<String>(
     'created_at',
     aliasedName,
     false,
-    type: DriftSqlType.dateTime,
+    type: DriftSqlType.string,
     requiredDuringInsert: true,
   );
   static const VerificationMeta _lastUsedAtMeta = const VerificationMeta(
     'lastUsedAt',
   );
   @override
-  late final GeneratedColumn<DateTime> lastUsedAt = GeneratedColumn<DateTime>(
+  late final GeneratedColumn<String> lastUsedAt = GeneratedColumn<String>(
     'last_used_at',
     aliasedName,
     false,
-    type: DriftSqlType.dateTime,
+    type: DriftSqlType.string,
     requiredDuringInsert: true,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<String> updatedAt = GeneratedColumn<String>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _keyVersionMeta = const VerificationMeta(
+    'keyVersion',
+  );
+  @override
+  late final GeneratedColumn<int> keyVersion = GeneratedColumn<int>(
+    'key_version',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _titleCipherMeta = const VerificationMeta(
+    'titleCipher',
+  );
+  @override
+  late final GeneratedColumn<String> titleCipher = GeneratedColumn<String>(
+    'title_cipher',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _authorsCipherMeta = const VerificationMeta(
+    'authorsCipher',
+  );
+  @override
+  late final GeneratedColumn<String> authorsCipher = GeneratedColumn<String>(
+    'authors_cipher',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _isbnCipherMeta = const VerificationMeta(
+    'isbnCipher',
+  );
+  @override
+  late final GeneratedColumn<String> isbnCipher = GeneratedColumn<String>(
+    'isbn_cipher',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _coverCipherMeta = const VerificationMeta(
+    'coverCipher',
+  );
+  @override
+  late final GeneratedColumn<String> coverCipher = GeneratedColumn<String>(
+    'cover_cipher',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
   );
   @override
   List<GeneratedColumn> get $columns => [
     id,
-    title,
-    authors,
-    isbn,
-    thumbnailUrl,
-    coverPath,
+    ownerId,
     status,
     createdAt,
     lastUsedAt,
+    updatedAt,
+    keyVersion,
+    titleCipher,
+    authorsCipher,
+    isbnCipher,
+    coverCipher,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -117,7 +146,7 @@ class $BooksTable extends Books with TableInfo<$BooksTable, LocalBook> {
   static const String $name = 'books';
   @override
   VerificationContext validateIntegrity(
-    Insertable<LocalBook> instance, {
+    Insertable<BookRow> instance, {
     bool isInserting = false,
   }) {
     final context = VerificationContext();
@@ -127,40 +156,21 @@ class $BooksTable extends Books with TableInfo<$BooksTable, LocalBook> {
     } else if (isInserting) {
       context.missing(_idMeta);
     }
-    if (data.containsKey('title')) {
+    if (data.containsKey('owner_id')) {
       context.handle(
-        _titleMeta,
-        title.isAcceptableOrUnknown(data['title']!, _titleMeta),
+        _ownerIdMeta,
+        ownerId.isAcceptableOrUnknown(data['owner_id']!, _ownerIdMeta),
       );
     } else if (isInserting) {
-      context.missing(_titleMeta);
-    }
-    if (data.containsKey('isbn')) {
-      context.handle(
-        _isbnMeta,
-        isbn.isAcceptableOrUnknown(data['isbn']!, _isbnMeta),
-      );
-    }
-    if (data.containsKey('thumbnail_url')) {
-      context.handle(
-        _thumbnailUrlMeta,
-        thumbnailUrl.isAcceptableOrUnknown(
-          data['thumbnail_url']!,
-          _thumbnailUrlMeta,
-        ),
-      );
-    }
-    if (data.containsKey('cover_path')) {
-      context.handle(
-        _coverPathMeta,
-        coverPath.isAcceptableOrUnknown(data['cover_path']!, _coverPathMeta),
-      );
+      context.missing(_ownerIdMeta);
     }
     if (data.containsKey('status')) {
       context.handle(
         _statusMeta,
         status.isAcceptableOrUnknown(data['status']!, _statusMeta),
       );
+    } else if (isInserting) {
+      context.missing(_statusMeta);
     }
     if (data.containsKey('created_at')) {
       context.handle(
@@ -181,53 +191,112 @@ class $BooksTable extends Books with TableInfo<$BooksTable, LocalBook> {
     } else if (isInserting) {
       context.missing(_lastUsedAtMeta);
     }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_updatedAtMeta);
+    }
+    if (data.containsKey('key_version')) {
+      context.handle(
+        _keyVersionMeta,
+        keyVersion.isAcceptableOrUnknown(data['key_version']!, _keyVersionMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_keyVersionMeta);
+    }
+    if (data.containsKey('title_cipher')) {
+      context.handle(
+        _titleCipherMeta,
+        titleCipher.isAcceptableOrUnknown(
+          data['title_cipher']!,
+          _titleCipherMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_titleCipherMeta);
+    }
+    if (data.containsKey('authors_cipher')) {
+      context.handle(
+        _authorsCipherMeta,
+        authorsCipher.isAcceptableOrUnknown(
+          data['authors_cipher']!,
+          _authorsCipherMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_authorsCipherMeta);
+    }
+    if (data.containsKey('isbn_cipher')) {
+      context.handle(
+        _isbnCipherMeta,
+        isbnCipher.isAcceptableOrUnknown(data['isbn_cipher']!, _isbnCipherMeta),
+      );
+    }
+    if (data.containsKey('cover_cipher')) {
+      context.handle(
+        _coverCipherMeta,
+        coverCipher.isAcceptableOrUnknown(
+          data['cover_cipher']!,
+          _coverCipherMeta,
+        ),
+      );
+    }
     return context;
   }
 
   @override
   Set<GeneratedColumn> get $primaryKey => {id};
   @override
-  LocalBook map(Map<String, dynamic> data, {String? tablePrefix}) {
+  BookRow map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
-    return LocalBook(
+    return BookRow(
       id: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}id'],
       )!,
-      title: attachedDatabase.typeMapping.read(
+      ownerId: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
-        data['${effectivePrefix}title'],
+        data['${effectivePrefix}owner_id'],
       )!,
-      authors: $BooksTable.$converterauthors.fromSql(
-        attachedDatabase.typeMapping.read(
-          DriftSqlType.string,
-          data['${effectivePrefix}authors'],
-        )!,
-      ),
-      isbn: attachedDatabase.typeMapping.read(
-        DriftSqlType.string,
-        data['${effectivePrefix}isbn'],
-      ),
-      thumbnailUrl: attachedDatabase.typeMapping.read(
-        DriftSqlType.string,
-        data['${effectivePrefix}thumbnail_url'],
-      ),
-      coverPath: attachedDatabase.typeMapping.read(
-        DriftSqlType.string,
-        data['${effectivePrefix}cover_path'],
-      ),
       status: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}status'],
       )!,
       createdAt: attachedDatabase.typeMapping.read(
-        DriftSqlType.dateTime,
+        DriftSqlType.string,
         data['${effectivePrefix}created_at'],
       )!,
       lastUsedAt: attachedDatabase.typeMapping.read(
-        DriftSqlType.dateTime,
+        DriftSqlType.string,
         data['${effectivePrefix}last_used_at'],
       )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}updated_at'],
+      )!,
+      keyVersion: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}key_version'],
+      )!,
+      titleCipher: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}title_cipher'],
+      )!,
+      authorsCipher: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}authors_cipher'],
+      )!,
+      isbnCipher: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}isbn_cipher'],
+      ),
+      coverCipher: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}cover_cipher'],
+      ),
     );
   }
 
@@ -235,90 +304,91 @@ class $BooksTable extends Books with TableInfo<$BooksTable, LocalBook> {
   $BooksTable createAlias(String alias) {
     return $BooksTable(attachedDatabase, alias);
   }
-
-  static TypeConverter<List<String>, String> $converterauthors =
-      const StringListConverter();
 }
 
-class LocalBook extends DataClass implements Insertable<LocalBook> {
+class BookRow extends DataClass implements Insertable<BookRow> {
   final String id;
-  final String title;
-  final List<String> authors;
-  final String? isbn;
-  final String? thumbnailUrl;
-  final String? coverPath;
+  final String ownerId;
   final String status;
-  final DateTime createdAt;
-  final DateTime lastUsedAt;
-  const LocalBook({
+  final String createdAt;
+  final String lastUsedAt;
+  final String updatedAt;
+  final int keyVersion;
+  final String titleCipher;
+  final String authorsCipher;
+  final String? isbnCipher;
+  final String? coverCipher;
+  const BookRow({
     required this.id,
-    required this.title,
-    required this.authors,
-    this.isbn,
-    this.thumbnailUrl,
-    this.coverPath,
+    required this.ownerId,
     required this.status,
     required this.createdAt,
     required this.lastUsedAt,
+    required this.updatedAt,
+    required this.keyVersion,
+    required this.titleCipher,
+    required this.authorsCipher,
+    this.isbnCipher,
+    this.coverCipher,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     map['id'] = Variable<String>(id);
-    map['title'] = Variable<String>(title);
-    {
-      map['authors'] = Variable<String>(
-        $BooksTable.$converterauthors.toSql(authors),
-      );
-    }
-    if (!nullToAbsent || isbn != null) {
-      map['isbn'] = Variable<String>(isbn);
-    }
-    if (!nullToAbsent || thumbnailUrl != null) {
-      map['thumbnail_url'] = Variable<String>(thumbnailUrl);
-    }
-    if (!nullToAbsent || coverPath != null) {
-      map['cover_path'] = Variable<String>(coverPath);
-    }
+    map['owner_id'] = Variable<String>(ownerId);
     map['status'] = Variable<String>(status);
-    map['created_at'] = Variable<DateTime>(createdAt);
-    map['last_used_at'] = Variable<DateTime>(lastUsedAt);
+    map['created_at'] = Variable<String>(createdAt);
+    map['last_used_at'] = Variable<String>(lastUsedAt);
+    map['updated_at'] = Variable<String>(updatedAt);
+    map['key_version'] = Variable<int>(keyVersion);
+    map['title_cipher'] = Variable<String>(titleCipher);
+    map['authors_cipher'] = Variable<String>(authorsCipher);
+    if (!nullToAbsent || isbnCipher != null) {
+      map['isbn_cipher'] = Variable<String>(isbnCipher);
+    }
+    if (!nullToAbsent || coverCipher != null) {
+      map['cover_cipher'] = Variable<String>(coverCipher);
+    }
     return map;
   }
 
   BooksCompanion toCompanion(bool nullToAbsent) {
     return BooksCompanion(
       id: Value(id),
-      title: Value(title),
-      authors: Value(authors),
-      isbn: isbn == null && nullToAbsent ? const Value.absent() : Value(isbn),
-      thumbnailUrl: thumbnailUrl == null && nullToAbsent
-          ? const Value.absent()
-          : Value(thumbnailUrl),
-      coverPath: coverPath == null && nullToAbsent
-          ? const Value.absent()
-          : Value(coverPath),
+      ownerId: Value(ownerId),
       status: Value(status),
       createdAt: Value(createdAt),
       lastUsedAt: Value(lastUsedAt),
+      updatedAt: Value(updatedAt),
+      keyVersion: Value(keyVersion),
+      titleCipher: Value(titleCipher),
+      authorsCipher: Value(authorsCipher),
+      isbnCipher: isbnCipher == null && nullToAbsent
+          ? const Value.absent()
+          : Value(isbnCipher),
+      coverCipher: coverCipher == null && nullToAbsent
+          ? const Value.absent()
+          : Value(coverCipher),
     );
   }
 
-  factory LocalBook.fromJson(
+  factory BookRow.fromJson(
     Map<String, dynamic> json, {
     ValueSerializer? serializer,
   }) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
-    return LocalBook(
+    return BookRow(
       id: serializer.fromJson<String>(json['id']),
-      title: serializer.fromJson<String>(json['title']),
-      authors: serializer.fromJson<List<String>>(json['authors']),
-      isbn: serializer.fromJson<String?>(json['isbn']),
-      thumbnailUrl: serializer.fromJson<String?>(json['thumbnailUrl']),
-      coverPath: serializer.fromJson<String?>(json['coverPath']),
+      ownerId: serializer.fromJson<String>(json['ownerId']),
       status: serializer.fromJson<String>(json['status']),
-      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
-      lastUsedAt: serializer.fromJson<DateTime>(json['lastUsedAt']),
+      createdAt: serializer.fromJson<String>(json['createdAt']),
+      lastUsedAt: serializer.fromJson<String>(json['lastUsedAt']),
+      updatedAt: serializer.fromJson<String>(json['updatedAt']),
+      keyVersion: serializer.fromJson<int>(json['keyVersion']),
+      titleCipher: serializer.fromJson<String>(json['titleCipher']),
+      authorsCipher: serializer.fromJson<String>(json['authorsCipher']),
+      isbnCipher: serializer.fromJson<String?>(json['isbnCipher']),
+      coverCipher: serializer.fromJson<String?>(json['coverCipher']),
     );
   }
   @override
@@ -326,68 +396,86 @@ class LocalBook extends DataClass implements Insertable<LocalBook> {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
       'id': serializer.toJson<String>(id),
-      'title': serializer.toJson<String>(title),
-      'authors': serializer.toJson<List<String>>(authors),
-      'isbn': serializer.toJson<String?>(isbn),
-      'thumbnailUrl': serializer.toJson<String?>(thumbnailUrl),
-      'coverPath': serializer.toJson<String?>(coverPath),
+      'ownerId': serializer.toJson<String>(ownerId),
       'status': serializer.toJson<String>(status),
-      'createdAt': serializer.toJson<DateTime>(createdAt),
-      'lastUsedAt': serializer.toJson<DateTime>(lastUsedAt),
+      'createdAt': serializer.toJson<String>(createdAt),
+      'lastUsedAt': serializer.toJson<String>(lastUsedAt),
+      'updatedAt': serializer.toJson<String>(updatedAt),
+      'keyVersion': serializer.toJson<int>(keyVersion),
+      'titleCipher': serializer.toJson<String>(titleCipher),
+      'authorsCipher': serializer.toJson<String>(authorsCipher),
+      'isbnCipher': serializer.toJson<String?>(isbnCipher),
+      'coverCipher': serializer.toJson<String?>(coverCipher),
     };
   }
 
-  LocalBook copyWith({
+  BookRow copyWith({
     String? id,
-    String? title,
-    List<String>? authors,
-    Value<String?> isbn = const Value.absent(),
-    Value<String?> thumbnailUrl = const Value.absent(),
-    Value<String?> coverPath = const Value.absent(),
+    String? ownerId,
     String? status,
-    DateTime? createdAt,
-    DateTime? lastUsedAt,
-  }) => LocalBook(
+    String? createdAt,
+    String? lastUsedAt,
+    String? updatedAt,
+    int? keyVersion,
+    String? titleCipher,
+    String? authorsCipher,
+    Value<String?> isbnCipher = const Value.absent(),
+    Value<String?> coverCipher = const Value.absent(),
+  }) => BookRow(
     id: id ?? this.id,
-    title: title ?? this.title,
-    authors: authors ?? this.authors,
-    isbn: isbn.present ? isbn.value : this.isbn,
-    thumbnailUrl: thumbnailUrl.present ? thumbnailUrl.value : this.thumbnailUrl,
-    coverPath: coverPath.present ? coverPath.value : this.coverPath,
+    ownerId: ownerId ?? this.ownerId,
     status: status ?? this.status,
     createdAt: createdAt ?? this.createdAt,
     lastUsedAt: lastUsedAt ?? this.lastUsedAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+    keyVersion: keyVersion ?? this.keyVersion,
+    titleCipher: titleCipher ?? this.titleCipher,
+    authorsCipher: authorsCipher ?? this.authorsCipher,
+    isbnCipher: isbnCipher.present ? isbnCipher.value : this.isbnCipher,
+    coverCipher: coverCipher.present ? coverCipher.value : this.coverCipher,
   );
-  LocalBook copyWithCompanion(BooksCompanion data) {
-    return LocalBook(
+  BookRow copyWithCompanion(BooksCompanion data) {
+    return BookRow(
       id: data.id.present ? data.id.value : this.id,
-      title: data.title.present ? data.title.value : this.title,
-      authors: data.authors.present ? data.authors.value : this.authors,
-      isbn: data.isbn.present ? data.isbn.value : this.isbn,
-      thumbnailUrl: data.thumbnailUrl.present
-          ? data.thumbnailUrl.value
-          : this.thumbnailUrl,
-      coverPath: data.coverPath.present ? data.coverPath.value : this.coverPath,
+      ownerId: data.ownerId.present ? data.ownerId.value : this.ownerId,
       status: data.status.present ? data.status.value : this.status,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
       lastUsedAt: data.lastUsedAt.present
           ? data.lastUsedAt.value
           : this.lastUsedAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+      keyVersion: data.keyVersion.present
+          ? data.keyVersion.value
+          : this.keyVersion,
+      titleCipher: data.titleCipher.present
+          ? data.titleCipher.value
+          : this.titleCipher,
+      authorsCipher: data.authorsCipher.present
+          ? data.authorsCipher.value
+          : this.authorsCipher,
+      isbnCipher: data.isbnCipher.present
+          ? data.isbnCipher.value
+          : this.isbnCipher,
+      coverCipher: data.coverCipher.present
+          ? data.coverCipher.value
+          : this.coverCipher,
     );
   }
 
   @override
   String toString() {
-    return (StringBuffer('LocalBook(')
+    return (StringBuffer('BookRow(')
           ..write('id: $id, ')
-          ..write('title: $title, ')
-          ..write('authors: $authors, ')
-          ..write('isbn: $isbn, ')
-          ..write('thumbnailUrl: $thumbnailUrl, ')
-          ..write('coverPath: $coverPath, ')
+          ..write('ownerId: $ownerId, ')
           ..write('status: $status, ')
           ..write('createdAt: $createdAt, ')
-          ..write('lastUsedAt: $lastUsedAt')
+          ..write('lastUsedAt: $lastUsedAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('keyVersion: $keyVersion, ')
+          ..write('titleCipher: $titleCipher, ')
+          ..write('authorsCipher: $authorsCipher, ')
+          ..write('isbnCipher: $isbnCipher, ')
+          ..write('coverCipher: $coverCipher')
           ..write(')'))
         .toString();
   }
@@ -395,117 +483,139 @@ class LocalBook extends DataClass implements Insertable<LocalBook> {
   @override
   int get hashCode => Object.hash(
     id,
-    title,
-    authors,
-    isbn,
-    thumbnailUrl,
-    coverPath,
+    ownerId,
     status,
     createdAt,
     lastUsedAt,
+    updatedAt,
+    keyVersion,
+    titleCipher,
+    authorsCipher,
+    isbnCipher,
+    coverCipher,
   );
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      (other is LocalBook &&
+      (other is BookRow &&
           other.id == this.id &&
-          other.title == this.title &&
-          other.authors == this.authors &&
-          other.isbn == this.isbn &&
-          other.thumbnailUrl == this.thumbnailUrl &&
-          other.coverPath == this.coverPath &&
+          other.ownerId == this.ownerId &&
           other.status == this.status &&
           other.createdAt == this.createdAt &&
-          other.lastUsedAt == this.lastUsedAt);
+          other.lastUsedAt == this.lastUsedAt &&
+          other.updatedAt == this.updatedAt &&
+          other.keyVersion == this.keyVersion &&
+          other.titleCipher == this.titleCipher &&
+          other.authorsCipher == this.authorsCipher &&
+          other.isbnCipher == this.isbnCipher &&
+          other.coverCipher == this.coverCipher);
 }
 
-class BooksCompanion extends UpdateCompanion<LocalBook> {
+class BooksCompanion extends UpdateCompanion<BookRow> {
   final Value<String> id;
-  final Value<String> title;
-  final Value<List<String>> authors;
-  final Value<String?> isbn;
-  final Value<String?> thumbnailUrl;
-  final Value<String?> coverPath;
+  final Value<String> ownerId;
   final Value<String> status;
-  final Value<DateTime> createdAt;
-  final Value<DateTime> lastUsedAt;
+  final Value<String> createdAt;
+  final Value<String> lastUsedAt;
+  final Value<String> updatedAt;
+  final Value<int> keyVersion;
+  final Value<String> titleCipher;
+  final Value<String> authorsCipher;
+  final Value<String?> isbnCipher;
+  final Value<String?> coverCipher;
   final Value<int> rowid;
   const BooksCompanion({
     this.id = const Value.absent(),
-    this.title = const Value.absent(),
-    this.authors = const Value.absent(),
-    this.isbn = const Value.absent(),
-    this.thumbnailUrl = const Value.absent(),
-    this.coverPath = const Value.absent(),
+    this.ownerId = const Value.absent(),
     this.status = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.lastUsedAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.keyVersion = const Value.absent(),
+    this.titleCipher = const Value.absent(),
+    this.authorsCipher = const Value.absent(),
+    this.isbnCipher = const Value.absent(),
+    this.coverCipher = const Value.absent(),
     this.rowid = const Value.absent(),
   });
   BooksCompanion.insert({
     required String id,
-    required String title,
-    required List<String> authors,
-    this.isbn = const Value.absent(),
-    this.thumbnailUrl = const Value.absent(),
-    this.coverPath = const Value.absent(),
-    this.status = const Value.absent(),
-    required DateTime createdAt,
-    required DateTime lastUsedAt,
+    required String ownerId,
+    required String status,
+    required String createdAt,
+    required String lastUsedAt,
+    required String updatedAt,
+    required int keyVersion,
+    required String titleCipher,
+    required String authorsCipher,
+    this.isbnCipher = const Value.absent(),
+    this.coverCipher = const Value.absent(),
     this.rowid = const Value.absent(),
   }) : id = Value(id),
-       title = Value(title),
-       authors = Value(authors),
+       ownerId = Value(ownerId),
+       status = Value(status),
        createdAt = Value(createdAt),
-       lastUsedAt = Value(lastUsedAt);
-  static Insertable<LocalBook> custom({
+       lastUsedAt = Value(lastUsedAt),
+       updatedAt = Value(updatedAt),
+       keyVersion = Value(keyVersion),
+       titleCipher = Value(titleCipher),
+       authorsCipher = Value(authorsCipher);
+  static Insertable<BookRow> custom({
     Expression<String>? id,
-    Expression<String>? title,
-    Expression<String>? authors,
-    Expression<String>? isbn,
-    Expression<String>? thumbnailUrl,
-    Expression<String>? coverPath,
+    Expression<String>? ownerId,
     Expression<String>? status,
-    Expression<DateTime>? createdAt,
-    Expression<DateTime>? lastUsedAt,
+    Expression<String>? createdAt,
+    Expression<String>? lastUsedAt,
+    Expression<String>? updatedAt,
+    Expression<int>? keyVersion,
+    Expression<String>? titleCipher,
+    Expression<String>? authorsCipher,
+    Expression<String>? isbnCipher,
+    Expression<String>? coverCipher,
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
-      if (title != null) 'title': title,
-      if (authors != null) 'authors': authors,
-      if (isbn != null) 'isbn': isbn,
-      if (thumbnailUrl != null) 'thumbnail_url': thumbnailUrl,
-      if (coverPath != null) 'cover_path': coverPath,
+      if (ownerId != null) 'owner_id': ownerId,
       if (status != null) 'status': status,
       if (createdAt != null) 'created_at': createdAt,
       if (lastUsedAt != null) 'last_used_at': lastUsedAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (keyVersion != null) 'key_version': keyVersion,
+      if (titleCipher != null) 'title_cipher': titleCipher,
+      if (authorsCipher != null) 'authors_cipher': authorsCipher,
+      if (isbnCipher != null) 'isbn_cipher': isbnCipher,
+      if (coverCipher != null) 'cover_cipher': coverCipher,
       if (rowid != null) 'rowid': rowid,
     });
   }
 
   BooksCompanion copyWith({
     Value<String>? id,
-    Value<String>? title,
-    Value<List<String>>? authors,
-    Value<String?>? isbn,
-    Value<String?>? thumbnailUrl,
-    Value<String?>? coverPath,
+    Value<String>? ownerId,
     Value<String>? status,
-    Value<DateTime>? createdAt,
-    Value<DateTime>? lastUsedAt,
+    Value<String>? createdAt,
+    Value<String>? lastUsedAt,
+    Value<String>? updatedAt,
+    Value<int>? keyVersion,
+    Value<String>? titleCipher,
+    Value<String>? authorsCipher,
+    Value<String?>? isbnCipher,
+    Value<String?>? coverCipher,
     Value<int>? rowid,
   }) {
     return BooksCompanion(
       id: id ?? this.id,
-      title: title ?? this.title,
-      authors: authors ?? this.authors,
-      isbn: isbn ?? this.isbn,
-      thumbnailUrl: thumbnailUrl ?? this.thumbnailUrl,
-      coverPath: coverPath ?? this.coverPath,
+      ownerId: ownerId ?? this.ownerId,
       status: status ?? this.status,
       createdAt: createdAt ?? this.createdAt,
       lastUsedAt: lastUsedAt ?? this.lastUsedAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      keyVersion: keyVersion ?? this.keyVersion,
+      titleCipher: titleCipher ?? this.titleCipher,
+      authorsCipher: authorsCipher ?? this.authorsCipher,
+      isbnCipher: isbnCipher ?? this.isbnCipher,
+      coverCipher: coverCipher ?? this.coverCipher,
       rowid: rowid ?? this.rowid,
     );
   }
@@ -516,31 +626,35 @@ class BooksCompanion extends UpdateCompanion<LocalBook> {
     if (id.present) {
       map['id'] = Variable<String>(id.value);
     }
-    if (title.present) {
-      map['title'] = Variable<String>(title.value);
-    }
-    if (authors.present) {
-      map['authors'] = Variable<String>(
-        $BooksTable.$converterauthors.toSql(authors.value),
-      );
-    }
-    if (isbn.present) {
-      map['isbn'] = Variable<String>(isbn.value);
-    }
-    if (thumbnailUrl.present) {
-      map['thumbnail_url'] = Variable<String>(thumbnailUrl.value);
-    }
-    if (coverPath.present) {
-      map['cover_path'] = Variable<String>(coverPath.value);
+    if (ownerId.present) {
+      map['owner_id'] = Variable<String>(ownerId.value);
     }
     if (status.present) {
       map['status'] = Variable<String>(status.value);
     }
     if (createdAt.present) {
-      map['created_at'] = Variable<DateTime>(createdAt.value);
+      map['created_at'] = Variable<String>(createdAt.value);
     }
     if (lastUsedAt.present) {
-      map['last_used_at'] = Variable<DateTime>(lastUsedAt.value);
+      map['last_used_at'] = Variable<String>(lastUsedAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<String>(updatedAt.value);
+    }
+    if (keyVersion.present) {
+      map['key_version'] = Variable<int>(keyVersion.value);
+    }
+    if (titleCipher.present) {
+      map['title_cipher'] = Variable<String>(titleCipher.value);
+    }
+    if (authorsCipher.present) {
+      map['authors_cipher'] = Variable<String>(authorsCipher.value);
+    }
+    if (isbnCipher.present) {
+      map['isbn_cipher'] = Variable<String>(isbnCipher.value);
+    }
+    if (coverCipher.present) {
+      map['cover_cipher'] = Variable<String>(coverCipher.value);
     }
     if (rowid.present) {
       map['rowid'] = Variable<int>(rowid.value);
@@ -552,21 +666,23 @@ class BooksCompanion extends UpdateCompanion<LocalBook> {
   String toString() {
     return (StringBuffer('BooksCompanion(')
           ..write('id: $id, ')
-          ..write('title: $title, ')
-          ..write('authors: $authors, ')
-          ..write('isbn: $isbn, ')
-          ..write('thumbnailUrl: $thumbnailUrl, ')
-          ..write('coverPath: $coverPath, ')
+          ..write('ownerId: $ownerId, ')
           ..write('status: $status, ')
           ..write('createdAt: $createdAt, ')
           ..write('lastUsedAt: $lastUsedAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('keyVersion: $keyVersion, ')
+          ..write('titleCipher: $titleCipher, ')
+          ..write('authorsCipher: $authorsCipher, ')
+          ..write('isbnCipher: $isbnCipher, ')
+          ..write('coverCipher: $coverCipher, ')
           ..write('rowid: $rowid')
           ..write(')'))
         .toString();
   }
 }
 
-class $QuotesTable extends Quotes with TableInfo<$QuotesTable, LocalQuote> {
+class $QuotesTable extends Quotes with TableInfo<$QuotesTable, QuoteRow> {
   @override
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
@@ -580,6 +696,17 @@ class $QuotesTable extends Quotes with TableInfo<$QuotesTable, LocalQuote> {
     type: DriftSqlType.string,
     requiredDuringInsert: true,
   );
+  static const VerificationMeta _ownerIdMeta = const VerificationMeta(
+    'ownerId',
+  );
+  @override
+  late final GeneratedColumn<String> ownerId = GeneratedColumn<String>(
+    'owner_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
   static const VerificationMeta _bookIdMeta = const VerificationMeta('bookId');
   @override
   late final GeneratedColumn<String> bookId = GeneratedColumn<String>(
@@ -588,127 +715,145 @@ class $QuotesTable extends Quotes with TableInfo<$QuotesTable, LocalQuote> {
     false,
     type: DriftSqlType.string,
     requiredDuringInsert: true,
-    defaultConstraints: GeneratedColumn.constraintIsAlways(
-      'REFERENCES books (id) ON DELETE CASCADE',
-    ),
   );
-  @override
-  late final GeneratedColumnWithTypeConverter<List<int>, String> pageNumbers =
-      GeneratedColumn<String>(
-        'page_numbers',
-        aliasedName,
-        false,
-        type: DriftSqlType.string,
-        requiredDuringInsert: true,
-      ).withConverter<List<int>>($QuotesTable.$converterpageNumbers);
-  static const VerificationMeta _quoteMeta = const VerificationMeta('quote');
-  @override
-  late final GeneratedColumn<String> quote = GeneratedColumn<String>(
-    'quote',
-    aliasedName,
-    false,
-    type: DriftSqlType.string,
-    requiredDuringInsert: true,
-  );
-  static const VerificationMeta _noteMeta = const VerificationMeta('note');
-  @override
-  late final GeneratedColumn<String> note = GeneratedColumn<String>(
-    'note',
-    aliasedName,
-    true,
-    type: DriftSqlType.string,
-    requiredDuringInsert: false,
-  );
-  static const VerificationMeta _voiceNotePathMeta = const VerificationMeta(
-    'voiceNotePath',
-  );
-  @override
-  late final GeneratedColumn<String> voiceNotePath = GeneratedColumn<String>(
-    'voice_note_path',
-    aliasedName,
-    true,
-    type: DriftSqlType.string,
-    requiredDuringInsert: false,
-  );
-  static const VerificationMeta _voiceNoteDurationMsMeta =
-      const VerificationMeta('voiceNoteDurationMs');
-  @override
-  late final GeneratedColumn<int> voiceNoteDurationMs = GeneratedColumn<int>(
-    'voice_note_duration_ms',
-    aliasedName,
-    true,
-    type: DriftSqlType.int,
-    requiredDuringInsert: false,
-  );
-  @override
-  late final GeneratedColumnWithTypeConverter<List<QuotePage>, String> pages =
-      GeneratedColumn<String>(
-        'pages',
-        aliasedName,
-        false,
-        type: DriftSqlType.string,
-        requiredDuringInsert: true,
-      ).withConverter<List<QuotePage>>($QuotesTable.$converterpages);
-  @override
-  late final GeneratedColumnWithTypeConverter<List<RecognizedWord>, String>
-  words = GeneratedColumn<String>(
-    'words',
-    aliasedName,
-    false,
-    type: DriftSqlType.string,
-    requiredDuringInsert: false,
-    defaultValue: const Constant(_emptyJsonList),
-  ).withConverter<List<RecognizedWord>>($QuotesTable.$converterwords);
-  @override
-  late final GeneratedColumnWithTypeConverter<List<int>, String>
-  markedWordIndexes = GeneratedColumn<String>(
-    'marked_word_indexes',
-    aliasedName,
-    false,
-    type: DriftSqlType.string,
-    requiredDuringInsert: false,
-    defaultValue: const Constant(_emptyJsonList),
-  ).withConverter<List<int>>($QuotesTable.$convertermarkedWordIndexes);
   static const VerificationMeta _isFavoriteMeta = const VerificationMeta(
     'isFavorite',
   );
   @override
-  late final GeneratedColumn<bool> isFavorite = GeneratedColumn<bool>(
+  late final GeneratedColumn<int> isFavorite = GeneratedColumn<int>(
     'is_favorite',
     aliasedName,
     false,
-    type: DriftSqlType.bool,
-    requiredDuringInsert: false,
-    defaultConstraints: GeneratedColumn.constraintIsAlways(
-      'CHECK ("is_favorite" IN (0, 1))',
-    ),
-    defaultValue: const Constant(false),
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
   );
   static const VerificationMeta _createdAtMeta = const VerificationMeta(
     'createdAt',
   );
   @override
-  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+  late final GeneratedColumn<String> createdAt = GeneratedColumn<String>(
     'created_at',
     aliasedName,
     false,
-    type: DriftSqlType.dateTime,
+    type: DriftSqlType.string,
     requiredDuringInsert: true,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<String> updatedAt = GeneratedColumn<String>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _keyVersionMeta = const VerificationMeta(
+    'keyVersion',
+  );
+  @override
+  late final GeneratedColumn<int> keyVersion = GeneratedColumn<int>(
+    'key_version',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _quoteCipherMeta = const VerificationMeta(
+    'quoteCipher',
+  );
+  @override
+  late final GeneratedColumn<String> quoteCipher = GeneratedColumn<String>(
+    'quote_cipher',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _noteCipherMeta = const VerificationMeta(
+    'noteCipher',
+  );
+  @override
+  late final GeneratedColumn<String> noteCipher = GeneratedColumn<String>(
+    'note_cipher',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _pageNumbersCipherMeta = const VerificationMeta(
+    'pageNumbersCipher',
+  );
+  @override
+  late final GeneratedColumn<String> pageNumbersCipher =
+      GeneratedColumn<String>(
+        'page_numbers_cipher',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: true,
+      );
+  static const VerificationMeta _pagesCipherMeta = const VerificationMeta(
+    'pagesCipher',
+  );
+  @override
+  late final GeneratedColumn<String> pagesCipher = GeneratedColumn<String>(
+    'pages_cipher',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _wordsCipherMeta = const VerificationMeta(
+    'wordsCipher',
+  );
+  @override
+  late final GeneratedColumn<String> wordsCipher = GeneratedColumn<String>(
+    'words_cipher',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _markedWordIndexesCipherMeta =
+      const VerificationMeta('markedWordIndexesCipher');
+  @override
+  late final GeneratedColumn<String> markedWordIndexesCipher =
+      GeneratedColumn<String>(
+        'marked_word_indexes_cipher',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: true,
+      );
+  static const VerificationMeta _voiceNoteCipherMeta = const VerificationMeta(
+    'voiceNoteCipher',
+  );
+  @override
+  late final GeneratedColumn<String> voiceNoteCipher = GeneratedColumn<String>(
+    'voice_note_cipher',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
   );
   @override
   List<GeneratedColumn> get $columns => [
     id,
+    ownerId,
     bookId,
-    pageNumbers,
-    quote,
-    note,
-    voiceNotePath,
-    voiceNoteDurationMs,
-    pages,
-    words,
-    markedWordIndexes,
     isFavorite,
     createdAt,
+    updatedAt,
+    keyVersion,
+    quoteCipher,
+    noteCipher,
+    pageNumbersCipher,
+    pagesCipher,
+    wordsCipher,
+    markedWordIndexesCipher,
+    voiceNoteCipher,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -717,7 +862,7 @@ class $QuotesTable extends Quotes with TableInfo<$QuotesTable, LocalQuote> {
   static const String $name = 'quotes';
   @override
   VerificationContext validateIntegrity(
-    Insertable<LocalQuote> instance, {
+    Insertable<QuoteRow> instance, {
     bool isInserting = false,
   }) {
     final context = VerificationContext();
@@ -727,6 +872,14 @@ class $QuotesTable extends Quotes with TableInfo<$QuotesTable, LocalQuote> {
     } else if (isInserting) {
       context.missing(_idMeta);
     }
+    if (data.containsKey('owner_id')) {
+      context.handle(
+        _ownerIdMeta,
+        ownerId.isAcceptableOrUnknown(data['owner_id']!, _ownerIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_ownerIdMeta);
+    }
     if (data.containsKey('book_id')) {
       context.handle(
         _bookIdMeta,
@@ -735,43 +888,13 @@ class $QuotesTable extends Quotes with TableInfo<$QuotesTable, LocalQuote> {
     } else if (isInserting) {
       context.missing(_bookIdMeta);
     }
-    if (data.containsKey('quote')) {
-      context.handle(
-        _quoteMeta,
-        quote.isAcceptableOrUnknown(data['quote']!, _quoteMeta),
-      );
-    } else if (isInserting) {
-      context.missing(_quoteMeta);
-    }
-    if (data.containsKey('note')) {
-      context.handle(
-        _noteMeta,
-        note.isAcceptableOrUnknown(data['note']!, _noteMeta),
-      );
-    }
-    if (data.containsKey('voice_note_path')) {
-      context.handle(
-        _voiceNotePathMeta,
-        voiceNotePath.isAcceptableOrUnknown(
-          data['voice_note_path']!,
-          _voiceNotePathMeta,
-        ),
-      );
-    }
-    if (data.containsKey('voice_note_duration_ms')) {
-      context.handle(
-        _voiceNoteDurationMsMeta,
-        voiceNoteDurationMs.isAcceptableOrUnknown(
-          data['voice_note_duration_ms']!,
-          _voiceNoteDurationMsMeta,
-        ),
-      );
-    }
     if (data.containsKey('is_favorite')) {
       context.handle(
         _isFavoriteMeta,
         isFavorite.isAcceptableOrUnknown(data['is_favorite']!, _isFavoriteMeta),
       );
+    } else if (isInserting) {
+      context.missing(_isFavoriteMeta);
     }
     if (data.containsKey('created_at')) {
       context.handle(
@@ -781,71 +904,157 @@ class $QuotesTable extends Quotes with TableInfo<$QuotesTable, LocalQuote> {
     } else if (isInserting) {
       context.missing(_createdAtMeta);
     }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_updatedAtMeta);
+    }
+    if (data.containsKey('key_version')) {
+      context.handle(
+        _keyVersionMeta,
+        keyVersion.isAcceptableOrUnknown(data['key_version']!, _keyVersionMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_keyVersionMeta);
+    }
+    if (data.containsKey('quote_cipher')) {
+      context.handle(
+        _quoteCipherMeta,
+        quoteCipher.isAcceptableOrUnknown(
+          data['quote_cipher']!,
+          _quoteCipherMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_quoteCipherMeta);
+    }
+    if (data.containsKey('note_cipher')) {
+      context.handle(
+        _noteCipherMeta,
+        noteCipher.isAcceptableOrUnknown(data['note_cipher']!, _noteCipherMeta),
+      );
+    }
+    if (data.containsKey('page_numbers_cipher')) {
+      context.handle(
+        _pageNumbersCipherMeta,
+        pageNumbersCipher.isAcceptableOrUnknown(
+          data['page_numbers_cipher']!,
+          _pageNumbersCipherMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_pageNumbersCipherMeta);
+    }
+    if (data.containsKey('pages_cipher')) {
+      context.handle(
+        _pagesCipherMeta,
+        pagesCipher.isAcceptableOrUnknown(
+          data['pages_cipher']!,
+          _pagesCipherMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_pagesCipherMeta);
+    }
+    if (data.containsKey('words_cipher')) {
+      context.handle(
+        _wordsCipherMeta,
+        wordsCipher.isAcceptableOrUnknown(
+          data['words_cipher']!,
+          _wordsCipherMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_wordsCipherMeta);
+    }
+    if (data.containsKey('marked_word_indexes_cipher')) {
+      context.handle(
+        _markedWordIndexesCipherMeta,
+        markedWordIndexesCipher.isAcceptableOrUnknown(
+          data['marked_word_indexes_cipher']!,
+          _markedWordIndexesCipherMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_markedWordIndexesCipherMeta);
+    }
+    if (data.containsKey('voice_note_cipher')) {
+      context.handle(
+        _voiceNoteCipherMeta,
+        voiceNoteCipher.isAcceptableOrUnknown(
+          data['voice_note_cipher']!,
+          _voiceNoteCipherMeta,
+        ),
+      );
+    }
     return context;
   }
 
   @override
   Set<GeneratedColumn> get $primaryKey => {id};
   @override
-  LocalQuote map(Map<String, dynamic> data, {String? tablePrefix}) {
+  QuoteRow map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
-    return LocalQuote(
+    return QuoteRow(
       id: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}id'],
+      )!,
+      ownerId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}owner_id'],
       )!,
       bookId: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}book_id'],
       )!,
-      pageNumbers: $QuotesTable.$converterpageNumbers.fromSql(
-        attachedDatabase.typeMapping.read(
-          DriftSqlType.string,
-          data['${effectivePrefix}page_numbers'],
-        )!,
-      ),
-      quote: attachedDatabase.typeMapping.read(
-        DriftSqlType.string,
-        data['${effectivePrefix}quote'],
-      )!,
-      note: attachedDatabase.typeMapping.read(
-        DriftSqlType.string,
-        data['${effectivePrefix}note'],
-      ),
-      voiceNotePath: attachedDatabase.typeMapping.read(
-        DriftSqlType.string,
-        data['${effectivePrefix}voice_note_path'],
-      ),
-      voiceNoteDurationMs: attachedDatabase.typeMapping.read(
-        DriftSqlType.int,
-        data['${effectivePrefix}voice_note_duration_ms'],
-      ),
-      pages: $QuotesTable.$converterpages.fromSql(
-        attachedDatabase.typeMapping.read(
-          DriftSqlType.string,
-          data['${effectivePrefix}pages'],
-        )!,
-      ),
-      words: $QuotesTable.$converterwords.fromSql(
-        attachedDatabase.typeMapping.read(
-          DriftSqlType.string,
-          data['${effectivePrefix}words'],
-        )!,
-      ),
-      markedWordIndexes: $QuotesTable.$convertermarkedWordIndexes.fromSql(
-        attachedDatabase.typeMapping.read(
-          DriftSqlType.string,
-          data['${effectivePrefix}marked_word_indexes'],
-        )!,
-      ),
       isFavorite: attachedDatabase.typeMapping.read(
-        DriftSqlType.bool,
+        DriftSqlType.int,
         data['${effectivePrefix}is_favorite'],
       )!,
       createdAt: attachedDatabase.typeMapping.read(
-        DriftSqlType.dateTime,
+        DriftSqlType.string,
         data['${effectivePrefix}created_at'],
       )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}updated_at'],
+      )!,
+      keyVersion: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}key_version'],
+      )!,
+      quoteCipher: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}quote_cipher'],
+      )!,
+      noteCipher: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}note_cipher'],
+      ),
+      pageNumbersCipher: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}page_numbers_cipher'],
+      )!,
+      pagesCipher: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}pages_cipher'],
+      )!,
+      wordsCipher: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}words_cipher'],
+      )!,
+      markedWordIndexesCipher: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}marked_word_indexes_cipher'],
+      )!,
+      voiceNoteCipher: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}voice_note_cipher'],
+      ),
     );
   }
 
@@ -853,127 +1062,110 @@ class $QuotesTable extends Quotes with TableInfo<$QuotesTable, LocalQuote> {
   $QuotesTable createAlias(String alias) {
     return $QuotesTable(attachedDatabase, alias);
   }
-
-  static TypeConverter<List<int>, String> $converterpageNumbers =
-      const IntListConverter();
-  static TypeConverter<List<QuotePage>, String> $converterpages =
-      const QuotePageListConverter();
-  static TypeConverter<List<RecognizedWord>, String> $converterwords =
-      const RecognizedWordListConverter();
-  static TypeConverter<List<int>, String> $convertermarkedWordIndexes =
-      const IntListConverter();
 }
 
-class LocalQuote extends DataClass implements Insertable<LocalQuote> {
+class QuoteRow extends DataClass implements Insertable<QuoteRow> {
   final String id;
+  final String ownerId;
   final String bookId;
-  final List<int> pageNumbers;
-  final String quote;
-  final String? note;
-  final String? voiceNotePath;
-  final int? voiceNoteDurationMs;
-  final List<QuotePage> pages;
-  final List<RecognizedWord> words;
-  final List<int> markedWordIndexes;
-  final bool isFavorite;
-  final DateTime createdAt;
-  const LocalQuote({
+  final int isFavorite;
+  final String createdAt;
+  final String updatedAt;
+  final int keyVersion;
+  final String quoteCipher;
+  final String? noteCipher;
+  final String pageNumbersCipher;
+  final String pagesCipher;
+  final String wordsCipher;
+  final String markedWordIndexesCipher;
+  final String? voiceNoteCipher;
+  const QuoteRow({
     required this.id,
+    required this.ownerId,
     required this.bookId,
-    required this.pageNumbers,
-    required this.quote,
-    this.note,
-    this.voiceNotePath,
-    this.voiceNoteDurationMs,
-    required this.pages,
-    required this.words,
-    required this.markedWordIndexes,
     required this.isFavorite,
     required this.createdAt,
+    required this.updatedAt,
+    required this.keyVersion,
+    required this.quoteCipher,
+    this.noteCipher,
+    required this.pageNumbersCipher,
+    required this.pagesCipher,
+    required this.wordsCipher,
+    required this.markedWordIndexesCipher,
+    this.voiceNoteCipher,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     map['id'] = Variable<String>(id);
+    map['owner_id'] = Variable<String>(ownerId);
     map['book_id'] = Variable<String>(bookId);
-    {
-      map['page_numbers'] = Variable<String>(
-        $QuotesTable.$converterpageNumbers.toSql(pageNumbers),
-      );
+    map['is_favorite'] = Variable<int>(isFavorite);
+    map['created_at'] = Variable<String>(createdAt);
+    map['updated_at'] = Variable<String>(updatedAt);
+    map['key_version'] = Variable<int>(keyVersion);
+    map['quote_cipher'] = Variable<String>(quoteCipher);
+    if (!nullToAbsent || noteCipher != null) {
+      map['note_cipher'] = Variable<String>(noteCipher);
     }
-    map['quote'] = Variable<String>(quote);
-    if (!nullToAbsent || note != null) {
-      map['note'] = Variable<String>(note);
+    map['page_numbers_cipher'] = Variable<String>(pageNumbersCipher);
+    map['pages_cipher'] = Variable<String>(pagesCipher);
+    map['words_cipher'] = Variable<String>(wordsCipher);
+    map['marked_word_indexes_cipher'] = Variable<String>(
+      markedWordIndexesCipher,
+    );
+    if (!nullToAbsent || voiceNoteCipher != null) {
+      map['voice_note_cipher'] = Variable<String>(voiceNoteCipher);
     }
-    if (!nullToAbsent || voiceNotePath != null) {
-      map['voice_note_path'] = Variable<String>(voiceNotePath);
-    }
-    if (!nullToAbsent || voiceNoteDurationMs != null) {
-      map['voice_note_duration_ms'] = Variable<int>(voiceNoteDurationMs);
-    }
-    {
-      map['pages'] = Variable<String>(
-        $QuotesTable.$converterpages.toSql(pages),
-      );
-    }
-    {
-      map['words'] = Variable<String>(
-        $QuotesTable.$converterwords.toSql(words),
-      );
-    }
-    {
-      map['marked_word_indexes'] = Variable<String>(
-        $QuotesTable.$convertermarkedWordIndexes.toSql(markedWordIndexes),
-      );
-    }
-    map['is_favorite'] = Variable<bool>(isFavorite);
-    map['created_at'] = Variable<DateTime>(createdAt);
     return map;
   }
 
   QuotesCompanion toCompanion(bool nullToAbsent) {
     return QuotesCompanion(
       id: Value(id),
+      ownerId: Value(ownerId),
       bookId: Value(bookId),
-      pageNumbers: Value(pageNumbers),
-      quote: Value(quote),
-      note: note == null && nullToAbsent ? const Value.absent() : Value(note),
-      voiceNotePath: voiceNotePath == null && nullToAbsent
-          ? const Value.absent()
-          : Value(voiceNotePath),
-      voiceNoteDurationMs: voiceNoteDurationMs == null && nullToAbsent
-          ? const Value.absent()
-          : Value(voiceNoteDurationMs),
-      pages: Value(pages),
-      words: Value(words),
-      markedWordIndexes: Value(markedWordIndexes),
       isFavorite: Value(isFavorite),
       createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+      keyVersion: Value(keyVersion),
+      quoteCipher: Value(quoteCipher),
+      noteCipher: noteCipher == null && nullToAbsent
+          ? const Value.absent()
+          : Value(noteCipher),
+      pageNumbersCipher: Value(pageNumbersCipher),
+      pagesCipher: Value(pagesCipher),
+      wordsCipher: Value(wordsCipher),
+      markedWordIndexesCipher: Value(markedWordIndexesCipher),
+      voiceNoteCipher: voiceNoteCipher == null && nullToAbsent
+          ? const Value.absent()
+          : Value(voiceNoteCipher),
     );
   }
 
-  factory LocalQuote.fromJson(
+  factory QuoteRow.fromJson(
     Map<String, dynamic> json, {
     ValueSerializer? serializer,
   }) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
-    return LocalQuote(
+    return QuoteRow(
       id: serializer.fromJson<String>(json['id']),
+      ownerId: serializer.fromJson<String>(json['ownerId']),
       bookId: serializer.fromJson<String>(json['bookId']),
-      pageNumbers: serializer.fromJson<List<int>>(json['pageNumbers']),
-      quote: serializer.fromJson<String>(json['quote']),
-      note: serializer.fromJson<String?>(json['note']),
-      voiceNotePath: serializer.fromJson<String?>(json['voiceNotePath']),
-      voiceNoteDurationMs: serializer.fromJson<int?>(
-        json['voiceNoteDurationMs'],
+      isFavorite: serializer.fromJson<int>(json['isFavorite']),
+      createdAt: serializer.fromJson<String>(json['createdAt']),
+      updatedAt: serializer.fromJson<String>(json['updatedAt']),
+      keyVersion: serializer.fromJson<int>(json['keyVersion']),
+      quoteCipher: serializer.fromJson<String>(json['quoteCipher']),
+      noteCipher: serializer.fromJson<String?>(json['noteCipher']),
+      pageNumbersCipher: serializer.fromJson<String>(json['pageNumbersCipher']),
+      pagesCipher: serializer.fromJson<String>(json['pagesCipher']),
+      wordsCipher: serializer.fromJson<String>(json['wordsCipher']),
+      markedWordIndexesCipher: serializer.fromJson<String>(
+        json['markedWordIndexesCipher'],
       ),
-      pages: serializer.fromJson<List<QuotePage>>(json['pages']),
-      words: serializer.fromJson<List<RecognizedWord>>(json['words']),
-      markedWordIndexes: serializer.fromJson<List<int>>(
-        json['markedWordIndexes'],
-      ),
-      isFavorite: serializer.fromJson<bool>(json['isFavorite']),
-      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      voiceNoteCipher: serializer.fromJson<String?>(json['voiceNoteCipher']),
     );
   }
   @override
@@ -981,93 +1173,112 @@ class LocalQuote extends DataClass implements Insertable<LocalQuote> {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
       'id': serializer.toJson<String>(id),
+      'ownerId': serializer.toJson<String>(ownerId),
       'bookId': serializer.toJson<String>(bookId),
-      'pageNumbers': serializer.toJson<List<int>>(pageNumbers),
-      'quote': serializer.toJson<String>(quote),
-      'note': serializer.toJson<String?>(note),
-      'voiceNotePath': serializer.toJson<String?>(voiceNotePath),
-      'voiceNoteDurationMs': serializer.toJson<int?>(voiceNoteDurationMs),
-      'pages': serializer.toJson<List<QuotePage>>(pages),
-      'words': serializer.toJson<List<RecognizedWord>>(words),
-      'markedWordIndexes': serializer.toJson<List<int>>(markedWordIndexes),
-      'isFavorite': serializer.toJson<bool>(isFavorite),
-      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'isFavorite': serializer.toJson<int>(isFavorite),
+      'createdAt': serializer.toJson<String>(createdAt),
+      'updatedAt': serializer.toJson<String>(updatedAt),
+      'keyVersion': serializer.toJson<int>(keyVersion),
+      'quoteCipher': serializer.toJson<String>(quoteCipher),
+      'noteCipher': serializer.toJson<String?>(noteCipher),
+      'pageNumbersCipher': serializer.toJson<String>(pageNumbersCipher),
+      'pagesCipher': serializer.toJson<String>(pagesCipher),
+      'wordsCipher': serializer.toJson<String>(wordsCipher),
+      'markedWordIndexesCipher': serializer.toJson<String>(
+        markedWordIndexesCipher,
+      ),
+      'voiceNoteCipher': serializer.toJson<String?>(voiceNoteCipher),
     };
   }
 
-  LocalQuote copyWith({
+  QuoteRow copyWith({
     String? id,
+    String? ownerId,
     String? bookId,
-    List<int>? pageNumbers,
-    String? quote,
-    Value<String?> note = const Value.absent(),
-    Value<String?> voiceNotePath = const Value.absent(),
-    Value<int?> voiceNoteDurationMs = const Value.absent(),
-    List<QuotePage>? pages,
-    List<RecognizedWord>? words,
-    List<int>? markedWordIndexes,
-    bool? isFavorite,
-    DateTime? createdAt,
-  }) => LocalQuote(
+    int? isFavorite,
+    String? createdAt,
+    String? updatedAt,
+    int? keyVersion,
+    String? quoteCipher,
+    Value<String?> noteCipher = const Value.absent(),
+    String? pageNumbersCipher,
+    String? pagesCipher,
+    String? wordsCipher,
+    String? markedWordIndexesCipher,
+    Value<String?> voiceNoteCipher = const Value.absent(),
+  }) => QuoteRow(
     id: id ?? this.id,
+    ownerId: ownerId ?? this.ownerId,
     bookId: bookId ?? this.bookId,
-    pageNumbers: pageNumbers ?? this.pageNumbers,
-    quote: quote ?? this.quote,
-    note: note.present ? note.value : this.note,
-    voiceNotePath: voiceNotePath.present
-        ? voiceNotePath.value
-        : this.voiceNotePath,
-    voiceNoteDurationMs: voiceNoteDurationMs.present
-        ? voiceNoteDurationMs.value
-        : this.voiceNoteDurationMs,
-    pages: pages ?? this.pages,
-    words: words ?? this.words,
-    markedWordIndexes: markedWordIndexes ?? this.markedWordIndexes,
     isFavorite: isFavorite ?? this.isFavorite,
     createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+    keyVersion: keyVersion ?? this.keyVersion,
+    quoteCipher: quoteCipher ?? this.quoteCipher,
+    noteCipher: noteCipher.present ? noteCipher.value : this.noteCipher,
+    pageNumbersCipher: pageNumbersCipher ?? this.pageNumbersCipher,
+    pagesCipher: pagesCipher ?? this.pagesCipher,
+    wordsCipher: wordsCipher ?? this.wordsCipher,
+    markedWordIndexesCipher:
+        markedWordIndexesCipher ?? this.markedWordIndexesCipher,
+    voiceNoteCipher: voiceNoteCipher.present
+        ? voiceNoteCipher.value
+        : this.voiceNoteCipher,
   );
-  LocalQuote copyWithCompanion(QuotesCompanion data) {
-    return LocalQuote(
+  QuoteRow copyWithCompanion(QuotesCompanion data) {
+    return QuoteRow(
       id: data.id.present ? data.id.value : this.id,
+      ownerId: data.ownerId.present ? data.ownerId.value : this.ownerId,
       bookId: data.bookId.present ? data.bookId.value : this.bookId,
-      pageNumbers: data.pageNumbers.present
-          ? data.pageNumbers.value
-          : this.pageNumbers,
-      quote: data.quote.present ? data.quote.value : this.quote,
-      note: data.note.present ? data.note.value : this.note,
-      voiceNotePath: data.voiceNotePath.present
-          ? data.voiceNotePath.value
-          : this.voiceNotePath,
-      voiceNoteDurationMs: data.voiceNoteDurationMs.present
-          ? data.voiceNoteDurationMs.value
-          : this.voiceNoteDurationMs,
-      pages: data.pages.present ? data.pages.value : this.pages,
-      words: data.words.present ? data.words.value : this.words,
-      markedWordIndexes: data.markedWordIndexes.present
-          ? data.markedWordIndexes.value
-          : this.markedWordIndexes,
       isFavorite: data.isFavorite.present
           ? data.isFavorite.value
           : this.isFavorite,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+      keyVersion: data.keyVersion.present
+          ? data.keyVersion.value
+          : this.keyVersion,
+      quoteCipher: data.quoteCipher.present
+          ? data.quoteCipher.value
+          : this.quoteCipher,
+      noteCipher: data.noteCipher.present
+          ? data.noteCipher.value
+          : this.noteCipher,
+      pageNumbersCipher: data.pageNumbersCipher.present
+          ? data.pageNumbersCipher.value
+          : this.pageNumbersCipher,
+      pagesCipher: data.pagesCipher.present
+          ? data.pagesCipher.value
+          : this.pagesCipher,
+      wordsCipher: data.wordsCipher.present
+          ? data.wordsCipher.value
+          : this.wordsCipher,
+      markedWordIndexesCipher: data.markedWordIndexesCipher.present
+          ? data.markedWordIndexesCipher.value
+          : this.markedWordIndexesCipher,
+      voiceNoteCipher: data.voiceNoteCipher.present
+          ? data.voiceNoteCipher.value
+          : this.voiceNoteCipher,
     );
   }
 
   @override
   String toString() {
-    return (StringBuffer('LocalQuote(')
+    return (StringBuffer('QuoteRow(')
           ..write('id: $id, ')
+          ..write('ownerId: $ownerId, ')
           ..write('bookId: $bookId, ')
-          ..write('pageNumbers: $pageNumbers, ')
-          ..write('quote: $quote, ')
-          ..write('note: $note, ')
-          ..write('voiceNotePath: $voiceNotePath, ')
-          ..write('voiceNoteDurationMs: $voiceNoteDurationMs, ')
-          ..write('pages: $pages, ')
-          ..write('words: $words, ')
-          ..write('markedWordIndexes: $markedWordIndexes, ')
           ..write('isFavorite: $isFavorite, ')
-          ..write('createdAt: $createdAt')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('keyVersion: $keyVersion, ')
+          ..write('quoteCipher: $quoteCipher, ')
+          ..write('noteCipher: $noteCipher, ')
+          ..write('pageNumbersCipher: $pageNumbersCipher, ')
+          ..write('pagesCipher: $pagesCipher, ')
+          ..write('wordsCipher: $wordsCipher, ')
+          ..write('markedWordIndexesCipher: $markedWordIndexesCipher, ')
+          ..write('voiceNoteCipher: $voiceNoteCipher')
           ..write(')'))
         .toString();
   }
@@ -1075,146 +1286,171 @@ class LocalQuote extends DataClass implements Insertable<LocalQuote> {
   @override
   int get hashCode => Object.hash(
     id,
+    ownerId,
     bookId,
-    pageNumbers,
-    quote,
-    note,
-    voiceNotePath,
-    voiceNoteDurationMs,
-    pages,
-    words,
-    markedWordIndexes,
     isFavorite,
     createdAt,
+    updatedAt,
+    keyVersion,
+    quoteCipher,
+    noteCipher,
+    pageNumbersCipher,
+    pagesCipher,
+    wordsCipher,
+    markedWordIndexesCipher,
+    voiceNoteCipher,
   );
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      (other is LocalQuote &&
+      (other is QuoteRow &&
           other.id == this.id &&
+          other.ownerId == this.ownerId &&
           other.bookId == this.bookId &&
-          other.pageNumbers == this.pageNumbers &&
-          other.quote == this.quote &&
-          other.note == this.note &&
-          other.voiceNotePath == this.voiceNotePath &&
-          other.voiceNoteDurationMs == this.voiceNoteDurationMs &&
-          other.pages == this.pages &&
-          other.words == this.words &&
-          other.markedWordIndexes == this.markedWordIndexes &&
           other.isFavorite == this.isFavorite &&
-          other.createdAt == this.createdAt);
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt &&
+          other.keyVersion == this.keyVersion &&
+          other.quoteCipher == this.quoteCipher &&
+          other.noteCipher == this.noteCipher &&
+          other.pageNumbersCipher == this.pageNumbersCipher &&
+          other.pagesCipher == this.pagesCipher &&
+          other.wordsCipher == this.wordsCipher &&
+          other.markedWordIndexesCipher == this.markedWordIndexesCipher &&
+          other.voiceNoteCipher == this.voiceNoteCipher);
 }
 
-class QuotesCompanion extends UpdateCompanion<LocalQuote> {
+class QuotesCompanion extends UpdateCompanion<QuoteRow> {
   final Value<String> id;
+  final Value<String> ownerId;
   final Value<String> bookId;
-  final Value<List<int>> pageNumbers;
-  final Value<String> quote;
-  final Value<String?> note;
-  final Value<String?> voiceNotePath;
-  final Value<int?> voiceNoteDurationMs;
-  final Value<List<QuotePage>> pages;
-  final Value<List<RecognizedWord>> words;
-  final Value<List<int>> markedWordIndexes;
-  final Value<bool> isFavorite;
-  final Value<DateTime> createdAt;
+  final Value<int> isFavorite;
+  final Value<String> createdAt;
+  final Value<String> updatedAt;
+  final Value<int> keyVersion;
+  final Value<String> quoteCipher;
+  final Value<String?> noteCipher;
+  final Value<String> pageNumbersCipher;
+  final Value<String> pagesCipher;
+  final Value<String> wordsCipher;
+  final Value<String> markedWordIndexesCipher;
+  final Value<String?> voiceNoteCipher;
   final Value<int> rowid;
   const QuotesCompanion({
     this.id = const Value.absent(),
+    this.ownerId = const Value.absent(),
     this.bookId = const Value.absent(),
-    this.pageNumbers = const Value.absent(),
-    this.quote = const Value.absent(),
-    this.note = const Value.absent(),
-    this.voiceNotePath = const Value.absent(),
-    this.voiceNoteDurationMs = const Value.absent(),
-    this.pages = const Value.absent(),
-    this.words = const Value.absent(),
-    this.markedWordIndexes = const Value.absent(),
     this.isFavorite = const Value.absent(),
     this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.keyVersion = const Value.absent(),
+    this.quoteCipher = const Value.absent(),
+    this.noteCipher = const Value.absent(),
+    this.pageNumbersCipher = const Value.absent(),
+    this.pagesCipher = const Value.absent(),
+    this.wordsCipher = const Value.absent(),
+    this.markedWordIndexesCipher = const Value.absent(),
+    this.voiceNoteCipher = const Value.absent(),
     this.rowid = const Value.absent(),
   });
   QuotesCompanion.insert({
     required String id,
+    required String ownerId,
     required String bookId,
-    required List<int> pageNumbers,
-    required String quote,
-    this.note = const Value.absent(),
-    this.voiceNotePath = const Value.absent(),
-    this.voiceNoteDurationMs = const Value.absent(),
-    required List<QuotePage> pages,
-    this.words = const Value.absent(),
-    this.markedWordIndexes = const Value.absent(),
-    this.isFavorite = const Value.absent(),
-    required DateTime createdAt,
+    required int isFavorite,
+    required String createdAt,
+    required String updatedAt,
+    required int keyVersion,
+    required String quoteCipher,
+    this.noteCipher = const Value.absent(),
+    required String pageNumbersCipher,
+    required String pagesCipher,
+    required String wordsCipher,
+    required String markedWordIndexesCipher,
+    this.voiceNoteCipher = const Value.absent(),
     this.rowid = const Value.absent(),
   }) : id = Value(id),
+       ownerId = Value(ownerId),
        bookId = Value(bookId),
-       pageNumbers = Value(pageNumbers),
-       quote = Value(quote),
-       pages = Value(pages),
-       createdAt = Value(createdAt);
-  static Insertable<LocalQuote> custom({
+       isFavorite = Value(isFavorite),
+       createdAt = Value(createdAt),
+       updatedAt = Value(updatedAt),
+       keyVersion = Value(keyVersion),
+       quoteCipher = Value(quoteCipher),
+       pageNumbersCipher = Value(pageNumbersCipher),
+       pagesCipher = Value(pagesCipher),
+       wordsCipher = Value(wordsCipher),
+       markedWordIndexesCipher = Value(markedWordIndexesCipher);
+  static Insertable<QuoteRow> custom({
     Expression<String>? id,
+    Expression<String>? ownerId,
     Expression<String>? bookId,
-    Expression<String>? pageNumbers,
-    Expression<String>? quote,
-    Expression<String>? note,
-    Expression<String>? voiceNotePath,
-    Expression<int>? voiceNoteDurationMs,
-    Expression<String>? pages,
-    Expression<String>? words,
-    Expression<String>? markedWordIndexes,
-    Expression<bool>? isFavorite,
-    Expression<DateTime>? createdAt,
+    Expression<int>? isFavorite,
+    Expression<String>? createdAt,
+    Expression<String>? updatedAt,
+    Expression<int>? keyVersion,
+    Expression<String>? quoteCipher,
+    Expression<String>? noteCipher,
+    Expression<String>? pageNumbersCipher,
+    Expression<String>? pagesCipher,
+    Expression<String>? wordsCipher,
+    Expression<String>? markedWordIndexesCipher,
+    Expression<String>? voiceNoteCipher,
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
+      if (ownerId != null) 'owner_id': ownerId,
       if (bookId != null) 'book_id': bookId,
-      if (pageNumbers != null) 'page_numbers': pageNumbers,
-      if (quote != null) 'quote': quote,
-      if (note != null) 'note': note,
-      if (voiceNotePath != null) 'voice_note_path': voiceNotePath,
-      if (voiceNoteDurationMs != null)
-        'voice_note_duration_ms': voiceNoteDurationMs,
-      if (pages != null) 'pages': pages,
-      if (words != null) 'words': words,
-      if (markedWordIndexes != null) 'marked_word_indexes': markedWordIndexes,
       if (isFavorite != null) 'is_favorite': isFavorite,
       if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (keyVersion != null) 'key_version': keyVersion,
+      if (quoteCipher != null) 'quote_cipher': quoteCipher,
+      if (noteCipher != null) 'note_cipher': noteCipher,
+      if (pageNumbersCipher != null) 'page_numbers_cipher': pageNumbersCipher,
+      if (pagesCipher != null) 'pages_cipher': pagesCipher,
+      if (wordsCipher != null) 'words_cipher': wordsCipher,
+      if (markedWordIndexesCipher != null)
+        'marked_word_indexes_cipher': markedWordIndexesCipher,
+      if (voiceNoteCipher != null) 'voice_note_cipher': voiceNoteCipher,
       if (rowid != null) 'rowid': rowid,
     });
   }
 
   QuotesCompanion copyWith({
     Value<String>? id,
+    Value<String>? ownerId,
     Value<String>? bookId,
-    Value<List<int>>? pageNumbers,
-    Value<String>? quote,
-    Value<String?>? note,
-    Value<String?>? voiceNotePath,
-    Value<int?>? voiceNoteDurationMs,
-    Value<List<QuotePage>>? pages,
-    Value<List<RecognizedWord>>? words,
-    Value<List<int>>? markedWordIndexes,
-    Value<bool>? isFavorite,
-    Value<DateTime>? createdAt,
+    Value<int>? isFavorite,
+    Value<String>? createdAt,
+    Value<String>? updatedAt,
+    Value<int>? keyVersion,
+    Value<String>? quoteCipher,
+    Value<String?>? noteCipher,
+    Value<String>? pageNumbersCipher,
+    Value<String>? pagesCipher,
+    Value<String>? wordsCipher,
+    Value<String>? markedWordIndexesCipher,
+    Value<String?>? voiceNoteCipher,
     Value<int>? rowid,
   }) {
     return QuotesCompanion(
       id: id ?? this.id,
+      ownerId: ownerId ?? this.ownerId,
       bookId: bookId ?? this.bookId,
-      pageNumbers: pageNumbers ?? this.pageNumbers,
-      quote: quote ?? this.quote,
-      note: note ?? this.note,
-      voiceNotePath: voiceNotePath ?? this.voiceNotePath,
-      voiceNoteDurationMs: voiceNoteDurationMs ?? this.voiceNoteDurationMs,
-      pages: pages ?? this.pages,
-      words: words ?? this.words,
-      markedWordIndexes: markedWordIndexes ?? this.markedWordIndexes,
       isFavorite: isFavorite ?? this.isFavorite,
       createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      keyVersion: keyVersion ?? this.keyVersion,
+      quoteCipher: quoteCipher ?? this.quoteCipher,
+      noteCipher: noteCipher ?? this.noteCipher,
+      pageNumbersCipher: pageNumbersCipher ?? this.pageNumbersCipher,
+      pagesCipher: pagesCipher ?? this.pagesCipher,
+      wordsCipher: wordsCipher ?? this.wordsCipher,
+      markedWordIndexesCipher:
+          markedWordIndexesCipher ?? this.markedWordIndexesCipher,
+      voiceNoteCipher: voiceNoteCipher ?? this.voiceNoteCipher,
       rowid: rowid ?? this.rowid,
     );
   }
@@ -1225,46 +1461,46 @@ class QuotesCompanion extends UpdateCompanion<LocalQuote> {
     if (id.present) {
       map['id'] = Variable<String>(id.value);
     }
+    if (ownerId.present) {
+      map['owner_id'] = Variable<String>(ownerId.value);
+    }
     if (bookId.present) {
       map['book_id'] = Variable<String>(bookId.value);
     }
-    if (pageNumbers.present) {
-      map['page_numbers'] = Variable<String>(
-        $QuotesTable.$converterpageNumbers.toSql(pageNumbers.value),
-      );
-    }
-    if (quote.present) {
-      map['quote'] = Variable<String>(quote.value);
-    }
-    if (note.present) {
-      map['note'] = Variable<String>(note.value);
-    }
-    if (voiceNotePath.present) {
-      map['voice_note_path'] = Variable<String>(voiceNotePath.value);
-    }
-    if (voiceNoteDurationMs.present) {
-      map['voice_note_duration_ms'] = Variable<int>(voiceNoteDurationMs.value);
-    }
-    if (pages.present) {
-      map['pages'] = Variable<String>(
-        $QuotesTable.$converterpages.toSql(pages.value),
-      );
-    }
-    if (words.present) {
-      map['words'] = Variable<String>(
-        $QuotesTable.$converterwords.toSql(words.value),
-      );
-    }
-    if (markedWordIndexes.present) {
-      map['marked_word_indexes'] = Variable<String>(
-        $QuotesTable.$convertermarkedWordIndexes.toSql(markedWordIndexes.value),
-      );
-    }
     if (isFavorite.present) {
-      map['is_favorite'] = Variable<bool>(isFavorite.value);
+      map['is_favorite'] = Variable<int>(isFavorite.value);
     }
     if (createdAt.present) {
-      map['created_at'] = Variable<DateTime>(createdAt.value);
+      map['created_at'] = Variable<String>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<String>(updatedAt.value);
+    }
+    if (keyVersion.present) {
+      map['key_version'] = Variable<int>(keyVersion.value);
+    }
+    if (quoteCipher.present) {
+      map['quote_cipher'] = Variable<String>(quoteCipher.value);
+    }
+    if (noteCipher.present) {
+      map['note_cipher'] = Variable<String>(noteCipher.value);
+    }
+    if (pageNumbersCipher.present) {
+      map['page_numbers_cipher'] = Variable<String>(pageNumbersCipher.value);
+    }
+    if (pagesCipher.present) {
+      map['pages_cipher'] = Variable<String>(pagesCipher.value);
+    }
+    if (wordsCipher.present) {
+      map['words_cipher'] = Variable<String>(wordsCipher.value);
+    }
+    if (markedWordIndexesCipher.present) {
+      map['marked_word_indexes_cipher'] = Variable<String>(
+        markedWordIndexesCipher.value,
+      );
+    }
+    if (voiceNoteCipher.present) {
+      map['voice_note_cipher'] = Variable<String>(voiceNoteCipher.value);
     }
     if (rowid.present) {
       map['rowid'] = Variable<int>(rowid.value);
@@ -1276,24 +1512,26 @@ class QuotesCompanion extends UpdateCompanion<LocalQuote> {
   String toString() {
     return (StringBuffer('QuotesCompanion(')
           ..write('id: $id, ')
+          ..write('ownerId: $ownerId, ')
           ..write('bookId: $bookId, ')
-          ..write('pageNumbers: $pageNumbers, ')
-          ..write('quote: $quote, ')
-          ..write('note: $note, ')
-          ..write('voiceNotePath: $voiceNotePath, ')
-          ..write('voiceNoteDurationMs: $voiceNoteDurationMs, ')
-          ..write('pages: $pages, ')
-          ..write('words: $words, ')
-          ..write('markedWordIndexes: $markedWordIndexes, ')
           ..write('isFavorite: $isFavorite, ')
           ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('keyVersion: $keyVersion, ')
+          ..write('quoteCipher: $quoteCipher, ')
+          ..write('noteCipher: $noteCipher, ')
+          ..write('pageNumbersCipher: $pageNumbersCipher, ')
+          ..write('pagesCipher: $pagesCipher, ')
+          ..write('wordsCipher: $wordsCipher, ')
+          ..write('markedWordIndexesCipher: $markedWordIndexesCipher, ')
+          ..write('voiceNoteCipher: $voiceNoteCipher, ')
           ..write('rowid: $rowid')
           ..write(')'))
         .toString();
   }
 }
 
-class $ThemesTable extends Themes with TableInfo<$ThemesTable, LocalTheme> {
+class $ThemesTable extends Themes with TableInfo<$ThemesTable, ThemeRow> {
   @override
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
@@ -1307,10 +1545,12 @@ class $ThemesTable extends Themes with TableInfo<$ThemesTable, LocalTheme> {
     type: DriftSqlType.string,
     requiredDuringInsert: true,
   );
-  static const VerificationMeta _nameMeta = const VerificationMeta('name');
+  static const VerificationMeta _ownerIdMeta = const VerificationMeta(
+    'ownerId',
+  );
   @override
-  late final GeneratedColumn<String> name = GeneratedColumn<String>(
-    'name',
+  late final GeneratedColumn<String> ownerId = GeneratedColumn<String>(
+    'owner_id',
     aliasedName,
     false,
     type: DriftSqlType.string,
@@ -1338,15 +1578,57 @@ class $ThemesTable extends Themes with TableInfo<$ThemesTable, LocalTheme> {
     'createdAt',
   );
   @override
-  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+  late final GeneratedColumn<String> createdAt = GeneratedColumn<String>(
     'created_at',
     aliasedName,
     false,
-    type: DriftSqlType.dateTime,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<String> updatedAt = GeneratedColumn<String>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _keyVersionMeta = const VerificationMeta(
+    'keyVersion',
+  );
+  @override
+  late final GeneratedColumn<int> keyVersion = GeneratedColumn<int>(
+    'key_version',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _nameCipherMeta = const VerificationMeta(
+    'nameCipher',
+  );
+  @override
+  late final GeneratedColumn<String> nameCipher = GeneratedColumn<String>(
+    'name_cipher',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
     requiredDuringInsert: true,
   );
   @override
-  List<GeneratedColumn> get $columns => [id, name, accent, symbol, createdAt];
+  List<GeneratedColumn> get $columns => [
+    id,
+    ownerId,
+    accent,
+    symbol,
+    createdAt,
+    updatedAt,
+    keyVersion,
+    nameCipher,
+  ];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -1354,7 +1636,7 @@ class $ThemesTable extends Themes with TableInfo<$ThemesTable, LocalTheme> {
   static const String $name = 'themes';
   @override
   VerificationContext validateIntegrity(
-    Insertable<LocalTheme> instance, {
+    Insertable<ThemeRow> instance, {
     bool isInserting = false,
   }) {
     final context = VerificationContext();
@@ -1364,13 +1646,13 @@ class $ThemesTable extends Themes with TableInfo<$ThemesTable, LocalTheme> {
     } else if (isInserting) {
       context.missing(_idMeta);
     }
-    if (data.containsKey('name')) {
+    if (data.containsKey('owner_id')) {
       context.handle(
-        _nameMeta,
-        name.isAcceptableOrUnknown(data['name']!, _nameMeta),
+        _ownerIdMeta,
+        ownerId.isAcceptableOrUnknown(data['owner_id']!, _ownerIdMeta),
       );
     } else if (isInserting) {
-      context.missing(_nameMeta);
+      context.missing(_ownerIdMeta);
     }
     if (data.containsKey('accent')) {
       context.handle(
@@ -1392,22 +1674,46 @@ class $ThemesTable extends Themes with TableInfo<$ThemesTable, LocalTheme> {
     } else if (isInserting) {
       context.missing(_createdAtMeta);
     }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_updatedAtMeta);
+    }
+    if (data.containsKey('key_version')) {
+      context.handle(
+        _keyVersionMeta,
+        keyVersion.isAcceptableOrUnknown(data['key_version']!, _keyVersionMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_keyVersionMeta);
+    }
+    if (data.containsKey('name_cipher')) {
+      context.handle(
+        _nameCipherMeta,
+        nameCipher.isAcceptableOrUnknown(data['name_cipher']!, _nameCipherMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_nameCipherMeta);
+    }
     return context;
   }
 
   @override
   Set<GeneratedColumn> get $primaryKey => {id};
   @override
-  LocalTheme map(Map<String, dynamic> data, {String? tablePrefix}) {
+  ThemeRow map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
-    return LocalTheme(
+    return ThemeRow(
       id: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}id'],
       )!,
-      name: attachedDatabase.typeMapping.read(
+      ownerId: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
-        data['${effectivePrefix}name'],
+        data['${effectivePrefix}owner_id'],
       )!,
       accent: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
@@ -1418,8 +1724,20 @@ class $ThemesTable extends Themes with TableInfo<$ThemesTable, LocalTheme> {
         data['${effectivePrefix}symbol'],
       ),
       createdAt: attachedDatabase.typeMapping.read(
-        DriftSqlType.dateTime,
+        DriftSqlType.string,
         data['${effectivePrefix}created_at'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}updated_at'],
+      )!,
+      keyVersion: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}key_version'],
+      )!,
+      nameCipher: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}name_cipher'],
       )!,
     );
   }
@@ -1430,38 +1748,47 @@ class $ThemesTable extends Themes with TableInfo<$ThemesTable, LocalTheme> {
   }
 }
 
-class LocalTheme extends DataClass implements Insertable<LocalTheme> {
+class ThemeRow extends DataClass implements Insertable<ThemeRow> {
   final String id;
-  final String name;
+  final String ownerId;
   final String? accent;
   final String? symbol;
-  final DateTime createdAt;
-  const LocalTheme({
+  final String createdAt;
+  final String updatedAt;
+  final int keyVersion;
+  final String nameCipher;
+  const ThemeRow({
     required this.id,
-    required this.name,
+    required this.ownerId,
     this.accent,
     this.symbol,
     required this.createdAt,
+    required this.updatedAt,
+    required this.keyVersion,
+    required this.nameCipher,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     map['id'] = Variable<String>(id);
-    map['name'] = Variable<String>(name);
+    map['owner_id'] = Variable<String>(ownerId);
     if (!nullToAbsent || accent != null) {
       map['accent'] = Variable<String>(accent);
     }
     if (!nullToAbsent || symbol != null) {
       map['symbol'] = Variable<String>(symbol);
     }
-    map['created_at'] = Variable<DateTime>(createdAt);
+    map['created_at'] = Variable<String>(createdAt);
+    map['updated_at'] = Variable<String>(updatedAt);
+    map['key_version'] = Variable<int>(keyVersion);
+    map['name_cipher'] = Variable<String>(nameCipher);
     return map;
   }
 
   ThemesCompanion toCompanion(bool nullToAbsent) {
     return ThemesCompanion(
       id: Value(id),
-      name: Value(name),
+      ownerId: Value(ownerId),
       accent: accent == null && nullToAbsent
           ? const Value.absent()
           : Value(accent),
@@ -1469,20 +1796,26 @@ class LocalTheme extends DataClass implements Insertable<LocalTheme> {
           ? const Value.absent()
           : Value(symbol),
       createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+      keyVersion: Value(keyVersion),
+      nameCipher: Value(nameCipher),
     );
   }
 
-  factory LocalTheme.fromJson(
+  factory ThemeRow.fromJson(
     Map<String, dynamic> json, {
     ValueSerializer? serializer,
   }) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
-    return LocalTheme(
+    return ThemeRow(
       id: serializer.fromJson<String>(json['id']),
-      name: serializer.fromJson<String>(json['name']),
+      ownerId: serializer.fromJson<String>(json['ownerId']),
       accent: serializer.fromJson<String?>(json['accent']),
       symbol: serializer.fromJson<String?>(json['symbol']),
-      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      createdAt: serializer.fromJson<String>(json['createdAt']),
+      updatedAt: serializer.fromJson<String>(json['updatedAt']),
+      keyVersion: serializer.fromJson<int>(json['keyVersion']),
+      nameCipher: serializer.fromJson<String>(json['nameCipher']),
     );
   }
   @override
@@ -1490,118 +1823,173 @@ class LocalTheme extends DataClass implements Insertable<LocalTheme> {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
       'id': serializer.toJson<String>(id),
-      'name': serializer.toJson<String>(name),
+      'ownerId': serializer.toJson<String>(ownerId),
       'accent': serializer.toJson<String?>(accent),
       'symbol': serializer.toJson<String?>(symbol),
-      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'createdAt': serializer.toJson<String>(createdAt),
+      'updatedAt': serializer.toJson<String>(updatedAt),
+      'keyVersion': serializer.toJson<int>(keyVersion),
+      'nameCipher': serializer.toJson<String>(nameCipher),
     };
   }
 
-  LocalTheme copyWith({
+  ThemeRow copyWith({
     String? id,
-    String? name,
+    String? ownerId,
     Value<String?> accent = const Value.absent(),
     Value<String?> symbol = const Value.absent(),
-    DateTime? createdAt,
-  }) => LocalTheme(
+    String? createdAt,
+    String? updatedAt,
+    int? keyVersion,
+    String? nameCipher,
+  }) => ThemeRow(
     id: id ?? this.id,
-    name: name ?? this.name,
+    ownerId: ownerId ?? this.ownerId,
     accent: accent.present ? accent.value : this.accent,
     symbol: symbol.present ? symbol.value : this.symbol,
     createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+    keyVersion: keyVersion ?? this.keyVersion,
+    nameCipher: nameCipher ?? this.nameCipher,
   );
-  LocalTheme copyWithCompanion(ThemesCompanion data) {
-    return LocalTheme(
+  ThemeRow copyWithCompanion(ThemesCompanion data) {
+    return ThemeRow(
       id: data.id.present ? data.id.value : this.id,
-      name: data.name.present ? data.name.value : this.name,
+      ownerId: data.ownerId.present ? data.ownerId.value : this.ownerId,
       accent: data.accent.present ? data.accent.value : this.accent,
       symbol: data.symbol.present ? data.symbol.value : this.symbol,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+      keyVersion: data.keyVersion.present
+          ? data.keyVersion.value
+          : this.keyVersion,
+      nameCipher: data.nameCipher.present
+          ? data.nameCipher.value
+          : this.nameCipher,
     );
   }
 
   @override
   String toString() {
-    return (StringBuffer('LocalTheme(')
+    return (StringBuffer('ThemeRow(')
           ..write('id: $id, ')
-          ..write('name: $name, ')
+          ..write('ownerId: $ownerId, ')
           ..write('accent: $accent, ')
           ..write('symbol: $symbol, ')
-          ..write('createdAt: $createdAt')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('keyVersion: $keyVersion, ')
+          ..write('nameCipher: $nameCipher')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(id, name, accent, symbol, createdAt);
+  int get hashCode => Object.hash(
+    id,
+    ownerId,
+    accent,
+    symbol,
+    createdAt,
+    updatedAt,
+    keyVersion,
+    nameCipher,
+  );
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      (other is LocalTheme &&
+      (other is ThemeRow &&
           other.id == this.id &&
-          other.name == this.name &&
+          other.ownerId == this.ownerId &&
           other.accent == this.accent &&
           other.symbol == this.symbol &&
-          other.createdAt == this.createdAt);
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt &&
+          other.keyVersion == this.keyVersion &&
+          other.nameCipher == this.nameCipher);
 }
 
-class ThemesCompanion extends UpdateCompanion<LocalTheme> {
+class ThemesCompanion extends UpdateCompanion<ThemeRow> {
   final Value<String> id;
-  final Value<String> name;
+  final Value<String> ownerId;
   final Value<String?> accent;
   final Value<String?> symbol;
-  final Value<DateTime> createdAt;
+  final Value<String> createdAt;
+  final Value<String> updatedAt;
+  final Value<int> keyVersion;
+  final Value<String> nameCipher;
   final Value<int> rowid;
   const ThemesCompanion({
     this.id = const Value.absent(),
-    this.name = const Value.absent(),
+    this.ownerId = const Value.absent(),
     this.accent = const Value.absent(),
     this.symbol = const Value.absent(),
     this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.keyVersion = const Value.absent(),
+    this.nameCipher = const Value.absent(),
     this.rowid = const Value.absent(),
   });
   ThemesCompanion.insert({
     required String id,
-    required String name,
+    required String ownerId,
     this.accent = const Value.absent(),
     this.symbol = const Value.absent(),
-    required DateTime createdAt,
+    required String createdAt,
+    required String updatedAt,
+    required int keyVersion,
+    required String nameCipher,
     this.rowid = const Value.absent(),
   }) : id = Value(id),
-       name = Value(name),
-       createdAt = Value(createdAt);
-  static Insertable<LocalTheme> custom({
+       ownerId = Value(ownerId),
+       createdAt = Value(createdAt),
+       updatedAt = Value(updatedAt),
+       keyVersion = Value(keyVersion),
+       nameCipher = Value(nameCipher);
+  static Insertable<ThemeRow> custom({
     Expression<String>? id,
-    Expression<String>? name,
+    Expression<String>? ownerId,
     Expression<String>? accent,
     Expression<String>? symbol,
-    Expression<DateTime>? createdAt,
+    Expression<String>? createdAt,
+    Expression<String>? updatedAt,
+    Expression<int>? keyVersion,
+    Expression<String>? nameCipher,
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
-      if (name != null) 'name': name,
+      if (ownerId != null) 'owner_id': ownerId,
       if (accent != null) 'accent': accent,
       if (symbol != null) 'symbol': symbol,
       if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (keyVersion != null) 'key_version': keyVersion,
+      if (nameCipher != null) 'name_cipher': nameCipher,
       if (rowid != null) 'rowid': rowid,
     });
   }
 
   ThemesCompanion copyWith({
     Value<String>? id,
-    Value<String>? name,
+    Value<String>? ownerId,
     Value<String?>? accent,
     Value<String?>? symbol,
-    Value<DateTime>? createdAt,
+    Value<String>? createdAt,
+    Value<String>? updatedAt,
+    Value<int>? keyVersion,
+    Value<String>? nameCipher,
     Value<int>? rowid,
   }) {
     return ThemesCompanion(
       id: id ?? this.id,
-      name: name ?? this.name,
+      ownerId: ownerId ?? this.ownerId,
       accent: accent ?? this.accent,
       symbol: symbol ?? this.symbol,
       createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      keyVersion: keyVersion ?? this.keyVersion,
+      nameCipher: nameCipher ?? this.nameCipher,
       rowid: rowid ?? this.rowid,
     );
   }
@@ -1612,8 +2000,8 @@ class ThemesCompanion extends UpdateCompanion<LocalTheme> {
     if (id.present) {
       map['id'] = Variable<String>(id.value);
     }
-    if (name.present) {
-      map['name'] = Variable<String>(name.value);
+    if (ownerId.present) {
+      map['owner_id'] = Variable<String>(ownerId.value);
     }
     if (accent.present) {
       map['accent'] = Variable<String>(accent.value);
@@ -1622,7 +2010,16 @@ class ThemesCompanion extends UpdateCompanion<LocalTheme> {
       map['symbol'] = Variable<String>(symbol.value);
     }
     if (createdAt.present) {
-      map['created_at'] = Variable<DateTime>(createdAt.value);
+      map['created_at'] = Variable<String>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<String>(updatedAt.value);
+    }
+    if (keyVersion.present) {
+      map['key_version'] = Variable<int>(keyVersion.value);
+    }
+    if (nameCipher.present) {
+      map['name_cipher'] = Variable<String>(nameCipher.value);
     }
     if (rowid.present) {
       map['rowid'] = Variable<int>(rowid.value);
@@ -1634,10 +2031,13 @@ class ThemesCompanion extends UpdateCompanion<LocalTheme> {
   String toString() {
     return (StringBuffer('ThemesCompanion(')
           ..write('id: $id, ')
-          ..write('name: $name, ')
+          ..write('ownerId: $ownerId, ')
           ..write('accent: $accent, ')
           ..write('symbol: $symbol, ')
           ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('keyVersion: $keyVersion, ')
+          ..write('nameCipher: $nameCipher, ')
           ..write('rowid: $rowid')
           ..write(')'))
         .toString();
@@ -1645,11 +2045,31 @@ class ThemesCompanion extends UpdateCompanion<LocalTheme> {
 }
 
 class $ThemeQuotesTable extends ThemeQuotes
-    with TableInfo<$ThemeQuotesTable, LocalThemeQuote> {
+    with TableInfo<$ThemeQuotesTable, ThemeQuoteRow> {
   @override
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
   $ThemeQuotesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _ownerIdMeta = const VerificationMeta(
+    'ownerId',
+  );
+  @override
+  late final GeneratedColumn<String> ownerId = GeneratedColumn<String>(
+    'owner_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
   static const VerificationMeta _themeIdMeta = const VerificationMeta(
     'themeId',
   );
@@ -1660,9 +2080,6 @@ class $ThemeQuotesTable extends ThemeQuotes
     false,
     type: DriftSqlType.string,
     requiredDuringInsert: true,
-    defaultConstraints: GeneratedColumn.constraintIsAlways(
-      'REFERENCES themes (id) ON DELETE CASCADE',
-    ),
   );
   static const VerificationMeta _quoteIdMeta = const VerificationMeta(
     'quoteId',
@@ -1674,12 +2091,26 @@ class $ThemeQuotesTable extends ThemeQuotes
     false,
     type: DriftSqlType.string,
     requiredDuringInsert: true,
-    defaultConstraints: GeneratedColumn.constraintIsAlways(
-      'REFERENCES quotes (id) ON DELETE CASCADE',
-    ),
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
   );
   @override
-  List<GeneratedColumn> get $columns => [themeId, quoteId];
+  late final GeneratedColumn<String> updatedAt = GeneratedColumn<String>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    ownerId,
+    themeId,
+    quoteId,
+    updatedAt,
+  ];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -1687,11 +2118,24 @@ class $ThemeQuotesTable extends ThemeQuotes
   static const String $name = 'theme_quotes';
   @override
   VerificationContext validateIntegrity(
-    Insertable<LocalThemeQuote> instance, {
+    Insertable<ThemeQuoteRow> instance, {
     bool isInserting = false,
   }) {
     final context = VerificationContext();
     final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('owner_id')) {
+      context.handle(
+        _ownerIdMeta,
+        ownerId.isAcceptableOrUnknown(data['owner_id']!, _ownerIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_ownerIdMeta);
+    }
     if (data.containsKey('theme_id')) {
       context.handle(
         _themeIdMeta,
@@ -1708,15 +2152,31 @@ class $ThemeQuotesTable extends ThemeQuotes
     } else if (isInserting) {
       context.missing(_quoteIdMeta);
     }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_updatedAtMeta);
+    }
     return context;
   }
 
   @override
-  Set<GeneratedColumn> get $primaryKey => {themeId, quoteId};
+  Set<GeneratedColumn> get $primaryKey => {id};
   @override
-  LocalThemeQuote map(Map<String, dynamic> data, {String? tablePrefix}) {
+  ThemeQuoteRow map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
-    return LocalThemeQuote(
+    return ThemeQuoteRow(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      ownerId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}owner_id'],
+      )!,
       themeId: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}theme_id'],
@@ -1724,6 +2184,10 @@ class $ThemeQuotesTable extends ThemeQuotes
       quoteId: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}quote_id'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}updated_at'],
       )!,
     );
   }
@@ -1734,110 +2198,172 @@ class $ThemeQuotesTable extends ThemeQuotes
   }
 }
 
-class LocalThemeQuote extends DataClass implements Insertable<LocalThemeQuote> {
+class ThemeQuoteRow extends DataClass implements Insertable<ThemeQuoteRow> {
+  final String id;
+  final String ownerId;
   final String themeId;
   final String quoteId;
-  const LocalThemeQuote({required this.themeId, required this.quoteId});
+  final String updatedAt;
+  const ThemeQuoteRow({
+    required this.id,
+    required this.ownerId,
+    required this.themeId,
+    required this.quoteId,
+    required this.updatedAt,
+  });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['owner_id'] = Variable<String>(ownerId);
     map['theme_id'] = Variable<String>(themeId);
     map['quote_id'] = Variable<String>(quoteId);
+    map['updated_at'] = Variable<String>(updatedAt);
     return map;
   }
 
   ThemeQuotesCompanion toCompanion(bool nullToAbsent) {
     return ThemeQuotesCompanion(
+      id: Value(id),
+      ownerId: Value(ownerId),
       themeId: Value(themeId),
       quoteId: Value(quoteId),
+      updatedAt: Value(updatedAt),
     );
   }
 
-  factory LocalThemeQuote.fromJson(
+  factory ThemeQuoteRow.fromJson(
     Map<String, dynamic> json, {
     ValueSerializer? serializer,
   }) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
-    return LocalThemeQuote(
+    return ThemeQuoteRow(
+      id: serializer.fromJson<String>(json['id']),
+      ownerId: serializer.fromJson<String>(json['ownerId']),
       themeId: serializer.fromJson<String>(json['themeId']),
       quoteId: serializer.fromJson<String>(json['quoteId']),
+      updatedAt: serializer.fromJson<String>(json['updatedAt']),
     );
   }
   @override
   Map<String, dynamic> toJson({ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'ownerId': serializer.toJson<String>(ownerId),
       'themeId': serializer.toJson<String>(themeId),
       'quoteId': serializer.toJson<String>(quoteId),
+      'updatedAt': serializer.toJson<String>(updatedAt),
     };
   }
 
-  LocalThemeQuote copyWith({String? themeId, String? quoteId}) =>
-      LocalThemeQuote(
-        themeId: themeId ?? this.themeId,
-        quoteId: quoteId ?? this.quoteId,
-      );
-  LocalThemeQuote copyWithCompanion(ThemeQuotesCompanion data) {
-    return LocalThemeQuote(
+  ThemeQuoteRow copyWith({
+    String? id,
+    String? ownerId,
+    String? themeId,
+    String? quoteId,
+    String? updatedAt,
+  }) => ThemeQuoteRow(
+    id: id ?? this.id,
+    ownerId: ownerId ?? this.ownerId,
+    themeId: themeId ?? this.themeId,
+    quoteId: quoteId ?? this.quoteId,
+    updatedAt: updatedAt ?? this.updatedAt,
+  );
+  ThemeQuoteRow copyWithCompanion(ThemeQuotesCompanion data) {
+    return ThemeQuoteRow(
+      id: data.id.present ? data.id.value : this.id,
+      ownerId: data.ownerId.present ? data.ownerId.value : this.ownerId,
       themeId: data.themeId.present ? data.themeId.value : this.themeId,
       quoteId: data.quoteId.present ? data.quoteId.value : this.quoteId,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
     );
   }
 
   @override
   String toString() {
-    return (StringBuffer('LocalThemeQuote(')
+    return (StringBuffer('ThemeQuoteRow(')
+          ..write('id: $id, ')
+          ..write('ownerId: $ownerId, ')
           ..write('themeId: $themeId, ')
-          ..write('quoteId: $quoteId')
+          ..write('quoteId: $quoteId, ')
+          ..write('updatedAt: $updatedAt')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(themeId, quoteId);
+  int get hashCode => Object.hash(id, ownerId, themeId, quoteId, updatedAt);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      (other is LocalThemeQuote &&
+      (other is ThemeQuoteRow &&
+          other.id == this.id &&
+          other.ownerId == this.ownerId &&
           other.themeId == this.themeId &&
-          other.quoteId == this.quoteId);
+          other.quoteId == this.quoteId &&
+          other.updatedAt == this.updatedAt);
 }
 
-class ThemeQuotesCompanion extends UpdateCompanion<LocalThemeQuote> {
+class ThemeQuotesCompanion extends UpdateCompanion<ThemeQuoteRow> {
+  final Value<String> id;
+  final Value<String> ownerId;
   final Value<String> themeId;
   final Value<String> quoteId;
+  final Value<String> updatedAt;
   final Value<int> rowid;
   const ThemeQuotesCompanion({
+    this.id = const Value.absent(),
+    this.ownerId = const Value.absent(),
     this.themeId = const Value.absent(),
     this.quoteId = const Value.absent(),
+    this.updatedAt = const Value.absent(),
     this.rowid = const Value.absent(),
   });
   ThemeQuotesCompanion.insert({
+    required String id,
+    required String ownerId,
     required String themeId,
     required String quoteId,
+    required String updatedAt,
     this.rowid = const Value.absent(),
-  }) : themeId = Value(themeId),
-       quoteId = Value(quoteId);
-  static Insertable<LocalThemeQuote> custom({
+  }) : id = Value(id),
+       ownerId = Value(ownerId),
+       themeId = Value(themeId),
+       quoteId = Value(quoteId),
+       updatedAt = Value(updatedAt);
+  static Insertable<ThemeQuoteRow> custom({
+    Expression<String>? id,
+    Expression<String>? ownerId,
     Expression<String>? themeId,
     Expression<String>? quoteId,
+    Expression<String>? updatedAt,
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (ownerId != null) 'owner_id': ownerId,
       if (themeId != null) 'theme_id': themeId,
       if (quoteId != null) 'quote_id': quoteId,
+      if (updatedAt != null) 'updated_at': updatedAt,
       if (rowid != null) 'rowid': rowid,
     });
   }
 
   ThemeQuotesCompanion copyWith({
+    Value<String>? id,
+    Value<String>? ownerId,
     Value<String>? themeId,
     Value<String>? quoteId,
+    Value<String>? updatedAt,
     Value<int>? rowid,
   }) {
     return ThemeQuotesCompanion(
+      id: id ?? this.id,
+      ownerId: ownerId ?? this.ownerId,
       themeId: themeId ?? this.themeId,
       quoteId: quoteId ?? this.quoteId,
+      updatedAt: updatedAt ?? this.updatedAt,
       rowid: rowid ?? this.rowid,
     );
   }
@@ -1845,11 +2371,20 @@ class ThemeQuotesCompanion extends UpdateCompanion<LocalThemeQuote> {
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (ownerId.present) {
+      map['owner_id'] = Variable<String>(ownerId.value);
+    }
     if (themeId.present) {
       map['theme_id'] = Variable<String>(themeId.value);
     }
     if (quoteId.present) {
       map['quote_id'] = Variable<String>(quoteId.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<String>(updatedAt.value);
     }
     if (rowid.present) {
       map['rowid'] = Variable<int>(rowid.value);
@@ -1860,15 +2395,18 @@ class ThemeQuotesCompanion extends UpdateCompanion<LocalThemeQuote> {
   @override
   String toString() {
     return (StringBuffer('ThemeQuotesCompanion(')
+          ..write('id: $id, ')
+          ..write('ownerId: $ownerId, ')
           ..write('themeId: $themeId, ')
           ..write('quoteId: $quoteId, ')
+          ..write('updatedAt: $updatedAt, ')
           ..write('rowid: $rowid')
           ..write(')'))
         .toString();
   }
 }
 
-class $ShelvesTable extends Shelves with TableInfo<$ShelvesTable, LocalShelf> {
+class $ShelvesTable extends Shelves with TableInfo<$ShelvesTable, ShelfRow> {
   @override
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
@@ -1882,10 +2420,12 @@ class $ShelvesTable extends Shelves with TableInfo<$ShelvesTable, LocalShelf> {
     type: DriftSqlType.string,
     requiredDuringInsert: true,
   );
-  static const VerificationMeta _nameMeta = const VerificationMeta('name');
+  static const VerificationMeta _ownerIdMeta = const VerificationMeta(
+    'ownerId',
+  );
   @override
-  late final GeneratedColumn<String> name = GeneratedColumn<String>(
-    'name',
+  late final GeneratedColumn<String> ownerId = GeneratedColumn<String>(
+    'owner_id',
     aliasedName,
     false,
     type: DriftSqlType.string,
@@ -1913,15 +2453,57 @@ class $ShelvesTable extends Shelves with TableInfo<$ShelvesTable, LocalShelf> {
     'createdAt',
   );
   @override
-  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+  late final GeneratedColumn<String> createdAt = GeneratedColumn<String>(
     'created_at',
     aliasedName,
     false,
-    type: DriftSqlType.dateTime,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<String> updatedAt = GeneratedColumn<String>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _keyVersionMeta = const VerificationMeta(
+    'keyVersion',
+  );
+  @override
+  late final GeneratedColumn<int> keyVersion = GeneratedColumn<int>(
+    'key_version',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _nameCipherMeta = const VerificationMeta(
+    'nameCipher',
+  );
+  @override
+  late final GeneratedColumn<String> nameCipher = GeneratedColumn<String>(
+    'name_cipher',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
     requiredDuringInsert: true,
   );
   @override
-  List<GeneratedColumn> get $columns => [id, name, accent, symbol, createdAt];
+  List<GeneratedColumn> get $columns => [
+    id,
+    ownerId,
+    accent,
+    symbol,
+    createdAt,
+    updatedAt,
+    keyVersion,
+    nameCipher,
+  ];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -1929,7 +2511,7 @@ class $ShelvesTable extends Shelves with TableInfo<$ShelvesTable, LocalShelf> {
   static const String $name = 'shelves';
   @override
   VerificationContext validateIntegrity(
-    Insertable<LocalShelf> instance, {
+    Insertable<ShelfRow> instance, {
     bool isInserting = false,
   }) {
     final context = VerificationContext();
@@ -1939,13 +2521,13 @@ class $ShelvesTable extends Shelves with TableInfo<$ShelvesTable, LocalShelf> {
     } else if (isInserting) {
       context.missing(_idMeta);
     }
-    if (data.containsKey('name')) {
+    if (data.containsKey('owner_id')) {
       context.handle(
-        _nameMeta,
-        name.isAcceptableOrUnknown(data['name']!, _nameMeta),
+        _ownerIdMeta,
+        ownerId.isAcceptableOrUnknown(data['owner_id']!, _ownerIdMeta),
       );
     } else if (isInserting) {
-      context.missing(_nameMeta);
+      context.missing(_ownerIdMeta);
     }
     if (data.containsKey('accent')) {
       context.handle(
@@ -1967,22 +2549,46 @@ class $ShelvesTable extends Shelves with TableInfo<$ShelvesTable, LocalShelf> {
     } else if (isInserting) {
       context.missing(_createdAtMeta);
     }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_updatedAtMeta);
+    }
+    if (data.containsKey('key_version')) {
+      context.handle(
+        _keyVersionMeta,
+        keyVersion.isAcceptableOrUnknown(data['key_version']!, _keyVersionMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_keyVersionMeta);
+    }
+    if (data.containsKey('name_cipher')) {
+      context.handle(
+        _nameCipherMeta,
+        nameCipher.isAcceptableOrUnknown(data['name_cipher']!, _nameCipherMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_nameCipherMeta);
+    }
     return context;
   }
 
   @override
   Set<GeneratedColumn> get $primaryKey => {id};
   @override
-  LocalShelf map(Map<String, dynamic> data, {String? tablePrefix}) {
+  ShelfRow map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
-    return LocalShelf(
+    return ShelfRow(
       id: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}id'],
       )!,
-      name: attachedDatabase.typeMapping.read(
+      ownerId: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
-        data['${effectivePrefix}name'],
+        data['${effectivePrefix}owner_id'],
       )!,
       accent: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
@@ -1993,8 +2599,20 @@ class $ShelvesTable extends Shelves with TableInfo<$ShelvesTable, LocalShelf> {
         data['${effectivePrefix}symbol'],
       ),
       createdAt: attachedDatabase.typeMapping.read(
-        DriftSqlType.dateTime,
+        DriftSqlType.string,
         data['${effectivePrefix}created_at'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}updated_at'],
+      )!,
+      keyVersion: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}key_version'],
+      )!,
+      nameCipher: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}name_cipher'],
       )!,
     );
   }
@@ -2005,38 +2623,47 @@ class $ShelvesTable extends Shelves with TableInfo<$ShelvesTable, LocalShelf> {
   }
 }
 
-class LocalShelf extends DataClass implements Insertable<LocalShelf> {
+class ShelfRow extends DataClass implements Insertable<ShelfRow> {
   final String id;
-  final String name;
+  final String ownerId;
   final String? accent;
   final String? symbol;
-  final DateTime createdAt;
-  const LocalShelf({
+  final String createdAt;
+  final String updatedAt;
+  final int keyVersion;
+  final String nameCipher;
+  const ShelfRow({
     required this.id,
-    required this.name,
+    required this.ownerId,
     this.accent,
     this.symbol,
     required this.createdAt,
+    required this.updatedAt,
+    required this.keyVersion,
+    required this.nameCipher,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     map['id'] = Variable<String>(id);
-    map['name'] = Variable<String>(name);
+    map['owner_id'] = Variable<String>(ownerId);
     if (!nullToAbsent || accent != null) {
       map['accent'] = Variable<String>(accent);
     }
     if (!nullToAbsent || symbol != null) {
       map['symbol'] = Variable<String>(symbol);
     }
-    map['created_at'] = Variable<DateTime>(createdAt);
+    map['created_at'] = Variable<String>(createdAt);
+    map['updated_at'] = Variable<String>(updatedAt);
+    map['key_version'] = Variable<int>(keyVersion);
+    map['name_cipher'] = Variable<String>(nameCipher);
     return map;
   }
 
   ShelvesCompanion toCompanion(bool nullToAbsent) {
     return ShelvesCompanion(
       id: Value(id),
-      name: Value(name),
+      ownerId: Value(ownerId),
       accent: accent == null && nullToAbsent
           ? const Value.absent()
           : Value(accent),
@@ -2044,20 +2671,26 @@ class LocalShelf extends DataClass implements Insertable<LocalShelf> {
           ? const Value.absent()
           : Value(symbol),
       createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+      keyVersion: Value(keyVersion),
+      nameCipher: Value(nameCipher),
     );
   }
 
-  factory LocalShelf.fromJson(
+  factory ShelfRow.fromJson(
     Map<String, dynamic> json, {
     ValueSerializer? serializer,
   }) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
-    return LocalShelf(
+    return ShelfRow(
       id: serializer.fromJson<String>(json['id']),
-      name: serializer.fromJson<String>(json['name']),
+      ownerId: serializer.fromJson<String>(json['ownerId']),
       accent: serializer.fromJson<String?>(json['accent']),
       symbol: serializer.fromJson<String?>(json['symbol']),
-      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      createdAt: serializer.fromJson<String>(json['createdAt']),
+      updatedAt: serializer.fromJson<String>(json['updatedAt']),
+      keyVersion: serializer.fromJson<int>(json['keyVersion']),
+      nameCipher: serializer.fromJson<String>(json['nameCipher']),
     );
   }
   @override
@@ -2065,118 +2698,173 @@ class LocalShelf extends DataClass implements Insertable<LocalShelf> {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
       'id': serializer.toJson<String>(id),
-      'name': serializer.toJson<String>(name),
+      'ownerId': serializer.toJson<String>(ownerId),
       'accent': serializer.toJson<String?>(accent),
       'symbol': serializer.toJson<String?>(symbol),
-      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'createdAt': serializer.toJson<String>(createdAt),
+      'updatedAt': serializer.toJson<String>(updatedAt),
+      'keyVersion': serializer.toJson<int>(keyVersion),
+      'nameCipher': serializer.toJson<String>(nameCipher),
     };
   }
 
-  LocalShelf copyWith({
+  ShelfRow copyWith({
     String? id,
-    String? name,
+    String? ownerId,
     Value<String?> accent = const Value.absent(),
     Value<String?> symbol = const Value.absent(),
-    DateTime? createdAt,
-  }) => LocalShelf(
+    String? createdAt,
+    String? updatedAt,
+    int? keyVersion,
+    String? nameCipher,
+  }) => ShelfRow(
     id: id ?? this.id,
-    name: name ?? this.name,
+    ownerId: ownerId ?? this.ownerId,
     accent: accent.present ? accent.value : this.accent,
     symbol: symbol.present ? symbol.value : this.symbol,
     createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+    keyVersion: keyVersion ?? this.keyVersion,
+    nameCipher: nameCipher ?? this.nameCipher,
   );
-  LocalShelf copyWithCompanion(ShelvesCompanion data) {
-    return LocalShelf(
+  ShelfRow copyWithCompanion(ShelvesCompanion data) {
+    return ShelfRow(
       id: data.id.present ? data.id.value : this.id,
-      name: data.name.present ? data.name.value : this.name,
+      ownerId: data.ownerId.present ? data.ownerId.value : this.ownerId,
       accent: data.accent.present ? data.accent.value : this.accent,
       symbol: data.symbol.present ? data.symbol.value : this.symbol,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+      keyVersion: data.keyVersion.present
+          ? data.keyVersion.value
+          : this.keyVersion,
+      nameCipher: data.nameCipher.present
+          ? data.nameCipher.value
+          : this.nameCipher,
     );
   }
 
   @override
   String toString() {
-    return (StringBuffer('LocalShelf(')
+    return (StringBuffer('ShelfRow(')
           ..write('id: $id, ')
-          ..write('name: $name, ')
+          ..write('ownerId: $ownerId, ')
           ..write('accent: $accent, ')
           ..write('symbol: $symbol, ')
-          ..write('createdAt: $createdAt')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('keyVersion: $keyVersion, ')
+          ..write('nameCipher: $nameCipher')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(id, name, accent, symbol, createdAt);
+  int get hashCode => Object.hash(
+    id,
+    ownerId,
+    accent,
+    symbol,
+    createdAt,
+    updatedAt,
+    keyVersion,
+    nameCipher,
+  );
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      (other is LocalShelf &&
+      (other is ShelfRow &&
           other.id == this.id &&
-          other.name == this.name &&
+          other.ownerId == this.ownerId &&
           other.accent == this.accent &&
           other.symbol == this.symbol &&
-          other.createdAt == this.createdAt);
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt &&
+          other.keyVersion == this.keyVersion &&
+          other.nameCipher == this.nameCipher);
 }
 
-class ShelvesCompanion extends UpdateCompanion<LocalShelf> {
+class ShelvesCompanion extends UpdateCompanion<ShelfRow> {
   final Value<String> id;
-  final Value<String> name;
+  final Value<String> ownerId;
   final Value<String?> accent;
   final Value<String?> symbol;
-  final Value<DateTime> createdAt;
+  final Value<String> createdAt;
+  final Value<String> updatedAt;
+  final Value<int> keyVersion;
+  final Value<String> nameCipher;
   final Value<int> rowid;
   const ShelvesCompanion({
     this.id = const Value.absent(),
-    this.name = const Value.absent(),
+    this.ownerId = const Value.absent(),
     this.accent = const Value.absent(),
     this.symbol = const Value.absent(),
     this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.keyVersion = const Value.absent(),
+    this.nameCipher = const Value.absent(),
     this.rowid = const Value.absent(),
   });
   ShelvesCompanion.insert({
     required String id,
-    required String name,
+    required String ownerId,
     this.accent = const Value.absent(),
     this.symbol = const Value.absent(),
-    required DateTime createdAt,
+    required String createdAt,
+    required String updatedAt,
+    required int keyVersion,
+    required String nameCipher,
     this.rowid = const Value.absent(),
   }) : id = Value(id),
-       name = Value(name),
-       createdAt = Value(createdAt);
-  static Insertable<LocalShelf> custom({
+       ownerId = Value(ownerId),
+       createdAt = Value(createdAt),
+       updatedAt = Value(updatedAt),
+       keyVersion = Value(keyVersion),
+       nameCipher = Value(nameCipher);
+  static Insertable<ShelfRow> custom({
     Expression<String>? id,
-    Expression<String>? name,
+    Expression<String>? ownerId,
     Expression<String>? accent,
     Expression<String>? symbol,
-    Expression<DateTime>? createdAt,
+    Expression<String>? createdAt,
+    Expression<String>? updatedAt,
+    Expression<int>? keyVersion,
+    Expression<String>? nameCipher,
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
-      if (name != null) 'name': name,
+      if (ownerId != null) 'owner_id': ownerId,
       if (accent != null) 'accent': accent,
       if (symbol != null) 'symbol': symbol,
       if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (keyVersion != null) 'key_version': keyVersion,
+      if (nameCipher != null) 'name_cipher': nameCipher,
       if (rowid != null) 'rowid': rowid,
     });
   }
 
   ShelvesCompanion copyWith({
     Value<String>? id,
-    Value<String>? name,
+    Value<String>? ownerId,
     Value<String?>? accent,
     Value<String?>? symbol,
-    Value<DateTime>? createdAt,
+    Value<String>? createdAt,
+    Value<String>? updatedAt,
+    Value<int>? keyVersion,
+    Value<String>? nameCipher,
     Value<int>? rowid,
   }) {
     return ShelvesCompanion(
       id: id ?? this.id,
-      name: name ?? this.name,
+      ownerId: ownerId ?? this.ownerId,
       accent: accent ?? this.accent,
       symbol: symbol ?? this.symbol,
       createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      keyVersion: keyVersion ?? this.keyVersion,
+      nameCipher: nameCipher ?? this.nameCipher,
       rowid: rowid ?? this.rowid,
     );
   }
@@ -2187,8 +2875,8 @@ class ShelvesCompanion extends UpdateCompanion<LocalShelf> {
     if (id.present) {
       map['id'] = Variable<String>(id.value);
     }
-    if (name.present) {
-      map['name'] = Variable<String>(name.value);
+    if (ownerId.present) {
+      map['owner_id'] = Variable<String>(ownerId.value);
     }
     if (accent.present) {
       map['accent'] = Variable<String>(accent.value);
@@ -2197,7 +2885,16 @@ class ShelvesCompanion extends UpdateCompanion<LocalShelf> {
       map['symbol'] = Variable<String>(symbol.value);
     }
     if (createdAt.present) {
-      map['created_at'] = Variable<DateTime>(createdAt.value);
+      map['created_at'] = Variable<String>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<String>(updatedAt.value);
+    }
+    if (keyVersion.present) {
+      map['key_version'] = Variable<int>(keyVersion.value);
+    }
+    if (nameCipher.present) {
+      map['name_cipher'] = Variable<String>(nameCipher.value);
     }
     if (rowid.present) {
       map['rowid'] = Variable<int>(rowid.value);
@@ -2209,10 +2906,13 @@ class ShelvesCompanion extends UpdateCompanion<LocalShelf> {
   String toString() {
     return (StringBuffer('ShelvesCompanion(')
           ..write('id: $id, ')
-          ..write('name: $name, ')
+          ..write('ownerId: $ownerId, ')
           ..write('accent: $accent, ')
           ..write('symbol: $symbol, ')
           ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('keyVersion: $keyVersion, ')
+          ..write('nameCipher: $nameCipher, ')
           ..write('rowid: $rowid')
           ..write(')'))
         .toString();
@@ -2220,11 +2920,31 @@ class ShelvesCompanion extends UpdateCompanion<LocalShelf> {
 }
 
 class $ShelfBooksTable extends ShelfBooks
-    with TableInfo<$ShelfBooksTable, LocalShelfBook> {
+    with TableInfo<$ShelfBooksTable, ShelfBookRow> {
   @override
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
   $ShelfBooksTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _ownerIdMeta = const VerificationMeta(
+    'ownerId',
+  );
+  @override
+  late final GeneratedColumn<String> ownerId = GeneratedColumn<String>(
+    'owner_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
   static const VerificationMeta _shelfIdMeta = const VerificationMeta(
     'shelfId',
   );
@@ -2235,9 +2955,6 @@ class $ShelfBooksTable extends ShelfBooks
     false,
     type: DriftSqlType.string,
     requiredDuringInsert: true,
-    defaultConstraints: GeneratedColumn.constraintIsAlways(
-      'REFERENCES shelves (id) ON DELETE CASCADE',
-    ),
   );
   static const VerificationMeta _bookIdMeta = const VerificationMeta('bookId');
   @override
@@ -2247,12 +2964,26 @@ class $ShelfBooksTable extends ShelfBooks
     false,
     type: DriftSqlType.string,
     requiredDuringInsert: true,
-    defaultConstraints: GeneratedColumn.constraintIsAlways(
-      'REFERENCES books (id) ON DELETE CASCADE',
-    ),
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
   );
   @override
-  List<GeneratedColumn> get $columns => [shelfId, bookId];
+  late final GeneratedColumn<String> updatedAt = GeneratedColumn<String>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    ownerId,
+    shelfId,
+    bookId,
+    updatedAt,
+  ];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -2260,11 +2991,24 @@ class $ShelfBooksTable extends ShelfBooks
   static const String $name = 'shelf_books';
   @override
   VerificationContext validateIntegrity(
-    Insertable<LocalShelfBook> instance, {
+    Insertable<ShelfBookRow> instance, {
     bool isInserting = false,
   }) {
     final context = VerificationContext();
     final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('owner_id')) {
+      context.handle(
+        _ownerIdMeta,
+        ownerId.isAcceptableOrUnknown(data['owner_id']!, _ownerIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_ownerIdMeta);
+    }
     if (data.containsKey('shelf_id')) {
       context.handle(
         _shelfIdMeta,
@@ -2281,15 +3025,31 @@ class $ShelfBooksTable extends ShelfBooks
     } else if (isInserting) {
       context.missing(_bookIdMeta);
     }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_updatedAtMeta);
+    }
     return context;
   }
 
   @override
-  Set<GeneratedColumn> get $primaryKey => {shelfId, bookId};
+  Set<GeneratedColumn> get $primaryKey => {id};
   @override
-  LocalShelfBook map(Map<String, dynamic> data, {String? tablePrefix}) {
+  ShelfBookRow map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
-    return LocalShelfBook(
+    return ShelfBookRow(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      ownerId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}owner_id'],
+      )!,
       shelfId: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}shelf_id'],
@@ -2297,6 +3057,10 @@ class $ShelfBooksTable extends ShelfBooks
       bookId: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}book_id'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}updated_at'],
       )!,
     );
   }
@@ -2307,106 +3071,172 @@ class $ShelfBooksTable extends ShelfBooks
   }
 }
 
-class LocalShelfBook extends DataClass implements Insertable<LocalShelfBook> {
+class ShelfBookRow extends DataClass implements Insertable<ShelfBookRow> {
+  final String id;
+  final String ownerId;
   final String shelfId;
   final String bookId;
-  const LocalShelfBook({required this.shelfId, required this.bookId});
+  final String updatedAt;
+  const ShelfBookRow({
+    required this.id,
+    required this.ownerId,
+    required this.shelfId,
+    required this.bookId,
+    required this.updatedAt,
+  });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['owner_id'] = Variable<String>(ownerId);
     map['shelf_id'] = Variable<String>(shelfId);
     map['book_id'] = Variable<String>(bookId);
+    map['updated_at'] = Variable<String>(updatedAt);
     return map;
   }
 
   ShelfBooksCompanion toCompanion(bool nullToAbsent) {
-    return ShelfBooksCompanion(shelfId: Value(shelfId), bookId: Value(bookId));
+    return ShelfBooksCompanion(
+      id: Value(id),
+      ownerId: Value(ownerId),
+      shelfId: Value(shelfId),
+      bookId: Value(bookId),
+      updatedAt: Value(updatedAt),
+    );
   }
 
-  factory LocalShelfBook.fromJson(
+  factory ShelfBookRow.fromJson(
     Map<String, dynamic> json, {
     ValueSerializer? serializer,
   }) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
-    return LocalShelfBook(
+    return ShelfBookRow(
+      id: serializer.fromJson<String>(json['id']),
+      ownerId: serializer.fromJson<String>(json['ownerId']),
       shelfId: serializer.fromJson<String>(json['shelfId']),
       bookId: serializer.fromJson<String>(json['bookId']),
+      updatedAt: serializer.fromJson<String>(json['updatedAt']),
     );
   }
   @override
   Map<String, dynamic> toJson({ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'ownerId': serializer.toJson<String>(ownerId),
       'shelfId': serializer.toJson<String>(shelfId),
       'bookId': serializer.toJson<String>(bookId),
+      'updatedAt': serializer.toJson<String>(updatedAt),
     };
   }
 
-  LocalShelfBook copyWith({String? shelfId, String? bookId}) => LocalShelfBook(
+  ShelfBookRow copyWith({
+    String? id,
+    String? ownerId,
+    String? shelfId,
+    String? bookId,
+    String? updatedAt,
+  }) => ShelfBookRow(
+    id: id ?? this.id,
+    ownerId: ownerId ?? this.ownerId,
     shelfId: shelfId ?? this.shelfId,
     bookId: bookId ?? this.bookId,
+    updatedAt: updatedAt ?? this.updatedAt,
   );
-  LocalShelfBook copyWithCompanion(ShelfBooksCompanion data) {
-    return LocalShelfBook(
+  ShelfBookRow copyWithCompanion(ShelfBooksCompanion data) {
+    return ShelfBookRow(
+      id: data.id.present ? data.id.value : this.id,
+      ownerId: data.ownerId.present ? data.ownerId.value : this.ownerId,
       shelfId: data.shelfId.present ? data.shelfId.value : this.shelfId,
       bookId: data.bookId.present ? data.bookId.value : this.bookId,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
     );
   }
 
   @override
   String toString() {
-    return (StringBuffer('LocalShelfBook(')
+    return (StringBuffer('ShelfBookRow(')
+          ..write('id: $id, ')
+          ..write('ownerId: $ownerId, ')
           ..write('shelfId: $shelfId, ')
-          ..write('bookId: $bookId')
+          ..write('bookId: $bookId, ')
+          ..write('updatedAt: $updatedAt')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(shelfId, bookId);
+  int get hashCode => Object.hash(id, ownerId, shelfId, bookId, updatedAt);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      (other is LocalShelfBook &&
+      (other is ShelfBookRow &&
+          other.id == this.id &&
+          other.ownerId == this.ownerId &&
           other.shelfId == this.shelfId &&
-          other.bookId == this.bookId);
+          other.bookId == this.bookId &&
+          other.updatedAt == this.updatedAt);
 }
 
-class ShelfBooksCompanion extends UpdateCompanion<LocalShelfBook> {
+class ShelfBooksCompanion extends UpdateCompanion<ShelfBookRow> {
+  final Value<String> id;
+  final Value<String> ownerId;
   final Value<String> shelfId;
   final Value<String> bookId;
+  final Value<String> updatedAt;
   final Value<int> rowid;
   const ShelfBooksCompanion({
+    this.id = const Value.absent(),
+    this.ownerId = const Value.absent(),
     this.shelfId = const Value.absent(),
     this.bookId = const Value.absent(),
+    this.updatedAt = const Value.absent(),
     this.rowid = const Value.absent(),
   });
   ShelfBooksCompanion.insert({
+    required String id,
+    required String ownerId,
     required String shelfId,
     required String bookId,
+    required String updatedAt,
     this.rowid = const Value.absent(),
-  }) : shelfId = Value(shelfId),
-       bookId = Value(bookId);
-  static Insertable<LocalShelfBook> custom({
+  }) : id = Value(id),
+       ownerId = Value(ownerId),
+       shelfId = Value(shelfId),
+       bookId = Value(bookId),
+       updatedAt = Value(updatedAt);
+  static Insertable<ShelfBookRow> custom({
+    Expression<String>? id,
+    Expression<String>? ownerId,
     Expression<String>? shelfId,
     Expression<String>? bookId,
+    Expression<String>? updatedAt,
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (ownerId != null) 'owner_id': ownerId,
       if (shelfId != null) 'shelf_id': shelfId,
       if (bookId != null) 'book_id': bookId,
+      if (updatedAt != null) 'updated_at': updatedAt,
       if (rowid != null) 'rowid': rowid,
     });
   }
 
   ShelfBooksCompanion copyWith({
+    Value<String>? id,
+    Value<String>? ownerId,
     Value<String>? shelfId,
     Value<String>? bookId,
+    Value<String>? updatedAt,
     Value<int>? rowid,
   }) {
     return ShelfBooksCompanion(
+      id: id ?? this.id,
+      ownerId: ownerId ?? this.ownerId,
       shelfId: shelfId ?? this.shelfId,
       bookId: bookId ?? this.bookId,
+      updatedAt: updatedAt ?? this.updatedAt,
       rowid: rowid ?? this.rowid,
     );
   }
@@ -2414,11 +3244,20 @@ class ShelfBooksCompanion extends UpdateCompanion<LocalShelfBook> {
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (ownerId.present) {
+      map['owner_id'] = Variable<String>(ownerId.value);
+    }
     if (shelfId.present) {
       map['shelf_id'] = Variable<String>(shelfId.value);
     }
     if (bookId.present) {
       map['book_id'] = Variable<String>(bookId.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<String>(updatedAt.value);
     }
     if (rowid.present) {
       map['rowid'] = Variable<int>(rowid.value);
@@ -2429,8 +3268,11 @@ class ShelfBooksCompanion extends UpdateCompanion<LocalShelfBook> {
   @override
   String toString() {
     return (StringBuffer('ShelfBooksCompanion(')
+          ..write('id: $id, ')
+          ..write('ownerId: $ownerId, ')
           ..write('shelfId: $shelfId, ')
           ..write('bookId: $bookId, ')
+          ..write('updatedAt: $updatedAt, ')
           ..write('rowid: $rowid')
           ..write(')'))
         .toString();
@@ -2445,13 +3287,12 @@ class $SettingsTableTable extends SettingsTable
   $SettingsTableTable(this.attachedDatabase, [this._alias]);
   static const VerificationMeta _idMeta = const VerificationMeta('id');
   @override
-  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
     'id',
     aliasedName,
     false,
-    type: DriftSqlType.int,
-    requiredDuringInsert: false,
-    defaultValue: const Constant(0),
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
   );
   static const VerificationMeta _displayNameMeta = const VerificationMeta(
     'displayName',
@@ -2519,6 +3360,8 @@ class $SettingsTableTable extends SettingsTable
     final data = instance.toColumns(true);
     if (data.containsKey('id')) {
       context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
     }
     if (data.containsKey('display_name')) {
       context.handle(
@@ -2566,7 +3409,7 @@ class $SettingsTableTable extends SettingsTable
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return LocalSettings(
       id: attachedDatabase.typeMapping.read(
-        DriftSqlType.int,
+        DriftSqlType.string,
         data['${effectivePrefix}id'],
       )!,
       displayName: attachedDatabase.typeMapping.read(
@@ -2595,7 +3438,7 @@ class $SettingsTableTable extends SettingsTable
 }
 
 class LocalSettings extends DataClass implements Insertable<LocalSettings> {
-  final int id;
+  final String id;
   final String? displayName;
   final String? localePreference;
   final String? themePreference;
@@ -2610,7 +3453,7 @@ class LocalSettings extends DataClass implements Insertable<LocalSettings> {
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
-    map['id'] = Variable<int>(id);
+    map['id'] = Variable<String>(id);
     if (!nullToAbsent || displayName != null) {
       map['display_name'] = Variable<String>(displayName);
     }
@@ -2650,7 +3493,7 @@ class LocalSettings extends DataClass implements Insertable<LocalSettings> {
   }) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return LocalSettings(
-      id: serializer.fromJson<int>(json['id']),
+      id: serializer.fromJson<String>(json['id']),
       displayName: serializer.fromJson<String?>(json['displayName']),
       localePreference: serializer.fromJson<String?>(json['localePreference']),
       themePreference: serializer.fromJson<String?>(json['themePreference']),
@@ -2663,7 +3506,7 @@ class LocalSettings extends DataClass implements Insertable<LocalSettings> {
   Map<String, dynamic> toJson({ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
-      'id': serializer.toJson<int>(id),
+      'id': serializer.toJson<String>(id),
       'displayName': serializer.toJson<String?>(displayName),
       'localePreference': serializer.toJson<String?>(localePreference),
       'themePreference': serializer.toJson<String?>(themePreference),
@@ -2672,7 +3515,7 @@ class LocalSettings extends DataClass implements Insertable<LocalSettings> {
   }
 
   LocalSettings copyWith({
-    int? id,
+    String? id,
     Value<String?> displayName = const Value.absent(),
     Value<String?> localePreference = const Value.absent(),
     Value<String?> themePreference = const Value.absent(),
@@ -2740,31 +3583,35 @@ class LocalSettings extends DataClass implements Insertable<LocalSettings> {
 }
 
 class SettingsTableCompanion extends UpdateCompanion<LocalSettings> {
-  final Value<int> id;
+  final Value<String> id;
   final Value<String?> displayName;
   final Value<String?> localePreference;
   final Value<String?> themePreference;
   final Value<String?> contrastPreference;
+  final Value<int> rowid;
   const SettingsTableCompanion({
     this.id = const Value.absent(),
     this.displayName = const Value.absent(),
     this.localePreference = const Value.absent(),
     this.themePreference = const Value.absent(),
     this.contrastPreference = const Value.absent(),
+    this.rowid = const Value.absent(),
   });
   SettingsTableCompanion.insert({
-    this.id = const Value.absent(),
+    required String id,
     this.displayName = const Value.absent(),
     this.localePreference = const Value.absent(),
     this.themePreference = const Value.absent(),
     this.contrastPreference = const Value.absent(),
-  });
+    this.rowid = const Value.absent(),
+  }) : id = Value(id);
   static Insertable<LocalSettings> custom({
-    Expression<int>? id,
+    Expression<String>? id,
     Expression<String>? displayName,
     Expression<String>? localePreference,
     Expression<String>? themePreference,
     Expression<String>? contrastPreference,
+    Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -2772,15 +3619,17 @@ class SettingsTableCompanion extends UpdateCompanion<LocalSettings> {
       if (localePreference != null) 'locale_preference': localePreference,
       if (themePreference != null) 'theme_preference': themePreference,
       if (contrastPreference != null) 'contrast_preference': contrastPreference,
+      if (rowid != null) 'rowid': rowid,
     });
   }
 
   SettingsTableCompanion copyWith({
-    Value<int>? id,
+    Value<String>? id,
     Value<String?>? displayName,
     Value<String?>? localePreference,
     Value<String?>? themePreference,
     Value<String?>? contrastPreference,
+    Value<int>? rowid,
   }) {
     return SettingsTableCompanion(
       id: id ?? this.id,
@@ -2788,6 +3637,7 @@ class SettingsTableCompanion extends UpdateCompanion<LocalSettings> {
       localePreference: localePreference ?? this.localePreference,
       themePreference: themePreference ?? this.themePreference,
       contrastPreference: contrastPreference ?? this.contrastPreference,
+      rowid: rowid ?? this.rowid,
     );
   }
 
@@ -2795,7 +3645,7 @@ class SettingsTableCompanion extends UpdateCompanion<LocalSettings> {
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     if (id.present) {
-      map['id'] = Variable<int>(id.value);
+      map['id'] = Variable<String>(id.value);
     }
     if (displayName.present) {
       map['display_name'] = Variable<String>(displayName.value);
@@ -2809,6 +3659,9 @@ class SettingsTableCompanion extends UpdateCompanion<LocalSettings> {
     if (contrastPreference.present) {
       map['contrast_preference'] = Variable<String>(contrastPreference.value);
     }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
     return map;
   }
 
@@ -2819,7 +3672,8 @@ class SettingsTableCompanion extends UpdateCompanion<LocalSettings> {
           ..write('displayName: $displayName, ')
           ..write('localePreference: $localePreference, ')
           ..write('themePreference: $themePreference, ')
-          ..write('contrastPreference: $contrastPreference')
+          ..write('contrastPreference: $contrastPreference, ')
+          ..write('rowid: $rowid')
           ..write(')'))
         .toString();
   }
@@ -2833,13 +3687,12 @@ class $AppConfigCacheTableTable extends AppConfigCacheTable
   $AppConfigCacheTableTable(this.attachedDatabase, [this._alias]);
   static const VerificationMeta _idMeta = const VerificationMeta('id');
   @override
-  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
     'id',
     aliasedName,
     false,
-    type: DriftSqlType.int,
-    requiredDuringInsert: false,
-    defaultValue: const Constant(0),
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
   );
   static const VerificationMeta _versionMeta = const VerificationMeta(
     'version',
@@ -2856,11 +3709,11 @@ class $AppConfigCacheTableTable extends AppConfigCacheTable
     'fetchedAt',
   );
   @override
-  late final GeneratedColumn<DateTime> fetchedAt = GeneratedColumn<DateTime>(
+  late final GeneratedColumn<String> fetchedAt = GeneratedColumn<String>(
     'fetched_at',
     aliasedName,
     false,
-    type: DriftSqlType.dateTime,
+    type: DriftSqlType.string,
     requiredDuringInsert: true,
   );
   static const VerificationMeta _payloadMeta = const VerificationMeta(
@@ -2890,6 +3743,8 @@ class $AppConfigCacheTableTable extends AppConfigCacheTable
     final data = instance.toColumns(true);
     if (data.containsKey('id')) {
       context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
     }
     if (data.containsKey('version')) {
       context.handle(
@@ -2925,7 +3780,7 @@ class $AppConfigCacheTableTable extends AppConfigCacheTable
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
     return LocalAppConfigCache(
       id: attachedDatabase.typeMapping.read(
-        DriftSqlType.int,
+        DriftSqlType.string,
         data['${effectivePrefix}id'],
       )!,
       version: attachedDatabase.typeMapping.read(
@@ -2933,7 +3788,7 @@ class $AppConfigCacheTableTable extends AppConfigCacheTable
         data['${effectivePrefix}version'],
       )!,
       fetchedAt: attachedDatabase.typeMapping.read(
-        DriftSqlType.dateTime,
+        DriftSqlType.string,
         data['${effectivePrefix}fetched_at'],
       )!,
       payload: attachedDatabase.typeMapping.read(
@@ -2951,9 +3806,9 @@ class $AppConfigCacheTableTable extends AppConfigCacheTable
 
 class LocalAppConfigCache extends DataClass
     implements Insertable<LocalAppConfigCache> {
-  final int id;
+  final String id;
   final int version;
-  final DateTime fetchedAt;
+  final String fetchedAt;
   final String payload;
   const LocalAppConfigCache({
     required this.id,
@@ -2964,9 +3819,9 @@ class LocalAppConfigCache extends DataClass
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
-    map['id'] = Variable<int>(id);
+    map['id'] = Variable<String>(id);
     map['version'] = Variable<int>(version);
-    map['fetched_at'] = Variable<DateTime>(fetchedAt);
+    map['fetched_at'] = Variable<String>(fetchedAt);
     map['payload'] = Variable<String>(payload);
     return map;
   }
@@ -2986,9 +3841,9 @@ class LocalAppConfigCache extends DataClass
   }) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return LocalAppConfigCache(
-      id: serializer.fromJson<int>(json['id']),
+      id: serializer.fromJson<String>(json['id']),
       version: serializer.fromJson<int>(json['version']),
-      fetchedAt: serializer.fromJson<DateTime>(json['fetchedAt']),
+      fetchedAt: serializer.fromJson<String>(json['fetchedAt']),
       payload: serializer.fromJson<String>(json['payload']),
     );
   }
@@ -2996,17 +3851,17 @@ class LocalAppConfigCache extends DataClass
   Map<String, dynamic> toJson({ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
-      'id': serializer.toJson<int>(id),
+      'id': serializer.toJson<String>(id),
       'version': serializer.toJson<int>(version),
-      'fetchedAt': serializer.toJson<DateTime>(fetchedAt),
+      'fetchedAt': serializer.toJson<String>(fetchedAt),
       'payload': serializer.toJson<String>(payload),
     };
   }
 
   LocalAppConfigCache copyWith({
-    int? id,
+    String? id,
     int? version,
-    DateTime? fetchedAt,
+    String? fetchedAt,
     String? payload,
   }) => LocalAppConfigCache(
     id: id ?? this.id,
@@ -3048,49 +3903,57 @@ class LocalAppConfigCache extends DataClass
 
 class AppConfigCacheTableCompanion
     extends UpdateCompanion<LocalAppConfigCache> {
-  final Value<int> id;
+  final Value<String> id;
   final Value<int> version;
-  final Value<DateTime> fetchedAt;
+  final Value<String> fetchedAt;
   final Value<String> payload;
+  final Value<int> rowid;
   const AppConfigCacheTableCompanion({
     this.id = const Value.absent(),
     this.version = const Value.absent(),
     this.fetchedAt = const Value.absent(),
     this.payload = const Value.absent(),
+    this.rowid = const Value.absent(),
   });
   AppConfigCacheTableCompanion.insert({
-    this.id = const Value.absent(),
+    required String id,
     required int version,
-    required DateTime fetchedAt,
+    required String fetchedAt,
     required String payload,
-  }) : version = Value(version),
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       version = Value(version),
        fetchedAt = Value(fetchedAt),
        payload = Value(payload);
   static Insertable<LocalAppConfigCache> custom({
-    Expression<int>? id,
+    Expression<String>? id,
     Expression<int>? version,
-    Expression<DateTime>? fetchedAt,
+    Expression<String>? fetchedAt,
     Expression<String>? payload,
+    Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
       if (version != null) 'version': version,
       if (fetchedAt != null) 'fetched_at': fetchedAt,
       if (payload != null) 'payload': payload,
+      if (rowid != null) 'rowid': rowid,
     });
   }
 
   AppConfigCacheTableCompanion copyWith({
-    Value<int>? id,
+    Value<String>? id,
     Value<int>? version,
-    Value<DateTime>? fetchedAt,
+    Value<String>? fetchedAt,
     Value<String>? payload,
+    Value<int>? rowid,
   }) {
     return AppConfigCacheTableCompanion(
       id: id ?? this.id,
       version: version ?? this.version,
       fetchedAt: fetchedAt ?? this.fetchedAt,
       payload: payload ?? this.payload,
+      rowid: rowid ?? this.rowid,
     );
   }
 
@@ -3098,16 +3961,19 @@ class AppConfigCacheTableCompanion
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     if (id.present) {
-      map['id'] = Variable<int>(id.value);
+      map['id'] = Variable<String>(id.value);
     }
     if (version.present) {
       map['version'] = Variable<int>(version.value);
     }
     if (fetchedAt.present) {
-      map['fetched_at'] = Variable<DateTime>(fetchedAt.value);
+      map['fetched_at'] = Variable<String>(fetchedAt.value);
     }
     if (payload.present) {
       map['payload'] = Variable<String>(payload.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
     }
     return map;
   }
@@ -3118,7 +3984,8 @@ class AppConfigCacheTableCompanion
           ..write('id: $id, ')
           ..write('version: $version, ')
           ..write('fetchedAt: $fetchedAt, ')
-          ..write('payload: $payload')
+          ..write('payload: $payload, ')
+          ..write('rowid: $rowid')
           ..write(')'))
         .toString();
   }
@@ -3150,112 +4017,36 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     settingsTable,
     appConfigCacheTable,
   ];
-  @override
-  StreamQueryUpdateRules get streamUpdateRules => const StreamQueryUpdateRules([
-    WritePropagation(
-      on: TableUpdateQuery.onTableName(
-        'books',
-        limitUpdateKind: UpdateKind.delete,
-      ),
-      result: [TableUpdate('quotes', kind: UpdateKind.delete)],
-    ),
-    WritePropagation(
-      on: TableUpdateQuery.onTableName(
-        'themes',
-        limitUpdateKind: UpdateKind.delete,
-      ),
-      result: [TableUpdate('theme_quotes', kind: UpdateKind.delete)],
-    ),
-    WritePropagation(
-      on: TableUpdateQuery.onTableName(
-        'quotes',
-        limitUpdateKind: UpdateKind.delete,
-      ),
-      result: [TableUpdate('theme_quotes', kind: UpdateKind.delete)],
-    ),
-    WritePropagation(
-      on: TableUpdateQuery.onTableName(
-        'shelves',
-        limitUpdateKind: UpdateKind.delete,
-      ),
-      result: [TableUpdate('shelf_books', kind: UpdateKind.delete)],
-    ),
-    WritePropagation(
-      on: TableUpdateQuery.onTableName(
-        'books',
-        limitUpdateKind: UpdateKind.delete,
-      ),
-      result: [TableUpdate('shelf_books', kind: UpdateKind.delete)],
-    ),
-  ]);
 }
 
 typedef $$BooksTableCreateCompanionBuilder = BooksCompanion Function({
   required String id,
-  required String title,
-  required List<String> authors,
-  Value<String?> isbn,
-  Value<String?> thumbnailUrl,
-  Value<String?> coverPath,
-  Value<String> status,
-  required DateTime createdAt,
-  required DateTime lastUsedAt,
+  required String ownerId,
+  required String status,
+  required String createdAt,
+  required String lastUsedAt,
+  required String updatedAt,
+  required int keyVersion,
+  required String titleCipher,
+  required String authorsCipher,
+  Value<String?> isbnCipher,
+  Value<String?> coverCipher,
   Value<int> rowid,
 });
 typedef $$BooksTableUpdateCompanionBuilder = BooksCompanion Function({
   Value<String> id,
-  Value<String> title,
-  Value<List<String>> authors,
-  Value<String?> isbn,
-  Value<String?> thumbnailUrl,
-  Value<String?> coverPath,
+  Value<String> ownerId,
   Value<String> status,
-  Value<DateTime> createdAt,
-  Value<DateTime> lastUsedAt,
+  Value<String> createdAt,
+  Value<String> lastUsedAt,
+  Value<String> updatedAt,
+  Value<int> keyVersion,
+  Value<String> titleCipher,
+  Value<String> authorsCipher,
+  Value<String?> isbnCipher,
+  Value<String?> coverCipher,
   Value<int> rowid,
 });
-
-final class $$BooksTableReferences
-    extends BaseReferences<_$AppDatabase, $BooksTable, LocalBook> {
-  $$BooksTableReferences(super.$_db, super.$_table, super.$_typedResult);
-
-  static MultiTypedResultKey<$QuotesTable, List<LocalQuote>> _quotesRefsTable(
-    _$AppDatabase db,
-  ) => MultiTypedResultKey.fromTable(
-    db.quotes,
-    aliasName: 'books__id__quotes__book_id',
-  );
-
-  $$QuotesTableProcessedTableManager get quotesRefs {
-    final manager = $$QuotesTableTableManager(
-      $_db,
-      $_db.quotes,
-    ).filter((f) => f.bookId.id.sqlEquals($_itemColumn<String>('id')!));
-
-    final cache = $_typedResult.readTableOrNull(_quotesRefsTable($_db));
-    return ProcessedTableManager(
-      manager.$state.copyWith(prefetchedData: cache),
-    );
-  }
-
-  static MultiTypedResultKey<$ShelfBooksTable, List<LocalShelfBook>>
-  _shelfBooksRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
-    db.shelfBooks,
-    aliasName: 'books__id__shelf_books__book_id',
-  );
-
-  $$ShelfBooksTableProcessedTableManager get shelfBooksRefs {
-    final manager = $$ShelfBooksTableTableManager(
-      $_db,
-      $_db.shelfBooks,
-    ).filter((f) => f.bookId.id.sqlEquals($_itemColumn<String>('id')!));
-
-    final cache = $_typedResult.readTableOrNull(_shelfBooksRefsTable($_db));
-    return ProcessedTableManager(
-      manager.$state.copyWith(prefetchedData: cache),
-    );
-  }
-}
 
 class $$BooksTableFilterComposer extends Composer<_$AppDatabase, $BooksTable> {
   $$BooksTableFilterComposer({
@@ -3270,29 +4061,8 @@ class $$BooksTableFilterComposer extends Composer<_$AppDatabase, $BooksTable> {
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<String> get title => $composableBuilder(
-    column: $table.title,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnWithTypeConverterFilters<List<String>, List<String>, String>
-  get authors => $composableBuilder(
-    column: $table.authors,
-    builder: (column) => ColumnWithTypeConverterFilters(column),
-  );
-
-  ColumnFilters<String> get isbn => $composableBuilder(
-    column: $table.isbn,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<String> get thumbnailUrl => $composableBuilder(
-    column: $table.thumbnailUrl,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<String> get coverPath => $composableBuilder(
-    column: $table.coverPath,
+  ColumnFilters<String> get ownerId => $composableBuilder(
+    column: $table.ownerId,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -3301,65 +4071,45 @@ class $$BooksTableFilterComposer extends Composer<_$AppDatabase, $BooksTable> {
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+  ColumnFilters<String> get createdAt => $composableBuilder(
     column: $table.createdAt,
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<DateTime> get lastUsedAt => $composableBuilder(
+  ColumnFilters<String> get lastUsedAt => $composableBuilder(
     column: $table.lastUsedAt,
     builder: (column) => ColumnFilters(column),
   );
 
-  Expression<bool> quotesRefs(
-    Expression<bool> Function($$QuotesTableFilterComposer f) f,
-  ) {
-    final $$QuotesTableFilterComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.id,
-      referencedTable: $db.quotes,
-      getReferencedColumn: (t) => t.bookId,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$QuotesTableFilterComposer(
-            $db: $db,
-            $table: $db.quotes,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return f(composer);
-  }
+  ColumnFilters<String> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
 
-  Expression<bool> shelfBooksRefs(
-    Expression<bool> Function($$ShelfBooksTableFilterComposer f) f,
-  ) {
-    final $$ShelfBooksTableFilterComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.id,
-      referencedTable: $db.shelfBooks,
-      getReferencedColumn: (t) => t.bookId,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$ShelfBooksTableFilterComposer(
-            $db: $db,
-            $table: $db.shelfBooks,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return f(composer);
-  }
+  ColumnFilters<int> get keyVersion => $composableBuilder(
+    column: $table.keyVersion,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get titleCipher => $composableBuilder(
+    column: $table.titleCipher,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get authorsCipher => $composableBuilder(
+    column: $table.authorsCipher,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get isbnCipher => $composableBuilder(
+    column: $table.isbnCipher,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get coverCipher => $composableBuilder(
+    column: $table.coverCipher,
+    builder: (column) => ColumnFilters(column),
+  );
 }
 
 class $$BooksTableOrderingComposer
@@ -3376,28 +4126,8 @@ class $$BooksTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<String> get title => $composableBuilder(
-    column: $table.title,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<String> get authors => $composableBuilder(
-    column: $table.authors,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<String> get isbn => $composableBuilder(
-    column: $table.isbn,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<String> get thumbnailUrl => $composableBuilder(
-    column: $table.thumbnailUrl,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<String> get coverPath => $composableBuilder(
-    column: $table.coverPath,
+  ColumnOrderings<String> get ownerId => $composableBuilder(
+    column: $table.ownerId,
     builder: (column) => ColumnOrderings(column),
   );
 
@@ -3406,13 +4136,43 @@ class $$BooksTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+  ColumnOrderings<String> get createdAt => $composableBuilder(
     column: $table.createdAt,
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<DateTime> get lastUsedAt => $composableBuilder(
+  ColumnOrderings<String> get lastUsedAt => $composableBuilder(
     column: $table.lastUsedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get keyVersion => $composableBuilder(
+    column: $table.keyVersion,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get titleCipher => $composableBuilder(
+    column: $table.titleCipher,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get authorsCipher => $composableBuilder(
+    column: $table.authorsCipher,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get isbnCipher => $composableBuilder(
+    column: $table.isbnCipher,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get coverCipher => $composableBuilder(
+    column: $table.coverCipher,
     builder: (column) => ColumnOrderings(column),
   );
 }
@@ -3429,83 +4189,47 @@ class $$BooksTableAnnotationComposer
   GeneratedColumn<String> get id =>
       $composableBuilder(column: $table.id, builder: (column) => column);
 
-  GeneratedColumn<String> get title =>
-      $composableBuilder(column: $table.title, builder: (column) => column);
-
-  GeneratedColumnWithTypeConverter<List<String>, String> get authors =>
-      $composableBuilder(column: $table.authors, builder: (column) => column);
-
-  GeneratedColumn<String> get isbn =>
-      $composableBuilder(column: $table.isbn, builder: (column) => column);
-
-  GeneratedColumn<String> get thumbnailUrl => $composableBuilder(
-    column: $table.thumbnailUrl,
-    builder: (column) => column,
-  );
-
-  GeneratedColumn<String> get coverPath =>
-      $composableBuilder(column: $table.coverPath, builder: (column) => column);
+  GeneratedColumn<String> get ownerId =>
+      $composableBuilder(column: $table.ownerId, builder: (column) => column);
 
   GeneratedColumn<String> get status =>
       $composableBuilder(column: $table.status, builder: (column) => column);
 
-  GeneratedColumn<DateTime> get createdAt =>
+  GeneratedColumn<String> get createdAt =>
       $composableBuilder(column: $table.createdAt, builder: (column) => column);
 
-  GeneratedColumn<DateTime> get lastUsedAt => $composableBuilder(
+  GeneratedColumn<String> get lastUsedAt => $composableBuilder(
     column: $table.lastUsedAt,
     builder: (column) => column,
   );
 
-  Expression<T> quotesRefs<T extends Object>(
-    Expression<T> Function($$QuotesTableAnnotationComposer a) f,
-  ) {
-    final $$QuotesTableAnnotationComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.id,
-      referencedTable: $db.quotes,
-      getReferencedColumn: (t) => t.bookId,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$QuotesTableAnnotationComposer(
-            $db: $db,
-            $table: $db.quotes,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return f(composer);
-  }
+  GeneratedColumn<String> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
 
-  Expression<T> shelfBooksRefs<T extends Object>(
-    Expression<T> Function($$ShelfBooksTableAnnotationComposer a) f,
-  ) {
-    final $$ShelfBooksTableAnnotationComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.id,
-      referencedTable: $db.shelfBooks,
-      getReferencedColumn: (t) => t.bookId,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$ShelfBooksTableAnnotationComposer(
-            $db: $db,
-            $table: $db.shelfBooks,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return f(composer);
-  }
+  GeneratedColumn<int> get keyVersion => $composableBuilder(
+    column: $table.keyVersion,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get titleCipher => $composableBuilder(
+    column: $table.titleCipher,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get authorsCipher => $composableBuilder(
+    column: $table.authorsCipher,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get isbnCipher => $composableBuilder(
+    column: $table.isbnCipher,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get coverCipher => $composableBuilder(
+    column: $table.coverCipher,
+    builder: (column) => column,
+  );
 }
 
 class $$BooksTableTableManager
@@ -3513,15 +4237,15 @@ class $$BooksTableTableManager
         RootTableManager<
           _$AppDatabase,
           $BooksTable,
-          LocalBook,
+          BookRow,
           $$BooksTableFilterComposer,
           $$BooksTableOrderingComposer,
           $$BooksTableAnnotationComposer,
           $$BooksTableCreateCompanionBuilder,
           $$BooksTableUpdateCompanionBuilder,
-          (LocalBook, $$BooksTableReferences),
-          LocalBook,
-          PrefetchHooks Function({bool quotesRefs, bool shelfBooksRefs})
+          (BookRow, BaseReferences<_$AppDatabase, $BooksTable, BookRow>),
+          BookRow,
+          PrefetchHooks Function()
         > {
   $$BooksTableTableManager(_$AppDatabase db, $BooksTable table)
     : super(
@@ -3537,110 +4261,63 @@ class $$BooksTableTableManager
           updateCompanionCallback:
               ({
                 Value<String> id = const Value.absent(),
-                Value<String> title = const Value.absent(),
-                Value<List<String>> authors = const Value.absent(),
-                Value<String?> isbn = const Value.absent(),
-                Value<String?> thumbnailUrl = const Value.absent(),
-                Value<String?> coverPath = const Value.absent(),
+                Value<String> ownerId = const Value.absent(),
                 Value<String> status = const Value.absent(),
-                Value<DateTime> createdAt = const Value.absent(),
-                Value<DateTime> lastUsedAt = const Value.absent(),
+                Value<String> createdAt = const Value.absent(),
+                Value<String> lastUsedAt = const Value.absent(),
+                Value<String> updatedAt = const Value.absent(),
+                Value<int> keyVersion = const Value.absent(),
+                Value<String> titleCipher = const Value.absent(),
+                Value<String> authorsCipher = const Value.absent(),
+                Value<String?> isbnCipher = const Value.absent(),
+                Value<String?> coverCipher = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => BooksCompanion(
                 id: id,
-                title: title,
-                authors: authors,
-                isbn: isbn,
-                thumbnailUrl: thumbnailUrl,
-                coverPath: coverPath,
+                ownerId: ownerId,
                 status: status,
                 createdAt: createdAt,
                 lastUsedAt: lastUsedAt,
+                updatedAt: updatedAt,
+                keyVersion: keyVersion,
+                titleCipher: titleCipher,
+                authorsCipher: authorsCipher,
+                isbnCipher: isbnCipher,
+                coverCipher: coverCipher,
                 rowid: rowid,
               ),
           createCompanionCallback:
               ({
                 required String id,
-                required String title,
-                required List<String> authors,
-                Value<String?> isbn = const Value.absent(),
-                Value<String?> thumbnailUrl = const Value.absent(),
-                Value<String?> coverPath = const Value.absent(),
-                Value<String> status = const Value.absent(),
-                required DateTime createdAt,
-                required DateTime lastUsedAt,
+                required String ownerId,
+                required String status,
+                required String createdAt,
+                required String lastUsedAt,
+                required String updatedAt,
+                required int keyVersion,
+                required String titleCipher,
+                required String authorsCipher,
+                Value<String?> isbnCipher = const Value.absent(),
+                Value<String?> coverCipher = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => BooksCompanion.insert(
                 id: id,
-                title: title,
-                authors: authors,
-                isbn: isbn,
-                thumbnailUrl: thumbnailUrl,
-                coverPath: coverPath,
+                ownerId: ownerId,
                 status: status,
                 createdAt: createdAt,
                 lastUsedAt: lastUsedAt,
+                updatedAt: updatedAt,
+                keyVersion: keyVersion,
+                titleCipher: titleCipher,
+                authorsCipher: authorsCipher,
+                isbnCipher: isbnCipher,
+                coverCipher: coverCipher,
                 rowid: rowid,
               ),
           withReferenceMapper: (p0) => p0
-              .map(
-                (e) =>
-                    (e.readTable(table), $$BooksTableReferences(db, table, e)),
-              )
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
               .toList(),
-          prefetchHooksCallback:
-              ({quotesRefs = false, shelfBooksRefs = false}) {
-                return PrefetchHooks(
-                  db: db,
-                  explicitlyWatchedTables: [
-                    if (quotesRefs) db.quotes,
-                    if (shelfBooksRefs) db.shelfBooks,
-                  ],
-                  addJoins: null,
-                  getPrefetchedDataCallback: (items) async {
-                    return [
-                      if (quotesRefs)
-                        await $_getPrefetchedData<
-                          LocalBook,
-                          $BooksTable,
-                          LocalQuote
-                        >(
-                          currentTable: table,
-                          referencedTable: $$BooksTableReferences
-                              ._quotesRefsTable(db),
-                          managerFromTypedResult: (p0) =>
-                              $$BooksTableReferences(db, table, p0).quotesRefs,
-                          referencedItemsForCurrentItem:
-                              (item, referencedItems) => referencedItems.where(
-                                (e) => e.bookId == item.id,
-                              ),
-                          typedResults: items,
-                        ),
-                      if (shelfBooksRefs)
-                        await $_getPrefetchedData<
-                          LocalBook,
-                          $BooksTable,
-                          LocalShelfBook
-                        >(
-                          currentTable: table,
-                          referencedTable: $$BooksTableReferences
-                              ._shelfBooksRefsTable(db),
-                          managerFromTypedResult: (p0) =>
-                              $$BooksTableReferences(
-                                db,
-                                table,
-                                p0,
-                              ).shelfBooksRefs,
-                          referencedItemsForCurrentItem:
-                              (item, referencedItems) => referencedItems.where(
-                                (e) => e.bookId == item.id,
-                              ),
-                          typedResults: items,
-                        ),
-                    ];
-                  },
-                );
-              },
+          prefetchHooksCallback: null,
         ),
       );
 }
@@ -3649,86 +4326,50 @@ typedef $$BooksTableProcessedTableManager =
     ProcessedTableManager<
       _$AppDatabase,
       $BooksTable,
-      LocalBook,
+      BookRow,
       $$BooksTableFilterComposer,
       $$BooksTableOrderingComposer,
       $$BooksTableAnnotationComposer,
       $$BooksTableCreateCompanionBuilder,
       $$BooksTableUpdateCompanionBuilder,
-      (LocalBook, $$BooksTableReferences),
-      LocalBook,
-      PrefetchHooks Function({bool quotesRefs, bool shelfBooksRefs})
+      (BookRow, BaseReferences<_$AppDatabase, $BooksTable, BookRow>),
+      BookRow,
+      PrefetchHooks Function()
     >;
 typedef $$QuotesTableCreateCompanionBuilder = QuotesCompanion Function({
   required String id,
+  required String ownerId,
   required String bookId,
-  required List<int> pageNumbers,
-  required String quote,
-  Value<String?> note,
-  Value<String?> voiceNotePath,
-  Value<int?> voiceNoteDurationMs,
-  required List<QuotePage> pages,
-  Value<List<RecognizedWord>> words,
-  Value<List<int>> markedWordIndexes,
-  Value<bool> isFavorite,
-  required DateTime createdAt,
+  required int isFavorite,
+  required String createdAt,
+  required String updatedAt,
+  required int keyVersion,
+  required String quoteCipher,
+  Value<String?> noteCipher,
+  required String pageNumbersCipher,
+  required String pagesCipher,
+  required String wordsCipher,
+  required String markedWordIndexesCipher,
+  Value<String?> voiceNoteCipher,
   Value<int> rowid,
 });
 typedef $$QuotesTableUpdateCompanionBuilder = QuotesCompanion Function({
   Value<String> id,
+  Value<String> ownerId,
   Value<String> bookId,
-  Value<List<int>> pageNumbers,
-  Value<String> quote,
-  Value<String?> note,
-  Value<String?> voiceNotePath,
-  Value<int?> voiceNoteDurationMs,
-  Value<List<QuotePage>> pages,
-  Value<List<RecognizedWord>> words,
-  Value<List<int>> markedWordIndexes,
-  Value<bool> isFavorite,
-  Value<DateTime> createdAt,
+  Value<int> isFavorite,
+  Value<String> createdAt,
+  Value<String> updatedAt,
+  Value<int> keyVersion,
+  Value<String> quoteCipher,
+  Value<String?> noteCipher,
+  Value<String> pageNumbersCipher,
+  Value<String> pagesCipher,
+  Value<String> wordsCipher,
+  Value<String> markedWordIndexesCipher,
+  Value<String?> voiceNoteCipher,
   Value<int> rowid,
 });
-
-final class $$QuotesTableReferences
-    extends BaseReferences<_$AppDatabase, $QuotesTable, LocalQuote> {
-  $$QuotesTableReferences(super.$_db, super.$_table, super.$_typedResult);
-
-  static $BooksTable _bookIdTable(_$AppDatabase db) =>
-      db.books.createAlias('quotes__book_id__books__id');
-
-  $$BooksTableProcessedTableManager get bookId {
-    final $_column = $_itemColumn<String>('book_id')!;
-
-    final manager = $$BooksTableTableManager(
-      $_db,
-      $_db.books,
-    ).filter((f) => f.id.sqlEquals($_column));
-    final item = $_typedResult.readTableOrNull(_bookIdTable($_db));
-    if (item == null) return manager;
-    return ProcessedTableManager(
-      manager.$state.copyWith(prefetchedData: [item]),
-    );
-  }
-
-  static MultiTypedResultKey<$ThemeQuotesTable, List<LocalThemeQuote>>
-  _themeQuotesRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
-    db.themeQuotes,
-    aliasName: 'quotes__id__theme_quotes__quote_id',
-  );
-
-  $$ThemeQuotesTableProcessedTableManager get themeQuotesRefs {
-    final manager = $$ThemeQuotesTableTableManager(
-      $_db,
-      $_db.themeQuotes,
-    ).filter((f) => f.quoteId.id.sqlEquals($_itemColumn<String>('id')!));
-
-    final cache = $_typedResult.readTableOrNull(_themeQuotesRefsTable($_db));
-    return ProcessedTableManager(
-      manager.$state.copyWith(prefetchedData: cache),
-    );
-  }
-}
 
 class $$QuotesTableFilterComposer
     extends Composer<_$AppDatabase, $QuotesTable> {
@@ -3744,111 +4385,70 @@ class $$QuotesTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnWithTypeConverterFilters<List<int>, List<int>, String>
-  get pageNumbers => $composableBuilder(
-    column: $table.pageNumbers,
-    builder: (column) => ColumnWithTypeConverterFilters(column),
-  );
-
-  ColumnFilters<String> get quote => $composableBuilder(
-    column: $table.quote,
+  ColumnFilters<String> get ownerId => $composableBuilder(
+    column: $table.ownerId,
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<String> get note => $composableBuilder(
-    column: $table.note,
+  ColumnFilters<String> get bookId => $composableBuilder(
+    column: $table.bookId,
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<String> get voiceNotePath => $composableBuilder(
-    column: $table.voiceNotePath,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<int> get voiceNoteDurationMs => $composableBuilder(
-    column: $table.voiceNoteDurationMs,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnWithTypeConverterFilters<List<QuotePage>, List<QuotePage>, String>
-  get pages => $composableBuilder(
-    column: $table.pages,
-    builder: (column) => ColumnWithTypeConverterFilters(column),
-  );
-
-  ColumnWithTypeConverterFilters<
-    List<RecognizedWord>,
-    List<RecognizedWord>,
-    String
-  >
-  get words => $composableBuilder(
-    column: $table.words,
-    builder: (column) => ColumnWithTypeConverterFilters(column),
-  );
-
-  ColumnWithTypeConverterFilters<List<int>, List<int>, String>
-  get markedWordIndexes => $composableBuilder(
-    column: $table.markedWordIndexes,
-    builder: (column) => ColumnWithTypeConverterFilters(column),
-  );
-
-  ColumnFilters<bool> get isFavorite => $composableBuilder(
+  ColumnFilters<int> get isFavorite => $composableBuilder(
     column: $table.isFavorite,
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+  ColumnFilters<String> get createdAt => $composableBuilder(
     column: $table.createdAt,
     builder: (column) => ColumnFilters(column),
   );
 
-  $$BooksTableFilterComposer get bookId {
-    final $$BooksTableFilterComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.bookId,
-      referencedTable: $db.books,
-      getReferencedColumn: (t) => t.id,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$BooksTableFilterComposer(
-            $db: $db,
-            $table: $db.books,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return composer;
-  }
+  ColumnFilters<String> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
 
-  Expression<bool> themeQuotesRefs(
-    Expression<bool> Function($$ThemeQuotesTableFilterComposer f) f,
-  ) {
-    final $$ThemeQuotesTableFilterComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.id,
-      referencedTable: $db.themeQuotes,
-      getReferencedColumn: (t) => t.quoteId,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$ThemeQuotesTableFilterComposer(
-            $db: $db,
-            $table: $db.themeQuotes,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return f(composer);
-  }
+  ColumnFilters<int> get keyVersion => $composableBuilder(
+    column: $table.keyVersion,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get quoteCipher => $composableBuilder(
+    column: $table.quoteCipher,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get noteCipher => $composableBuilder(
+    column: $table.noteCipher,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get pageNumbersCipher => $composableBuilder(
+    column: $table.pageNumbersCipher,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get pagesCipher => $composableBuilder(
+    column: $table.pagesCipher,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get wordsCipher => $composableBuilder(
+    column: $table.wordsCipher,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get markedWordIndexesCipher => $composableBuilder(
+    column: $table.markedWordIndexesCipher,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get voiceNoteCipher => $composableBuilder(
+    column: $table.voiceNoteCipher,
+    builder: (column) => ColumnFilters(column),
+  );
 }
 
 class $$QuotesTableOrderingComposer
@@ -3865,78 +4465,70 @@ class $$QuotesTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<String> get pageNumbers => $composableBuilder(
-    column: $table.pageNumbers,
+  ColumnOrderings<String> get ownerId => $composableBuilder(
+    column: $table.ownerId,
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<String> get quote => $composableBuilder(
-    column: $table.quote,
+  ColumnOrderings<String> get bookId => $composableBuilder(
+    column: $table.bookId,
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<String> get note => $composableBuilder(
-    column: $table.note,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<String> get voiceNotePath => $composableBuilder(
-    column: $table.voiceNotePath,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<int> get voiceNoteDurationMs => $composableBuilder(
-    column: $table.voiceNoteDurationMs,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<String> get pages => $composableBuilder(
-    column: $table.pages,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<String> get words => $composableBuilder(
-    column: $table.words,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<String> get markedWordIndexes => $composableBuilder(
-    column: $table.markedWordIndexes,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<bool> get isFavorite => $composableBuilder(
+  ColumnOrderings<int> get isFavorite => $composableBuilder(
     column: $table.isFavorite,
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+  ColumnOrderings<String> get createdAt => $composableBuilder(
     column: $table.createdAt,
     builder: (column) => ColumnOrderings(column),
   );
 
-  $$BooksTableOrderingComposer get bookId {
-    final $$BooksTableOrderingComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.bookId,
-      referencedTable: $db.books,
-      getReferencedColumn: (t) => t.id,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$BooksTableOrderingComposer(
-            $db: $db,
-            $table: $db.books,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return composer;
-  }
+  ColumnOrderings<String> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get keyVersion => $composableBuilder(
+    column: $table.keyVersion,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get quoteCipher => $composableBuilder(
+    column: $table.quoteCipher,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get noteCipher => $composableBuilder(
+    column: $table.noteCipher,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get pageNumbersCipher => $composableBuilder(
+    column: $table.pageNumbersCipher,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get pagesCipher => $composableBuilder(
+    column: $table.pagesCipher,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get wordsCipher => $composableBuilder(
+    column: $table.wordsCipher,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get markedWordIndexesCipher => $composableBuilder(
+    column: $table.markedWordIndexesCipher,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get voiceNoteCipher => $composableBuilder(
+    column: $table.voiceNoteCipher,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$QuotesTableAnnotationComposer
@@ -3951,95 +4543,62 @@ class $$QuotesTableAnnotationComposer
   GeneratedColumn<String> get id =>
       $composableBuilder(column: $table.id, builder: (column) => column);
 
-  GeneratedColumnWithTypeConverter<List<int>, String> get pageNumbers =>
-      $composableBuilder(
-        column: $table.pageNumbers,
-        builder: (column) => column,
-      );
+  GeneratedColumn<String> get ownerId =>
+      $composableBuilder(column: $table.ownerId, builder: (column) => column);
 
-  GeneratedColumn<String> get quote =>
-      $composableBuilder(column: $table.quote, builder: (column) => column);
+  GeneratedColumn<String> get bookId =>
+      $composableBuilder(column: $table.bookId, builder: (column) => column);
 
-  GeneratedColumn<String> get note =>
-      $composableBuilder(column: $table.note, builder: (column) => column);
-
-  GeneratedColumn<String> get voiceNotePath => $composableBuilder(
-    column: $table.voiceNotePath,
-    builder: (column) => column,
-  );
-
-  GeneratedColumn<int> get voiceNoteDurationMs => $composableBuilder(
-    column: $table.voiceNoteDurationMs,
-    builder: (column) => column,
-  );
-
-  GeneratedColumnWithTypeConverter<List<QuotePage>, String> get pages =>
-      $composableBuilder(column: $table.pages, builder: (column) => column);
-
-  GeneratedColumnWithTypeConverter<List<RecognizedWord>, String> get words =>
-      $composableBuilder(column: $table.words, builder: (column) => column);
-
-  GeneratedColumnWithTypeConverter<List<int>, String> get markedWordIndexes =>
-      $composableBuilder(
-        column: $table.markedWordIndexes,
-        builder: (column) => column,
-      );
-
-  GeneratedColumn<bool> get isFavorite => $composableBuilder(
+  GeneratedColumn<int> get isFavorite => $composableBuilder(
     column: $table.isFavorite,
     builder: (column) => column,
   );
 
-  GeneratedColumn<DateTime> get createdAt =>
+  GeneratedColumn<String> get createdAt =>
       $composableBuilder(column: $table.createdAt, builder: (column) => column);
 
-  $$BooksTableAnnotationComposer get bookId {
-    final $$BooksTableAnnotationComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.bookId,
-      referencedTable: $db.books,
-      getReferencedColumn: (t) => t.id,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$BooksTableAnnotationComposer(
-            $db: $db,
-            $table: $db.books,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return composer;
-  }
+  GeneratedColumn<String> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
 
-  Expression<T> themeQuotesRefs<T extends Object>(
-    Expression<T> Function($$ThemeQuotesTableAnnotationComposer a) f,
-  ) {
-    final $$ThemeQuotesTableAnnotationComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.id,
-      referencedTable: $db.themeQuotes,
-      getReferencedColumn: (t) => t.quoteId,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$ThemeQuotesTableAnnotationComposer(
-            $db: $db,
-            $table: $db.themeQuotes,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return f(composer);
-  }
+  GeneratedColumn<int> get keyVersion => $composableBuilder(
+    column: $table.keyVersion,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get quoteCipher => $composableBuilder(
+    column: $table.quoteCipher,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get noteCipher => $composableBuilder(
+    column: $table.noteCipher,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get pageNumbersCipher => $composableBuilder(
+    column: $table.pageNumbersCipher,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get pagesCipher => $composableBuilder(
+    column: $table.pagesCipher,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get wordsCipher => $composableBuilder(
+    column: $table.wordsCipher,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get markedWordIndexesCipher => $composableBuilder(
+    column: $table.markedWordIndexesCipher,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get voiceNoteCipher => $composableBuilder(
+    column: $table.voiceNoteCipher,
+    builder: (column) => column,
+  );
 }
 
 class $$QuotesTableTableManager
@@ -4047,15 +4606,15 @@ class $$QuotesTableTableManager
         RootTableManager<
           _$AppDatabase,
           $QuotesTable,
-          LocalQuote,
+          QuoteRow,
           $$QuotesTableFilterComposer,
           $$QuotesTableOrderingComposer,
           $$QuotesTableAnnotationComposer,
           $$QuotesTableCreateCompanionBuilder,
           $$QuotesTableUpdateCompanionBuilder,
-          (LocalQuote, $$QuotesTableReferences),
-          LocalQuote,
-          PrefetchHooks Function({bool bookId, bool themeQuotesRefs})
+          (QuoteRow, BaseReferences<_$AppDatabase, $QuotesTable, QuoteRow>),
+          QuoteRow,
+          PrefetchHooks Function()
         > {
   $$QuotesTableTableManager(_$AppDatabase db, $QuotesTable table)
     : super(
@@ -4071,128 +4630,75 @@ class $$QuotesTableTableManager
           updateCompanionCallback:
               ({
                 Value<String> id = const Value.absent(),
+                Value<String> ownerId = const Value.absent(),
                 Value<String> bookId = const Value.absent(),
-                Value<List<int>> pageNumbers = const Value.absent(),
-                Value<String> quote = const Value.absent(),
-                Value<String?> note = const Value.absent(),
-                Value<String?> voiceNotePath = const Value.absent(),
-                Value<int?> voiceNoteDurationMs = const Value.absent(),
-                Value<List<QuotePage>> pages = const Value.absent(),
-                Value<List<RecognizedWord>> words = const Value.absent(),
-                Value<List<int>> markedWordIndexes = const Value.absent(),
-                Value<bool> isFavorite = const Value.absent(),
-                Value<DateTime> createdAt = const Value.absent(),
+                Value<int> isFavorite = const Value.absent(),
+                Value<String> createdAt = const Value.absent(),
+                Value<String> updatedAt = const Value.absent(),
+                Value<int> keyVersion = const Value.absent(),
+                Value<String> quoteCipher = const Value.absent(),
+                Value<String?> noteCipher = const Value.absent(),
+                Value<String> pageNumbersCipher = const Value.absent(),
+                Value<String> pagesCipher = const Value.absent(),
+                Value<String> wordsCipher = const Value.absent(),
+                Value<String> markedWordIndexesCipher = const Value.absent(),
+                Value<String?> voiceNoteCipher = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => QuotesCompanion(
                 id: id,
+                ownerId: ownerId,
                 bookId: bookId,
-                pageNumbers: pageNumbers,
-                quote: quote,
-                note: note,
-                voiceNotePath: voiceNotePath,
-                voiceNoteDurationMs: voiceNoteDurationMs,
-                pages: pages,
-                words: words,
-                markedWordIndexes: markedWordIndexes,
                 isFavorite: isFavorite,
                 createdAt: createdAt,
+                updatedAt: updatedAt,
+                keyVersion: keyVersion,
+                quoteCipher: quoteCipher,
+                noteCipher: noteCipher,
+                pageNumbersCipher: pageNumbersCipher,
+                pagesCipher: pagesCipher,
+                wordsCipher: wordsCipher,
+                markedWordIndexesCipher: markedWordIndexesCipher,
+                voiceNoteCipher: voiceNoteCipher,
                 rowid: rowid,
               ),
           createCompanionCallback:
               ({
                 required String id,
+                required String ownerId,
                 required String bookId,
-                required List<int> pageNumbers,
-                required String quote,
-                Value<String?> note = const Value.absent(),
-                Value<String?> voiceNotePath = const Value.absent(),
-                Value<int?> voiceNoteDurationMs = const Value.absent(),
-                required List<QuotePage> pages,
-                Value<List<RecognizedWord>> words = const Value.absent(),
-                Value<List<int>> markedWordIndexes = const Value.absent(),
-                Value<bool> isFavorite = const Value.absent(),
-                required DateTime createdAt,
+                required int isFavorite,
+                required String createdAt,
+                required String updatedAt,
+                required int keyVersion,
+                required String quoteCipher,
+                Value<String?> noteCipher = const Value.absent(),
+                required String pageNumbersCipher,
+                required String pagesCipher,
+                required String wordsCipher,
+                required String markedWordIndexesCipher,
+                Value<String?> voiceNoteCipher = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => QuotesCompanion.insert(
                 id: id,
+                ownerId: ownerId,
                 bookId: bookId,
-                pageNumbers: pageNumbers,
-                quote: quote,
-                note: note,
-                voiceNotePath: voiceNotePath,
-                voiceNoteDurationMs: voiceNoteDurationMs,
-                pages: pages,
-                words: words,
-                markedWordIndexes: markedWordIndexes,
                 isFavorite: isFavorite,
                 createdAt: createdAt,
+                updatedAt: updatedAt,
+                keyVersion: keyVersion,
+                quoteCipher: quoteCipher,
+                noteCipher: noteCipher,
+                pageNumbersCipher: pageNumbersCipher,
+                pagesCipher: pagesCipher,
+                wordsCipher: wordsCipher,
+                markedWordIndexesCipher: markedWordIndexesCipher,
+                voiceNoteCipher: voiceNoteCipher,
                 rowid: rowid,
               ),
           withReferenceMapper: (p0) => p0
-              .map(
-                (e) =>
-                    (e.readTable(table), $$QuotesTableReferences(db, table, e)),
-              )
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
               .toList(),
-          prefetchHooksCallback: ({bookId = false, themeQuotesRefs = false}) {
-            return PrefetchHooks(
-              db: db,
-              explicitlyWatchedTables: [if (themeQuotesRefs) db.themeQuotes],
-              addJoins:
-                  <
-                    T extends TableManagerState<
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic
-                    >
-                  >(state) {
-                    if (bookId) {
-                      state = state.withJoin(
-                        currentTable: table,
-                        currentColumn: table.bookId,
-                        referencedTable: $$QuotesTableReferences._bookIdTable(
-                          db,
-                        ),
-                        referencedColumn: $$QuotesTableReferences
-                            ._bookIdTable(db)
-                            .id,
-                      ) as T;
-                    }
-
-                    return state;
-                  },
-              getPrefetchedDataCallback: (items) async {
-                return [
-                  if (themeQuotesRefs)
-                    await $_getPrefetchedData<
-                      LocalQuote,
-                      $QuotesTable,
-                      LocalThemeQuote
-                    >(
-                      currentTable: table,
-                      referencedTable: $$QuotesTableReferences
-                          ._themeQuotesRefsTable(db),
-                      managerFromTypedResult: (p0) => $$QuotesTableReferences(
-                        db,
-                        table,
-                        p0,
-                      ).themeQuotesRefs,
-                      referencedItemsForCurrentItem: (item, referencedItems) =>
-                          referencedItems.where((e) => e.quoteId == item.id),
-                      typedResults: items,
-                    ),
-                ];
-              },
-            );
-          },
+          prefetchHooksCallback: null,
         ),
       );
 }
@@ -4201,55 +4707,38 @@ typedef $$QuotesTableProcessedTableManager =
     ProcessedTableManager<
       _$AppDatabase,
       $QuotesTable,
-      LocalQuote,
+      QuoteRow,
       $$QuotesTableFilterComposer,
       $$QuotesTableOrderingComposer,
       $$QuotesTableAnnotationComposer,
       $$QuotesTableCreateCompanionBuilder,
       $$QuotesTableUpdateCompanionBuilder,
-      (LocalQuote, $$QuotesTableReferences),
-      LocalQuote,
-      PrefetchHooks Function({bool bookId, bool themeQuotesRefs})
+      (QuoteRow, BaseReferences<_$AppDatabase, $QuotesTable, QuoteRow>),
+      QuoteRow,
+      PrefetchHooks Function()
     >;
 typedef $$ThemesTableCreateCompanionBuilder = ThemesCompanion Function({
   required String id,
-  required String name,
+  required String ownerId,
   Value<String?> accent,
   Value<String?> symbol,
-  required DateTime createdAt,
+  required String createdAt,
+  required String updatedAt,
+  required int keyVersion,
+  required String nameCipher,
   Value<int> rowid,
 });
 typedef $$ThemesTableUpdateCompanionBuilder = ThemesCompanion Function({
   Value<String> id,
-  Value<String> name,
+  Value<String> ownerId,
   Value<String?> accent,
   Value<String?> symbol,
-  Value<DateTime> createdAt,
+  Value<String> createdAt,
+  Value<String> updatedAt,
+  Value<int> keyVersion,
+  Value<String> nameCipher,
   Value<int> rowid,
 });
-
-final class $$ThemesTableReferences
-    extends BaseReferences<_$AppDatabase, $ThemesTable, LocalTheme> {
-  $$ThemesTableReferences(super.$_db, super.$_table, super.$_typedResult);
-
-  static MultiTypedResultKey<$ThemeQuotesTable, List<LocalThemeQuote>>
-  _themeQuotesRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
-    db.themeQuotes,
-    aliasName: 'themes__id__theme_quotes__theme_id',
-  );
-
-  $$ThemeQuotesTableProcessedTableManager get themeQuotesRefs {
-    final manager = $$ThemeQuotesTableTableManager(
-      $_db,
-      $_db.themeQuotes,
-    ).filter((f) => f.themeId.id.sqlEquals($_itemColumn<String>('id')!));
-
-    final cache = $_typedResult.readTableOrNull(_themeQuotesRefsTable($_db));
-    return ProcessedTableManager(
-      manager.$state.copyWith(prefetchedData: cache),
-    );
-  }
-}
 
 class $$ThemesTableFilterComposer
     extends Composer<_$AppDatabase, $ThemesTable> {
@@ -4265,8 +4754,8 @@ class $$ThemesTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<String> get name => $composableBuilder(
-    column: $table.name,
+  ColumnFilters<String> get ownerId => $composableBuilder(
+    column: $table.ownerId,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -4280,35 +4769,25 @@ class $$ThemesTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+  ColumnFilters<String> get createdAt => $composableBuilder(
     column: $table.createdAt,
     builder: (column) => ColumnFilters(column),
   );
 
-  Expression<bool> themeQuotesRefs(
-    Expression<bool> Function($$ThemeQuotesTableFilterComposer f) f,
-  ) {
-    final $$ThemeQuotesTableFilterComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.id,
-      referencedTable: $db.themeQuotes,
-      getReferencedColumn: (t) => t.themeId,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$ThemeQuotesTableFilterComposer(
-            $db: $db,
-            $table: $db.themeQuotes,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return f(composer);
-  }
+  ColumnFilters<String> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get keyVersion => $composableBuilder(
+    column: $table.keyVersion,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get nameCipher => $composableBuilder(
+    column: $table.nameCipher,
+    builder: (column) => ColumnFilters(column),
+  );
 }
 
 class $$ThemesTableOrderingComposer
@@ -4325,8 +4804,8 @@ class $$ThemesTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<String> get name => $composableBuilder(
-    column: $table.name,
+  ColumnOrderings<String> get ownerId => $composableBuilder(
+    column: $table.ownerId,
     builder: (column) => ColumnOrderings(column),
   );
 
@@ -4340,8 +4819,23 @@ class $$ThemesTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+  ColumnOrderings<String> get createdAt => $composableBuilder(
     column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get keyVersion => $composableBuilder(
+    column: $table.keyVersion,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get nameCipher => $composableBuilder(
+    column: $table.nameCipher,
     builder: (column) => ColumnOrderings(column),
   );
 }
@@ -4358,8 +4852,8 @@ class $$ThemesTableAnnotationComposer
   GeneratedColumn<String> get id =>
       $composableBuilder(column: $table.id, builder: (column) => column);
 
-  GeneratedColumn<String> get name =>
-      $composableBuilder(column: $table.name, builder: (column) => column);
+  GeneratedColumn<String> get ownerId =>
+      $composableBuilder(column: $table.ownerId, builder: (column) => column);
 
   GeneratedColumn<String> get accent =>
       $composableBuilder(column: $table.accent, builder: (column) => column);
@@ -4367,33 +4861,21 @@ class $$ThemesTableAnnotationComposer
   GeneratedColumn<String> get symbol =>
       $composableBuilder(column: $table.symbol, builder: (column) => column);
 
-  GeneratedColumn<DateTime> get createdAt =>
+  GeneratedColumn<String> get createdAt =>
       $composableBuilder(column: $table.createdAt, builder: (column) => column);
 
-  Expression<T> themeQuotesRefs<T extends Object>(
-    Expression<T> Function($$ThemeQuotesTableAnnotationComposer a) f,
-  ) {
-    final $$ThemeQuotesTableAnnotationComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.id,
-      referencedTable: $db.themeQuotes,
-      getReferencedColumn: (t) => t.themeId,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$ThemeQuotesTableAnnotationComposer(
-            $db: $db,
-            $table: $db.themeQuotes,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return f(composer);
-  }
+  GeneratedColumn<String> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+
+  GeneratedColumn<int> get keyVersion => $composableBuilder(
+    column: $table.keyVersion,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get nameCipher => $composableBuilder(
+    column: $table.nameCipher,
+    builder: (column) => column,
+  );
 }
 
 class $$ThemesTableTableManager
@@ -4401,15 +4883,15 @@ class $$ThemesTableTableManager
         RootTableManager<
           _$AppDatabase,
           $ThemesTable,
-          LocalTheme,
+          ThemeRow,
           $$ThemesTableFilterComposer,
           $$ThemesTableOrderingComposer,
           $$ThemesTableAnnotationComposer,
           $$ThemesTableCreateCompanionBuilder,
           $$ThemesTableUpdateCompanionBuilder,
-          (LocalTheme, $$ThemesTableReferences),
-          LocalTheme,
-          PrefetchHooks Function({bool themeQuotesRefs})
+          (ThemeRow, BaseReferences<_$AppDatabase, $ThemesTable, ThemeRow>),
+          ThemeRow,
+          PrefetchHooks Function()
         > {
   $$ThemesTableTableManager(_$AppDatabase db, $ThemesTable table)
     : super(
@@ -4425,70 +4907,51 @@ class $$ThemesTableTableManager
           updateCompanionCallback:
               ({
                 Value<String> id = const Value.absent(),
-                Value<String> name = const Value.absent(),
+                Value<String> ownerId = const Value.absent(),
                 Value<String?> accent = const Value.absent(),
                 Value<String?> symbol = const Value.absent(),
-                Value<DateTime> createdAt = const Value.absent(),
+                Value<String> createdAt = const Value.absent(),
+                Value<String> updatedAt = const Value.absent(),
+                Value<int> keyVersion = const Value.absent(),
+                Value<String> nameCipher = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => ThemesCompanion(
                 id: id,
-                name: name,
+                ownerId: ownerId,
                 accent: accent,
                 symbol: symbol,
                 createdAt: createdAt,
+                updatedAt: updatedAt,
+                keyVersion: keyVersion,
+                nameCipher: nameCipher,
                 rowid: rowid,
               ),
           createCompanionCallback:
               ({
                 required String id,
-                required String name,
+                required String ownerId,
                 Value<String?> accent = const Value.absent(),
                 Value<String?> symbol = const Value.absent(),
-                required DateTime createdAt,
+                required String createdAt,
+                required String updatedAt,
+                required int keyVersion,
+                required String nameCipher,
                 Value<int> rowid = const Value.absent(),
               }) => ThemesCompanion.insert(
                 id: id,
-                name: name,
+                ownerId: ownerId,
                 accent: accent,
                 symbol: symbol,
                 createdAt: createdAt,
+                updatedAt: updatedAt,
+                keyVersion: keyVersion,
+                nameCipher: nameCipher,
                 rowid: rowid,
               ),
           withReferenceMapper: (p0) => p0
-              .map(
-                (e) =>
-                    (e.readTable(table), $$ThemesTableReferences(db, table, e)),
-              )
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
               .toList(),
-          prefetchHooksCallback: ({themeQuotesRefs = false}) {
-            return PrefetchHooks(
-              db: db,
-              explicitlyWatchedTables: [if (themeQuotesRefs) db.themeQuotes],
-              addJoins: null,
-              getPrefetchedDataCallback: (items) async {
-                return [
-                  if (themeQuotesRefs)
-                    await $_getPrefetchedData<
-                      LocalTheme,
-                      $ThemesTable,
-                      LocalThemeQuote
-                    >(
-                      currentTable: table,
-                      referencedTable: $$ThemesTableReferences
-                          ._themeQuotesRefsTable(db),
-                      managerFromTypedResult: (p0) => $$ThemesTableReferences(
-                        db,
-                        table,
-                        p0,
-                      ).themeQuotesRefs,
-                      referencedItemsForCurrentItem: (item, referencedItems) =>
-                          referencedItems.where((e) => e.themeId == item.id),
-                      typedResults: items,
-                    ),
-                ];
-              },
-            );
-          },
+          prefetchHooksCallback: null,
         ),
       );
 }
@@ -4497,67 +4960,34 @@ typedef $$ThemesTableProcessedTableManager =
     ProcessedTableManager<
       _$AppDatabase,
       $ThemesTable,
-      LocalTheme,
+      ThemeRow,
       $$ThemesTableFilterComposer,
       $$ThemesTableOrderingComposer,
       $$ThemesTableAnnotationComposer,
       $$ThemesTableCreateCompanionBuilder,
       $$ThemesTableUpdateCompanionBuilder,
-      (LocalTheme, $$ThemesTableReferences),
-      LocalTheme,
-      PrefetchHooks Function({bool themeQuotesRefs})
+      (ThemeRow, BaseReferences<_$AppDatabase, $ThemesTable, ThemeRow>),
+      ThemeRow,
+      PrefetchHooks Function()
     >;
 typedef $$ThemeQuotesTableCreateCompanionBuilder =
     ThemeQuotesCompanion Function({
+      required String id,
+      required String ownerId,
       required String themeId,
       required String quoteId,
+      required String updatedAt,
       Value<int> rowid,
     });
 typedef $$ThemeQuotesTableUpdateCompanionBuilder =
     ThemeQuotesCompanion Function({
+      Value<String> id,
+      Value<String> ownerId,
       Value<String> themeId,
       Value<String> quoteId,
+      Value<String> updatedAt,
       Value<int> rowid,
     });
-
-final class $$ThemeQuotesTableReferences
-    extends BaseReferences<_$AppDatabase, $ThemeQuotesTable, LocalThemeQuote> {
-  $$ThemeQuotesTableReferences(super.$_db, super.$_table, super.$_typedResult);
-
-  static $ThemesTable _themeIdTable(_$AppDatabase db) =>
-      db.themes.createAlias('theme_quotes__theme_id__themes__id');
-
-  $$ThemesTableProcessedTableManager get themeId {
-    final $_column = $_itemColumn<String>('theme_id')!;
-
-    final manager = $$ThemesTableTableManager(
-      $_db,
-      $_db.themes,
-    ).filter((f) => f.id.sqlEquals($_column));
-    final item = $_typedResult.readTableOrNull(_themeIdTable($_db));
-    if (item == null) return manager;
-    return ProcessedTableManager(
-      manager.$state.copyWith(prefetchedData: [item]),
-    );
-  }
-
-  static $QuotesTable _quoteIdTable(_$AppDatabase db) =>
-      db.quotes.createAlias('theme_quotes__quote_id__quotes__id');
-
-  $$QuotesTableProcessedTableManager get quoteId {
-    final $_column = $_itemColumn<String>('quote_id')!;
-
-    final manager = $$QuotesTableTableManager(
-      $_db,
-      $_db.quotes,
-    ).filter((f) => f.id.sqlEquals($_column));
-    final item = $_typedResult.readTableOrNull(_quoteIdTable($_db));
-    if (item == null) return manager;
-    return ProcessedTableManager(
-      manager.$state.copyWith(prefetchedData: [item]),
-    );
-  }
-}
 
 class $$ThemeQuotesTableFilterComposer
     extends Composer<_$AppDatabase, $ThemeQuotesTable> {
@@ -4568,51 +4998,30 @@ class $$ThemeQuotesTableFilterComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  $$ThemesTableFilterComposer get themeId {
-    final $$ThemesTableFilterComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.themeId,
-      referencedTable: $db.themes,
-      getReferencedColumn: (t) => t.id,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$ThemesTableFilterComposer(
-            $db: $db,
-            $table: $db.themes,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return composer;
-  }
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
 
-  $$QuotesTableFilterComposer get quoteId {
-    final $$QuotesTableFilterComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.quoteId,
-      referencedTable: $db.quotes,
-      getReferencedColumn: (t) => t.id,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$QuotesTableFilterComposer(
-            $db: $db,
-            $table: $db.quotes,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return composer;
-  }
+  ColumnFilters<String> get ownerId => $composableBuilder(
+    column: $table.ownerId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get themeId => $composableBuilder(
+    column: $table.themeId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get quoteId => $composableBuilder(
+    column: $table.quoteId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
 }
 
 class $$ThemeQuotesTableOrderingComposer
@@ -4624,51 +5033,30 @@ class $$ThemeQuotesTableOrderingComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  $$ThemesTableOrderingComposer get themeId {
-    final $$ThemesTableOrderingComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.themeId,
-      referencedTable: $db.themes,
-      getReferencedColumn: (t) => t.id,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$ThemesTableOrderingComposer(
-            $db: $db,
-            $table: $db.themes,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return composer;
-  }
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
 
-  $$QuotesTableOrderingComposer get quoteId {
-    final $$QuotesTableOrderingComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.quoteId,
-      referencedTable: $db.quotes,
-      getReferencedColumn: (t) => t.id,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$QuotesTableOrderingComposer(
-            $db: $db,
-            $table: $db.quotes,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return composer;
-  }
+  ColumnOrderings<String> get ownerId => $composableBuilder(
+    column: $table.ownerId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get themeId => $composableBuilder(
+    column: $table.themeId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get quoteId => $composableBuilder(
+    column: $table.quoteId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$ThemeQuotesTableAnnotationComposer
@@ -4680,51 +5068,20 @@ class $$ThemeQuotesTableAnnotationComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  $$ThemesTableAnnotationComposer get themeId {
-    final $$ThemesTableAnnotationComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.themeId,
-      referencedTable: $db.themes,
-      getReferencedColumn: (t) => t.id,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$ThemesTableAnnotationComposer(
-            $db: $db,
-            $table: $db.themes,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return composer;
-  }
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
 
-  $$QuotesTableAnnotationComposer get quoteId {
-    final $$QuotesTableAnnotationComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.quoteId,
-      referencedTable: $db.quotes,
-      getReferencedColumn: (t) => t.id,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$QuotesTableAnnotationComposer(
-            $db: $db,
-            $table: $db.quotes,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return composer;
-  }
+  GeneratedColumn<String> get ownerId =>
+      $composableBuilder(column: $table.ownerId, builder: (column) => column);
+
+  GeneratedColumn<String> get themeId =>
+      $composableBuilder(column: $table.themeId, builder: (column) => column);
+
+  GeneratedColumn<String> get quoteId =>
+      $composableBuilder(column: $table.quoteId, builder: (column) => column);
+
+  GeneratedColumn<String> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
 }
 
 class $$ThemeQuotesTableTableManager
@@ -4732,15 +5089,18 @@ class $$ThemeQuotesTableTableManager
         RootTableManager<
           _$AppDatabase,
           $ThemeQuotesTable,
-          LocalThemeQuote,
+          ThemeQuoteRow,
           $$ThemeQuotesTableFilterComposer,
           $$ThemeQuotesTableOrderingComposer,
           $$ThemeQuotesTableAnnotationComposer,
           $$ThemeQuotesTableCreateCompanionBuilder,
           $$ThemeQuotesTableUpdateCompanionBuilder,
-          (LocalThemeQuote, $$ThemeQuotesTableReferences),
-          LocalThemeQuote,
-          PrefetchHooks Function({bool themeId, bool quoteId})
+          (
+            ThemeQuoteRow,
+            BaseReferences<_$AppDatabase, $ThemeQuotesTable, ThemeQuoteRow>,
+          ),
+          ThemeQuoteRow,
+          PrefetchHooks Function()
         > {
   $$ThemeQuotesTableTableManager(_$AppDatabase db, $ThemeQuotesTable table)
     : super(
@@ -4755,82 +5115,40 @@ class $$ThemeQuotesTableTableManager
               $$ThemeQuotesTableAnnotationComposer($db: db, $table: table),
           updateCompanionCallback:
               ({
+                Value<String> id = const Value.absent(),
+                Value<String> ownerId = const Value.absent(),
                 Value<String> themeId = const Value.absent(),
                 Value<String> quoteId = const Value.absent(),
+                Value<String> updatedAt = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => ThemeQuotesCompanion(
+                id: id,
+                ownerId: ownerId,
                 themeId: themeId,
                 quoteId: quoteId,
+                updatedAt: updatedAt,
                 rowid: rowid,
               ),
           createCompanionCallback:
               ({
+                required String id,
+                required String ownerId,
                 required String themeId,
                 required String quoteId,
+                required String updatedAt,
                 Value<int> rowid = const Value.absent(),
               }) => ThemeQuotesCompanion.insert(
+                id: id,
+                ownerId: ownerId,
                 themeId: themeId,
                 quoteId: quoteId,
+                updatedAt: updatedAt,
                 rowid: rowid,
               ),
           withReferenceMapper: (p0) => p0
-              .map(
-                (e) => (
-                  e.readTable(table),
-                  $$ThemeQuotesTableReferences(db, table, e),
-                ),
-              )
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
               .toList(),
-          prefetchHooksCallback: ({themeId = false, quoteId = false}) {
-            return PrefetchHooks(
-              db: db,
-              explicitlyWatchedTables: [],
-              addJoins:
-                  <
-                    T extends TableManagerState<
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic
-                    >
-                  >(state) {
-                    if (themeId) {
-                      state = state.withJoin(
-                        currentTable: table,
-                        currentColumn: table.themeId,
-                        referencedTable: $$ThemeQuotesTableReferences
-                            ._themeIdTable(db),
-                        referencedColumn: $$ThemeQuotesTableReferences
-                            ._themeIdTable(db)
-                            .id,
-                      ) as T;
-                    }
-                    if (quoteId) {
-                      state = state.withJoin(
-                        currentTable: table,
-                        currentColumn: table.quoteId,
-                        referencedTable: $$ThemeQuotesTableReferences
-                            ._quoteIdTable(db),
-                        referencedColumn: $$ThemeQuotesTableReferences
-                            ._quoteIdTable(db)
-                            .id,
-                      ) as T;
-                    }
-
-                    return state;
-                  },
-              getPrefetchedDataCallback: (items) async {
-                return [];
-              },
-            );
-          },
+          prefetchHooksCallback: null,
         ),
       );
 }
@@ -4839,55 +5157,41 @@ typedef $$ThemeQuotesTableProcessedTableManager =
     ProcessedTableManager<
       _$AppDatabase,
       $ThemeQuotesTable,
-      LocalThemeQuote,
+      ThemeQuoteRow,
       $$ThemeQuotesTableFilterComposer,
       $$ThemeQuotesTableOrderingComposer,
       $$ThemeQuotesTableAnnotationComposer,
       $$ThemeQuotesTableCreateCompanionBuilder,
       $$ThemeQuotesTableUpdateCompanionBuilder,
-      (LocalThemeQuote, $$ThemeQuotesTableReferences),
-      LocalThemeQuote,
-      PrefetchHooks Function({bool themeId, bool quoteId})
+      (
+        ThemeQuoteRow,
+        BaseReferences<_$AppDatabase, $ThemeQuotesTable, ThemeQuoteRow>,
+      ),
+      ThemeQuoteRow,
+      PrefetchHooks Function()
     >;
 typedef $$ShelvesTableCreateCompanionBuilder = ShelvesCompanion Function({
   required String id,
-  required String name,
+  required String ownerId,
   Value<String?> accent,
   Value<String?> symbol,
-  required DateTime createdAt,
+  required String createdAt,
+  required String updatedAt,
+  required int keyVersion,
+  required String nameCipher,
   Value<int> rowid,
 });
 typedef $$ShelvesTableUpdateCompanionBuilder = ShelvesCompanion Function({
   Value<String> id,
-  Value<String> name,
+  Value<String> ownerId,
   Value<String?> accent,
   Value<String?> symbol,
-  Value<DateTime> createdAt,
+  Value<String> createdAt,
+  Value<String> updatedAt,
+  Value<int> keyVersion,
+  Value<String> nameCipher,
   Value<int> rowid,
 });
-
-final class $$ShelvesTableReferences
-    extends BaseReferences<_$AppDatabase, $ShelvesTable, LocalShelf> {
-  $$ShelvesTableReferences(super.$_db, super.$_table, super.$_typedResult);
-
-  static MultiTypedResultKey<$ShelfBooksTable, List<LocalShelfBook>>
-  _shelfBooksRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
-    db.shelfBooks,
-    aliasName: 'shelves__id__shelf_books__shelf_id',
-  );
-
-  $$ShelfBooksTableProcessedTableManager get shelfBooksRefs {
-    final manager = $$ShelfBooksTableTableManager(
-      $_db,
-      $_db.shelfBooks,
-    ).filter((f) => f.shelfId.id.sqlEquals($_itemColumn<String>('id')!));
-
-    final cache = $_typedResult.readTableOrNull(_shelfBooksRefsTable($_db));
-    return ProcessedTableManager(
-      manager.$state.copyWith(prefetchedData: cache),
-    );
-  }
-}
 
 class $$ShelvesTableFilterComposer
     extends Composer<_$AppDatabase, $ShelvesTable> {
@@ -4903,8 +5207,8 @@ class $$ShelvesTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<String> get name => $composableBuilder(
-    column: $table.name,
+  ColumnFilters<String> get ownerId => $composableBuilder(
+    column: $table.ownerId,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -4918,35 +5222,25 @@ class $$ShelvesTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+  ColumnFilters<String> get createdAt => $composableBuilder(
     column: $table.createdAt,
     builder: (column) => ColumnFilters(column),
   );
 
-  Expression<bool> shelfBooksRefs(
-    Expression<bool> Function($$ShelfBooksTableFilterComposer f) f,
-  ) {
-    final $$ShelfBooksTableFilterComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.id,
-      referencedTable: $db.shelfBooks,
-      getReferencedColumn: (t) => t.shelfId,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$ShelfBooksTableFilterComposer(
-            $db: $db,
-            $table: $db.shelfBooks,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return f(composer);
-  }
+  ColumnFilters<String> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get keyVersion => $composableBuilder(
+    column: $table.keyVersion,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get nameCipher => $composableBuilder(
+    column: $table.nameCipher,
+    builder: (column) => ColumnFilters(column),
+  );
 }
 
 class $$ShelvesTableOrderingComposer
@@ -4963,8 +5257,8 @@ class $$ShelvesTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<String> get name => $composableBuilder(
-    column: $table.name,
+  ColumnOrderings<String> get ownerId => $composableBuilder(
+    column: $table.ownerId,
     builder: (column) => ColumnOrderings(column),
   );
 
@@ -4978,8 +5272,23 @@ class $$ShelvesTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+  ColumnOrderings<String> get createdAt => $composableBuilder(
     column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get keyVersion => $composableBuilder(
+    column: $table.keyVersion,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get nameCipher => $composableBuilder(
+    column: $table.nameCipher,
     builder: (column) => ColumnOrderings(column),
   );
 }
@@ -4996,8 +5305,8 @@ class $$ShelvesTableAnnotationComposer
   GeneratedColumn<String> get id =>
       $composableBuilder(column: $table.id, builder: (column) => column);
 
-  GeneratedColumn<String> get name =>
-      $composableBuilder(column: $table.name, builder: (column) => column);
+  GeneratedColumn<String> get ownerId =>
+      $composableBuilder(column: $table.ownerId, builder: (column) => column);
 
   GeneratedColumn<String> get accent =>
       $composableBuilder(column: $table.accent, builder: (column) => column);
@@ -5005,33 +5314,21 @@ class $$ShelvesTableAnnotationComposer
   GeneratedColumn<String> get symbol =>
       $composableBuilder(column: $table.symbol, builder: (column) => column);
 
-  GeneratedColumn<DateTime> get createdAt =>
+  GeneratedColumn<String> get createdAt =>
       $composableBuilder(column: $table.createdAt, builder: (column) => column);
 
-  Expression<T> shelfBooksRefs<T extends Object>(
-    Expression<T> Function($$ShelfBooksTableAnnotationComposer a) f,
-  ) {
-    final $$ShelfBooksTableAnnotationComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.id,
-      referencedTable: $db.shelfBooks,
-      getReferencedColumn: (t) => t.shelfId,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$ShelfBooksTableAnnotationComposer(
-            $db: $db,
-            $table: $db.shelfBooks,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return f(composer);
-  }
+  GeneratedColumn<String> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+
+  GeneratedColumn<int> get keyVersion => $composableBuilder(
+    column: $table.keyVersion,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get nameCipher => $composableBuilder(
+    column: $table.nameCipher,
+    builder: (column) => column,
+  );
 }
 
 class $$ShelvesTableTableManager
@@ -5039,15 +5336,15 @@ class $$ShelvesTableTableManager
         RootTableManager<
           _$AppDatabase,
           $ShelvesTable,
-          LocalShelf,
+          ShelfRow,
           $$ShelvesTableFilterComposer,
           $$ShelvesTableOrderingComposer,
           $$ShelvesTableAnnotationComposer,
           $$ShelvesTableCreateCompanionBuilder,
           $$ShelvesTableUpdateCompanionBuilder,
-          (LocalShelf, $$ShelvesTableReferences),
-          LocalShelf,
-          PrefetchHooks Function({bool shelfBooksRefs})
+          (ShelfRow, BaseReferences<_$AppDatabase, $ShelvesTable, ShelfRow>),
+          ShelfRow,
+          PrefetchHooks Function()
         > {
   $$ShelvesTableTableManager(_$AppDatabase db, $ShelvesTable table)
     : super(
@@ -5063,72 +5360,51 @@ class $$ShelvesTableTableManager
           updateCompanionCallback:
               ({
                 Value<String> id = const Value.absent(),
-                Value<String> name = const Value.absent(),
+                Value<String> ownerId = const Value.absent(),
                 Value<String?> accent = const Value.absent(),
                 Value<String?> symbol = const Value.absent(),
-                Value<DateTime> createdAt = const Value.absent(),
+                Value<String> createdAt = const Value.absent(),
+                Value<String> updatedAt = const Value.absent(),
+                Value<int> keyVersion = const Value.absent(),
+                Value<String> nameCipher = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => ShelvesCompanion(
                 id: id,
-                name: name,
+                ownerId: ownerId,
                 accent: accent,
                 symbol: symbol,
                 createdAt: createdAt,
+                updatedAt: updatedAt,
+                keyVersion: keyVersion,
+                nameCipher: nameCipher,
                 rowid: rowid,
               ),
           createCompanionCallback:
               ({
                 required String id,
-                required String name,
+                required String ownerId,
                 Value<String?> accent = const Value.absent(),
                 Value<String?> symbol = const Value.absent(),
-                required DateTime createdAt,
+                required String createdAt,
+                required String updatedAt,
+                required int keyVersion,
+                required String nameCipher,
                 Value<int> rowid = const Value.absent(),
               }) => ShelvesCompanion.insert(
                 id: id,
-                name: name,
+                ownerId: ownerId,
                 accent: accent,
                 symbol: symbol,
                 createdAt: createdAt,
+                updatedAt: updatedAt,
+                keyVersion: keyVersion,
+                nameCipher: nameCipher,
                 rowid: rowid,
               ),
           withReferenceMapper: (p0) => p0
-              .map(
-                (e) => (
-                  e.readTable(table),
-                  $$ShelvesTableReferences(db, table, e),
-                ),
-              )
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
               .toList(),
-          prefetchHooksCallback: ({shelfBooksRefs = false}) {
-            return PrefetchHooks(
-              db: db,
-              explicitlyWatchedTables: [if (shelfBooksRefs) db.shelfBooks],
-              addJoins: null,
-              getPrefetchedDataCallback: (items) async {
-                return [
-                  if (shelfBooksRefs)
-                    await $_getPrefetchedData<
-                      LocalShelf,
-                      $ShelvesTable,
-                      LocalShelfBook
-                    >(
-                      currentTable: table,
-                      referencedTable: $$ShelvesTableReferences
-                          ._shelfBooksRefsTable(db),
-                      managerFromTypedResult: (p0) => $$ShelvesTableReferences(
-                        db,
-                        table,
-                        p0,
-                      ).shelfBooksRefs,
-                      referencedItemsForCurrentItem: (item, referencedItems) =>
-                          referencedItems.where((e) => e.shelfId == item.id),
-                      typedResults: items,
-                    ),
-                ];
-              },
-            );
-          },
+          prefetchHooksCallback: null,
         ),
       );
 }
@@ -5137,65 +5413,32 @@ typedef $$ShelvesTableProcessedTableManager =
     ProcessedTableManager<
       _$AppDatabase,
       $ShelvesTable,
-      LocalShelf,
+      ShelfRow,
       $$ShelvesTableFilterComposer,
       $$ShelvesTableOrderingComposer,
       $$ShelvesTableAnnotationComposer,
       $$ShelvesTableCreateCompanionBuilder,
       $$ShelvesTableUpdateCompanionBuilder,
-      (LocalShelf, $$ShelvesTableReferences),
-      LocalShelf,
-      PrefetchHooks Function({bool shelfBooksRefs})
+      (ShelfRow, BaseReferences<_$AppDatabase, $ShelvesTable, ShelfRow>),
+      ShelfRow,
+      PrefetchHooks Function()
     >;
 typedef $$ShelfBooksTableCreateCompanionBuilder = ShelfBooksCompanion Function({
+  required String id,
+  required String ownerId,
   required String shelfId,
   required String bookId,
+  required String updatedAt,
   Value<int> rowid,
 });
 typedef $$ShelfBooksTableUpdateCompanionBuilder = ShelfBooksCompanion Function({
+  Value<String> id,
+  Value<String> ownerId,
   Value<String> shelfId,
   Value<String> bookId,
+  Value<String> updatedAt,
   Value<int> rowid,
 });
-
-final class $$ShelfBooksTableReferences
-    extends BaseReferences<_$AppDatabase, $ShelfBooksTable, LocalShelfBook> {
-  $$ShelfBooksTableReferences(super.$_db, super.$_table, super.$_typedResult);
-
-  static $ShelvesTable _shelfIdTable(_$AppDatabase db) =>
-      db.shelves.createAlias('shelf_books__shelf_id__shelves__id');
-
-  $$ShelvesTableProcessedTableManager get shelfId {
-    final $_column = $_itemColumn<String>('shelf_id')!;
-
-    final manager = $$ShelvesTableTableManager(
-      $_db,
-      $_db.shelves,
-    ).filter((f) => f.id.sqlEquals($_column));
-    final item = $_typedResult.readTableOrNull(_shelfIdTable($_db));
-    if (item == null) return manager;
-    return ProcessedTableManager(
-      manager.$state.copyWith(prefetchedData: [item]),
-    );
-  }
-
-  static $BooksTable _bookIdTable(_$AppDatabase db) =>
-      db.books.createAlias('shelf_books__book_id__books__id');
-
-  $$BooksTableProcessedTableManager get bookId {
-    final $_column = $_itemColumn<String>('book_id')!;
-
-    final manager = $$BooksTableTableManager(
-      $_db,
-      $_db.books,
-    ).filter((f) => f.id.sqlEquals($_column));
-    final item = $_typedResult.readTableOrNull(_bookIdTable($_db));
-    if (item == null) return manager;
-    return ProcessedTableManager(
-      manager.$state.copyWith(prefetchedData: [item]),
-    );
-  }
-}
 
 class $$ShelfBooksTableFilterComposer
     extends Composer<_$AppDatabase, $ShelfBooksTable> {
@@ -5206,51 +5449,30 @@ class $$ShelfBooksTableFilterComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  $$ShelvesTableFilterComposer get shelfId {
-    final $$ShelvesTableFilterComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.shelfId,
-      referencedTable: $db.shelves,
-      getReferencedColumn: (t) => t.id,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$ShelvesTableFilterComposer(
-            $db: $db,
-            $table: $db.shelves,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return composer;
-  }
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
 
-  $$BooksTableFilterComposer get bookId {
-    final $$BooksTableFilterComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.bookId,
-      referencedTable: $db.books,
-      getReferencedColumn: (t) => t.id,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$BooksTableFilterComposer(
-            $db: $db,
-            $table: $db.books,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return composer;
-  }
+  ColumnFilters<String> get ownerId => $composableBuilder(
+    column: $table.ownerId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get shelfId => $composableBuilder(
+    column: $table.shelfId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get bookId => $composableBuilder(
+    column: $table.bookId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
 }
 
 class $$ShelfBooksTableOrderingComposer
@@ -5262,51 +5484,30 @@ class $$ShelfBooksTableOrderingComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  $$ShelvesTableOrderingComposer get shelfId {
-    final $$ShelvesTableOrderingComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.shelfId,
-      referencedTable: $db.shelves,
-      getReferencedColumn: (t) => t.id,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$ShelvesTableOrderingComposer(
-            $db: $db,
-            $table: $db.shelves,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return composer;
-  }
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
 
-  $$BooksTableOrderingComposer get bookId {
-    final $$BooksTableOrderingComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.bookId,
-      referencedTable: $db.books,
-      getReferencedColumn: (t) => t.id,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$BooksTableOrderingComposer(
-            $db: $db,
-            $table: $db.books,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return composer;
-  }
+  ColumnOrderings<String> get ownerId => $composableBuilder(
+    column: $table.ownerId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get shelfId => $composableBuilder(
+    column: $table.shelfId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get bookId => $composableBuilder(
+    column: $table.bookId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$ShelfBooksTableAnnotationComposer
@@ -5318,51 +5519,20 @@ class $$ShelfBooksTableAnnotationComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  $$ShelvesTableAnnotationComposer get shelfId {
-    final $$ShelvesTableAnnotationComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.shelfId,
-      referencedTable: $db.shelves,
-      getReferencedColumn: (t) => t.id,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$ShelvesTableAnnotationComposer(
-            $db: $db,
-            $table: $db.shelves,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return composer;
-  }
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
 
-  $$BooksTableAnnotationComposer get bookId {
-    final $$BooksTableAnnotationComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.bookId,
-      referencedTable: $db.books,
-      getReferencedColumn: (t) => t.id,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$BooksTableAnnotationComposer(
-            $db: $db,
-            $table: $db.books,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return composer;
-  }
+  GeneratedColumn<String> get ownerId =>
+      $composableBuilder(column: $table.ownerId, builder: (column) => column);
+
+  GeneratedColumn<String> get shelfId =>
+      $composableBuilder(column: $table.shelfId, builder: (column) => column);
+
+  GeneratedColumn<String> get bookId =>
+      $composableBuilder(column: $table.bookId, builder: (column) => column);
+
+  GeneratedColumn<String> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
 }
 
 class $$ShelfBooksTableTableManager
@@ -5370,15 +5540,18 @@ class $$ShelfBooksTableTableManager
         RootTableManager<
           _$AppDatabase,
           $ShelfBooksTable,
-          LocalShelfBook,
+          ShelfBookRow,
           $$ShelfBooksTableFilterComposer,
           $$ShelfBooksTableOrderingComposer,
           $$ShelfBooksTableAnnotationComposer,
           $$ShelfBooksTableCreateCompanionBuilder,
           $$ShelfBooksTableUpdateCompanionBuilder,
-          (LocalShelfBook, $$ShelfBooksTableReferences),
-          LocalShelfBook,
-          PrefetchHooks Function({bool shelfId, bool bookId})
+          (
+            ShelfBookRow,
+            BaseReferences<_$AppDatabase, $ShelfBooksTable, ShelfBookRow>,
+          ),
+          ShelfBookRow,
+          PrefetchHooks Function()
         > {
   $$ShelfBooksTableTableManager(_$AppDatabase db, $ShelfBooksTable table)
     : super(
@@ -5393,82 +5566,40 @@ class $$ShelfBooksTableTableManager
               $$ShelfBooksTableAnnotationComposer($db: db, $table: table),
           updateCompanionCallback:
               ({
+                Value<String> id = const Value.absent(),
+                Value<String> ownerId = const Value.absent(),
                 Value<String> shelfId = const Value.absent(),
                 Value<String> bookId = const Value.absent(),
+                Value<String> updatedAt = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => ShelfBooksCompanion(
+                id: id,
+                ownerId: ownerId,
                 shelfId: shelfId,
                 bookId: bookId,
+                updatedAt: updatedAt,
                 rowid: rowid,
               ),
           createCompanionCallback:
               ({
+                required String id,
+                required String ownerId,
                 required String shelfId,
                 required String bookId,
+                required String updatedAt,
                 Value<int> rowid = const Value.absent(),
               }) => ShelfBooksCompanion.insert(
+                id: id,
+                ownerId: ownerId,
                 shelfId: shelfId,
                 bookId: bookId,
+                updatedAt: updatedAt,
                 rowid: rowid,
               ),
           withReferenceMapper: (p0) => p0
-              .map(
-                (e) => (
-                  e.readTable(table),
-                  $$ShelfBooksTableReferences(db, table, e),
-                ),
-              )
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
               .toList(),
-          prefetchHooksCallback: ({shelfId = false, bookId = false}) {
-            return PrefetchHooks(
-              db: db,
-              explicitlyWatchedTables: [],
-              addJoins:
-                  <
-                    T extends TableManagerState<
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic
-                    >
-                  >(state) {
-                    if (shelfId) {
-                      state = state.withJoin(
-                        currentTable: table,
-                        currentColumn: table.shelfId,
-                        referencedTable: $$ShelfBooksTableReferences
-                            ._shelfIdTable(db),
-                        referencedColumn: $$ShelfBooksTableReferences
-                            ._shelfIdTable(db)
-                            .id,
-                      ) as T;
-                    }
-                    if (bookId) {
-                      state = state.withJoin(
-                        currentTable: table,
-                        currentColumn: table.bookId,
-                        referencedTable: $$ShelfBooksTableReferences
-                            ._bookIdTable(db),
-                        referencedColumn: $$ShelfBooksTableReferences
-                            ._bookIdTable(db)
-                            .id,
-                      ) as T;
-                    }
-
-                    return state;
-                  },
-              getPrefetchedDataCallback: (items) async {
-                return [];
-              },
-            );
-          },
+          prefetchHooksCallback: null,
         ),
       );
 }
@@ -5477,31 +5608,36 @@ typedef $$ShelfBooksTableProcessedTableManager =
     ProcessedTableManager<
       _$AppDatabase,
       $ShelfBooksTable,
-      LocalShelfBook,
+      ShelfBookRow,
       $$ShelfBooksTableFilterComposer,
       $$ShelfBooksTableOrderingComposer,
       $$ShelfBooksTableAnnotationComposer,
       $$ShelfBooksTableCreateCompanionBuilder,
       $$ShelfBooksTableUpdateCompanionBuilder,
-      (LocalShelfBook, $$ShelfBooksTableReferences),
-      LocalShelfBook,
-      PrefetchHooks Function({bool shelfId, bool bookId})
+      (
+        ShelfBookRow,
+        BaseReferences<_$AppDatabase, $ShelfBooksTable, ShelfBookRow>,
+      ),
+      ShelfBookRow,
+      PrefetchHooks Function()
     >;
 typedef $$SettingsTableTableCreateCompanionBuilder =
     SettingsTableCompanion Function({
-      Value<int> id,
+      required String id,
       Value<String?> displayName,
       Value<String?> localePreference,
       Value<String?> themePreference,
       Value<String?> contrastPreference,
+      Value<int> rowid,
     });
 typedef $$SettingsTableTableUpdateCompanionBuilder =
     SettingsTableCompanion Function({
-      Value<int> id,
+      Value<String> id,
       Value<String?> displayName,
       Value<String?> localePreference,
       Value<String?> themePreference,
       Value<String?> contrastPreference,
+      Value<int> rowid,
     });
 
 class $$SettingsTableTableFilterComposer
@@ -5513,7 +5649,7 @@ class $$SettingsTableTableFilterComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  ColumnFilters<int> get id => $composableBuilder(
+  ColumnFilters<String> get id => $composableBuilder(
     column: $table.id,
     builder: (column) => ColumnFilters(column),
   );
@@ -5548,7 +5684,7 @@ class $$SettingsTableTableOrderingComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  ColumnOrderings<int> get id => $composableBuilder(
+  ColumnOrderings<String> get id => $composableBuilder(
     column: $table.id,
     builder: (column) => ColumnOrderings(column),
   );
@@ -5583,7 +5719,7 @@ class $$SettingsTableTableAnnotationComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  GeneratedColumn<int> get id =>
+  GeneratedColumn<String> get id =>
       $composableBuilder(column: $table.id, builder: (column) => column);
 
   GeneratedColumn<String> get displayName => $composableBuilder(
@@ -5638,31 +5774,35 @@ class $$SettingsTableTableTableManager
               $$SettingsTableTableAnnotationComposer($db: db, $table: table),
           updateCompanionCallback:
               ({
-                Value<int> id = const Value.absent(),
+                Value<String> id = const Value.absent(),
                 Value<String?> displayName = const Value.absent(),
                 Value<String?> localePreference = const Value.absent(),
                 Value<String?> themePreference = const Value.absent(),
                 Value<String?> contrastPreference = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
               }) => SettingsTableCompanion(
                 id: id,
                 displayName: displayName,
                 localePreference: localePreference,
                 themePreference: themePreference,
                 contrastPreference: contrastPreference,
+                rowid: rowid,
               ),
           createCompanionCallback:
               ({
-                Value<int> id = const Value.absent(),
+                required String id,
                 Value<String?> displayName = const Value.absent(),
                 Value<String?> localePreference = const Value.absent(),
                 Value<String?> themePreference = const Value.absent(),
                 Value<String?> contrastPreference = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
               }) => SettingsTableCompanion.insert(
                 id: id,
                 displayName: displayName,
                 localePreference: localePreference,
                 themePreference: themePreference,
                 contrastPreference: contrastPreference,
+                rowid: rowid,
               ),
           withReferenceMapper: (p0) => p0
               .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
@@ -5691,17 +5831,19 @@ typedef $$SettingsTableTableProcessedTableManager =
     >;
 typedef $$AppConfigCacheTableTableCreateCompanionBuilder =
     AppConfigCacheTableCompanion Function({
-      Value<int> id,
+      required String id,
       required int version,
-      required DateTime fetchedAt,
+      required String fetchedAt,
       required String payload,
+      Value<int> rowid,
     });
 typedef $$AppConfigCacheTableTableUpdateCompanionBuilder =
     AppConfigCacheTableCompanion Function({
-      Value<int> id,
+      Value<String> id,
       Value<int> version,
-      Value<DateTime> fetchedAt,
+      Value<String> fetchedAt,
       Value<String> payload,
+      Value<int> rowid,
     });
 
 class $$AppConfigCacheTableTableFilterComposer
@@ -5713,7 +5855,7 @@ class $$AppConfigCacheTableTableFilterComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  ColumnFilters<int> get id => $composableBuilder(
+  ColumnFilters<String> get id => $composableBuilder(
     column: $table.id,
     builder: (column) => ColumnFilters(column),
   );
@@ -5723,7 +5865,7 @@ class $$AppConfigCacheTableTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<DateTime> get fetchedAt => $composableBuilder(
+  ColumnFilters<String> get fetchedAt => $composableBuilder(
     column: $table.fetchedAt,
     builder: (column) => ColumnFilters(column),
   );
@@ -5743,7 +5885,7 @@ class $$AppConfigCacheTableTableOrderingComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  ColumnOrderings<int> get id => $composableBuilder(
+  ColumnOrderings<String> get id => $composableBuilder(
     column: $table.id,
     builder: (column) => ColumnOrderings(column),
   );
@@ -5753,7 +5895,7 @@ class $$AppConfigCacheTableTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<DateTime> get fetchedAt => $composableBuilder(
+  ColumnOrderings<String> get fetchedAt => $composableBuilder(
     column: $table.fetchedAt,
     builder: (column) => ColumnOrderings(column),
   );
@@ -5773,13 +5915,13 @@ class $$AppConfigCacheTableTableAnnotationComposer
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  GeneratedColumn<int> get id =>
+  GeneratedColumn<String> get id =>
       $composableBuilder(column: $table.id, builder: (column) => column);
 
   GeneratedColumn<int> get version =>
       $composableBuilder(column: $table.version, builder: (column) => column);
 
-  GeneratedColumn<DateTime> get fetchedAt =>
+  GeneratedColumn<String> get fetchedAt =>
       $composableBuilder(column: $table.fetchedAt, builder: (column) => column);
 
   GeneratedColumn<String> get payload =>
@@ -5829,27 +5971,31 @@ class $$AppConfigCacheTableTableTableManager
               ),
           updateCompanionCallback:
               ({
-                Value<int> id = const Value.absent(),
+                Value<String> id = const Value.absent(),
                 Value<int> version = const Value.absent(),
-                Value<DateTime> fetchedAt = const Value.absent(),
+                Value<String> fetchedAt = const Value.absent(),
                 Value<String> payload = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
               }) => AppConfigCacheTableCompanion(
                 id: id,
                 version: version,
                 fetchedAt: fetchedAt,
                 payload: payload,
+                rowid: rowid,
               ),
           createCompanionCallback:
               ({
-                Value<int> id = const Value.absent(),
+                required String id,
                 required int version,
-                required DateTime fetchedAt,
+                required String fetchedAt,
                 required String payload,
+                Value<int> rowid = const Value.absent(),
               }) => AppConfigCacheTableCompanion.insert(
                 id: id,
                 version: version,
                 fetchedAt: fetchedAt,
                 payload: payload,
+                rowid: rowid,
               ),
           withReferenceMapper: (p0) => p0
               .map((e) => (e.readTable(table), BaseReferences(db, table, e)))

@@ -1,7 +1,7 @@
 import 'package:shared/data/database/app_database.dart';
+import 'package:shared/data/database/sync_schema.dart';
 import 'package:shared/domain/entities/user_settings.dart';
 
-const _settingsRowId = 0;
 const _localeSystem = "system";
 const _localeEnglish = "english";
 const _localeGerman = "german";
@@ -26,7 +26,7 @@ extension LocalSettingsMappers on LocalSettings {
 extension UserSettingsMappers on UserSettings {
   LocalSettings toLocalSettings() {
     return LocalSettings(
-      id: _settingsRowId,
+      id: settingsRowId,
       displayName: displayName,
       localePreference: localePreference.value,
       themePreference: themePreference.value,

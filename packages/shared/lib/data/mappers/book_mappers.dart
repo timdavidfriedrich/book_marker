@@ -1,4 +1,4 @@
-import 'package:shared/data/database/app_database.dart';
+import 'package:shared/data/models/local_book.dart';
 import 'package:shared/data/models/remote_google_book.dart';
 import 'package:shared/data/models/remote_open_library_book.dart';
 import 'package:shared/domain/entities/book.dart';

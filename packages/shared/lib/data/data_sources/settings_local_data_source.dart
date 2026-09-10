@@ -1,7 +1,6 @@
 import 'package:injectable/injectable.dart';
 import 'package:shared/data/database/app_database.dart';
-
-const _settingsRowId = 0;
+import 'package:shared/data/database/sync_schema.dart';
 
 abstract class SettingsLocalDataSource {
   Stream<LocalSettings?> watchSettings();
@@ -18,18 +17,18 @@ class const SettingsLocalDataSourceImpl(
   @override
   Stream<LocalSettings?> watchSettings() {
     final query = _database.select(_database.settingsTable)
-      ..where((table) => table.id.equals(_settingsRowId));
+      ..where((table) => table.id.equals(settingsRowId));
     return query.watchSingleOrNull();
   }
 
   @override
   Future<LocalSettings?> readSettings() {
     final query = _database.select(_database.settingsTable)
-      ..where((table) => table.id.equals(_settingsRowId));
+      ..where((table) => table.id.equals(settingsRowId));
     return query.getSingleOrNull();
   }
 
   @override
   Future<void> upsertSettings(LocalSettings settings) =>
-      _database.into(_database.settingsTable).insertOnConflictUpdate(settings);
+      _database.upsert(_database.settingsTable, settings);
 }

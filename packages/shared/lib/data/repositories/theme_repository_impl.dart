@@ -97,6 +97,7 @@ class const ThemeRepositoryImpl(
   @override
   Future<AppResult<()>> deleteTheme(String id) async {
     try {
+      await _localDataSource.removeAllQuotes(id);
       await _localDataSource.deleteTheme(id);
       return const Success(());
     } on Object {

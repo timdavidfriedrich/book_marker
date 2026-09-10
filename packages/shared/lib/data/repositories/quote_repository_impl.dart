@@ -3,6 +3,7 @@ import 'package:core/error/app_result.dart';
 import 'package:injectable/injectable.dart';
 import 'package:shared/data/data_sources/image_storage_data_source.dart';
 import 'package:shared/data/data_sources/quote_local_data_source.dart';
+import 'package:shared/data/data_sources/theme_local_data_source.dart';
 import 'package:shared/data/mappers/quote_mappers.dart';
 import 'package:shared/domain/entities/quote.dart';
 import 'package:shared/domain/entities/quote_page.dart';
@@ -12,6 +13,7 @@ import 'package:shared/domain/repositories/quote_repository.dart';
 @Injectable(as: QuoteRepository)
 class const QuoteRepositoryImpl(
   final QuoteLocalDataSource _localDataSource,
+  final ThemeLocalDataSource _themeLocalDataSource,
   final ImageStorageDataSource _imageStorageDataSource,
 ) implements QuoteRepository {
   @override
@@ -108,6 +110,9 @@ class const QuoteRepositoryImpl(
   Future<AppResult<()>> deleteQuote(String id) async {
     try {
       final localQuote = await _localDataSource.readQuote(id);
+      // * no foreign key cascades from a PowerSync view, so the theme links go
+      // * here or they outlive the quote and sync as orphans
+      await _themeLocalDataSource.removeQuoteEverywhere(id);
       await _localDataSource.deleteQuote(id);
       for (final page in localQuote?.pages ?? const <QuotePage>[]) {
         await _imageStorageDataSource.deleteImage(page.photoPath);

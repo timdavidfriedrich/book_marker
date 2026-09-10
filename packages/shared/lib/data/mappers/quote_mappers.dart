@@ -1,4 +1,4 @@
-import 'package:shared/data/database/app_database.dart';
+import 'package:shared/data/models/local_quote.dart';
 import 'package:shared/domain/entities/quote.dart';
 
 extension LocalQuoteMappers on LocalQuote {

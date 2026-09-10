@@ -26,6 +26,10 @@ dependencies:
   book_marker_client: ^0.0.0
   serverpod_flutter: ^4.0.0-rc.2
   serverpod_auth_idp_flutter: ^4.0.0-rc.2
+  powersync: ^2.4.0
+  drift_sqlite_async: ^0.3.1
+  sqlite_async: ^0.14.5
+  path: ^1.9.1
 
 flutter:
   generate: true
