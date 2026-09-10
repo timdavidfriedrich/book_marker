@@ -133,6 +133,39 @@ docker compose -f server/docker-compose.prod.yaml up -d --build
 server never boots against an old schema. If it fails, the deploy stops there and
 the previous containers keep running.
 
+### After a migration that dropped or recreated a table
+
+Check the publication. A destructive migration recreates the table, which
+silently removes it from `powersync`, and sync then goes quiet with no error
+anywhere. The first phase 4 deploy is exactly this case: it drops `sync_probes`
+and creates the six synced tables, none of which are in the publication yet.
+
+```bash
+docker compose -f docker-compose.prod.yaml exec -T postgres \
+  psql -U postgres -d book_marker -c \
+  "SELECT tablename FROM pg_publication_tables WHERE pubname='powersync' ORDER BY tablename;"
+
+docker compose -f docker-compose.prod.yaml exec -T postgres \
+  psql -U postgres -d book_marker -c \
+  "ALTER PUBLICATION powersync ADD TABLE books, quotes, shelves, themes, shelf_books, theme_quotes;"
+```
+
+`ALTER DEFAULT PRIVILEGES` already grants `powersync_role` SELECT on new tables,
+but it costs nothing to confirm:
+
+```bash
+docker compose -f docker-compose.prod.yaml exec -T postgres \
+  psql -U postgres -d book_marker -c \
+  "SELECT table_name, has_table_privilege('powersync_role', 'public.'||table_name, 'SELECT') FROM information_schema.tables WHERE table_schema='public' AND table_name IN ('books','quotes','shelves','themes','shelf_books','theme_quotes');"
+```
+
+Then restart PowerSync so it picks up the new sync rules and re-snapshots:
+
+```bash
+docker compose -f docker-compose.prod.yaml restart powersync
+docker compose -f docker-compose.prod.yaml logs --tail 40 powersync
+```
+
 ## Verify
 
 ```bash
