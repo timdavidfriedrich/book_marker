@@ -54,14 +54,17 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
   }
 
   Future<void> _applySync({required bool isReady}) async {
-    if (isReady == _isSyncing) return;
-    _isSyncing = isReady;
-    // * locked and blocked both stop at disconnect, never at clear: the rows on
-    // * this device are the user's whatever the server thinks
-    await (isReady ? _syncService.connect() : _syncService.disconnect(clearsLocalData: false));
-    // * attachments have their own gate on top of sync: rows go up for every
-    // * signed in account, files only for a plan that includes them
-    await (isReady ? _attachmentService.refresh() : _attachmentService.stop());
+    if (isReady != _isSyncing) {
+      _isSyncing = isReady;
+      // * locked and blocked both stop at disconnect, never at clear: the rows on
+      // * this device are the user's whatever the server thinks
+      await (isReady ? _syncService.connect() : _syncService.disconnect(clearsLocalData: false));
+    }
+    // * unguarded, unlike the connection above: a plan can change while the
+    // * account state does not, and this is what notices
+    await _attachmentService.setEnabled(
+      isEnabled: isReady && (_entitlement?.attachmentsEnabled ?? false),
+    );
   }
 
   @override

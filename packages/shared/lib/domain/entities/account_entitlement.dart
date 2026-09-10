@@ -17,6 +17,10 @@ class const AccountEntitlement({
   required final int usedDay,
   required final int usedWeek,
   required final int usedMonth,
+  // * resolved from the runtime config against the plan, in the repository.
+  // * Nothing above needs to know which plan implies what, and the answer moves
+  // * the moment app_config.yaml does
+  required final bool attachmentsEnabled,
 }) with AccountEntitlementMappable {
   bool get hasBackup => backupVerifier != null;
 }

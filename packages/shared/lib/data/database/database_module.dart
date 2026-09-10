@@ -7,8 +7,6 @@ import 'package:shared/data/database/attachment_paths.dart';
 import 'package:shared/data/database/encrypted_attachment_storage.dart';
 import 'package:shared/data/database/power_sync_attachment_service.dart';
 import 'package:shared/data/database/sync_database.dart';
-import 'package:shared/domain/repositories/app_config_repository.dart';
-import 'package:shared/domain/repositories/entitlement_repository.dart';
 
 @module
 abstract class DatabaseModule {
@@ -34,14 +32,10 @@ abstract class DatabaseModule {
     EncryptedAttachmentStorage storage,
     AttachmentPaths paths,
     QuoteLocalDataSource quotes,
-    EntitlementRepository entitlements,
-    AppConfigRepository config,
   ) => PowerSyncAttachmentService.open(
     syncDatabase: syncDatabase,
     storage: storage,
     paths: paths,
     quotes: quotes,
-    entitlements: entitlements,
-    config: config,
   );
 }

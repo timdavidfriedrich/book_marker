@@ -1,14 +1,10 @@
 // * the attachment seam, matching SyncService: nothing above it knows that
 // * PowerSync has an attachment queue, or that there is a queue at all.
 abstract class AttachmentService {
-  /// Re-reads the plan and starts or stops uploading accordingly.
-  ///
-  /// Called on every account state change rather than on a plan change, because
-  /// the plan is not something this device is told about; it is something it
-  /// notices.
-  Future<void> refresh();
-
-  Future<void> stop();
+  /// Starts or stops uploading. Idempotent, and called on every account state
+  /// change rather than only on a plan change, because a plan can change while
+  /// the account state does not.
+  Future<void> setEnabled({required bool isEnabled});
 
   /// Copies a captured file into attachment storage and queues it for upload,
   /// returning where it now lives.

@@ -159,6 +159,12 @@ class AccountEntitlementMapper extends ClassMapperBase<AccountEntitlement> {
     'usedMonth',
     _$usedMonth,
   );
+  static bool _$attachmentsEnabled(AccountEntitlement v) =>
+      v.attachmentsEnabled;
+  static const Field<AccountEntitlement, bool> _f$attachmentsEnabled = Field(
+    'attachmentsEnabled',
+    _$attachmentsEnabled,
+  );
 
   @override
   final MappableFields<AccountEntitlement> fields = const {
@@ -169,6 +175,7 @@ class AccountEntitlementMapper extends ClassMapperBase<AccountEntitlement> {
     #usedDay: _f$usedDay,
     #usedWeek: _f$usedWeek,
     #usedMonth: _f$usedMonth,
+    #attachmentsEnabled: _f$attachmentsEnabled,
   };
 
   static AccountEntitlement _instantiate(DecodingData data) {
@@ -180,6 +187,7 @@ class AccountEntitlementMapper extends ClassMapperBase<AccountEntitlement> {
       usedDay: data.dec(_f$usedDay),
       usedWeek: data.dec(_f$usedWeek),
       usedMonth: data.dec(_f$usedMonth),
+      attachmentsEnabled: data.dec(_f$attachmentsEnabled),
     );
   }
 
@@ -262,6 +270,7 @@ abstract class AccountEntitlementCopyWith<
     int? usedDay,
     int? usedWeek,
     int? usedMonth,
+    bool? attachmentsEnabled,
   });
   AccountEntitlementCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(
     Then<$Out2, $R2> t,
@@ -285,6 +294,7 @@ class _AccountEntitlementCopyWithImpl<$R, $Out>
     int? usedDay,
     int? usedWeek,
     int? usedMonth,
+    bool? attachmentsEnabled,
   }) => $apply(
     FieldCopyWithData({
       if (plan != null) #plan: plan,
@@ -294,6 +304,7 @@ class _AccountEntitlementCopyWithImpl<$R, $Out>
       if (usedDay != null) #usedDay: usedDay,
       if (usedWeek != null) #usedWeek: usedWeek,
       if (usedMonth != null) #usedMonth: usedMonth,
+      if (attachmentsEnabled != null) #attachmentsEnabled: attachmentsEnabled,
     }),
   );
   @override
@@ -305,6 +316,10 @@ class _AccountEntitlementCopyWithImpl<$R, $Out>
     usedDay: data.get(#usedDay, or: $value.usedDay),
     usedWeek: data.get(#usedWeek, or: $value.usedWeek),
     usedMonth: data.get(#usedMonth, or: $value.usedMonth),
+    attachmentsEnabled: data.get(
+      #attachmentsEnabled,
+      or: $value.attachmentsEnabled,
+    ),
   );
 
   @override

@@ -7,8 +7,9 @@ const _statusActive = "active";
 const _statusBlocked = "blocked";
 
 extension RemoteEntitlementMappers on RemoteEntitlement {
-  AccountEntitlement toAccountEntitlement() {
+  AccountEntitlement toAccountEntitlement({required bool attachmentsEnabled}) {
     return AccountEntitlement(
+      attachmentsEnabled: attachmentsEnabled,
       plan: plan.toAccountPlan(),
       status: status.toAccountStatus(),
       blockedReason: blockedReason,

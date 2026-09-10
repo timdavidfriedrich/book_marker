@@ -101,9 +101,6 @@ class SharedPackageModule extends _i526.MicroPackageModule {
     gh.factory<_i1039.EntitlementRemoteDataSource>(
       () => _i1039.EntitlementRemoteDataSourceImpl(gh<_i63.Client>()),
     );
-    gh.factory<_i446.EntitlementRepository>(
-      () => _i1011.EntitlementRepositoryImpl(gh<_i1039.EntitlementRemoteDataSource>()),
-    );
     gh.factory<_i833.AttachmentRemoteDataSource>(
       () => _i833.AttachmentRemoteDataSourceImpl(gh<_i63.Client>()),
     );
@@ -150,6 +147,15 @@ class SharedPackageModule extends _i526.MicroPackageModule {
         gh<_i770.AttachmentCipher>(),
       ),
     );
+    await gh.lazySingletonAsync<_i194.AttachmentService>(
+      () => databaseModule.attachmentService(
+        gh<_i659.SyncDatabase>(),
+        gh<_i385.EncryptedAttachmentStorage>(),
+        gh<_i258.AttachmentPaths>(),
+        gh<_i516.QuoteLocalDataSource>(),
+      ),
+      preResolve: true,
+    );
     gh.factory<_i814.ThemeLocalDataSource>(
       () => _i814.ThemeLocalDataSourceImpl(
         gh<_i50.AppDatabase>(),
@@ -171,17 +177,6 @@ class SharedPackageModule extends _i526.MicroPackageModule {
     gh.factory<_i115.SettingsLocalDataSource>(
       () => _i115.SettingsLocalDataSourceImpl(gh<_i50.AppDatabase>()),
     );
-    await gh.lazySingletonAsync<_i194.AttachmentService>(
-      () => databaseModule.attachmentService(
-        gh<_i659.SyncDatabase>(),
-        gh<_i385.EncryptedAttachmentStorage>(),
-        gh<_i258.AttachmentPaths>(),
-        gh<_i516.QuoteLocalDataSource>(),
-        gh<_i446.EntitlementRepository>(),
-        gh<_i541.AppConfigRepository>(),
-      ),
-      preResolve: true,
-    );
     gh.factory<_i570.QuoteRepository>(
       () => _i943.QuoteRepositoryImpl(
         gh<_i516.QuoteLocalDataSource>(),
@@ -190,6 +185,12 @@ class SharedPackageModule extends _i526.MicroPackageModule {
       ),
     );
     gh.factory<_i56.AppConfigCubit>(() => _i56.AppConfigCubit(gh<_i541.AppConfigRepository>()));
+    gh.factory<_i446.EntitlementRepository>(
+      () => _i1011.EntitlementRepositoryImpl(
+        gh<_i1039.EntitlementRemoteDataSource>(),
+        gh<_i541.AppConfigRepository>(),
+      ),
+    );
     gh.factory<_i0.SettingsRepository>(
       () => _i921.SettingsRepositoryImpl(gh<_i115.SettingsLocalDataSource>()),
     );
