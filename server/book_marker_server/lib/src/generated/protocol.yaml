@@ -12,6 +12,8 @@ config:
 entitlement:
   - fetch:
   - registerBackup:
+ocr:
+  - recognizePage:
 powerSync:
   - createToken:
 sync:

@@ -18,17 +18,20 @@ abstract class RecognitionConfig
     implements _is.SerializableModel, _is.ProtocolSerialization {
   RecognitionConfig._({
     required this.provider,
+    required this.model,
     required this.cloudEnabledByDefault,
   });
 
   factory RecognitionConfig({
     required String provider,
+    required String model,
     required bool cloudEnabledByDefault,
   }) = _RecognitionConfigImpl;
 
   factory RecognitionConfig.fromJson(Map<String, dynamic> jsonSerialization) {
     return RecognitionConfig(
       provider: jsonSerialization['provider'] as String,
+      model: jsonSerialization['model'] as String,
       cloudEnabledByDefault: _is.BoolJsonExtension.fromJson(
         jsonSerialization['cloudEnabledByDefault'],
       ),
@@ -37,6 +40,10 @@ abstract class RecognitionConfig
 
   String provider;
 
+  /// Which model the provider calls. Here rather than in code so a cheaper or
+  /// better one can be tried in production without a deploy.
+  String model;
+
   bool cloudEnabledByDefault;
 
   /// Returns a shallow copy of this [RecognitionConfig]
@@ -44,6 +51,7 @@ abstract class RecognitionConfig
   @_is.useResult
   RecognitionConfig copyWith({
     String? provider,
+    String? model,
     bool? cloudEnabledByDefault,
   });
   @override
@@ -51,6 +59,7 @@ abstract class RecognitionConfig
     return {
       '__className__': 'RecognitionConfig',
       'provider': provider,
+      'model': model,
       'cloudEnabledByDefault': cloudEnabledByDefault,
     };
   }
@@ -60,6 +69,7 @@ abstract class RecognitionConfig
     return {
       '__className__': 'RecognitionConfig',
       'provider': provider,
+      'model': model,
       'cloudEnabledByDefault': cloudEnabledByDefault,
     };
   }
@@ -73,9 +83,11 @@ abstract class RecognitionConfig
 class _RecognitionConfigImpl extends RecognitionConfig {
   _RecognitionConfigImpl({
     required String provider,
+    required String model,
     required bool cloudEnabledByDefault,
   }) : super._(
          provider: provider,
+         model: model,
          cloudEnabledByDefault: cloudEnabledByDefault,
        );
 
@@ -85,10 +97,12 @@ class _RecognitionConfigImpl extends RecognitionConfig {
   @override
   RecognitionConfig copyWith({
     String? provider,
+    String? model,
     bool? cloudEnabledByDefault,
   }) {
     return RecognitionConfig(
       provider: provider ?? this.provider,
+      model: model ?? this.model,
       cloudEnabledByDefault:
           cloudEnabledByDefault ?? this.cloudEnabledByDefault,
     );

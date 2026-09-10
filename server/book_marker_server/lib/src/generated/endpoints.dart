@@ -10,6 +10,7 @@
 // ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
+import 'dart:typed_data' as _idt;
 import 'package:book_marker_server/src/generated/sync/sync_write.dart'
     as _ibimu8vb;
 import 'package:serverpod/serverpod.dart' as _is;
@@ -22,6 +23,7 @@ import '../auth/google_idp_endpoint.dart' as _i71axiz0;
 import '../auth/jwt_refresh_endpoint.dart' as _inwq3ztq;
 import '../endpoints/config_endpoint.dart' as _i74a5xur;
 import '../endpoints/entitlement_endpoint.dart' as _im71ml4a;
+import '../endpoints/ocr_endpoint.dart' as _ixzu59l7;
 import '../endpoints/power_sync_endpoint.dart' as _i61fa217;
 import '../endpoints/sync_endpoint.dart' as _i609im4b;
 
@@ -57,6 +59,12 @@ class Endpoints extends _is.EndpointDispatch {
         ..initialize(
           server,
           'entitlement',
+          null,
+        ),
+      'ocr': _ixzu59l7.OcrEndpoint()
+        ..initialize(
+          server,
+          'ocr',
           null,
         ),
       'powerSync': _i61fa217.PowerSyncEndpoint()
@@ -280,6 +288,31 @@ class Endpoints extends _is.EndpointDispatch {
                         session,
                         params['verifier'],
                       ),
+        ),
+      },
+    );
+    connectors['ocr'] = _is.EndpointConnector(
+      name: 'ocr',
+      endpoint: endpoints['ocr']!,
+      methodConnectors: {
+        'recognizePage': _is.MethodConnector(
+          name: 'recognizePage',
+          params: {
+            'image': _is.ParameterDescription(
+              name: 'image',
+              type: _is.getType<_idt.ByteData>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _is.Session session,
+                Map<String, dynamic> params,
+              ) async =>
+                  (endpoints['ocr'] as _ixzu59l7.OcrEndpoint).recognizePage(
+                    session,
+                    params['image'],
+                  ),
         ),
       },
     );

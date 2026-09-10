@@ -1,0 +1,6 @@
+### The provider failed, or the upload was larger than the plan allows. Both
+### mean the same thing to the app: use on-device recognition for this page.
+exception: OcrUnavailableException
+
+fields:
+  reason: String

@@ -4,4 +4,7 @@ class: RecognitionConfig
 
 fields:
   provider: String
+  ### Which model the provider calls. Here rather than in code so a cheaper or
+  ### better one can be tried in production without a deploy.
+  model: String
   cloudEnabledByDefault: bool

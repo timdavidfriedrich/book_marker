@@ -26,6 +26,9 @@ import 'config/sync_limits.dart' as _ivlkv61n;
 import 'entitlements/account_blocked_exception.dart' as _i42k8jky;
 import 'entitlements/entitlement.dart' as _id6kwse3;
 import 'entitlements/entitlement_view.dart' as _ik9sk60n;
+import 'entitlements/ocr_quota_exhausted_exception.dart' as _ik0msexu;
+import 'entitlements/ocr_result.dart' as _ib23r0hr;
+import 'entitlements/ocr_unavailable_exception.dart' as _ivem8n6h;
 import 'entitlements/ocr_usage.dart' as _i13b5r7e;
 import 'sync/book.dart' as _i8t9sm2n;
 import 'sync/quote.dart' as _ivf4v01a;
@@ -44,6 +47,9 @@ export 'config/sync_limits.dart';
 export 'entitlements/account_blocked_exception.dart';
 export 'entitlements/entitlement.dart';
 export 'entitlements/entitlement_view.dart';
+export 'entitlements/ocr_quota_exhausted_exception.dart';
+export 'entitlements/ocr_result.dart';
+export 'entitlements/ocr_unavailable_exception.dart';
 export 'entitlements/ocr_usage.dart';
 export 'sync/book.dart';
 export 'sync/quote.dart';
@@ -114,6 +120,15 @@ class Protocol extends _isc.SerializationManager {
     if (t == _ik9sk60n.EntitlementView) {
       return _ik9sk60n.EntitlementView.fromJson(data) as T;
     }
+    if (t == _ik0msexu.OcrQuotaExhaustedException) {
+      return _ik0msexu.OcrQuotaExhaustedException.fromJson(data) as T;
+    }
+    if (t == _ib23r0hr.OcrResult) {
+      return _ib23r0hr.OcrResult.fromJson(data) as T;
+    }
+    if (t == _ivem8n6h.OcrUnavailableException) {
+      return _ivem8n6h.OcrUnavailableException.fromJson(data) as T;
+    }
     if (t == _i13b5r7e.OcrUsage) {
       return _i13b5r7e.OcrUsage.fromJson(data) as T;
     }
@@ -172,6 +187,21 @@ class Protocol extends _isc.SerializationManager {
     }
     if (t == _isc.getType<_ik9sk60n.EntitlementView?>()) {
       return (data != null ? _ik9sk60n.EntitlementView.fromJson(data) : null)
+          as T;
+    }
+    if (t == _isc.getType<_ik0msexu.OcrQuotaExhaustedException?>()) {
+      return (data != null
+              ? _ik0msexu.OcrQuotaExhaustedException.fromJson(data)
+              : null)
+          as T;
+    }
+    if (t == _isc.getType<_ib23r0hr.OcrResult?>()) {
+      return (data != null ? _ib23r0hr.OcrResult.fromJson(data) : null) as T;
+    }
+    if (t == _isc.getType<_ivem8n6h.OcrUnavailableException?>()) {
+      return (data != null
+              ? _ivem8n6h.OcrUnavailableException.fromJson(data)
+              : null)
           as T;
     }
     if (t == _isc.getType<_i13b5r7e.OcrUsage?>()) {
@@ -234,6 +264,9 @@ class Protocol extends _isc.SerializationManager {
       _i42k8jky.AccountBlockedException => 'AccountBlockedException',
       _id6kwse3.Entitlement => 'Entitlement',
       _ik9sk60n.EntitlementView => 'EntitlementView',
+      _ik0msexu.OcrQuotaExhaustedException => 'OcrQuotaExhaustedException',
+      _ib23r0hr.OcrResult => 'OcrResult',
+      _ivem8n6h.OcrUnavailableException => 'OcrUnavailableException',
       _i13b5r7e.OcrUsage => 'OcrUsage',
       _i8t9sm2n.SyncedBook => 'SyncedBook',
       _ivf4v01a.SyncedQuote => 'SyncedQuote',
@@ -274,6 +307,12 @@ class Protocol extends _isc.SerializationManager {
         return 'Entitlement';
       case _ik9sk60n.EntitlementView():
         return 'EntitlementView';
+      case _ik0msexu.OcrQuotaExhaustedException():
+        return 'OcrQuotaExhaustedException';
+      case _ib23r0hr.OcrResult():
+        return 'OcrResult';
+      case _ivem8n6h.OcrUnavailableException():
+        return 'OcrUnavailableException';
       case _i13b5r7e.OcrUsage():
         return 'OcrUsage';
       case _i8t9sm2n.SyncedBook():
@@ -339,6 +378,15 @@ class Protocol extends _isc.SerializationManager {
     }
     if (dataClassName == 'EntitlementView') {
       return deserialize<_ik9sk60n.EntitlementView>(data['data']);
+    }
+    if (dataClassName == 'OcrQuotaExhaustedException') {
+      return deserialize<_ik0msexu.OcrQuotaExhaustedException>(data['data']);
+    }
+    if (dataClassName == 'OcrResult') {
+      return deserialize<_ib23r0hr.OcrResult>(data['data']);
+    }
+    if (dataClassName == 'OcrUnavailableException') {
+      return deserialize<_ivem8n6h.OcrUnavailableException>(data['data']);
     }
     if (dataClassName == 'OcrUsage') {
       return deserialize<_i13b5r7e.OcrUsage>(data['data']);

@@ -1,0 +1,15 @@
+### What a cloud scan produced, plus the refreshed counters so the quota readout
+### updates immediately instead of waiting for a sync round trip.
+###
+### There is no per-word geometry here, deliberately. The marking and correction
+### UI is built on ML Kit's boxes and exists to compensate for ML Kit's errors;
+### aligning cloud text back onto them would be a second recognition problem.
+class: OcrResult
+
+fields:
+  text: String
+  engine: String
+  requestId: UuidValue
+  usedDay: int
+  usedWeek: int
+  usedMonth: int

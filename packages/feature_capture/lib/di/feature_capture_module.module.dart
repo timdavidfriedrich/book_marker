@@ -6,6 +6,7 @@
 import 'dart:async' as _i687;
 
 import 'package:feature_capture/data/data_sources/camera_data_source.dart' as _i160;
+import 'package:feature_capture/data/data_sources/cloud_text_recognition_data_source.dart' as _i620;
 import 'package:feature_capture/data/data_sources/gallery_data_source.dart' as _i13;
 import 'package:feature_capture/data/data_sources/jpeg_encoder_data_source.dart' as _i483;
 import 'package:feature_capture/data/data_sources/page_image_cropper.dart' as _i556;
@@ -25,6 +26,8 @@ import 'package:feature_capture/presentation/capture/page_detection_cubit.dart' 
 import 'package:feature_capture/presentation/crop/crop_bloc.dart' as _i975;
 import 'package:feature_capture/presentation/marking/marking_bloc.dart' as _i1073;
 import 'package:injectable/injectable.dart' as _i526;
+import 'package:shared/data/data_sources/ocr_remote_data_source.dart' as _i895;
+import 'package:shared/domain/repositories/app_config_repository.dart' as _i541;
 import 'package:shared/domain/repositories/book_repository.dart' as _i748;
 import 'package:shared/domain/repositories/quote_repository.dart' as _i570;
 import 'package:shared/domain/repositories/theme_repository.dart' as _i640;
@@ -43,6 +46,9 @@ class FeatureCapturePackageModule extends _i526.MicroPackageModule {
     gh.factory<_i567.PageDetectionRepository>(
       () => _i490.PageDetectionRepositoryImpl(gh<_i556.PageImageCropper>()),
     );
+    gh.factory<_i620.CloudTextRecognitionDataSource>(
+      () => _i620.CloudTextRecognitionDataSourceImpl(gh<_i895.OcrRemoteDataSource>()),
+    );
     gh.factory<_i946.CameraRepository>(
       () => _i629.CameraRepositoryImpl(
         gh<_i160.CameraDataSource>(),
@@ -60,9 +66,6 @@ class FeatureCapturePackageModule extends _i526.MicroPackageModule {
     gh.factory<_i1072.PageDetectionCubit>(
       () => _i1072.PageDetectionCubit(gh<_i567.PageDetectionRepository>()),
     );
-    gh.factory<_i653.TextRecognitionRepository>(
-      () => _i23.TextRecognitionRepositoryImpl(gh<_i972.SpellCheckDataSource>()),
-    );
     gh.factoryParam<_i975.CropBloc, _i800.Crop, dynamic>(
       (
         _route,
@@ -73,6 +76,13 @@ class FeatureCapturePackageModule extends _i526.MicroPackageModule {
       ),
     );
     gh.factory<_i741.CameraCubit>(() => _i741.CameraCubit(gh<_i946.CameraRepository>()));
+    gh.factory<_i653.TextRecognitionRepository>(
+      () => _i23.TextRecognitionRepositoryImpl(
+        gh<_i972.SpellCheckDataSource>(),
+        gh<_i620.CloudTextRecognitionDataSource>(),
+        gh<_i541.AppConfigRepository>(),
+      ),
+    );
     gh.factory<_i204.RecognizeCapturedPageUseCase>(
       () => _i204.RecognizeCapturedPageUseCase(
         gh<_i567.PageDetectionRepository>(),

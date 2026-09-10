@@ -11,10 +11,13 @@
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'dart:async' as _ida;
+import 'dart:typed_data' as _idt;
 import 'package:book_marker_client/src/protocol/config/runtime_config.dart'
     as _i0ksu74t;
 import 'package:book_marker_client/src/protocol/entitlements/entitlement_view.dart'
     as _i54kjtar;
+import 'package:book_marker_client/src/protocol/entitlements/ocr_result.dart'
+    as _ihko1ch1;
 import 'package:book_marker_client/src/protocol/sync/sync_result.dart'
     as _ikx0tj25;
 import 'package:book_marker_client/src/protocol/sync/sync_write.dart'
@@ -226,6 +229,29 @@ class EndpointEntitlement extends _isc.EndpointRef {
       );
 }
 
+/// The cloud OCR proxy. It exists so the model provider's API key never ships
+/// in an app binary, and so the per-user limits are enforced somewhere the user
+/// cannot edit.
+///
+/// The image is not end-to-end encrypted and cannot be: it reaches this server
+/// in the clear and is forwarded in the clear. What it never does is touch the
+/// disk, a log, or anything stored. Everything the app *keeps* stays E2E; this
+/// one request in flight is not, and the privacy policy has to say so.
+/// {@category Endpoint}
+class EndpointOcr extends _isc.EndpointRef {
+  EndpointOcr(_isc.EndpointCaller caller) : super(caller);
+
+  @override
+  String get name => 'ocr';
+
+  _ida.Future<_ihko1ch1.OcrResult> recognizePage(_idt.ByteData image) =>
+      caller.callServerEndpoint<_ihko1ch1.OcrResult>(
+        'ocr',
+        'recognizePage',
+        {'image': image},
+      );
+}
+
 /// Hands the client a PowerSync credential. This is the real gate on sync: a
 /// blocked account is refused here, and the 10-minute token lifetime bounds how
 /// long an already-issued one stays usable.
@@ -303,6 +329,7 @@ class Client extends _isc.ServerpodClientShared {
     jwtRefresh = EndpointJwtRefresh(this);
     config = EndpointConfig(this);
     entitlement = EndpointEntitlement(this);
+    ocr = EndpointOcr(this);
     powerSync = EndpointPowerSync(this);
     sync = EndpointSync(this);
     modules = Modules(this);
@@ -318,6 +345,8 @@ class Client extends _isc.ServerpodClientShared {
 
   late final EndpointEntitlement entitlement;
 
+  late final EndpointOcr ocr;
+
   late final EndpointPowerSync powerSync;
 
   late final EndpointSync sync;
@@ -331,6 +360,7 @@ class Client extends _isc.ServerpodClientShared {
     'jwtRefresh': jwtRefresh,
     'config': config,
     'entitlement': entitlement,
+    'ocr': ocr,
     'powerSync': powerSync,
     'sync': sync,
   };

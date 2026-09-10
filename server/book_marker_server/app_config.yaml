@@ -34,8 +34,13 @@ sync:
   maxRowsPerTable: 100000
 
 recognition:
+  # gemini, or echo to exercise the quota path with no API key and no billing
   provider: gemini
-  cloudEnabledByDefault: true
+  model: gemini-2.5-flash-lite
+  # false until the marking screen can render a result that has no word boxes.
+  # The cloud path returns a transcription and no geometry, and the tap-a-word
+  # correction UI is built entirely on ML Kit's boxes. Flip this when it can.
+  cloudEnabledByDefault: false
 
 client:
   minSupportedVersion: "0.1.0"

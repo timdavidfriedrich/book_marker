@@ -21,6 +21,7 @@ import 'package:shared/data/data_sources/book_local_data_source.dart' as _i315;
 import 'package:shared/data/data_sources/entitlement_remote_data_source.dart' as _i1039;
 import 'package:shared/data/data_sources/google_books_data_source.dart' as _i357;
 import 'package:shared/data/data_sources/image_storage_data_source.dart' as _i47;
+import 'package:shared/data/data_sources/ocr_remote_data_source.dart' as _i895;
 import 'package:shared/data/data_sources/open_library_data_source.dart' as _i492;
 import 'package:shared/data/data_sources/quote_local_data_source.dart' as _i516;
 import 'package:shared/data/data_sources/serverpod_auth_data_source.dart' as _i502;
@@ -98,6 +99,7 @@ class SharedPackageModule extends _i526.MicroPackageModule {
     gh.factory<_i49.AppConfigLocalDataSource>(
       () => _i49.AppConfigLocalDataSourceImpl(gh<_i50.AppDatabase>()),
     );
+    gh.factory<_i895.OcrRemoteDataSource>(() => _i895.OcrRemoteDataSourceImpl(gh<_i63.Client>()));
     gh.factory<_i223.AppConfigRemoteDataSource>(
       () => _i223.AppConfigRemoteDataSourceImpl(gh<_i63.Client>()),
     );

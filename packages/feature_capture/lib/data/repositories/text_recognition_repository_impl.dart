@@ -3,15 +3,18 @@ import 'dart:ui' as ui;
 
 import 'package:core/error/app_error.dart';
 import 'package:core/error/app_result.dart';
+import 'package:feature_capture/data/data_sources/cloud_text_recognition_data_source.dart';
 import 'package:feature_capture/data/data_sources/spell_check_data_source.dart';
 import 'package:feature_capture/domain/mark_text.dart';
 import 'package:feature_capture/domain/repositories/text_recognition_repository.dart';
 import 'package:feature_capture/domain/word_quality.dart';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 import 'package:injectable/injectable.dart';
+import 'package:shared/domain/entities/app_config.dart';
 import 'package:shared/domain/entities/recognized_page.dart';
 import 'package:shared/domain/entities/recognized_word.dart';
 import 'package:shared/domain/entities/spell_check_report.dart';
+import 'package:shared/domain/repositories/app_config_repository.dart';
 
 const _edgeMargin = 0.18;
 const _maxPageNumber = 3000;
@@ -20,9 +23,49 @@ final _pageNumberPattern = RegExp(r"^\d{1,4}$");
 @Injectable(as: TextRecognitionRepository)
 class const TextRecognitionRepositoryImpl(
   final SpellCheckDataSource _spellCheckDataSource,
+  final CloudTextRecognitionDataSource _cloudDataSource,
+  final AppConfigRepository _appConfigRepository,
 ) implements TextRecognitionRepository {
+  // * the cloud result is preferred and never required. Out of quota, blocked,
+  // * signed out, offline and a provider outage all land in the same place:
+  // * recognise on device instead. A scan is never lost to a gate.
   @override
   Future<AppResult<RecognizedPage>> recognizePage(String imagePath) async {
+    final config = await _config();
+    if (config != null && config.cloudRecognitionEnabledByDefault) {
+      final page = await _recognizeInCloud(imagePath, config.free.maxImageBytes);
+      if (page != null) return Success(page);
+    }
+    return recognizeOnDevice(imagePath);
+  }
+
+  Future<AppConfig?> _config() async {
+    return switch (await _appConfigRepository.watchConfig().first) {
+      Success(:final data) => data,
+      Failure() => null,
+    };
+  }
+
+  // * no per-word geometry comes back, so `words` and `lines` stay empty and
+  // * `text` carries everything. Building an alignment layer onto ML Kit's
+  // * boxes would be a second recognition problem, not a fix
+  Future<RecognizedPage?> _recognizeInCloud(String imagePath, int maxBytes) async {
+    try {
+      final imageSize = await _readImageSize(imagePath);
+      final result = await _cloudDataSource.recognizeFile(imagePath, maxBytes);
+      return RecognizedPage(
+        lines: const [],
+        words: const [],
+        detectedPageNumber: null,
+        aspectRatio: imageSize.width / imageSize.height,
+        text: result.text,
+      );
+    } on Object {
+      return null;
+    }
+  }
+
+  Future<AppResult<RecognizedPage>> recognizeOnDevice(String imagePath) async {
     final recognizer = TextRecognizer(script: TextRecognitionScript.latin);
     try {
       final imageSize = await _readImageSize(imagePath);
@@ -53,6 +96,7 @@ class const TextRecognitionRepositoryImpl(
           words: markUncertainWords(words, spelling),
           detectedPageNumber: _detectPageNumber(lines),
           aspectRatio: imageSize.width / imageSize.height,
+          text: lines.map((line) => line.text).join("\n"),
         ),
       );
     } on Object {

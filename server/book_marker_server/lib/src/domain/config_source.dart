@@ -69,6 +69,7 @@ RuntimeConfig _parse(final String source) {
     ),
     recognition: RecognitionConfig(
       provider: _stringAt(recognition['provider'], 'recognition.provider'),
+      model: _stringAt(recognition['model'], 'recognition.model'),
       cloudEnabledByDefault: _boolAt(
         recognition['cloudEnabledByDefault'],
         'recognition.cloudEnabledByDefault',

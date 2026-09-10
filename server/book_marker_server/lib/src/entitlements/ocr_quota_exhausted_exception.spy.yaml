@@ -1,0 +1,14 @@
+### Thrown when the rolling windows are full. Carries the numbers so the app can
+### say which window ran out and show the readout without a second call.
+###
+### The app treats this as a signal to fall back to on-device recognition, not
+### as an error: a scan is never lost to a spent quota.
+exception: OcrQuotaExhaustedException
+
+fields:
+  usedDay: int
+  usedWeek: int
+  usedMonth: int
+  limitDay: int
+  limitWeek: int
+  limitMonth: int

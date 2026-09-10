@@ -1,6 +1,7 @@
 import 'package:serverpod/serverpod.dart';
 
 import '../generated/protocol.dart';
+import 'owner_lock.dart';
 
 const planFree = 'free';
 const planPremium = 'premium';
@@ -73,7 +74,7 @@ class Entitlements {
     final String verifier,
   ) {
     return session.db.transaction((final transaction) async {
-      await _lockOwner(session, ownerId, transaction);
+      await lockOwner(session, ownerId, transaction);
       final entitlement = await ensureForUser(
         session,
         ownerId,
@@ -119,16 +120,4 @@ class Entitlements {
       transaction: transaction,
     );
   }
-}
-
-Future<void> _lockOwner(
-  final Session session,
-  final UuidValue ownerId,
-  final Transaction transaction,
-) async {
-  await session.db.unsafeQuery(
-    'SELECT pg_advisory_xact_lock(hashtext(@owner))',
-    parameters: QueryParameters.named({'owner': ownerId.toString()}),
-    transaction: transaction,
-  );
 }

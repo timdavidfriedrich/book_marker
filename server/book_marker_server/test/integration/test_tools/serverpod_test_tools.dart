@@ -13,10 +13,13 @@
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'dart:async' as _ida;
 import 'dart:io' as _idi;
+import 'dart:typed_data' as _idt;
 import 'package:book_marker_server/src/generated/config/runtime_config.dart'
     as _izn3a0mv;
 import 'package:book_marker_server/src/generated/entitlements/entitlement_view.dart'
     as _iy7x57jb;
+import 'package:book_marker_server/src/generated/entitlements/ocr_result.dart'
+    as _i0oriarl;
 import 'package:book_marker_server/src/generated/sync/sync_result.dart'
     as _i716kltw;
 import 'package:book_marker_server/src/generated/sync/sync_write.dart'
@@ -163,6 +166,8 @@ class TestEndpoints {
 
   late final _EntitlementEndpoint entitlement;
 
+  late final _OcrEndpoint ocr;
+
   late final _PowerSyncEndpoint powerSync;
 
   late final _SyncEndpoint sync;
@@ -192,6 +197,10 @@ class _InternalTestEndpoints extends TestEndpoints
       serializationManager,
     );
     entitlement = _EntitlementEndpoint(
+      endpoints,
+      serializationManager,
+    );
+    ocr = _OcrEndpoint(
       endpoints,
       serializationManager,
     );
@@ -544,6 +553,48 @@ class _EntitlementEndpoint {
                   _localCallContext.arguments,
                 )
                 as _ida.Future<_iy7x57jb.EntitlementView>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+}
+
+class _OcrEndpoint {
+  _OcrEndpoint(
+    this._endpointDispatch,
+    this._serializationManager,
+  );
+
+  final _is.EndpointDispatch _endpointDispatch;
+
+  final _is.SerializationManager _serializationManager;
+
+  _ida.Future<_i0oriarl.OcrResult> recognizePage(
+    _ist.TestSessionBuilder sessionBuilder,
+    _idt.ByteData image,
+  ) async {
+    return _ist.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'ocr',
+            method: 'recognizePage',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'ocr',
+          methodName: 'recognizePage',
+          parameters: _ist.testObjectToJson({'image': image}),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _ida.Future<_i0oriarl.OcrResult>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();

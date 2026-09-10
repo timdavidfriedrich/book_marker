@@ -75,6 +75,18 @@ cd server/book_marker_server && dart run tool/generate_keys.dart
 Public half (`PS_JWK_N`, `PS_JWK_E`, `PS_JWK_KID`) → `.env`.
 Private half → `passwords.yaml` as `powerSyncSigningKey`.
 **Generate this on the VPS, or anywhere the output is not written to a log.**
+Development has its own pair, so this one never has to leave the machine.
+
+Cloud OCR needs one more, under `production:`:
+
+```yaml
+  geminiApiKey: '<from Google AI Studio, restricted to the Generative Language API>'
+```
+
+Without it the server still boots and everything else works; the first cloud
+scan fails with a clear `Missing "geminiApiKey"` and the app quietly recognises
+on device instead. `recognition.provider: echo` in `app_config.yaml` exercises
+the whole quota path with no key and no billing account.
 
 **3. First boot, in this order.** PowerSync must not start before the schema and
 the replication role exist.
