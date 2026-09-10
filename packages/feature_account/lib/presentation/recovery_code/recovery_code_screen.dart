@@ -76,7 +76,7 @@ Future<void> _confirmLeaving(BuildContext context) async {
       ],
     ),
   );
-  if ((abort ?? false) && context.mounted) Navigator.of(context).pop();
+  if ((abort ?? false) && context.mounted) context.closeScreen();
 }
 
 class const _Content({
