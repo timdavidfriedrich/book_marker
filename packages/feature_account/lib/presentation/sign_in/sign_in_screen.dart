@@ -3,7 +3,7 @@ import 'package:core/theme/spacing.dart';
 import 'package:feature_account/presentation/account/account_bloc.dart';
 import 'package:feature_account/presentation/account/account_event.dart';
 import 'package:feature_account/presentation/account/account_state.dart';
-import 'package:feature_account/presentation/widgets/provider_button.dart';
+import 'package:feature_account/presentation/widgets/ink_action_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared/presentation/extensions/app_error_extensions.dart';
@@ -71,7 +71,7 @@ class const _Content({
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              ProviderButton(
+              InkActionButton(
                 glyph: Icons.account_circle_outlined,
                 label: error == null ? context.s.signInWithGoogle : context.s.signInRetry,
                 onPressed: _isSigningIn
@@ -81,7 +81,7 @@ class const _Content({
                       ),
               ),
               const SizedBox(height: _actionGap),
-              ProviderButton(
+              InkActionButton(
                 glyph: Icons.apple,
                 label: context.s.signInWithApple,
                 isOutlined: true,

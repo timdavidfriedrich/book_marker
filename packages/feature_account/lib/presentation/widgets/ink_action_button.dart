@@ -7,26 +7,33 @@ const _shape = RoundedRectangleBorder(
   borderRadius: BorderRadius.all(Radius.circular(Spacing.radiusXl)),
 );
 
-class const ProviderButton({
-  required final IconData _glyph,
+// * the ink button the Sicherung designs specify, rather than the app's amber
+// * primary. inverseSurface is exactly the design's ink and inverts correctly
+// * in dark mode, and the disabled pair matches the specified sand-on-muted.
+class const InkActionButton({
   required final String _label,
   required final VoidCallback? _onPressed,
+  final IconData? _glyph,
   final bool _isOutlined = false,
   super.key,
 }) extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final child = Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      // * the button is full width but its label is not; min plus Flexible lets
-      // * a long translation shrink instead of overflowing
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Icon(_glyph, size: _glyphSize),
-        const SizedBox(width: Spacing.s),
-        Flexible(child: Text(_label, overflow: TextOverflow.ellipsis)),
-      ],
-    );
+    final glyph = _glyph;
+    final label = Text(_label, overflow: TextOverflow.ellipsis, textAlign: TextAlign.center);
+    // * Flexible only belongs inside the Row; a button wraps a lone child in an
+    // * Align, where it would assert
+    final child = glyph == null
+        ? label
+        : Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(glyph, size: _glyphSize),
+              const SizedBox(width: Spacing.s),
+              Flexible(child: label),
+            ],
+          );
     if (_isOutlined) {
       return OutlinedButton(
         onPressed: _onPressed,
@@ -34,8 +41,6 @@ class const ProviderButton({
         child: child,
       );
     }
-    // * ink rather than the app's amber primary: these screens are about
-    // * securing data, and inverseSurface flips correctly in dark mode
     return FilledButton(
       onPressed: _onPressed,
       style: FilledButton.styleFrom(

@@ -1430,6 +1430,138 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Signing in…'**
   String get signInInProgress;
+
+  /// No description provided for @recoveryCodeTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Your recovery code'**
+  String get recoveryCodeTitle;
+
+  /// No description provided for @recoveryCodeLead.
+  ///
+  /// In en, this message translates to:
+  /// **'It is the only key to your secured library. We do not have it.'**
+  String get recoveryCodeLead;
+
+  /// No description provided for @recoveryCodeCopy.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy code'**
+  String get recoveryCodeCopy;
+
+  /// No description provided for @recoveryCodeCopyAgain.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy again'**
+  String get recoveryCodeCopyAgain;
+
+  /// No description provided for @recoveryCodeCopied.
+  ///
+  /// In en, this message translates to:
+  /// **'Copied'**
+  String get recoveryCodeCopied;
+
+  /// No description provided for @recoveryCodeShare.
+  ///
+  /// In en, this message translates to:
+  /// **'Share'**
+  String get recoveryCodeShare;
+
+  /// No description provided for @recoveryCodeConsequenceTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'If the code is gone, the secured library is gone.'**
+  String get recoveryCodeConsequenceTitle;
+
+  /// No description provided for @recoveryCodeConsequenceReset.
+  ///
+  /// In en, this message translates to:
+  /// **'We cannot reset it and cannot look it up.'**
+  String get recoveryCodeConsequenceReset;
+
+  /// No description provided for @recoveryCodeConsequenceDevice.
+  ///
+  /// In en, this message translates to:
+  /// **'After a device change Commonplace asks for it.'**
+  String get recoveryCodeConsequenceDevice;
+
+  /// No description provided for @recoveryCodeConsequenceClipboard.
+  ///
+  /// In en, this message translates to:
+  /// **'It will not survive the next copy in your clipboard. Save it somewhere safe.'**
+  String get recoveryCodeConsequenceClipboard;
+
+  /// No description provided for @recoveryCodeConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'I have saved the code'**
+  String get recoveryCodeConfirm;
+
+  /// No description provided for @recoveryCodeContinue.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue'**
+  String get recoveryCodeContinue;
+
+  /// No description provided for @recoveryCodeStart.
+  ///
+  /// In en, this message translates to:
+  /// **'Start securing'**
+  String get recoveryCodeStart;
+
+  /// No description provided for @recoveryCodeLeaveTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No backup without a saved code'**
+  String get recoveryCodeLeaveTitle;
+
+  /// No description provided for @recoveryCodeLeaveMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'The code cannot be generated again later. If you leave now your library stays on this device and is not secured.'**
+  String get recoveryCodeLeaveMessage;
+
+  /// No description provided for @recoveryCodeLeaveBack.
+  ///
+  /// In en, this message translates to:
+  /// **'Back to the code'**
+  String get recoveryCodeLeaveBack;
+
+  /// No description provided for @recoveryCodeLeaveAbort.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel securing'**
+  String get recoveryCodeLeaveAbort;
+
+  /// No description provided for @unlockTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Unlock library'**
+  String get unlockTitle;
+
+  /// No description provided for @unlockLead.
+  ///
+  /// In en, this message translates to:
+  /// **'The key is missing on this device. Your secured data is safe.'**
+  String get unlockLead;
+
+  /// No description provided for @unlockAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Unlock'**
+  String get unlockAction;
+
+  /// No description provided for @unlockRetry.
+  ///
+  /// In en, this message translates to:
+  /// **'Check again'**
+  String get unlockRetry;
+
+  /// No description provided for @unlockWrongCode.
+  ///
+  /// In en, this message translates to:
+  /// **'That code is not right. Check your entry and try again.'**
+  String get unlockWrongCode;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

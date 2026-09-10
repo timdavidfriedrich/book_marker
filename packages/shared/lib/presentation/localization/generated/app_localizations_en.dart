@@ -844,4 +844,72 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get signInInProgress => 'Signing in…';
+
+  @override
+  String get recoveryCodeTitle => 'Your recovery code';
+
+  @override
+  String get recoveryCodeLead => 'It is the only key to your secured library. We do not have it.';
+
+  @override
+  String get recoveryCodeCopy => 'Copy code';
+
+  @override
+  String get recoveryCodeCopyAgain => 'Copy again';
+
+  @override
+  String get recoveryCodeCopied => 'Copied';
+
+  @override
+  String get recoveryCodeShare => 'Share';
+
+  @override
+  String get recoveryCodeConsequenceTitle => 'If the code is gone, the secured library is gone.';
+
+  @override
+  String get recoveryCodeConsequenceReset => 'We cannot reset it and cannot look it up.';
+
+  @override
+  String get recoveryCodeConsequenceDevice => 'After a device change Commonplace asks for it.';
+
+  @override
+  String get recoveryCodeConsequenceClipboard =>
+      'It will not survive the next copy in your clipboard. Save it somewhere safe.';
+
+  @override
+  String get recoveryCodeConfirm => 'I have saved the code';
+
+  @override
+  String get recoveryCodeContinue => 'Continue';
+
+  @override
+  String get recoveryCodeStart => 'Start securing';
+
+  @override
+  String get recoveryCodeLeaveTitle => 'No backup without a saved code';
+
+  @override
+  String get recoveryCodeLeaveMessage =>
+      'The code cannot be generated again later. If you leave now your library stays on this device and is not secured.';
+
+  @override
+  String get recoveryCodeLeaveBack => 'Back to the code';
+
+  @override
+  String get recoveryCodeLeaveAbort => 'Cancel securing';
+
+  @override
+  String get unlockTitle => 'Unlock library';
+
+  @override
+  String get unlockLead => 'The key is missing on this device. Your secured data is safe.';
+
+  @override
+  String get unlockAction => 'Unlock';
+
+  @override
+  String get unlockRetry => 'Check again';
+
+  @override
+  String get unlockWrongCode => 'That code is not right. Check your entry and try again.';
 }

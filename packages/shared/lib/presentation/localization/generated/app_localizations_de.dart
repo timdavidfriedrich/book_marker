@@ -849,4 +849,76 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get signInInProgress => 'Anmelden…';
+
+  @override
+  String get recoveryCodeTitle => 'Dein Wiederherstellungs-Code';
+
+  @override
+  String get recoveryCodeLead =>
+      'Er ist der einzige Schlüssel zu deiner gesicherten Bibliothek. Wir haben ihn nicht.';
+
+  @override
+  String get recoveryCodeCopy => 'Code kopieren';
+
+  @override
+  String get recoveryCodeCopyAgain => 'Nochmal kopieren';
+
+  @override
+  String get recoveryCodeCopied => 'Kopiert';
+
+  @override
+  String get recoveryCodeShare => 'Teilen';
+
+  @override
+  String get recoveryCodeConsequenceTitle =>
+      'Wenn der Code weg ist, ist die gesicherte Bibliothek weg.';
+
+  @override
+  String get recoveryCodeConsequenceReset =>
+      'Wir können ihn nicht zurücksetzen und nicht nachsehen.';
+
+  @override
+  String get recoveryCodeConsequenceDevice => 'Nach einem Gerätewechsel fragt Commonplace danach.';
+
+  @override
+  String get recoveryCodeConsequenceClipboard =>
+      'In der Zwischenablage überlebt er den nächsten Kopiervorgang nicht. Speichere ihn an einem sicheren Ort.';
+
+  @override
+  String get recoveryCodeConfirm => 'Ich habe den Code gespeichert';
+
+  @override
+  String get recoveryCodeContinue => 'Weiter';
+
+  @override
+  String get recoveryCodeStart => 'Sicherung starten';
+
+  @override
+  String get recoveryCodeLeaveTitle => 'Ohne gespeicherten Code keine Sicherung';
+
+  @override
+  String get recoveryCodeLeaveMessage =>
+      'Der Code lässt sich später nicht mehr erzeugen. Wenn du jetzt gehst, bleibt deine Bibliothek auf diesem Gerät und wird nicht gesichert.';
+
+  @override
+  String get recoveryCodeLeaveBack => 'Zurück zum Code';
+
+  @override
+  String get recoveryCodeLeaveAbort => 'Sicherung abbrechen';
+
+  @override
+  String get unlockTitle => 'Bibliothek entsperren';
+
+  @override
+  String get unlockLead =>
+      'Der Schlüssel fehlt auf diesem Gerät. Deine gesicherten Daten bleiben erhalten.';
+
+  @override
+  String get unlockAction => 'Entsperren';
+
+  @override
+  String get unlockRetry => 'Nochmal prüfen';
+
+  @override
+  String get unlockWrongCode => 'Der Code stimmt nicht. Prüfe die Eingabe und versuche es erneut.';
 }
