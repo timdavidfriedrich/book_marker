@@ -12,8 +12,7 @@ const _tickInterval = Duration(milliseconds: 200);
 
 @injectable
 class VoiceNoteCubit extends Cubit<VoiceNoteState> {
-  VoiceNoteCubit(this._voiceNoteRepository, this._routeChanges)
-    : super(const VoiceNoteIdle()) {
+  VoiceNoteCubit(this._voiceNoteRepository, this._routeChanges) : super(const VoiceNoteIdle()) {
     _routeChanges.addRouteListener(_onRouteChanged);
   }
 

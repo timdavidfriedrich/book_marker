@@ -1,12 +1,12 @@
 import 'package:core/config/build_config.dart';
 import 'package:core/error/app_error.dart';
 import 'package:core/theme/spacing.dart';
-import 'package:feature_account/presentation/account/account_bloc.dart';
-import 'package:feature_account/presentation/account/account_event.dart';
-import 'package:feature_account/presentation/account/account_state.dart';
 import 'package:feature_account/presentation/widgets/ink_action_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:shared/presentation/account/account_bloc.dart';
+import 'package:shared/presentation/account/account_event.dart';
+import 'package:shared/presentation/account/account_state.dart';
 import 'package:shared/presentation/extensions/app_error_extensions.dart';
 import 'package:shared/presentation/extensions/context_extensions.dart';
 import 'package:shared/presentation/extensions/screen_layout_extensions.dart';

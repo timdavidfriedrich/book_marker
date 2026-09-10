@@ -15,6 +15,7 @@ import 'package:shared/presentation/navigation/navigation_extensions.dart';
 import 'package:shared/presentation/widgets/circle_icon_button.dart';
 import 'package:shared/presentation/widgets/ink_tap_box.dart';
 import 'package:shared/presentation/widgets/segmented_toggle.dart';
+import 'package:shared/presentation/widgets/sicherung_section.dart';
 
 const _avatarSize = 56.0;
 const _groupRadius = Spacing.radiusXl;
@@ -72,6 +73,10 @@ class const _Content({
     );
     final appearance = <Widget>[
       _ProfileCard(state: state, controller: controller),
+      const SizedBox(height: Spacing.xl),
+      _SectionLabel(text: context.s.sicherungLabel),
+      const SizedBox(height: Spacing.s),
+      const SicherungSection(),
       const SizedBox(height: Spacing.xl),
       _SectionLabel(text: context.s.settingsAppearanceLabel),
       const SizedBox(height: Spacing.s),

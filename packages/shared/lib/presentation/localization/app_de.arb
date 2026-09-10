@@ -302,5 +302,16 @@
   "unlockLead": "Der Schlüssel fehlt auf diesem Gerät. Deine gesicherten Daten bleiben erhalten.",
   "unlockAction": "Entsperren",
   "unlockRetry": "Nochmal prüfen",
-  "unlockWrongCode": "Der Code stimmt nicht. Prüfe die Eingabe und versuche es erneut."
+  "unlockWrongCode": "Der Code stimmt nicht. Prüfe die Eingabe und versuche es erneut.",
+  "sicherungLabel": "Sicherung",
+  "sicherungSignInCta": "Anmeldung, um Daten zu sichern",
+  "sicherungSignedOut": "Nicht angemeldet",
+  "sicherungSecured": "Gesichert",
+  "sicherungLockedTitle": "Gesperrt auf diesem Gerät",
+  "sicherungLockedBody": "Der Schlüssel ist beim Zurücksetzen des Geräts verloren gegangen. Deine Bibliothek ist vollständig gesichert, sie lässt sich nur nicht ohne Code lesen.",
+  "sicherungLockedCta": "Code eingeben",
+  "sicherungBlockedTitle": "Konto gesperrt",
+  "sicherungBlockedBody": "Sync und Cloud-OCR sind angehalten. Auf diesem Gerät funktioniert alles weiter: lesen, erfassen, bearbeiten, exportieren.",
+  "sicherungBlockedCta": "Support kontaktieren",
+  "sicherungSignOut": "Abmelden"
 }

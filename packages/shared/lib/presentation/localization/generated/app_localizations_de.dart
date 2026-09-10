@@ -921,4 +921,39 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get unlockWrongCode => 'Der Code stimmt nicht. Prüfe die Eingabe und versuche es erneut.';
+
+  @override
+  String get sicherungLabel => 'Sicherung';
+
+  @override
+  String get sicherungSignInCta => 'Anmeldung, um Daten zu sichern';
+
+  @override
+  String get sicherungSignedOut => 'Nicht angemeldet';
+
+  @override
+  String get sicherungSecured => 'Gesichert';
+
+  @override
+  String get sicherungLockedTitle => 'Gesperrt auf diesem Gerät';
+
+  @override
+  String get sicherungLockedBody =>
+      'Der Schlüssel ist beim Zurücksetzen des Geräts verloren gegangen. Deine Bibliothek ist vollständig gesichert, sie lässt sich nur nicht ohne Code lesen.';
+
+  @override
+  String get sicherungLockedCta => 'Code eingeben';
+
+  @override
+  String get sicherungBlockedTitle => 'Konto gesperrt';
+
+  @override
+  String get sicherungBlockedBody =>
+      'Sync und Cloud-OCR sind angehalten. Auf diesem Gerät funktioniert alles weiter: lesen, erfassen, bearbeiten, exportieren.';
+
+  @override
+  String get sicherungBlockedCta => 'Support kontaktieren';
+
+  @override
+  String get sicherungSignOut => 'Abmelden';
 }

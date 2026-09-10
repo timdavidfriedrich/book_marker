@@ -290,7 +290,6 @@ class const _SidePanel({
   }
 }
 
-
 class const _Header({
   required final ThemeDetailLoaded _state,
 }) extends StatelessWidget {

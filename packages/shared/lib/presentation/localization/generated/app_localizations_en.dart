@@ -912,4 +912,39 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get unlockWrongCode => 'That code is not right. Check your entry and try again.';
+
+  @override
+  String get sicherungLabel => 'Backup';
+
+  @override
+  String get sicherungSignInCta => 'Sign in to secure your data';
+
+  @override
+  String get sicherungSignedOut => 'Not signed in';
+
+  @override
+  String get sicherungSecured => 'Secured';
+
+  @override
+  String get sicherungLockedTitle => 'Locked on this device';
+
+  @override
+  String get sicherungLockedBody =>
+      'The key was lost when the device was reset. Your library is fully secured, it just cannot be read without the code.';
+
+  @override
+  String get sicherungLockedCta => 'Enter code';
+
+  @override
+  String get sicherungBlockedTitle => 'Account suspended';
+
+  @override
+  String get sicherungBlockedBody =>
+      'Sync and cloud OCR are paused. Everything still works on this device: reading, capturing, editing, exporting.';
+
+  @override
+  String get sicherungBlockedCta => 'Contact support';
+
+  @override
+  String get sicherungSignOut => 'Sign out';
 }

@@ -1562,6 +1562,72 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'That code is not right. Check your entry and try again.'**
   String get unlockWrongCode;
+
+  /// No description provided for @sicherungLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Backup'**
+  String get sicherungLabel;
+
+  /// No description provided for @sicherungSignInCta.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in to secure your data'**
+  String get sicherungSignInCta;
+
+  /// No description provided for @sicherungSignedOut.
+  ///
+  /// In en, this message translates to:
+  /// **'Not signed in'**
+  String get sicherungSignedOut;
+
+  /// No description provided for @sicherungSecured.
+  ///
+  /// In en, this message translates to:
+  /// **'Secured'**
+  String get sicherungSecured;
+
+  /// No description provided for @sicherungLockedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Locked on this device'**
+  String get sicherungLockedTitle;
+
+  /// No description provided for @sicherungLockedBody.
+  ///
+  /// In en, this message translates to:
+  /// **'The key was lost when the device was reset. Your library is fully secured, it just cannot be read without the code.'**
+  String get sicherungLockedBody;
+
+  /// No description provided for @sicherungLockedCta.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter code'**
+  String get sicherungLockedCta;
+
+  /// No description provided for @sicherungBlockedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Account suspended'**
+  String get sicherungBlockedTitle;
+
+  /// No description provided for @sicherungBlockedBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Sync and cloud OCR are paused. Everything still works on this device: reading, capturing, editing, exporting.'**
+  String get sicherungBlockedBody;
+
+  /// No description provided for @sicherungBlockedCta.
+  ///
+  /// In en, this message translates to:
+  /// **'Contact support'**
+  String get sicherungBlockedCta;
+
+  /// No description provided for @sicherungSignOut.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign out'**
+  String get sicherungSignOut;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

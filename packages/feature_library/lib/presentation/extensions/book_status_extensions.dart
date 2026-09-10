@@ -10,8 +10,7 @@ extension BookStatusExtensions on BookStatus {
     BookStatus.finished => context.s.libraryStatusFinished,
   };
 
-  Widget toChip(BuildContext context) =>
-      StatusChip(label: toLabel(context), icon: toIcon());
+  Widget toChip(BuildContext context) => StatusChip(label: toLabel(context), icon: toIcon());
 
   Widget? toSummaryChip(BuildContext context) =>
       this == BookStatus.reading ? null : toChip(context);

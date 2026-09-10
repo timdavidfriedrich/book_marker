@@ -468,5 +468,16 @@
   "unlockLead": "The key is missing on this device. Your secured data is safe.",
   "unlockAction": "Unlock",
   "unlockRetry": "Check again",
-  "unlockWrongCode": "That code is not right. Check your entry and try again."
+  "unlockWrongCode": "That code is not right. Check your entry and try again.",
+  "sicherungLabel": "Backup",
+  "sicherungSignInCta": "Sign in to secure your data",
+  "sicherungSignedOut": "Not signed in",
+  "sicherungSecured": "Secured",
+  "sicherungLockedTitle": "Locked on this device",
+  "sicherungLockedBody": "The key was lost when the device was reset. Your library is fully secured, it just cannot be read without the code.",
+  "sicherungLockedCta": "Enter code",
+  "sicherungBlockedTitle": "Account suspended",
+  "sicherungBlockedBody": "Sync and cloud OCR are paused. Everything still works on this device: reading, capturing, editing, exporting.",
+  "sicherungBlockedCta": "Contact support",
+  "sicherungSignOut": "Sign out"
 }

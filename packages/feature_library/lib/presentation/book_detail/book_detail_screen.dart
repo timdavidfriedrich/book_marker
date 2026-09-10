@@ -360,7 +360,6 @@ class const _CollapsedHeader({
   }
 }
 
-
 Future<void> _showBookMenu(BuildContext context, BookStatus status) async {
   final bloc = context.read<BookDetailBloc>();
   final deleteRequested = await showModalBottomSheet<bool>(

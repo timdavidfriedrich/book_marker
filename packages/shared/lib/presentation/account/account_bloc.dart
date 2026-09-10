@@ -3,12 +3,12 @@ import 'dart:async';
 import 'package:core/error/app_error.dart';
 import 'package:core/error/app_result.dart';
 import 'package:core/security/master_key_store.dart';
-import 'package:feature_account/presentation/account/account_event.dart';
-import 'package:feature_account/presentation/account/account_state.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
 import 'package:shared/domain/entities/account.dart';
 import 'package:shared/domain/repositories/auth_repository.dart';
+import 'package:shared/presentation/account/account_event.dart';
+import 'package:shared/presentation/account/account_state.dart';
 
 @injectable
 class AccountBloc extends Bloc<AccountEvent, AccountState> {
