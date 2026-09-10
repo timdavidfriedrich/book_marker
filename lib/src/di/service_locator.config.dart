@@ -12,6 +12,7 @@
 import 'package:book_marker/src/navigation/navigation_router.dart' as _i837;
 import 'package:book_marker/src/settings/app_settings_cubit.dart' as _i296;
 import 'package:core/di/core_module.module.dart' as _i8;
+import 'package:feature_account/di/feature_account_module.module.dart' as _i800;
 import 'package:feature_capture/di/feature_capture_module.module.dart' as _i816;
 import 'package:feature_library/di/feature_library_module.module.dart' as _i949;
 import 'package:feature_settings/di/feature_settings_module.module.dart'
@@ -35,6 +36,7 @@ extension GetItInjectableX on _i174.GetIt {
     await _i949.FeatureLibraryPackageModule().init(gh);
     await _i322.FeatureThemesPackageModule().init(gh);
     await _i924.FeatureSettingsPackageModule().init(gh);
+    await _i800.FeatureAccountPackageModule().init(gh);
     gh.lazySingleton<_i837.NavigationRouter>(() => _i837.NavigationRouter());
     gh.factory<_i296.AppSettingsCubit>(
       () => _i296.AppSettingsCubit(gh<_i0.SettingsRepository>()),

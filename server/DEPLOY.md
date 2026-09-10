@@ -4,7 +4,7 @@
 pull-only, sparse checkout of `server/` and builds the image itself.**
 
 Nothing is ever authored on the VPS, so the checkout cannot diverge. It also
-never sees the Flutter app — `sparse-checkout` limits it to `server/`.
+never sees the Flutter app, `sparse-checkout` limits it to `server/`.
 
 Images are built **on the VPS**, not locally: the Mac is arm64 and the VPS is
 x86_64, and cross-building a Dart AOT compile under emulation is painfully slow.
@@ -13,13 +13,13 @@ The VPS builds natively in a couple of minutes.
 > If build time or memory ever becomes a problem (Dart AOT is hungry, and 7.5 GB
 > is shared with the other projects), the upgrade is GitHub Actions building an
 > amd64 image, pushing to GHCR, and the VPS running `docker compose pull` with no
-> source at all. Do not start there — it solves a problem you do not have yet.
+> source at all. Do not start there, it solves a problem you do not have yet.
 
 ## Topology
 
 Nothing in this stack publishes a host port. Caddy already owns :80 and :443 in
 the separate `global-gateway` project and reaches services **by network alias**
-over the shared external `global-proxy` network — the same way it reaches
+over the shared external `global-proxy` network, the same way it reaches
 `openclaw-gateway`. This is also why the host's already-occupied :8080 is
 irrelevant.
 
@@ -55,7 +55,7 @@ cd book-marker
 git sparse-checkout set server
 ```
 
-**2. Secrets** — neither file is in git.
+**2. Secrets**, neither file is in git.
 
 `server/.env` (from `.env.prod.example`):
 
@@ -64,7 +64,7 @@ cd /home/informaten/workspaces/book-marker/server
 cp .env.prod.example .env && chmod 600 .env && vi .env
 ```
 
-`server/book_marker_server/config/passwords.yaml` — copy the local one, replace
+`server/book_marker_server/config/passwords.yaml`, copy the local one, replace
 every value under `production:` with fresh secrets, and add the PowerSync signing
 key. `POSTGRES_PASSWORD`/`REDIS_PASSWORD` in `.env` **must match** `database:`
 and `redis:` under `production:`.
@@ -85,7 +85,7 @@ docker compose -f docker-compose.prod.yaml up -d --build postgres redis
 docker compose -f docker-compose.prod.yaml run --rm migrate
 ```
 
-**4. Replication role, publication and bucket-storage database** — cluster-level
+**4. Replication role, publication and bucket-storage database**, cluster-level
 objects, deliberately not in a migration (a migration would commit a database
 password, and roles and publications are per-cluster while migrations are
 per-database).
@@ -105,7 +105,7 @@ docker compose -f ../docker-compose.prod.yaml exec -T postgres \
 docker compose -f docker-compose.prod.yaml up -d --build
 ```
 
-**6. Caddy** — append `caddy-snippet.conf` to the gateway's Caddyfile:
+**6. Caddy**, append `caddy-snippet.conf` to the gateway's Caddyfile:
 
 ```bash
 cat /home/informaten/workspaces/book-marker/server/caddy-snippet.conf \
@@ -113,7 +113,7 @@ cat /home/informaten/workspaces/book-marker/server/caddy-snippet.conf \
 docker compose -f /home/informaten/workspaces/global-gateway/docker-compose.yml restart caddy
 ```
 
-**7. DNS** — two Cloudflare A records, `book-marker-api` and `book-marker-sync`,
+**7. DNS**, two Cloudflare A records, `book-marker-api` and `book-marker-sync`,
 pointing at the VPS, proxied. Single-label on purpose: free Universal SSL covers
 the apex plus **one** label, so a nested `api.book-marker.…` would need paid
 Advanced Certificate Manager.
@@ -144,7 +144,7 @@ curl -sS -o /dev/null -w '%{http_code}\n' https://book-marker-sync.timdavidfried
 ```
 
 The replication slot must show `active = t`. An inactive slot accumulates WAL
-until the disk fills — it is the most likely way this stack breaks, so it belongs
+until the disk fills, it is the most likely way this stack breaks, so it belongs
 in whatever monitoring you add.
 
 ## Gotchas

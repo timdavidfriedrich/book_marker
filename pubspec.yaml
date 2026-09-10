@@ -18,6 +18,7 @@ workspace:
   - packages/feature_library
   - packages/feature_themes
   - packages/feature_settings
+  - packages/feature_account
 
 dependencies:
   flutter:
@@ -29,6 +30,7 @@ dependencies:
   feature_library:
   feature_themes:
   feature_settings:
+  feature_account:
   flutter_bloc: ^9.1.1
   get_it: ^9.2.1
   kaisel: ^1.1.0

@@ -6,6 +6,13 @@ analyzer:
     strict-inference: true
     strict-raw-types: true
   exclude:
+    # The Serverpod backend has its own analysis_options and its own lint
+    # baseline (including `name: _` on its workspace root, which is a Serverpod
+    # convention). Formatting or analysing it from here reaches across a
+    # boundary it does not own.
+    - server/**
+    # Rewritten wholesale by `serverpod generate`; never edited by hand.
+    - packages/book_marker_client/**
     - build/**
     - android/**
     - ios/**

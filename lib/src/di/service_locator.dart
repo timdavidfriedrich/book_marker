@@ -1,5 +1,6 @@
 import 'package:book_marker/src/di/service_locator.config.dart';
 import 'package:core/di/core_module.module.dart';
+import 'package:feature_account/di/feature_account_module.module.dart';
 import 'package:feature_capture/di/feature_capture_module.module.dart';
 import 'package:feature_library/di/feature_library_module.module.dart';
 import 'package:feature_settings/di/feature_settings_module.module.dart';
@@ -18,6 +19,7 @@ final sl = GetIt.instance;
     ExternalModule(FeatureLibraryPackageModule),
     ExternalModule(FeatureThemesPackageModule),
     ExternalModule(FeatureSettingsPackageModule),
+    ExternalModule(FeatureAccountPackageModule),
   ],
 )
 Future<void> configureDependencies() async => sl.init();
