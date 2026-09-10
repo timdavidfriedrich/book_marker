@@ -987,6 +987,47 @@ class AppLocalizationsEn extends AppLocalizations {
   String get sicherungSignOut => 'Sign out';
 
   @override
+  String get deleteAccountTitle => 'Delete account';
+
+  @override
+  String get deleteAccountLead => 'Permanent, with no way back. Deletion happens within 30 days.';
+
+  @override
+  String get deleteAccountRemovedTitle => 'What goes';
+
+  @override
+  String get deleteAccountRemovedIdentity => 'Account, e-mail and key';
+
+  @override
+  String get deleteAccountRemovedLibrary => 'The backed-up library on the server';
+
+  @override
+  String get deleteAccountRemovedUsage => 'Cloud OCR quota and logs';
+
+  @override
+  String get deleteAccountKeptTitle => 'What stays';
+
+  @override
+  String get deleteAccountKeptLibrary => 'Your library on this device';
+
+  @override
+  String get deleteAccountAction => 'Delete account';
+
+  @override
+  String get deleteAccountDialogTitle => 'Delete account and backed-up library';
+
+  @override
+  String get deleteAccountDialogBody =>
+      'Your library on the server will be deleted. This cannot be undone.';
+
+  @override
+  String get deleteAccountConfirmAction => 'Delete permanently';
+
+  @override
+  String get deleteAccountFailed =>
+      'The account could not be deleted. Check your connection and try again.';
+
+  @override
   String get signOutTitle => 'Sign out';
 
   @override

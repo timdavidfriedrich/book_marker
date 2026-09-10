@@ -21,6 +21,7 @@ import 'package:serverpod_auth_idp_server/serverpod_auth_idp_server.dart'
 import '../auth/apple_idp_endpoint.dart' as _ilq63su8;
 import '../auth/google_idp_endpoint.dart' as _i71axiz0;
 import '../auth/jwt_refresh_endpoint.dart' as _inwq3ztq;
+import '../endpoints/account_endpoint.dart' as _iaho7ul5;
 import '../endpoints/config_endpoint.dart' as _i74a5xur;
 import '../endpoints/entitlement_endpoint.dart' as _im71ml4a;
 import '../endpoints/ocr_endpoint.dart' as _ixzu59l7;
@@ -47,6 +48,12 @@ class Endpoints extends _is.EndpointDispatch {
         ..initialize(
           server,
           'jwtRefresh',
+          null,
+        ),
+      'account': _iaho7ul5.AccountEndpoint()
+        ..initialize(
+          server,
+          'account',
           null,
         ),
       'config': _i74a5xur.ConfigEndpoint()
@@ -235,6 +242,22 @@ class Endpoints extends _is.EndpointDispatch {
                         session,
                         refreshToken: params['refreshToken'],
                       ),
+        ),
+      },
+    );
+    connectors['account'] = _is.EndpointConnector(
+      name: 'account',
+      endpoint: endpoints['account']!,
+      methodConnectors: {
+        'delete': _is.MethodConnector(
+          name: 'delete',
+          params: {},
+          call:
+              (
+                _is.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['account'] as _iaho7ul5.AccountEndpoint)
+                  .delete(session),
         ),
       },
     );

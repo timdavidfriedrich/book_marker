@@ -171,6 +171,26 @@ class EndpointJwtRefresh extends _iacc.EndpointRefreshJwtTokens {
       );
 }
 
+/// Account deletion, which DSGVO requires and which nothing else on this server
+/// does: every other path only ever adds or updates.
+///
+/// Deliberately allowed while blocked. A suspended account still has the right
+/// to its own erasure, and refusing would turn a legal obligation into a
+/// support ticket.
+/// {@category Endpoint}
+class EndpointAccount extends _isc.EndpointRef {
+  EndpointAccount(_isc.EndpointCaller caller) : super(caller);
+
+  @override
+  String get name => 'account';
+
+  _ida.Future<void> delete() => caller.callServerEndpoint<void>(
+    'account',
+    'delete',
+    {},
+  );
+}
+
 /// Serves the runtime configuration to the app.
 ///
 /// Deliberately unauthenticated. `maintenanceMode` and `minSupportedVersion`
@@ -327,6 +347,7 @@ class Client extends _isc.ServerpodClientShared {
     appleIdp = EndpointAppleIdp(this);
     googleIdp = EndpointGoogleIdp(this);
     jwtRefresh = EndpointJwtRefresh(this);
+    account = EndpointAccount(this);
     config = EndpointConfig(this);
     entitlement = EndpointEntitlement(this);
     ocr = EndpointOcr(this);
@@ -340,6 +361,8 @@ class Client extends _isc.ServerpodClientShared {
   late final EndpointGoogleIdp googleIdp;
 
   late final EndpointJwtRefresh jwtRefresh;
+
+  late final EndpointAccount account;
 
   late final EndpointConfig config;
 
@@ -358,6 +381,7 @@ class Client extends _isc.ServerpodClientShared {
     'appleIdp': appleIdp,
     'googleIdp': googleIdp,
     'jwtRefresh': jwtRefresh,
+    'account': account,
     'config': config,
     'entitlement': entitlement,
     'ocr': ocr,

@@ -21,6 +21,8 @@ abstract class ServerpodAuthDataSource {
   Future<RemoteAccount> signInWithApple();
 
   Future<void> signOut({required bool allDevices});
+
+  Future<void> deleteAccount();
 }
 
 @Injectable(as: ServerpodAuthDataSource)
@@ -82,6 +84,9 @@ class const ServerpodAuthDataSourceImpl(
     }
     await _sessionManager.signOutDevice();
   }
+
+  @override
+  Future<void> deleteAccount() => _client.account.delete();
 
   _SignInHandle _googleController(VoidCallback onDone, _OnError onError) {
     final controller = GoogleAuthController(

@@ -65,6 +65,8 @@ class const AccountCard({
             if (account != null) ...[
               const SizedBox(height: _groupGap),
               const _SignOutTile(),
+              const SizedBox(height: _groupGap),
+              const _DeleteAccountTile(),
             ],
           ],
         );
@@ -182,12 +184,34 @@ class const _SyncedTile() extends StatelessWidget {
   }
 }
 
-class const _SignOutTile() extends StatelessWidget {
+class const _DeleteAccountTile() extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return _Tile(
       isFirst: false,
       isLast: true,
+      onTap: () => context.appRouter.push(const DeleteAccount()),
+      child: Row(
+        children: [
+          Expanded(
+            child: Text(
+              context.s.deleteAccountTitle,
+              style: context.t.titleSmall?.copyWith(color: context.c.onSurfaceVariant),
+            ),
+          ),
+          Icon(Icons.chevron_right, size: Spacing.iconM, color: context.c.onSurfaceVariant),
+        ],
+      ),
+    );
+  }
+}
+
+class const _SignOutTile() extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return _Tile(
+      isFirst: false,
+      isLast: false,
       onTap: () async {
         final removesLocalData = await showSignOutDialog(context);
         if (removesLocalData == null || !context.mounted) return;

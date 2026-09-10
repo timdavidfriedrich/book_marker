@@ -1,6 +1,8 @@
 import 'package:book_marker/src/di/service_locator.dart';
 import 'package:book_marker/src/navigation/navigation_shell_container.dart';
 import 'package:book_marker/src/theme/app_theme.dart';
+import 'package:feature_account/presentation/delete_account/delete_account_bloc.dart';
+import 'package:feature_account/presentation/delete_account/delete_account_screen.dart';
 import 'package:feature_account/presentation/recovery_code/recovery_code_bloc.dart';
 import 'package:feature_account/presentation/recovery_code/recovery_code_event.dart';
 import 'package:feature_account/presentation/recovery_code/recovery_code_screen.dart';
@@ -96,6 +98,10 @@ class const _AppPage({
     RecoveryCodeUnlock() => BlocProvider(
       create: (_) => sl<UnlockBloc>()..add(const UnlockStarted()),
       child: const UnlockScreen(),
+    ),
+    DeleteAccount() => BlocProvider(
+      create: (_) => sl<DeleteAccountBloc>(),
+      child: const DeleteAccountScreen(),
     ),
     Settings() => BlocProvider(
       create: (_) => sl<SettingsBloc>()..add(const SettingsStarted()),

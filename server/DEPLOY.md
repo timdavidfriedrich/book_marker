@@ -192,6 +192,36 @@ The replication slot must show `active = t`. An inactive slot accumulates WAL
 until the disk fills, it is the most likely way this stack breaks, so it belongs
 in whatever monitoring you add.
 
+## Keeping it alive
+
+Two cron entries, both scripts in this folder, both silent when healthy so cron
+only mails on trouble.
+
+```cron
+0  3 * * * BACKUP_PASSPHRASE=... BACKUP_TARGET=user@host:/backups /home/informaten/workspaces/book-marker/server/backup.sh
+*/15 * * * *                                                     /home/informaten/workspaces/book-marker/server/check-replication.sh
+```
+
+`backup.sh` dumps `book_marker`, gzips it, encrypts it with AES-256 and pushes
+it off the machine. `powersync_storage` is deliberately not backed up: it is
+derivable, and resetting PowerSync rebuilds it from this dump. The passphrase
+must not live on the VPS, so it goes wherever the recovery code went; without
+it the backups are as unreadable to you as the quotes are.
+
+**Restore-test the dump.** A backup nobody has restored is not a backup, it is a
+file. Once, into a throwaway database:
+
+```bash
+openssl enc -d -aes-256-cbc -pbkdf2 -pass env:BACKUP_PASSPHRASE -in book_marker-<stamp>.sql.gz.enc \
+  | gunzip \
+  | docker compose -f docker-compose.prod.yaml exec -T postgres psql -U postgres -d restore_test
+```
+
+`check-replication.sh` is the one that matters most. An inactive replication slot
+holds WAL until the disk fills, and nothing else complains until it does; it also
+catches a slot that exists but has fallen far behind, and a liveness probe that
+has stopped answering.
+
 ## Gotchas
 
 - **After any `serverpod create-migration --force`** the table is recreated and

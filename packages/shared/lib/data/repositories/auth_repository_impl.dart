@@ -48,6 +48,20 @@ class const AuthRepositoryImpl(
     }
   }
 
+  // * the server destroys the account and everything it owns. The device is
+  // * untouched on purpose: the library here stays readable, which is what the
+  // * screen promises, and the master key stays with it because those rows are
+  // * still encrypted under it
+  @override
+  Future<AppResult<()>> deleteAccount() async {
+    try {
+      await _dataSource.deleteAccount();
+      return const Success(());
+    } on Object catch (error) {
+      return Failure(_toAppError(error));
+    }
+  }
+
   Future<AppResult<Account>> _signIn(Future<RemoteAccount> Function() signIn) async {
     try {
       return Success((await signIn()).toAccount());

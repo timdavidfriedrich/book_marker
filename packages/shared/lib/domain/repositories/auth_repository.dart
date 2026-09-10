@@ -11,4 +11,6 @@ abstract class AuthRepository {
   Future<AppResult<Account>> signInWithApple();
 
   Future<AppResult<()>> signOut({required bool allDevices});
+
+  Future<AppResult<()>> deleteAccount();
 }

@@ -996,6 +996,48 @@ class AppLocalizationsDe extends AppLocalizations {
   String get sicherungSignOut => 'Abmelden';
 
   @override
+  String get deleteAccountTitle => 'Konto löschen';
+
+  @override
+  String get deleteAccountLead =>
+      'Endgültig und ohne Wiederherstellung. Die Löschung erfolgt binnen 30 Tagen.';
+
+  @override
+  String get deleteAccountRemovedTitle => 'Gelöscht wird';
+
+  @override
+  String get deleteAccountRemovedIdentity => 'Konto, E-Mail und Schlüssel';
+
+  @override
+  String get deleteAccountRemovedLibrary => 'Die gesicherte Bibliothek auf dem Server';
+
+  @override
+  String get deleteAccountRemovedUsage => 'Cloud-OCR-Kontingent und Protokolle';
+
+  @override
+  String get deleteAccountKeptTitle => 'Bleibt';
+
+  @override
+  String get deleteAccountKeptLibrary => 'Deine Bibliothek auf diesem Gerät';
+
+  @override
+  String get deleteAccountAction => 'Konto löschen';
+
+  @override
+  String get deleteAccountDialogTitle => 'Konto und gesicherte Bibliothek löschen';
+
+  @override
+  String get deleteAccountDialogBody =>
+      'Deine Bibliothek auf dem Server wird gelöscht. Das lässt sich nicht rückgängig machen.';
+
+  @override
+  String get deleteAccountConfirmAction => 'Endgültig löschen';
+
+  @override
+  String get deleteAccountFailed =>
+      'Das Konto konnte nicht gelöscht werden. Prüfe die Verbindung und versuche es erneut.';
+
+  @override
   String get signOutTitle => 'Abmelden';
 
   @override

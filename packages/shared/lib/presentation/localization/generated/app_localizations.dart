@@ -1695,6 +1695,84 @@ abstract class AppLocalizations {
   /// **'Sign out'**
   String get sicherungSignOut;
 
+  /// No description provided for @deleteAccountTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete account'**
+  String get deleteAccountTitle;
+
+  /// No description provided for @deleteAccountLead.
+  ///
+  /// In en, this message translates to:
+  /// **'Permanent, with no way back. Deletion happens within 30 days.'**
+  String get deleteAccountLead;
+
+  /// No description provided for @deleteAccountRemovedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'What goes'**
+  String get deleteAccountRemovedTitle;
+
+  /// No description provided for @deleteAccountRemovedIdentity.
+  ///
+  /// In en, this message translates to:
+  /// **'Account, e-mail and key'**
+  String get deleteAccountRemovedIdentity;
+
+  /// No description provided for @deleteAccountRemovedLibrary.
+  ///
+  /// In en, this message translates to:
+  /// **'The backed-up library on the server'**
+  String get deleteAccountRemovedLibrary;
+
+  /// No description provided for @deleteAccountRemovedUsage.
+  ///
+  /// In en, this message translates to:
+  /// **'Cloud OCR quota and logs'**
+  String get deleteAccountRemovedUsage;
+
+  /// No description provided for @deleteAccountKeptTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'What stays'**
+  String get deleteAccountKeptTitle;
+
+  /// No description provided for @deleteAccountKeptLibrary.
+  ///
+  /// In en, this message translates to:
+  /// **'Your library on this device'**
+  String get deleteAccountKeptLibrary;
+
+  /// No description provided for @deleteAccountAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete account'**
+  String get deleteAccountAction;
+
+  /// No description provided for @deleteAccountDialogTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete account and backed-up library'**
+  String get deleteAccountDialogTitle;
+
+  /// No description provided for @deleteAccountDialogBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Your library on the server will be deleted. This cannot be undone.'**
+  String get deleteAccountDialogBody;
+
+  /// No description provided for @deleteAccountConfirmAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete permanently'**
+  String get deleteAccountConfirmAction;
+
+  /// No description provided for @deleteAccountFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'The account could not be deleted. Check your connection and try again.'**
+  String get deleteAccountFailed;
+
   /// No description provided for @signOutTitle.
   ///
   /// In en, this message translates to:
