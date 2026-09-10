@@ -5,3 +5,5 @@ const bool isInDebugMode = bool.fromEnvironment("DEBUG_MODE") || kDebugMode || k
 const String apiBaseUrl = String.fromEnvironment("API_BASE_URL");
 
 const String googleBooksApiKey = String.fromEnvironment("GOOGLE_BOOKS_API_KEY");
+
+const String serverBaseUrl = String.fromEnvironment("SERVER_BASE_URL");

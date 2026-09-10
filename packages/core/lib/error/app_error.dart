@@ -20,6 +20,12 @@ class const ServiceUnavailableError() extends AppError;
 
 class const MicrophonePermissionError() extends AppError;
 
+class const AccountBlockedError([
+  final String? reason,
+]) extends AppError;
+
+class const SignInCancelledError() extends AppError;
+
 class const UnexpectedError([
   final String? message,
 ]) extends AppError;

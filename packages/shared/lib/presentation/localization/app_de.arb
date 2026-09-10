@@ -16,7 +16,13 @@
   "error": "Fehler",
   "errorConnection": "Keine Internetverbindung.",
   "errorApi": "Fehler bei der Kommunikation mit dem Server: {message}.",
-  "@errorApi": { "placeholders": { "message": { "type": "String" } } },
+  "@errorApi": {
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
   "errorAuth": "Du bist nicht angemeldet.",
   "errorValidation": "Die empfangenen Daten sind ungültig.",
   "errorMicrophonePermission": "Erlaube den Mikrofonzugriff, um eine Sprachnotiz aufzunehmen.",
@@ -29,7 +35,13 @@
   "libraryBooksEmptyMessage": "Noch keine Bücher. Fotografiere eine Buchseite, um zu beginnen.",
   "libraryUnknownBook": "Unbekanntes Buch",
   "libraryPageLabel": "Seite {page}",
-  "@libraryPageLabel": { "placeholders": { "page": { "type": "int" } } },
+  "@libraryPageLabel": {
+    "placeholders": {
+      "page": {
+        "type": "int"
+      }
+    }
+  },
   "libraryNoPageLabel": "Keine Seite",
   "bookAuthorsUnknown": "Unbekannter Autor",
   "captureTitle": "Seite aufnehmen",
@@ -58,7 +70,13 @@
   "quoteDetailTitle": "Zitat",
   "quoteDetailQuoteLabel": "Zitat",
   "quoteDetailPageLabel": "Seite {page}",
-  "@quoteDetailPageLabel": { "placeholders": { "page": { "type": "int" } } },
+  "@quoteDetailPageLabel": {
+    "placeholders": {
+      "page": {
+        "type": "int"
+      }
+    }
+  },
   "quoteDetailNoPage": "Keine Seitenzahl",
   "quoteDetailFavoriteAdd": "Zu Favoriten hinzufügen",
   "quoteDetailFavoriteRemove": "Aus Favoriten entfernen",
@@ -104,7 +122,13 @@
   "cropRotateLabel": "Seite drehen",
   "cropAddPageLabel": "Seite hinzufügen",
   "cropPageLabel": "Seite {number}",
-  "@cropPageLabel": { "placeholders": { "number": { "type": "int" } } },
+  "@cropPageLabel": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
   "cropRemovePageButton": "Seite entfernen",
   "cropRemovePageTitle": "Seite entfernen?",
   "cropRemovePageMessage": "Das Foto dieser Seite wird verworfen.",
@@ -114,7 +138,13 @@
   "markingAddBookButton": "Neues Buch hinzufügen",
   "cropLoadingMessage": "Seite wird gesucht…",
   "cropContinueButton": "{count, plural, =1{Weiter mit 1 Seite} other{Weiter mit {count} Seiten}}",
-  "@cropContinueButton": { "placeholders": { "count": { "type": "int" } } },
+  "@cropContinueButton": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "addBookQuestionTitle": "Welches Buch ist das?",
   "addBookInLibraryLabel": "in deiner Bibliothek",
   "addBookNotInLibraryLabel": "noch nicht in deiner Bibliothek",
@@ -147,7 +177,16 @@
   "quoteDetailFavoriteLabel": "Favorit",
   "quoteDetailShareButton": "Zitat teilen",
   "quoteShareBody": "„{quote}“\n\n— {source}",
-  "@quoteShareBody": { "placeholders": { "quote": { "type": "String" }, "source": { "type": "String" } } },
+  "@quoteShareBody": {
+    "placeholders": {
+      "quote": {
+        "type": "String"
+      },
+      "source": {
+        "type": "String"
+      }
+    }
+  },
   "quoteDetailMoreLabel": "mehr",
   "quoteDetailQuoteHint": "Zitat schreiben…",
   "quoteDetailNoteHint": "Notiz hinzufügen…",
@@ -195,7 +234,19 @@
   "settingsTitle": "Einstellungen",
   "settingsProfileNameHint": "Dein Name",
   "settingsStats": "{books, plural, =1{1 Buch} other{{books} Bücher}}, {quotes, plural, =1{1 Zitat} other{{quotes} Zitate}}, {themes, plural, =1{1 Thema} other{{themes} Themen}}",
-  "@settingsStats": { "placeholders": { "books": { "type": "int" }, "quotes": { "type": "int" }, "themes": { "type": "int" } } },
+  "@settingsStats": {
+    "placeholders": {
+      "books": {
+        "type": "int"
+      },
+      "quotes": {
+        "type": "int"
+      },
+      "themes": {
+        "type": "int"
+      }
+    }
+  },
   "settingsAppearanceLabel": "Darstellung",
   "settingsColorSchemeLabel": "Farbschema",
   "settingsColorSchemeSystem": "System",
@@ -220,5 +271,7 @@
   "settingsDebugLabel": "Debug",
   "settingsSeedSampleDataButton": "Beispieldaten laden",
   "showMore": "mehr anzeigen",
-  "showLess": "weniger anzeigen"
+  "showLess": "weniger anzeigen",
+  "errorAccountBlocked": "Konto gesperrt. Sync und Cloud-OCR sind angehalten.",
+  "errorSignInCancelled": "Abgebrochen. Es hat sich nichts geändert."
 }

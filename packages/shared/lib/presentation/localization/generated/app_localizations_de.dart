@@ -821,4 +821,10 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get showLess => 'weniger anzeigen';
+
+  @override
+  String get errorAccountBlocked => 'Konto gesperrt. Sync und Cloud-OCR sind angehalten.';
+
+  @override
+  String get errorSignInCancelled => 'Abgebrochen. Es hat sich nichts geändert.';
 }

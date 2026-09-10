@@ -29,9 +29,8 @@ class const RecoveryCode({
     return RecoveryCode(key: key, formatted: _group(_encode(payload)));
   }
 
-  /// Returns null when the input is not a well-formed code. A single verdict
-  /// for the whole code, never per group, the UI must not reveal which part is
-  /// wrong.
+  // * one verdict for the whole code, never per group: the UI must not reveal
+  // * which part is wrong
   static RecoveryCode? tryParse(String input) {
     final symbols = _normalise(input);
     if (symbols.length != _groupCount * _groupSize) return null;
@@ -54,8 +53,8 @@ class const RecoveryCode({
   ];
 }
 
-/// Accepts what people actually type: lower case, hyphens, missing spaces, and
-/// the letters Crockford maps onto digits.
+// * accepts what people actually type: lower case, hyphens, missing spaces,
+// * and the letters Crockford folds onto digits
 String _normalise(String input) {
   final buffer = StringBuffer();
   for (final rune in input.toUpperCase().runes) {

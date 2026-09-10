@@ -12,6 +12,8 @@ extension AppErrorExtensions on AppError {
     RateLimitError() => context.s.errorRateLimit,
     ServiceUnavailableError() => context.s.errorServiceUnavailable,
     MicrophonePermissionError() => context.s.errorMicrophonePermission,
+    AccountBlockedError() => context.s.errorAccountBlocked,
+    SignInCancelledError() => context.s.errorSignInCancelled,
     UnexpectedError() => context.s.errorUnexpected,
   };
 }

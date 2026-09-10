@@ -23,6 +23,9 @@ dependencies:
   uuid: ^4.6.0
   audioplayers: ^6.1.0
   record: ^6.1.1
+  book_marker_client: ^0.0.0
+  serverpod_flutter: ^4.0.0-rc.2
+  serverpod_auth_idp_flutter: ^4.0.0-rc.2
 
 flutter:
   generate: true

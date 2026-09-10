@@ -1376,6 +1376,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'show less'**
   String get showLess;
+
+  /// No description provided for @errorAccountBlocked.
+  ///
+  /// In en, this message translates to:
+  /// **'Account suspended. Sync and cloud OCR are paused.'**
+  String get errorAccountBlocked;
+
+  /// No description provided for @errorSignInCancelled.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancelled. Nothing changed.'**
+  String get errorSignInCancelled;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

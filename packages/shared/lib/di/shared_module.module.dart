@@ -5,8 +5,11 @@
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'dart:async' as _i687;
 
+import 'package:book_marker_client/book_marker_client.dart' as _i63;
 import 'package:dio/dio.dart' as _i361;
 import 'package:injectable/injectable.dart' as _i526;
+import 'package:serverpod_auth_idp_flutter/serverpod_auth_idp_flutter.dart'
+    as _i90;
 import 'package:shared/data/data_sources/book_cover_data_source.dart' as _i510;
 import 'package:shared/data/data_sources/book_local_data_source.dart' as _i315;
 import 'package:shared/data/data_sources/google_books_data_source.dart'
@@ -16,6 +19,8 @@ import 'package:shared/data/data_sources/image_storage_data_source.dart'
 import 'package:shared/data/data_sources/open_library_data_source.dart'
     as _i492;
 import 'package:shared/data/data_sources/quote_local_data_source.dart' as _i516;
+import 'package:shared/data/data_sources/serverpod_auth_data_source.dart'
+    as _i502;
 import 'package:shared/data/data_sources/settings_local_data_source.dart'
     as _i115;
 import 'package:shared/data/data_sources/shelf_local_data_source.dart'
@@ -23,6 +28,8 @@ import 'package:shared/data/data_sources/shelf_local_data_source.dart'
 import 'package:shared/data/data_sources/theme_local_data_source.dart' as _i814;
 import 'package:shared/data/database/app_database.dart' as _i50;
 import 'package:shared/data/database/database_module.dart' as _i860;
+import 'package:shared/data/network/serverpod_client_module.dart' as _i665;
+import 'package:shared/data/repositories/auth_repository_impl.dart' as _i674;
 import 'package:shared/data/repositories/book_repository_impl.dart' as _i245;
 import 'package:shared/data/repositories/quote_repository_impl.dart' as _i943;
 import 'package:shared/data/repositories/sample_data_repository_impl.dart'
@@ -34,6 +41,7 @@ import 'package:shared/data/repositories/theme_repository_impl.dart' as _i308;
 import 'package:shared/data/repositories/voice_note_repository_impl.dart'
     as _i908;
 import 'package:shared/data/sample_data_seeder.dart' as _i716;
+import 'package:shared/domain/repositories/auth_repository.dart' as _i1022;
 import 'package:shared/domain/repositories/book_repository.dart' as _i748;
 import 'package:shared/domain/repositories/quote_repository.dart' as _i570;
 import 'package:shared/domain/repositories/sample_data_repository.dart'
@@ -51,7 +59,10 @@ class SharedPackageModule extends _i526.MicroPackageModule {
   @override
   _i687.FutureOr<void> init(_i526.GetItHelper gh) {
     final databaseModule = _$DatabaseModule();
+    final serverpodClientModule = _$ServerpodClientModule();
     gh.lazySingleton<_i50.AppDatabase>(() => databaseModule.appDatabase());
+    gh.lazySingleton<_i90.FlutterAuthSessionManager>(
+        () => serverpodClientModule.sessionManager());
     gh.lazySingleton<_i533.RouteChangeNotifier>(
         () => _i533.RouteChangeNotifier());
     gh.factory<_i814.ThemeLocalDataSource>(
@@ -99,9 +110,20 @@ class SharedPackageModule extends _i526.MicroPackageModule {
           gh<_i814.ThemeLocalDataSource>(),
           gh<_i1026.ShelfLocalDataSource>(),
         ));
+    gh.lazySingleton<_i63.Client>(() =>
+        serverpodClientModule.client(gh<_i90.FlutterAuthSessionManager>()));
     gh.factory<_i124.SampleDataRepository>(
         () => _i136.SampleDataRepositoryImpl(gh<_i716.SampleDataSeeder>()));
+    gh.factory<_i502.ServerpodAuthDataSource>(
+        () => _i502.ServerpodAuthDataSourceImpl(
+              gh<_i63.Client>(),
+              gh<_i90.FlutterAuthSessionManager>(),
+            ));
+    gh.factory<_i1022.AuthRepository>(
+        () => _i674.AuthRepositoryImpl(gh<_i502.ServerpodAuthDataSource>()));
   }
 }
 
 class _$DatabaseModule extends _i860.DatabaseModule {}
+
+class _$ServerpodClientModule extends _i665.ServerpodClientModule {}
