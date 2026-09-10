@@ -363,12 +363,8 @@ class BookRow extends DataClass implements Insertable<BookRow> {
       keyVersion: Value(keyVersion),
       titleCipher: Value(titleCipher),
       authorsCipher: Value(authorsCipher),
-      isbnCipher: isbnCipher == null && nullToAbsent
-          ? const Value.absent()
-          : Value(isbnCipher),
-      coverCipher: coverCipher == null && nullToAbsent
-          ? const Value.absent()
-          : Value(coverCipher),
+      isbnCipher: isbnCipher == null && nullToAbsent ? const Value.absent() : Value(isbnCipher),
+      coverCipher: coverCipher == null && nullToAbsent ? const Value.absent() : Value(coverCipher),
     );
   }
 
@@ -440,25 +436,13 @@ class BookRow extends DataClass implements Insertable<BookRow> {
       ownerId: data.ownerId.present ? data.ownerId.value : this.ownerId,
       status: data.status.present ? data.status.value : this.status,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
-      lastUsedAt: data.lastUsedAt.present
-          ? data.lastUsedAt.value
-          : this.lastUsedAt,
+      lastUsedAt: data.lastUsedAt.present ? data.lastUsedAt.value : this.lastUsedAt,
       updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
-      keyVersion: data.keyVersion.present
-          ? data.keyVersion.value
-          : this.keyVersion,
-      titleCipher: data.titleCipher.present
-          ? data.titleCipher.value
-          : this.titleCipher,
-      authorsCipher: data.authorsCipher.present
-          ? data.authorsCipher.value
-          : this.authorsCipher,
-      isbnCipher: data.isbnCipher.present
-          ? data.isbnCipher.value
-          : this.isbnCipher,
-      coverCipher: data.coverCipher.present
-          ? data.coverCipher.value
-          : this.coverCipher,
+      keyVersion: data.keyVersion.present ? data.keyVersion.value : this.keyVersion,
+      titleCipher: data.titleCipher.present ? data.titleCipher.value : this.titleCipher,
+      authorsCipher: data.authorsCipher.present ? data.authorsCipher.value : this.authorsCipher,
+      isbnCipher: data.isbnCipher.present ? data.isbnCipher.value : this.isbnCipher,
+      coverCipher: data.coverCipher.present ? data.coverCipher.value : this.coverCipher,
     );
   }
 
@@ -786,14 +770,13 @@ class $QuotesTable extends Quotes with TableInfo<$QuotesTable, QuoteRow> {
     'pageNumbersCipher',
   );
   @override
-  late final GeneratedColumn<String> pageNumbersCipher =
-      GeneratedColumn<String>(
-        'page_numbers_cipher',
-        aliasedName,
-        false,
-        type: DriftSqlType.string,
-        requiredDuringInsert: true,
-      );
+  late final GeneratedColumn<String> pageNumbersCipher = GeneratedColumn<String>(
+    'page_numbers_cipher',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
   static const VerificationMeta _pagesCipherMeta = const VerificationMeta(
     'pagesCipher',
   );
@@ -816,17 +799,17 @@ class $QuotesTable extends Quotes with TableInfo<$QuotesTable, QuoteRow> {
     type: DriftSqlType.string,
     requiredDuringInsert: true,
   );
-  static const VerificationMeta _markedWordIndexesCipherMeta =
-      const VerificationMeta('markedWordIndexesCipher');
+  static const VerificationMeta _markedWordIndexesCipherMeta = const VerificationMeta(
+    'markedWordIndexesCipher',
+  );
   @override
-  late final GeneratedColumn<String> markedWordIndexesCipher =
-      GeneratedColumn<String>(
-        'marked_word_indexes_cipher',
-        aliasedName,
-        false,
-        type: DriftSqlType.string,
-        requiredDuringInsert: true,
-      );
+  late final GeneratedColumn<String> markedWordIndexesCipher = GeneratedColumn<String>(
+    'marked_word_indexes_cipher',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
   static const VerificationMeta _voiceNoteCipherMeta = const VerificationMeta(
     'voiceNoteCipher',
   );
@@ -1131,9 +1114,7 @@ class QuoteRow extends DataClass implements Insertable<QuoteRow> {
       updatedAt: Value(updatedAt),
       keyVersion: Value(keyVersion),
       quoteCipher: Value(quoteCipher),
-      noteCipher: noteCipher == null && nullToAbsent
-          ? const Value.absent()
-          : Value(noteCipher),
+      noteCipher: noteCipher == null && nullToAbsent ? const Value.absent() : Value(noteCipher),
       pageNumbersCipher: Value(pageNumbersCipher),
       pagesCipher: Value(pagesCipher),
       wordsCipher: Value(wordsCipher),
@@ -1219,40 +1200,25 @@ class QuoteRow extends DataClass implements Insertable<QuoteRow> {
     pageNumbersCipher: pageNumbersCipher ?? this.pageNumbersCipher,
     pagesCipher: pagesCipher ?? this.pagesCipher,
     wordsCipher: wordsCipher ?? this.wordsCipher,
-    markedWordIndexesCipher:
-        markedWordIndexesCipher ?? this.markedWordIndexesCipher,
-    voiceNoteCipher: voiceNoteCipher.present
-        ? voiceNoteCipher.value
-        : this.voiceNoteCipher,
+    markedWordIndexesCipher: markedWordIndexesCipher ?? this.markedWordIndexesCipher,
+    voiceNoteCipher: voiceNoteCipher.present ? voiceNoteCipher.value : this.voiceNoteCipher,
   );
   QuoteRow copyWithCompanion(QuotesCompanion data) {
     return QuoteRow(
       id: data.id.present ? data.id.value : this.id,
       ownerId: data.ownerId.present ? data.ownerId.value : this.ownerId,
       bookId: data.bookId.present ? data.bookId.value : this.bookId,
-      isFavorite: data.isFavorite.present
-          ? data.isFavorite.value
-          : this.isFavorite,
+      isFavorite: data.isFavorite.present ? data.isFavorite.value : this.isFavorite,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
       updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
-      keyVersion: data.keyVersion.present
-          ? data.keyVersion.value
-          : this.keyVersion,
-      quoteCipher: data.quoteCipher.present
-          ? data.quoteCipher.value
-          : this.quoteCipher,
-      noteCipher: data.noteCipher.present
-          ? data.noteCipher.value
-          : this.noteCipher,
+      keyVersion: data.keyVersion.present ? data.keyVersion.value : this.keyVersion,
+      quoteCipher: data.quoteCipher.present ? data.quoteCipher.value : this.quoteCipher,
+      noteCipher: data.noteCipher.present ? data.noteCipher.value : this.noteCipher,
       pageNumbersCipher: data.pageNumbersCipher.present
           ? data.pageNumbersCipher.value
           : this.pageNumbersCipher,
-      pagesCipher: data.pagesCipher.present
-          ? data.pagesCipher.value
-          : this.pagesCipher,
-      wordsCipher: data.wordsCipher.present
-          ? data.wordsCipher.value
-          : this.wordsCipher,
+      pagesCipher: data.pagesCipher.present ? data.pagesCipher.value : this.pagesCipher,
+      wordsCipher: data.wordsCipher.present ? data.wordsCipher.value : this.wordsCipher,
       markedWordIndexesCipher: data.markedWordIndexesCipher.present
           ? data.markedWordIndexesCipher.value
           : this.markedWordIndexesCipher,
@@ -1411,8 +1377,7 @@ class QuotesCompanion extends UpdateCompanion<QuoteRow> {
       if (pageNumbersCipher != null) 'page_numbers_cipher': pageNumbersCipher,
       if (pagesCipher != null) 'pages_cipher': pagesCipher,
       if (wordsCipher != null) 'words_cipher': wordsCipher,
-      if (markedWordIndexesCipher != null)
-        'marked_word_indexes_cipher': markedWordIndexesCipher,
+      if (markedWordIndexesCipher != null) 'marked_word_indexes_cipher': markedWordIndexesCipher,
       if (voiceNoteCipher != null) 'voice_note_cipher': voiceNoteCipher,
       if (rowid != null) 'rowid': rowid,
     });
@@ -1448,8 +1413,7 @@ class QuotesCompanion extends UpdateCompanion<QuoteRow> {
       pageNumbersCipher: pageNumbersCipher ?? this.pageNumbersCipher,
       pagesCipher: pagesCipher ?? this.pagesCipher,
       wordsCipher: wordsCipher ?? this.wordsCipher,
-      markedWordIndexesCipher:
-          markedWordIndexesCipher ?? this.markedWordIndexesCipher,
+      markedWordIndexesCipher: markedWordIndexesCipher ?? this.markedWordIndexesCipher,
       voiceNoteCipher: voiceNoteCipher ?? this.voiceNoteCipher,
       rowid: rowid ?? this.rowid,
     );
@@ -1789,12 +1753,8 @@ class ThemeRow extends DataClass implements Insertable<ThemeRow> {
     return ThemesCompanion(
       id: Value(id),
       ownerId: Value(ownerId),
-      accent: accent == null && nullToAbsent
-          ? const Value.absent()
-          : Value(accent),
-      symbol: symbol == null && nullToAbsent
-          ? const Value.absent()
-          : Value(symbol),
+      accent: accent == null && nullToAbsent ? const Value.absent() : Value(accent),
+      symbol: symbol == null && nullToAbsent ? const Value.absent() : Value(symbol),
       createdAt: Value(createdAt),
       updatedAt: Value(updatedAt),
       keyVersion: Value(keyVersion),
@@ -1860,12 +1820,8 @@ class ThemeRow extends DataClass implements Insertable<ThemeRow> {
       symbol: data.symbol.present ? data.symbol.value : this.symbol,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
       updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
-      keyVersion: data.keyVersion.present
-          ? data.keyVersion.value
-          : this.keyVersion,
-      nameCipher: data.nameCipher.present
-          ? data.nameCipher.value
-          : this.nameCipher,
+      keyVersion: data.keyVersion.present ? data.keyVersion.value : this.keyVersion,
+      nameCipher: data.nameCipher.present ? data.nameCipher.value : this.nameCipher,
     );
   }
 
@@ -2044,8 +2000,7 @@ class ThemesCompanion extends UpdateCompanion<ThemeRow> {
   }
 }
 
-class $ThemeQuotesTable extends ThemeQuotes
-    with TableInfo<$ThemeQuotesTable, ThemeQuoteRow> {
+class $ThemeQuotesTable extends ThemeQuotes with TableInfo<$ThemeQuotesTable, ThemeQuoteRow> {
   @override
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
@@ -2664,12 +2619,8 @@ class ShelfRow extends DataClass implements Insertable<ShelfRow> {
     return ShelvesCompanion(
       id: Value(id),
       ownerId: Value(ownerId),
-      accent: accent == null && nullToAbsent
-          ? const Value.absent()
-          : Value(accent),
-      symbol: symbol == null && nullToAbsent
-          ? const Value.absent()
-          : Value(symbol),
+      accent: accent == null && nullToAbsent ? const Value.absent() : Value(accent),
+      symbol: symbol == null && nullToAbsent ? const Value.absent() : Value(symbol),
       createdAt: Value(createdAt),
       updatedAt: Value(updatedAt),
       keyVersion: Value(keyVersion),
@@ -2735,12 +2686,8 @@ class ShelfRow extends DataClass implements Insertable<ShelfRow> {
       symbol: data.symbol.present ? data.symbol.value : this.symbol,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
       updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
-      keyVersion: data.keyVersion.present
-          ? data.keyVersion.value
-          : this.keyVersion,
-      nameCipher: data.nameCipher.present
-          ? data.nameCipher.value
-          : this.nameCipher,
+      keyVersion: data.keyVersion.present ? data.keyVersion.value : this.keyVersion,
+      nameCipher: data.nameCipher.present ? data.nameCipher.value : this.nameCipher,
     );
   }
 
@@ -2919,8 +2866,7 @@ class ShelvesCompanion extends UpdateCompanion<ShelfRow> {
   }
 }
 
-class $ShelfBooksTable extends ShelfBooks
-    with TableInfo<$ShelfBooksTable, ShelfBookRow> {
+class $ShelfBooksTable extends ShelfBooks with TableInfo<$ShelfBooksTable, ShelfBookRow> {
   @override
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
@@ -3279,8 +3225,7 @@ class ShelfBooksCompanion extends UpdateCompanion<ShelfBookRow> {
   }
 }
 
-class $SettingsTableTable extends SettingsTable
-    with TableInfo<$SettingsTableTable, LocalSettings> {
+class $SettingsTableTable extends SettingsTable with TableInfo<$SettingsTableTable, LocalSettings> {
   @override
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
@@ -3327,17 +3272,17 @@ class $SettingsTableTable extends SettingsTable
     type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
-  static const VerificationMeta _contrastPreferenceMeta =
-      const VerificationMeta('contrastPreference');
+  static const VerificationMeta _contrastPreferenceMeta = const VerificationMeta(
+    'contrastPreference',
+  );
   @override
-  late final GeneratedColumn<String> contrastPreference =
-      GeneratedColumn<String>(
-        'contrast_preference',
-        aliasedName,
-        true,
-        type: DriftSqlType.string,
-        requiredDuringInsert: false,
-      );
+  late final GeneratedColumn<String> contrastPreference = GeneratedColumn<String>(
+    'contrast_preference',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -3472,9 +3417,7 @@ class LocalSettings extends DataClass implements Insertable<LocalSettings> {
   SettingsTableCompanion toCompanion(bool nullToAbsent) {
     return SettingsTableCompanion(
       id: Value(id),
-      displayName: displayName == null && nullToAbsent
-          ? const Value.absent()
-          : Value(displayName),
+      displayName: displayName == null && nullToAbsent ? const Value.absent() : Value(displayName),
       localePreference: localePreference == null && nullToAbsent
           ? const Value.absent()
           : Value(localePreference),
@@ -3523,12 +3466,8 @@ class LocalSettings extends DataClass implements Insertable<LocalSettings> {
   }) => LocalSettings(
     id: id ?? this.id,
     displayName: displayName.present ? displayName.value : this.displayName,
-    localePreference: localePreference.present
-        ? localePreference.value
-        : this.localePreference,
-    themePreference: themePreference.present
-        ? themePreference.value
-        : this.themePreference,
+    localePreference: localePreference.present ? localePreference.value : this.localePreference,
+    themePreference: themePreference.present ? themePreference.value : this.themePreference,
     contrastPreference: contrastPreference.present
         ? contrastPreference.value
         : this.contrastPreference,
@@ -3536,9 +3475,7 @@ class LocalSettings extends DataClass implements Insertable<LocalSettings> {
   LocalSettings copyWithCompanion(SettingsTableCompanion data) {
     return LocalSettings(
       id: data.id.present ? data.id.value : this.id,
-      displayName: data.displayName.present
-          ? data.displayName.value
-          : this.displayName,
+      displayName: data.displayName.present ? data.displayName.value : this.displayName,
       localePreference: data.localePreference.present
           ? data.localePreference.value
           : this.localePreference,
@@ -3804,8 +3741,7 @@ class $AppConfigCacheTableTable extends AppConfigCacheTable
   }
 }
 
-class LocalAppConfigCache extends DataClass
-    implements Insertable<LocalAppConfigCache> {
+class LocalAppConfigCache extends DataClass implements Insertable<LocalAppConfigCache> {
   final String id;
   final int version;
   final String fetchedAt;
@@ -3901,8 +3837,7 @@ class LocalAppConfigCache extends DataClass
           other.payload == this.payload);
 }
 
-class AppConfigCacheTableCompanion
-    extends UpdateCompanion<LocalAppConfigCache> {
+class AppConfigCacheTableCompanion extends UpdateCompanion<LocalAppConfigCache> {
   final Value<String> id;
   final Value<int> version;
   final Value<String> fetchedAt;
@@ -4001,8 +3936,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $ShelvesTable shelves = $ShelvesTable(this);
   late final $ShelfBooksTable shelfBooks = $ShelfBooksTable(this);
   late final $SettingsTableTable settingsTable = $SettingsTableTable(this);
-  late final $AppConfigCacheTableTable appConfigCacheTable =
-      $AppConfigCacheTableTable(this);
+  late final $AppConfigCacheTableTable appConfigCacheTable = $AppConfigCacheTableTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -4112,8 +4046,7 @@ class $$BooksTableFilterComposer extends Composer<_$AppDatabase, $BooksTable> {
   );
 }
 
-class $$BooksTableOrderingComposer
-    extends Composer<_$AppDatabase, $BooksTable> {
+class $$BooksTableOrderingComposer extends Composer<_$AppDatabase, $BooksTable> {
   $$BooksTableOrderingComposer({
     required super.$db,
     required super.$table,
@@ -4177,8 +4110,7 @@ class $$BooksTableOrderingComposer
   );
 }
 
-class $$BooksTableAnnotationComposer
-    extends Composer<_$AppDatabase, $BooksTable> {
+class $$BooksTableAnnotationComposer extends Composer<_$AppDatabase, $BooksTable> {
   $$BooksTableAnnotationComposer({
     required super.$db,
     required super.$table,
@@ -4252,12 +4184,9 @@ class $$BooksTableTableManager
         TableManagerState(
           db: db,
           table: table,
-          createFilteringComposer: () =>
-              $$BooksTableFilterComposer($db: db, $table: table),
-          createOrderingComposer: () =>
-              $$BooksTableOrderingComposer($db: db, $table: table),
-          createComputedFieldComposer: () =>
-              $$BooksTableAnnotationComposer($db: db, $table: table),
+          createFilteringComposer: () => $$BooksTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () => $$BooksTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () => $$BooksTableAnnotationComposer($db: db, $table: table),
           updateCompanionCallback:
               ({
                 Value<String> id = const Value.absent(),
@@ -4314,9 +4243,8 @@ class $$BooksTableTableManager
                 coverCipher: coverCipher,
                 rowid: rowid,
               ),
-          withReferenceMapper: (p0) => p0
-              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
-              .toList(),
+          withReferenceMapper: (p0) =>
+              p0.map((e) => (e.readTable(table), BaseReferences(db, table, e))).toList(),
           prefetchHooksCallback: null,
         ),
       );
@@ -4371,8 +4299,7 @@ typedef $$QuotesTableUpdateCompanionBuilder = QuotesCompanion Function({
   Value<int> rowid,
 });
 
-class $$QuotesTableFilterComposer
-    extends Composer<_$AppDatabase, $QuotesTable> {
+class $$QuotesTableFilterComposer extends Composer<_$AppDatabase, $QuotesTable> {
   $$QuotesTableFilterComposer({
     required super.$db,
     required super.$table,
@@ -4451,8 +4378,7 @@ class $$QuotesTableFilterComposer
   );
 }
 
-class $$QuotesTableOrderingComposer
-    extends Composer<_$AppDatabase, $QuotesTable> {
+class $$QuotesTableOrderingComposer extends Composer<_$AppDatabase, $QuotesTable> {
   $$QuotesTableOrderingComposer({
     required super.$db,
     required super.$table,
@@ -4531,8 +4457,7 @@ class $$QuotesTableOrderingComposer
   );
 }
 
-class $$QuotesTableAnnotationComposer
-    extends Composer<_$AppDatabase, $QuotesTable> {
+class $$QuotesTableAnnotationComposer extends Composer<_$AppDatabase, $QuotesTable> {
   $$QuotesTableAnnotationComposer({
     required super.$db,
     required super.$table,
@@ -4621,10 +4546,8 @@ class $$QuotesTableTableManager
         TableManagerState(
           db: db,
           table: table,
-          createFilteringComposer: () =>
-              $$QuotesTableFilterComposer($db: db, $table: table),
-          createOrderingComposer: () =>
-              $$QuotesTableOrderingComposer($db: db, $table: table),
+          createFilteringComposer: () => $$QuotesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () => $$QuotesTableOrderingComposer($db: db, $table: table),
           createComputedFieldComposer: () =>
               $$QuotesTableAnnotationComposer($db: db, $table: table),
           updateCompanionCallback:
@@ -4695,9 +4618,8 @@ class $$QuotesTableTableManager
                 voiceNoteCipher: voiceNoteCipher,
                 rowid: rowid,
               ),
-          withReferenceMapper: (p0) => p0
-              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
-              .toList(),
+          withReferenceMapper: (p0) =>
+              p0.map((e) => (e.readTable(table), BaseReferences(db, table, e))).toList(),
           prefetchHooksCallback: null,
         ),
       );
@@ -4740,8 +4662,7 @@ typedef $$ThemesTableUpdateCompanionBuilder = ThemesCompanion Function({
   Value<int> rowid,
 });
 
-class $$ThemesTableFilterComposer
-    extends Composer<_$AppDatabase, $ThemesTable> {
+class $$ThemesTableFilterComposer extends Composer<_$AppDatabase, $ThemesTable> {
   $$ThemesTableFilterComposer({
     required super.$db,
     required super.$table,
@@ -4790,8 +4711,7 @@ class $$ThemesTableFilterComposer
   );
 }
 
-class $$ThemesTableOrderingComposer
-    extends Composer<_$AppDatabase, $ThemesTable> {
+class $$ThemesTableOrderingComposer extends Composer<_$AppDatabase, $ThemesTable> {
   $$ThemesTableOrderingComposer({
     required super.$db,
     required super.$table,
@@ -4840,8 +4760,7 @@ class $$ThemesTableOrderingComposer
   );
 }
 
-class $$ThemesTableAnnotationComposer
-    extends Composer<_$AppDatabase, $ThemesTable> {
+class $$ThemesTableAnnotationComposer extends Composer<_$AppDatabase, $ThemesTable> {
   $$ThemesTableAnnotationComposer({
     required super.$db,
     required super.$table,
@@ -4898,10 +4817,8 @@ class $$ThemesTableTableManager
         TableManagerState(
           db: db,
           table: table,
-          createFilteringComposer: () =>
-              $$ThemesTableFilterComposer($db: db, $table: table),
-          createOrderingComposer: () =>
-              $$ThemesTableOrderingComposer($db: db, $table: table),
+          createFilteringComposer: () => $$ThemesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () => $$ThemesTableOrderingComposer($db: db, $table: table),
           createComputedFieldComposer: () =>
               $$ThemesTableAnnotationComposer($db: db, $table: table),
           updateCompanionCallback:
@@ -4948,9 +4865,8 @@ class $$ThemesTableTableManager
                 nameCipher: nameCipher,
                 rowid: rowid,
               ),
-          withReferenceMapper: (p0) => p0
-              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
-              .toList(),
+          withReferenceMapper: (p0) =>
+              p0.map((e) => (e.readTable(table), BaseReferences(db, table, e))).toList(),
           prefetchHooksCallback: null,
         ),
       );
@@ -4970,27 +4886,24 @@ typedef $$ThemesTableProcessedTableManager =
       ThemeRow,
       PrefetchHooks Function()
     >;
-typedef $$ThemeQuotesTableCreateCompanionBuilder =
-    ThemeQuotesCompanion Function({
-      required String id,
-      required String ownerId,
-      required String themeId,
-      required String quoteId,
-      required String updatedAt,
-      Value<int> rowid,
-    });
-typedef $$ThemeQuotesTableUpdateCompanionBuilder =
-    ThemeQuotesCompanion Function({
-      Value<String> id,
-      Value<String> ownerId,
-      Value<String> themeId,
-      Value<String> quoteId,
-      Value<String> updatedAt,
-      Value<int> rowid,
-    });
+typedef $$ThemeQuotesTableCreateCompanionBuilder = ThemeQuotesCompanion Function({
+  required String id,
+  required String ownerId,
+  required String themeId,
+  required String quoteId,
+  required String updatedAt,
+  Value<int> rowid,
+});
+typedef $$ThemeQuotesTableUpdateCompanionBuilder = ThemeQuotesCompanion Function({
+  Value<String> id,
+  Value<String> ownerId,
+  Value<String> themeId,
+  Value<String> quoteId,
+  Value<String> updatedAt,
+  Value<int> rowid,
+});
 
-class $$ThemeQuotesTableFilterComposer
-    extends Composer<_$AppDatabase, $ThemeQuotesTable> {
+class $$ThemeQuotesTableFilterComposer extends Composer<_$AppDatabase, $ThemeQuotesTable> {
   $$ThemeQuotesTableFilterComposer({
     required super.$db,
     required super.$table,
@@ -5024,8 +4937,7 @@ class $$ThemeQuotesTableFilterComposer
   );
 }
 
-class $$ThemeQuotesTableOrderingComposer
-    extends Composer<_$AppDatabase, $ThemeQuotesTable> {
+class $$ThemeQuotesTableOrderingComposer extends Composer<_$AppDatabase, $ThemeQuotesTable> {
   $$ThemeQuotesTableOrderingComposer({
     required super.$db,
     required super.$table,
@@ -5059,8 +4971,7 @@ class $$ThemeQuotesTableOrderingComposer
   );
 }
 
-class $$ThemeQuotesTableAnnotationComposer
-    extends Composer<_$AppDatabase, $ThemeQuotesTable> {
+class $$ThemeQuotesTableAnnotationComposer extends Composer<_$AppDatabase, $ThemeQuotesTable> {
   $$ThemeQuotesTableAnnotationComposer({
     required super.$db,
     required super.$table,
@@ -5107,10 +5018,8 @@ class $$ThemeQuotesTableTableManager
         TableManagerState(
           db: db,
           table: table,
-          createFilteringComposer: () =>
-              $$ThemeQuotesTableFilterComposer($db: db, $table: table),
-          createOrderingComposer: () =>
-              $$ThemeQuotesTableOrderingComposer($db: db, $table: table),
+          createFilteringComposer: () => $$ThemeQuotesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () => $$ThemeQuotesTableOrderingComposer($db: db, $table: table),
           createComputedFieldComposer: () =>
               $$ThemeQuotesTableAnnotationComposer($db: db, $table: table),
           updateCompanionCallback:
@@ -5145,9 +5054,8 @@ class $$ThemeQuotesTableTableManager
                 updatedAt: updatedAt,
                 rowid: rowid,
               ),
-          withReferenceMapper: (p0) => p0
-              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
-              .toList(),
+          withReferenceMapper: (p0) =>
+              p0.map((e) => (e.readTable(table), BaseReferences(db, table, e))).toList(),
           prefetchHooksCallback: null,
         ),
       );
@@ -5193,8 +5101,7 @@ typedef $$ShelvesTableUpdateCompanionBuilder = ShelvesCompanion Function({
   Value<int> rowid,
 });
 
-class $$ShelvesTableFilterComposer
-    extends Composer<_$AppDatabase, $ShelvesTable> {
+class $$ShelvesTableFilterComposer extends Composer<_$AppDatabase, $ShelvesTable> {
   $$ShelvesTableFilterComposer({
     required super.$db,
     required super.$table,
@@ -5243,8 +5150,7 @@ class $$ShelvesTableFilterComposer
   );
 }
 
-class $$ShelvesTableOrderingComposer
-    extends Composer<_$AppDatabase, $ShelvesTable> {
+class $$ShelvesTableOrderingComposer extends Composer<_$AppDatabase, $ShelvesTable> {
   $$ShelvesTableOrderingComposer({
     required super.$db,
     required super.$table,
@@ -5293,8 +5199,7 @@ class $$ShelvesTableOrderingComposer
   );
 }
 
-class $$ShelvesTableAnnotationComposer
-    extends Composer<_$AppDatabase, $ShelvesTable> {
+class $$ShelvesTableAnnotationComposer extends Composer<_$AppDatabase, $ShelvesTable> {
   $$ShelvesTableAnnotationComposer({
     required super.$db,
     required super.$table,
@@ -5351,10 +5256,8 @@ class $$ShelvesTableTableManager
         TableManagerState(
           db: db,
           table: table,
-          createFilteringComposer: () =>
-              $$ShelvesTableFilterComposer($db: db, $table: table),
-          createOrderingComposer: () =>
-              $$ShelvesTableOrderingComposer($db: db, $table: table),
+          createFilteringComposer: () => $$ShelvesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () => $$ShelvesTableOrderingComposer($db: db, $table: table),
           createComputedFieldComposer: () =>
               $$ShelvesTableAnnotationComposer($db: db, $table: table),
           updateCompanionCallback:
@@ -5401,9 +5304,8 @@ class $$ShelvesTableTableManager
                 nameCipher: nameCipher,
                 rowid: rowid,
               ),
-          withReferenceMapper: (p0) => p0
-              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
-              .toList(),
+          withReferenceMapper: (p0) =>
+              p0.map((e) => (e.readTable(table), BaseReferences(db, table, e))).toList(),
           prefetchHooksCallback: null,
         ),
       );
@@ -5440,8 +5342,7 @@ typedef $$ShelfBooksTableUpdateCompanionBuilder = ShelfBooksCompanion Function({
   Value<int> rowid,
 });
 
-class $$ShelfBooksTableFilterComposer
-    extends Composer<_$AppDatabase, $ShelfBooksTable> {
+class $$ShelfBooksTableFilterComposer extends Composer<_$AppDatabase, $ShelfBooksTable> {
   $$ShelfBooksTableFilterComposer({
     required super.$db,
     required super.$table,
@@ -5475,8 +5376,7 @@ class $$ShelfBooksTableFilterComposer
   );
 }
 
-class $$ShelfBooksTableOrderingComposer
-    extends Composer<_$AppDatabase, $ShelfBooksTable> {
+class $$ShelfBooksTableOrderingComposer extends Composer<_$AppDatabase, $ShelfBooksTable> {
   $$ShelfBooksTableOrderingComposer({
     required super.$db,
     required super.$table,
@@ -5510,8 +5410,7 @@ class $$ShelfBooksTableOrderingComposer
   );
 }
 
-class $$ShelfBooksTableAnnotationComposer
-    extends Composer<_$AppDatabase, $ShelfBooksTable> {
+class $$ShelfBooksTableAnnotationComposer extends Composer<_$AppDatabase, $ShelfBooksTable> {
   $$ShelfBooksTableAnnotationComposer({
     required super.$db,
     required super.$table,
@@ -5558,10 +5457,8 @@ class $$ShelfBooksTableTableManager
         TableManagerState(
           db: db,
           table: table,
-          createFilteringComposer: () =>
-              $$ShelfBooksTableFilterComposer($db: db, $table: table),
-          createOrderingComposer: () =>
-              $$ShelfBooksTableOrderingComposer($db: db, $table: table),
+          createFilteringComposer: () => $$ShelfBooksTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () => $$ShelfBooksTableOrderingComposer($db: db, $table: table),
           createComputedFieldComposer: () =>
               $$ShelfBooksTableAnnotationComposer($db: db, $table: table),
           updateCompanionCallback:
@@ -5596,9 +5493,8 @@ class $$ShelfBooksTableTableManager
                 updatedAt: updatedAt,
                 rowid: rowid,
               ),
-          withReferenceMapper: (p0) => p0
-              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
-              .toList(),
+          withReferenceMapper: (p0) =>
+              p0.map((e) => (e.readTable(table), BaseReferences(db, table, e))).toList(),
           prefetchHooksCallback: null,
         ),
       );
@@ -5621,27 +5517,24 @@ typedef $$ShelfBooksTableProcessedTableManager =
       ShelfBookRow,
       PrefetchHooks Function()
     >;
-typedef $$SettingsTableTableCreateCompanionBuilder =
-    SettingsTableCompanion Function({
-      required String id,
-      Value<String?> displayName,
-      Value<String?> localePreference,
-      Value<String?> themePreference,
-      Value<String?> contrastPreference,
-      Value<int> rowid,
-    });
-typedef $$SettingsTableTableUpdateCompanionBuilder =
-    SettingsTableCompanion Function({
-      Value<String> id,
-      Value<String?> displayName,
-      Value<String?> localePreference,
-      Value<String?> themePreference,
-      Value<String?> contrastPreference,
-      Value<int> rowid,
-    });
+typedef $$SettingsTableTableCreateCompanionBuilder = SettingsTableCompanion Function({
+  required String id,
+  Value<String?> displayName,
+  Value<String?> localePreference,
+  Value<String?> themePreference,
+  Value<String?> contrastPreference,
+  Value<int> rowid,
+});
+typedef $$SettingsTableTableUpdateCompanionBuilder = SettingsTableCompanion Function({
+  Value<String> id,
+  Value<String?> displayName,
+  Value<String?> localePreference,
+  Value<String?> themePreference,
+  Value<String?> contrastPreference,
+  Value<int> rowid,
+});
 
-class $$SettingsTableTableFilterComposer
-    extends Composer<_$AppDatabase, $SettingsTableTable> {
+class $$SettingsTableTableFilterComposer extends Composer<_$AppDatabase, $SettingsTableTable> {
   $$SettingsTableTableFilterComposer({
     required super.$db,
     required super.$table,
@@ -5675,8 +5568,7 @@ class $$SettingsTableTableFilterComposer
   );
 }
 
-class $$SettingsTableTableOrderingComposer
-    extends Composer<_$AppDatabase, $SettingsTableTable> {
+class $$SettingsTableTableOrderingComposer extends Composer<_$AppDatabase, $SettingsTableTable> {
   $$SettingsTableTableOrderingComposer({
     required super.$db,
     required super.$table,
@@ -5710,8 +5602,7 @@ class $$SettingsTableTableOrderingComposer
   );
 }
 
-class $$SettingsTableTableAnnotationComposer
-    extends Composer<_$AppDatabase, $SettingsTableTable> {
+class $$SettingsTableTableAnnotationComposer extends Composer<_$AppDatabase, $SettingsTableTable> {
   $$SettingsTableTableAnnotationComposer({
     required super.$db,
     required super.$table,
@@ -5766,8 +5657,7 @@ class $$SettingsTableTableTableManager
         TableManagerState(
           db: db,
           table: table,
-          createFilteringComposer: () =>
-              $$SettingsTableTableFilterComposer($db: db, $table: table),
+          createFilteringComposer: () => $$SettingsTableTableFilterComposer($db: db, $table: table),
           createOrderingComposer: () =>
               $$SettingsTableTableOrderingComposer($db: db, $table: table),
           createComputedFieldComposer: () =>
@@ -5804,9 +5694,8 @@ class $$SettingsTableTableTableManager
                 contrastPreference: contrastPreference,
                 rowid: rowid,
               ),
-          withReferenceMapper: (p0) => p0
-              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
-              .toList(),
+          withReferenceMapper: (p0) =>
+              p0.map((e) => (e.readTable(table), BaseReferences(db, table, e))).toList(),
           prefetchHooksCallback: null,
         ),
       );
@@ -5829,22 +5718,20 @@ typedef $$SettingsTableTableProcessedTableManager =
       LocalSettings,
       PrefetchHooks Function()
     >;
-typedef $$AppConfigCacheTableTableCreateCompanionBuilder =
-    AppConfigCacheTableCompanion Function({
-      required String id,
-      required int version,
-      required String fetchedAt,
-      required String payload,
-      Value<int> rowid,
-    });
-typedef $$AppConfigCacheTableTableUpdateCompanionBuilder =
-    AppConfigCacheTableCompanion Function({
-      Value<String> id,
-      Value<int> version,
-      Value<String> fetchedAt,
-      Value<String> payload,
-      Value<int> rowid,
-    });
+typedef $$AppConfigCacheTableTableCreateCompanionBuilder = AppConfigCacheTableCompanion Function({
+  required String id,
+  required int version,
+  required String fetchedAt,
+  required String payload,
+  Value<int> rowid,
+});
+typedef $$AppConfigCacheTableTableUpdateCompanionBuilder = AppConfigCacheTableCompanion Function({
+  Value<String> id,
+  Value<int> version,
+  Value<String> fetchedAt,
+  Value<String> payload,
+  Value<int> rowid,
+});
 
 class $$AppConfigCacheTableTableFilterComposer
     extends Composer<_$AppDatabase, $AppConfigCacheTableTable> {
@@ -5941,11 +5828,7 @@ class $$AppConfigCacheTableTableTableManager
           $$AppConfigCacheTableTableUpdateCompanionBuilder,
           (
             LocalAppConfigCache,
-            BaseReferences<
-              _$AppDatabase,
-              $AppConfigCacheTableTable,
-              LocalAppConfigCache
-            >,
+            BaseReferences<_$AppDatabase, $AppConfigCacheTableTable, LocalAppConfigCache>,
           ),
           LocalAppConfigCache,
           PrefetchHooks Function()
@@ -5959,16 +5842,14 @@ class $$AppConfigCacheTableTableTableManager
           table: table,
           createFilteringComposer: () =>
               $$AppConfigCacheTableTableFilterComposer($db: db, $table: table),
-          createOrderingComposer: () =>
-              $$AppConfigCacheTableTableOrderingComposer(
-                $db: db,
-                $table: table,
-              ),
-          createComputedFieldComposer: () =>
-              $$AppConfigCacheTableTableAnnotationComposer(
-                $db: db,
-                $table: table,
-              ),
+          createOrderingComposer: () => $$AppConfigCacheTableTableOrderingComposer(
+            $db: db,
+            $table: table,
+          ),
+          createComputedFieldComposer: () => $$AppConfigCacheTableTableAnnotationComposer(
+            $db: db,
+            $table: table,
+          ),
           updateCompanionCallback:
               ({
                 Value<String> id = const Value.absent(),
@@ -5997,9 +5878,8 @@ class $$AppConfigCacheTableTableTableManager
                 payload: payload,
                 rowid: rowid,
               ),
-          withReferenceMapper: (p0) => p0
-              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
-              .toList(),
+          withReferenceMapper: (p0) =>
+              p0.map((e) => (e.readTable(table), BaseReferences(db, table, e))).toList(),
           prefetchHooksCallback: null,
         ),
       );
@@ -6017,11 +5897,7 @@ typedef $$AppConfigCacheTableTableProcessedTableManager =
       $$AppConfigCacheTableTableUpdateCompanionBuilder,
       (
         LocalAppConfigCache,
-        BaseReferences<
-          _$AppDatabase,
-          $AppConfigCacheTableTable,
-          LocalAppConfigCache
-        >,
+        BaseReferences<_$AppDatabase, $AppConfigCacheTableTable, LocalAppConfigCache>,
       ),
       LocalAppConfigCache,
       PrefetchHooks Function()
@@ -6030,16 +5906,12 @@ typedef $$AppConfigCacheTableTableProcessedTableManager =
 class $AppDatabaseManager {
   final _$AppDatabase _db;
   $AppDatabaseManager(this._db);
-  $$BooksTableTableManager get books =>
-      $$BooksTableTableManager(_db, _db.books);
-  $$QuotesTableTableManager get quotes =>
-      $$QuotesTableTableManager(_db, _db.quotes);
-  $$ThemesTableTableManager get themes =>
-      $$ThemesTableTableManager(_db, _db.themes);
+  $$BooksTableTableManager get books => $$BooksTableTableManager(_db, _db.books);
+  $$QuotesTableTableManager get quotes => $$QuotesTableTableManager(_db, _db.quotes);
+  $$ThemesTableTableManager get themes => $$ThemesTableTableManager(_db, _db.themes);
   $$ThemeQuotesTableTableManager get themeQuotes =>
       $$ThemeQuotesTableTableManager(_db, _db.themeQuotes);
-  $$ShelvesTableTableManager get shelves =>
-      $$ShelvesTableTableManager(_db, _db.shelves);
+  $$ShelvesTableTableManager get shelves => $$ShelvesTableTableManager(_db, _db.shelves);
   $$ShelfBooksTableTableManager get shelfBooks =>
       $$ShelfBooksTableTableManager(_db, _db.shelfBooks);
   $$SettingsTableTableTableManager get settingsTable =>

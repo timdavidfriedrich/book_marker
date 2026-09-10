@@ -15,6 +15,7 @@ import 'package:serverpod/serverpod.dart' as _is;
 import '../config/client_config.dart' as _izbnfhbo;
 import '../config/plan_limits.dart' as _ikxhbfyx;
 import '../config/recognition_config.dart' as _iw7rryx2;
+import '../config/sync_limits.dart' as _iq33rqo6;
 
 /// Everything that can change in production without a deploy or an app release.
 ///
@@ -30,6 +31,7 @@ abstract class RuntimeConfig
     required this.version,
     required this.free,
     required this.premium,
+    required this.syncLimits,
     required this.recognition,
     required this.client,
   });
@@ -38,6 +40,7 @@ abstract class RuntimeConfig
     required int version,
     required _ikxhbfyx.PlanLimits free,
     required _ikxhbfyx.PlanLimits premium,
+    required _iq33rqo6.SyncLimits syncLimits,
     required _iw7rryx2.RecognitionConfig recognition,
     required _izbnfhbo.ClientConfig client,
   }) = _RuntimeConfigImpl;
@@ -50,6 +53,9 @@ abstract class RuntimeConfig
       ),
       premium: _imiqnoyo.Protocol().deserialize<_ikxhbfyx.PlanLimits>(
         jsonSerialization['premium'],
+      ),
+      syncLimits: _imiqnoyo.Protocol().deserialize<_iq33rqo6.SyncLimits>(
+        jsonSerialization['syncLimits'],
       ),
       recognition: _imiqnoyo.Protocol()
           .deserialize<_iw7rryx2.RecognitionConfig>(
@@ -67,6 +73,8 @@ abstract class RuntimeConfig
 
   _ikxhbfyx.PlanLimits premium;
 
+  _iq33rqo6.SyncLimits syncLimits;
+
   _iw7rryx2.RecognitionConfig recognition;
 
   _izbnfhbo.ClientConfig client;
@@ -78,6 +86,7 @@ abstract class RuntimeConfig
     int? version,
     _ikxhbfyx.PlanLimits? free,
     _ikxhbfyx.PlanLimits? premium,
+    _iq33rqo6.SyncLimits? syncLimits,
     _iw7rryx2.RecognitionConfig? recognition,
     _izbnfhbo.ClientConfig? client,
   });
@@ -88,6 +97,7 @@ abstract class RuntimeConfig
       'version': version,
       'free': free.toJson(),
       'premium': premium.toJson(),
+      'syncLimits': syncLimits.toJson(),
       'recognition': recognition.toJson(),
       'client': client.toJson(),
     };
@@ -100,6 +110,7 @@ abstract class RuntimeConfig
       'version': version,
       'free': free.toJsonForProtocol(),
       'premium': premium.toJsonForProtocol(),
+      'syncLimits': syncLimits.toJsonForProtocol(),
       'recognition': recognition.toJsonForProtocol(),
       'client': client.toJsonForProtocol(),
     };
@@ -116,12 +127,14 @@ class _RuntimeConfigImpl extends RuntimeConfig {
     required int version,
     required _ikxhbfyx.PlanLimits free,
     required _ikxhbfyx.PlanLimits premium,
+    required _iq33rqo6.SyncLimits syncLimits,
     required _iw7rryx2.RecognitionConfig recognition,
     required _izbnfhbo.ClientConfig client,
   }) : super._(
          version: version,
          free: free,
          premium: premium,
+         syncLimits: syncLimits,
          recognition: recognition,
          client: client,
        );
@@ -134,6 +147,7 @@ class _RuntimeConfigImpl extends RuntimeConfig {
     int? version,
     _ikxhbfyx.PlanLimits? free,
     _ikxhbfyx.PlanLimits? premium,
+    _iq33rqo6.SyncLimits? syncLimits,
     _iw7rryx2.RecognitionConfig? recognition,
     _izbnfhbo.ClientConfig? client,
   }) {
@@ -141,6 +155,7 @@ class _RuntimeConfigImpl extends RuntimeConfig {
       version: version ?? this.version,
       free: free ?? this.free.copyWith(),
       premium: premium ?? this.premium.copyWith(),
+      syncLimits: syncLimits ?? this.syncLimits.copyWith(),
       recognition: recognition ?? this.recognition.copyWith(),
       client: client ?? this.client.copyWith(),
     );

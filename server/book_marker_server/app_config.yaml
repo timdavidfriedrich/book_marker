@@ -27,6 +27,12 @@ plans:
     maxImageBytes: 2097152
     attachmentsEnabled: true
 
+sync:
+  # Guards against a runaway client, not a monetisation gate. Every signed in
+  # account syncs rows regardless of plan.
+  maxWritesPerBatch: 500
+  maxRowsPerTable: 100000
+
 recognition:
   provider: gemini
   cloudEnabledByDefault: true

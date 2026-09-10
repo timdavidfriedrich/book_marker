@@ -1,0 +1,15 @@
+### One row change from a device, as PowerSync's CRUD queue recorded it.
+###
+### `data` is a JSON object of column names to values, or null for a delete.
+### `owner_id` is never read from it: SyncEndpoint.upload overwrites it from the
+### session, so a client that forges the field changes nothing.
+class: SyncWrite
+
+fields:
+  ### The table's public name, matching the PowerSync view: books, quotes,
+  ### shelves, themes, shelf_books, theme_quotes.
+  table: String
+  ### put | patch | delete
+  operation: String
+  rowId: UuidValue
+  data: String?

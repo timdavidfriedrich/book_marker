@@ -1,0 +1,8 @@
+### Thrown when a batch exceeds the configured cap. Unreachable for a client
+### that chunks to the limit it reads from the same config, so it means a broken
+### or hostile one, and failing loudly beats silently truncating a batch.
+exception: SyncBatchTooLargeException
+
+fields:
+  size: int
+  limit: int

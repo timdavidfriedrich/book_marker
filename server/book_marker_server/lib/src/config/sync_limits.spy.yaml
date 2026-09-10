@@ -1,0 +1,7 @@
+### Guards against a runaway or hostile client, not a monetisation gate. Every
+### signed-in account syncs rows regardless of plan.
+class: SyncLimits
+
+fields:
+  maxWritesPerBatch: int
+  maxRowsPerTable: int

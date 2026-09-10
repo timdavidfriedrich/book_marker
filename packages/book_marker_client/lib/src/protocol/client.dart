@@ -15,6 +15,10 @@ import 'package:book_marker_client/src/protocol/config/runtime_config.dart'
     as _i0ksu74t;
 import 'package:book_marker_client/src/protocol/entitlements/entitlement_view.dart'
     as _i54kjtar;
+import 'package:book_marker_client/src/protocol/sync/sync_result.dart'
+    as _ikx0tj25;
+import 'package:book_marker_client/src/protocol/sync/sync_write.dart'
+    as _ihx5no0d;
 import 'package:http/http.dart' as _i85jenna;
 import 'package:serverpod_auth_core_client/serverpod_auth_core_client.dart'
     as _iacc;
@@ -239,6 +243,23 @@ class EndpointPowerSync extends _isc.EndpointRef {
   );
 }
 
+/// The upload half of sync. PowerSync streams rows down; everything the device
+/// writes comes back up through here.
+/// {@category Endpoint}
+class EndpointSync extends _isc.EndpointRef {
+  EndpointSync(_isc.EndpointCaller caller) : super(caller);
+
+  @override
+  String get name => 'sync';
+
+  _ida.Future<_ikx0tj25.SyncResult> upload(List<_ihx5no0d.SyncWrite> writes) =>
+      caller.callServerEndpoint<_ikx0tj25.SyncResult>(
+        'sync',
+        'upload',
+        {'writes': writes},
+      );
+}
+
 class Modules {
   Modules(Client client) {
     serverpod_auth_idp = _iaic.Caller(client);
@@ -283,6 +304,7 @@ class Client extends _isc.ServerpodClientShared {
     config = EndpointConfig(this);
     entitlement = EndpointEntitlement(this);
     powerSync = EndpointPowerSync(this);
+    sync = EndpointSync(this);
     modules = Modules(this);
   }
 
@@ -298,6 +320,8 @@ class Client extends _isc.ServerpodClientShared {
 
   late final EndpointPowerSync powerSync;
 
+  late final EndpointSync sync;
+
   late final Modules modules;
 
   @override
@@ -308,6 +332,7 @@ class Client extends _isc.ServerpodClientShared {
     'config': config,
     'entitlement': entitlement,
     'powerSync': powerSync,
+    'sync': sync,
   };
 
   @override

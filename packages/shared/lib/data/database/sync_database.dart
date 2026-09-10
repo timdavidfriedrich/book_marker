@@ -37,12 +37,62 @@ class SyncDatabase(
 
   bool _isSynced = false;
 
-  /// Swaps which half of each table pair owns the public view name. The rows
-  /// are copied by the caller inside the same transaction, so the app sees one
-  /// consistent library before and after and never learns anything moved.
-  Future<void> useSchema({required bool isSynced}) async {
-    if (_isSynced == isSynced) return;
-    await _database.updateSchema(buildSyncSchema(isSynced: isSynced));
-    _isSynced = isSynced;
+  /// Moves a library built without an account into the synced tables.
+  ///
+  /// The schema swap and the copy happen together: after it, the public view
+  /// name belongs to the synced half, and every row that was local only is in
+  /// it. The app queries the same table names before and after and never learns
+  /// that anything moved.
+  ///
+  /// The copy is what puts the rows into the CRUD queue, which is how they
+  /// reach the server. `owner_id` stays empty here; the server overwrites it
+  /// from the session and sends the row back with the real value.
+  Future<void> adoptLocalLibrary() async {
+    if (_isSynced) return;
+    await _database.updateSchema(buildSyncSchema(isSynced: true));
+    _isSynced = true;
+    await _database.writeTransaction((transaction) async {
+      for (final entry in syncedTableColumns.entries) {
+        await _copy(transaction, inactiveLocalName(entry.key), entry.key, entry.value);
+        await transaction.execute('DELETE FROM ${inactiveLocalName(entry.key)}');
+      }
+    });
+  }
+
+  /// The reverse, for signing out.
+  ///
+  /// With [keepsRows] the rows are copied back before the swap, because
+  /// afterwards the synced half is inactive and gets emptied. Without it
+  /// everything goes, which is the "remove from this device" branch of the sign
+  /// out dialog.
+  ///
+  /// The schema always ends up local only, so anything written afterwards stays
+  /// on the device instead of queueing an upload for an account that is no
+  /// longer signed in.
+  Future<void> releaseToLocalLibrary({required bool keepsRows}) async {
+    if (!_isSynced) return;
+    if (keepsRows) {
+      await _database.writeTransaction((transaction) async {
+        for (final entry in syncedTableColumns.entries) {
+          await _copy(transaction, entry.key, inactiveLocalName(entry.key), entry.value);
+        }
+      });
+    }
+    await _database.updateSchema(buildSyncSchema(isSynced: false));
+    _isSynced = false;
+    // * clearLocal follows keepsRows exactly. The default is true, which would
+    // * wipe the local only tables as well, and those are precisely the rows
+    // * just copied there to survive the sign out
+    await _database.disconnectAndClear(clearLocal: !keepsRows);
+  }
+
+  Future<void> _copy(
+    SqliteWriteContext transaction,
+    String from,
+    String to,
+    List<String> columns,
+  ) {
+    final names = ["id", ...columns].join(", ");
+    return transaction.execute("INSERT INTO $to ($names) SELECT $names FROM $from");
   }
 }

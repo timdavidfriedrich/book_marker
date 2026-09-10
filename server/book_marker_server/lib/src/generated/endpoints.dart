@@ -10,6 +10,8 @@
 // ignore_for_file: invalid_use_of_internal_member
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
+import 'package:book_marker_server/src/generated/sync/sync_write.dart'
+    as _ibimu8vb;
 import 'package:serverpod/serverpod.dart' as _is;
 import 'package:serverpod_auth_core_server/serverpod_auth_core_server.dart'
     as _iacs;
@@ -21,6 +23,7 @@ import '../auth/jwt_refresh_endpoint.dart' as _inwq3ztq;
 import '../endpoints/config_endpoint.dart' as _i74a5xur;
 import '../endpoints/entitlement_endpoint.dart' as _im71ml4a;
 import '../endpoints/power_sync_endpoint.dart' as _i61fa217;
+import '../endpoints/sync_endpoint.dart' as _i609im4b;
 
 class Endpoints extends _is.EndpointDispatch {
   @override
@@ -60,6 +63,12 @@ class Endpoints extends _is.EndpointDispatch {
         ..initialize(
           server,
           'powerSync',
+          null,
+        ),
+      'sync': _i609im4b.SyncEndpoint()
+        ..initialize(
+          server,
+          'sync',
           null,
         ),
     };
@@ -287,6 +296,30 @@ class Endpoints extends _is.EndpointDispatch {
                 Map<String, dynamic> params,
               ) async => (endpoints['powerSync'] as _i61fa217.PowerSyncEndpoint)
                   .createToken(session),
+        ),
+      },
+    );
+    connectors['sync'] = _is.EndpointConnector(
+      name: 'sync',
+      endpoint: endpoints['sync']!,
+      methodConnectors: {
+        'upload': _is.MethodConnector(
+          name: 'upload',
+          params: {
+            'writes': _is.ParameterDescription(
+              name: 'writes',
+              type: _is.getType<List<_ibimu8vb.SyncWrite>>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _is.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['sync'] as _i609im4b.SyncEndpoint).upload(
+                session,
+                params['writes'],
+              ),
         ),
       },
     );

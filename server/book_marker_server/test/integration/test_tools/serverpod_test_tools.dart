@@ -17,6 +17,10 @@ import 'package:book_marker_server/src/generated/config/runtime_config.dart'
     as _izn3a0mv;
 import 'package:book_marker_server/src/generated/entitlements/entitlement_view.dart'
     as _iy7x57jb;
+import 'package:book_marker_server/src/generated/sync/sync_result.dart'
+    as _i716kltw;
+import 'package:book_marker_server/src/generated/sync/sync_write.dart'
+    as _ibimu8vb;
 import 'package:serverpod/serverpod.dart' as _is;
 import 'package:serverpod_auth_core_server/serverpod_auth_core_server.dart'
     as _iacs;
@@ -160,6 +164,8 @@ class TestEndpoints {
   late final _EntitlementEndpoint entitlement;
 
   late final _PowerSyncEndpoint powerSync;
+
+  late final _SyncEndpoint sync;
 }
 
 class _InternalTestEndpoints extends TestEndpoints
@@ -190,6 +196,10 @@ class _InternalTestEndpoints extends TestEndpoints
       serializationManager,
     );
     powerSync = _PowerSyncEndpoint(
+      endpoints,
+      serializationManager,
+    );
+    sync = _SyncEndpoint(
       endpoints,
       serializationManager,
     );
@@ -575,6 +585,48 @@ class _PowerSyncEndpoint {
                   _localCallContext.arguments,
                 )
                 as _ida.Future<String>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+}
+
+class _SyncEndpoint {
+  _SyncEndpoint(
+    this._endpointDispatch,
+    this._serializationManager,
+  );
+
+  final _is.EndpointDispatch _endpointDispatch;
+
+  final _is.SerializationManager _serializationManager;
+
+  _ida.Future<_i716kltw.SyncResult> upload(
+    _ist.TestSessionBuilder sessionBuilder,
+    List<_ibimu8vb.SyncWrite> writes,
+  ) async {
+    return _ist.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'sync',
+            method: 'upload',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'sync',
+          methodName: 'upload',
+          parameters: _ist.testObjectToJson({'writes': writes}),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _ida.Future<_i716kltw.SyncResult>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();

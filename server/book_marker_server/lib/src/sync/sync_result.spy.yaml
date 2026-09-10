@@ -1,0 +1,12 @@
+### What the server did with a batch.
+###
+### `rejected` counts writes that were refused for a reason retrying cannot fix:
+### an unknown table, a column that is not the device's to write, a row that is
+### server owned. They are reported rather than thrown, because a 4xx would
+### block the client's upload queue permanently and every later write with it.
+class: SyncResult
+
+fields:
+  applied: int
+  rejected: int
+  rejectionReason: String?

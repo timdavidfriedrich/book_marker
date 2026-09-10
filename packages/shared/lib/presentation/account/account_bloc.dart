@@ -4,6 +4,7 @@ import 'package:core/error/app_error.dart';
 import 'package:core/error/app_result.dart';
 import 'package:core/security/backup_verifier.dart';
 import 'package:core/security/master_key_store.dart';
+import 'package:core/sync/sync_service.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
 import 'package:shared/domain/entities/account.dart';
@@ -20,6 +21,7 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
     this._masterKeyStore,
     this._backupVerifier,
     this._entitlementRepository,
+    this._syncService,
   ) : super(const AccountRestoring()) {
     on<AccountStarted>(_onStarted);
     on<AccountUpdated>(_onUpdated);
@@ -34,9 +36,27 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
   final MasterKeyStore _masterKeyStore;
   final BackupVerifier _backupVerifier;
   final EntitlementRepository _entitlementRepository;
+  final SyncService _syncService;
   StreamSubscription<AppResult<Account?>>? _accountSubscription;
+  bool _isSyncing = false;
   AccountEntitlement? _entitlement;
   String? _blockedReason;
+
+  // * sync follows the account state rather than being started from a screen,
+  // * so there is one place that decides when rows may leave the device
+  @override
+  void onChange(Change<AccountState> change) {
+    super.onChange(change);
+    unawaited(_applySync(isReady: change.nextState is AccountReady));
+  }
+
+  Future<void> _applySync({required bool isReady}) async {
+    if (isReady == _isSyncing) return;
+    _isSyncing = isReady;
+    // * locked and blocked both stop at disconnect, never at clear: the rows on
+    // * this device are the user's whatever the server thinks
+    await (isReady ? _syncService.connect() : _syncService.disconnect(clearsLocalData: false));
+  }
 
   @override
   Future<void> close() async {
@@ -85,7 +105,13 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
     Emitter<AccountState> emit,
   ) async {
     await _authRepository.signOut(allDevices: false);
-    if (event.removesLocalData) await _masterKeyStore.clear();
+    if (event.removesLocalData) {
+      await _masterKeyStore.clear();
+      // * the only path that empties the database. Everything else keeps the
+      // * library readable, which is the promise the sign out dialog makes
+      _isSyncing = false;
+      await _syncService.disconnect(clearsLocalData: true);
+    }
     _blockedReason = null;
     _entitlement = null;
     emit(const AccountSignedOut());

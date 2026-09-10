@@ -11,6 +11,8 @@
 // ignore_for_file: dead_code, unnecessary_type_check
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
+import 'package:book_marker_server/src/generated/sync/sync_write.dart'
+    as _ibimu8vb;
 import 'package:serverpod/protocol.dart' as _isp;
 import 'package:serverpod/serverpod.dart' as _is;
 import 'package:serverpod_auth_core_server/serverpod_auth_core_server.dart'
@@ -21,6 +23,7 @@ import 'config/client_config.dart' as _ikmgnzhy;
 import 'config/plan_limits.dart' as _ios57rmt;
 import 'config/recognition_config.dart' as _i96enlzs;
 import 'config/runtime_config.dart' as _iadewe5j;
+import 'config/sync_limits.dart' as _ivlkv61n;
 import 'entitlements/account_blocked_exception.dart' as _i42k8jky;
 import 'entitlements/entitlement.dart' as _id6kwse3;
 import 'entitlements/entitlement_view.dart' as _ik9sk60n;
@@ -29,12 +32,16 @@ import 'sync/book.dart' as _i8t9sm2n;
 import 'sync/quote.dart' as _ivf4v01a;
 import 'sync/shelf.dart' as _ibxgxncl;
 import 'sync/shelf_book.dart' as _isij2asi;
+import 'sync/sync_batch_too_large_exception.dart' as _ivzk7mwa;
+import 'sync/sync_result.dart' as _ibtdwinl;
+import 'sync/sync_write.dart' as _it8m259u;
 import 'sync/theme.dart' as _itq42fc1;
 import 'sync/theme_quote.dart' as _ih8stdgt;
 export 'config/client_config.dart';
 export 'config/plan_limits.dart';
 export 'config/recognition_config.dart';
 export 'config/runtime_config.dart';
+export 'config/sync_limits.dart';
 export 'entitlements/account_blocked_exception.dart';
 export 'entitlements/entitlement.dart';
 export 'entitlements/entitlement_view.dart';
@@ -43,6 +50,9 @@ export 'sync/book.dart';
 export 'sync/quote.dart';
 export 'sync/shelf.dart';
 export 'sync/shelf_book.dart';
+export 'sync/sync_batch_too_large_exception.dart';
+export 'sync/sync_result.dart';
+export 'sync/sync_write.dart';
 export 'sync/theme.dart';
 export 'sync/theme_quote.dart';
 
@@ -818,6 +828,9 @@ class Protocol extends _is.DatabaseSerializationManager {
     if (t == _iadewe5j.RuntimeConfig) {
       return _iadewe5j.RuntimeConfig.fromJson(data) as T;
     }
+    if (t == _ivlkv61n.SyncLimits) {
+      return _ivlkv61n.SyncLimits.fromJson(data) as T;
+    }
     if (t == _i42k8jky.AccountBlockedException) {
       return _i42k8jky.AccountBlockedException.fromJson(data) as T;
     }
@@ -842,6 +855,15 @@ class Protocol extends _is.DatabaseSerializationManager {
     if (t == _isij2asi.SyncedShelfBook) {
       return _isij2asi.SyncedShelfBook.fromJson(data) as T;
     }
+    if (t == _ivzk7mwa.SyncBatchTooLargeException) {
+      return _ivzk7mwa.SyncBatchTooLargeException.fromJson(data) as T;
+    }
+    if (t == _ibtdwinl.SyncResult) {
+      return _ibtdwinl.SyncResult.fromJson(data) as T;
+    }
+    if (t == _it8m259u.SyncWrite) {
+      return _it8m259u.SyncWrite.fromJson(data) as T;
+    }
     if (t == _itq42fc1.SyncedTheme) {
       return _itq42fc1.SyncedTheme.fromJson(data) as T;
     }
@@ -861,6 +883,9 @@ class Protocol extends _is.DatabaseSerializationManager {
     if (t == _is.getType<_iadewe5j.RuntimeConfig?>()) {
       return (data != null ? _iadewe5j.RuntimeConfig.fromJson(data) : null)
           as T;
+    }
+    if (t == _is.getType<_ivlkv61n.SyncLimits?>()) {
+      return (data != null ? _ivlkv61n.SyncLimits.fromJson(data) : null) as T;
     }
     if (t == _is.getType<_i42k8jky.AccountBlockedException?>()) {
       return (data != null
@@ -891,11 +916,29 @@ class Protocol extends _is.DatabaseSerializationManager {
       return (data != null ? _isij2asi.SyncedShelfBook.fromJson(data) : null)
           as T;
     }
+    if (t == _is.getType<_ivzk7mwa.SyncBatchTooLargeException?>()) {
+      return (data != null
+              ? _ivzk7mwa.SyncBatchTooLargeException.fromJson(data)
+              : null)
+          as T;
+    }
+    if (t == _is.getType<_ibtdwinl.SyncResult?>()) {
+      return (data != null ? _ibtdwinl.SyncResult.fromJson(data) : null) as T;
+    }
+    if (t == _is.getType<_it8m259u.SyncWrite?>()) {
+      return (data != null ? _it8m259u.SyncWrite.fromJson(data) : null) as T;
+    }
     if (t == _is.getType<_itq42fc1.SyncedTheme?>()) {
       return (data != null ? _itq42fc1.SyncedTheme.fromJson(data) : null) as T;
     }
     if (t == _is.getType<_ih8stdgt.SyncedThemeQuote?>()) {
       return (data != null ? _ih8stdgt.SyncedThemeQuote.fromJson(data) : null)
+          as T;
+    }
+    if (t == List<_ibimu8vb.SyncWrite>) {
+      return (data as List)
+              .map((e) => deserialize<_ibimu8vb.SyncWrite>(e))
+              .toList()
           as T;
     }
     try {
@@ -916,6 +959,7 @@ class Protocol extends _is.DatabaseSerializationManager {
       _ios57rmt.PlanLimits => 'PlanLimits',
       _i96enlzs.RecognitionConfig => 'RecognitionConfig',
       _iadewe5j.RuntimeConfig => 'RuntimeConfig',
+      _ivlkv61n.SyncLimits => 'SyncLimits',
       _i42k8jky.AccountBlockedException => 'AccountBlockedException',
       _id6kwse3.Entitlement => 'Entitlement',
       _ik9sk60n.EntitlementView => 'EntitlementView',
@@ -924,6 +968,9 @@ class Protocol extends _is.DatabaseSerializationManager {
       _ivf4v01a.SyncedQuote => 'SyncedQuote',
       _ibxgxncl.SyncedShelf => 'SyncedShelf',
       _isij2asi.SyncedShelfBook => 'SyncedShelfBook',
+      _ivzk7mwa.SyncBatchTooLargeException => 'SyncBatchTooLargeException',
+      _ibtdwinl.SyncResult => 'SyncResult',
+      _it8m259u.SyncWrite => 'SyncWrite',
       _itq42fc1.SyncedTheme => 'SyncedTheme',
       _ih8stdgt.SyncedThemeQuote => 'SyncedThemeQuote',
       _ => null,
@@ -948,6 +995,8 @@ class Protocol extends _is.DatabaseSerializationManager {
         return 'RecognitionConfig';
       case _iadewe5j.RuntimeConfig():
         return 'RuntimeConfig';
+      case _ivlkv61n.SyncLimits():
+        return 'SyncLimits';
       case _i42k8jky.AccountBlockedException():
         return 'AccountBlockedException';
       case _id6kwse3.Entitlement():
@@ -964,6 +1013,12 @@ class Protocol extends _is.DatabaseSerializationManager {
         return 'SyncedShelf';
       case _isij2asi.SyncedShelfBook():
         return 'SyncedShelfBook';
+      case _ivzk7mwa.SyncBatchTooLargeException():
+        return 'SyncBatchTooLargeException';
+      case _ibtdwinl.SyncResult():
+        return 'SyncResult';
+      case _it8m259u.SyncWrite():
+        return 'SyncWrite';
       case _itq42fc1.SyncedTheme():
         return 'SyncedTheme';
       case _ih8stdgt.SyncedThemeQuote():
@@ -1006,6 +1061,9 @@ class Protocol extends _is.DatabaseSerializationManager {
     if (dataClassName == 'RuntimeConfig') {
       return deserialize<_iadewe5j.RuntimeConfig>(data['data']);
     }
+    if (dataClassName == 'SyncLimits') {
+      return deserialize<_ivlkv61n.SyncLimits>(data['data']);
+    }
     if (dataClassName == 'AccountBlockedException') {
       return deserialize<_i42k8jky.AccountBlockedException>(data['data']);
     }
@@ -1029,6 +1087,15 @@ class Protocol extends _is.DatabaseSerializationManager {
     }
     if (dataClassName == 'SyncedShelfBook') {
       return deserialize<_isij2asi.SyncedShelfBook>(data['data']);
+    }
+    if (dataClassName == 'SyncBatchTooLargeException') {
+      return deserialize<_ivzk7mwa.SyncBatchTooLargeException>(data['data']);
+    }
+    if (dataClassName == 'SyncResult') {
+      return deserialize<_ibtdwinl.SyncResult>(data['data']);
+    }
+    if (dataClassName == 'SyncWrite') {
+      return deserialize<_it8m259u.SyncWrite>(data['data']);
     }
     if (dataClassName == 'SyncedTheme') {
       return deserialize<_itq42fc1.SyncedTheme>(data['data']);

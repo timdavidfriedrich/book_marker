@@ -12,5 +12,6 @@ fields:
   version: int
   free: PlanLimits
   premium: PlanLimits
+  syncLimits: SyncLimits
   recognition: RecognitionConfig
   client: ClientConfig

@@ -52,6 +52,7 @@ class ConfigSource {
 RuntimeConfig _parse(final String source) {
   final root = _mapAt(loadYaml(source), 'root');
   final plans = _mapAt(root['plans'], 'plans');
+  final sync = _mapAt(root['sync'], 'sync');
   final recognition = _mapAt(root['recognition'], 'recognition');
   final client = _mapAt(root['client'], 'client');
 
@@ -59,6 +60,13 @@ RuntimeConfig _parse(final String source) {
     version: _intAt(root['version'], 'version'),
     free: _planAt(plans['free'], 'plans.free'),
     premium: _planAt(plans['premium'], 'plans.premium'),
+    syncLimits: SyncLimits(
+      maxWritesPerBatch: _intAt(
+        sync['maxWritesPerBatch'],
+        'sync.maxWritesPerBatch',
+      ),
+      maxRowsPerTable: _intAt(sync['maxRowsPerTable'], 'sync.maxRowsPerTable'),
+    ),
     recognition: RecognitionConfig(
       provider: _stringAt(recognition['provider'], 'recognition.provider'),
       cloudEnabledByDefault: _boolAt(

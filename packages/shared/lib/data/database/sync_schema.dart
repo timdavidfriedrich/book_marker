@@ -8,54 +8,78 @@ const _shelfBooks = "shelf_books";
 const _themeQuotes = "theme_quotes";
 const _entitlements = "entitlements";
 
+// * the six tables that exist twice, once synced and once local only, with the
+// * columns each pair shares. Adoption copies between them by name, so the two
+// * halves must stay identical
+const syncedTableColumns = <String, List<String>>{
+  _books: _bookColumnNames,
+  _quotes: _quoteColumnNames,
+  _shelves: _collectionColumnNames,
+  _themes: _collectionColumnNames,
+  _shelfBooks: _shelfBookColumnNames,
+  _themeQuotes: _themeQuoteColumnNames,
+};
+
+String inactiveSyncedName(String table) => "inactive_synced_$table";
+
+String inactiveLocalName(String table) => "inactive_local_$table";
+
 const settingsTableName = "settings";
 const appConfigCacheTableName = "app_config_cache";
 const settingsRowId = "settings";
 const appConfigCacheRowId = "config";
 
-// * every table is declared twice, once synced and once local only, and the
-// * inactive half is parked under a prefixed name. Swapping which half owns the
-// * public name is how a library built without an account is adopted into one:
-// * the rows are copied across inside a single transaction and the views change
-// * underneath the app, which never learns that anything moved.
+// * every table is declared twice, once synced and once local only. The two
+// * physical tables always keep their own names; only the VIEW name flips, so
+// * exactly one of them answers to `books` at a time and no data ever has to
+// * move between storage. Swapping which half owns the public name is how a
+// * library built without an account is adopted into one.
 Schema buildSyncSchema({required bool isSynced}) {
-  String synced(String table) => isSynced ? table : "inactive_synced_$table";
-  String local(String table) => isSynced ? "inactive_local_$table" : table;
+  String syncedView(String table) => isSynced ? table : inactiveSyncedName(table);
+  String localView(String table) => isSynced ? inactiveLocalName(table) : table;
 
   return Schema([
-    for (final name in [synced(_books), local(_books)])
-      _table(name, _bookColumns, isLocalOnly: name == local(_books)),
-    for (final name in [synced(_quotes), local(_quotes)])
-      _table(
-        name,
-        _quoteColumns,
-        isLocalOnly: name == local(_quotes),
-        indexes: [
-          const Index("book", [IndexedColumn("book_id")]),
-        ],
-      ),
-    for (final name in [synced(_shelves), local(_shelves)])
-      _table(name, _collectionColumns, isLocalOnly: name == local(_shelves)),
-    for (final name in [synced(_themes), local(_themes)])
-      _table(name, _collectionColumns, isLocalOnly: name == local(_themes)),
-    for (final name in [synced(_shelfBooks), local(_shelfBooks)])
-      _table(
-        name,
-        _shelfBookColumns,
-        isLocalOnly: name == local(_shelfBooks),
-        indexes: [
-          const Index("shelf", [IndexedColumn("shelf_id")]),
-        ],
-      ),
-    for (final name in [synced(_themeQuotes), local(_themeQuotes)])
-      _table(
-        name,
-        _themeQuoteColumns,
-        isLocalOnly: name == local(_themeQuotes),
-        indexes: [
-          const Index("theme", [IndexedColumn("theme_id")]),
-        ],
-      ),
+    Table(_books, _bookColumns, viewName: syncedView(_books)),
+    Table.localOnly(_localName(_books), _bookColumns, viewName: localView(_books)),
+    Table(
+      _quotes,
+      _quoteColumns,
+      viewName: syncedView(_quotes),
+      indexes: const [
+        Index("book", [IndexedColumn("book_id")]),
+      ],
+    ),
+    Table.localOnly(_localName(_quotes), _quoteColumns, viewName: localView(_quotes)),
+    Table(_shelves, _collectionColumns, viewName: syncedView(_shelves)),
+    Table.localOnly(_localName(_shelves), _collectionColumns, viewName: localView(_shelves)),
+    Table(_themes, _collectionColumns, viewName: syncedView(_themes)),
+    Table.localOnly(_localName(_themes), _collectionColumns, viewName: localView(_themes)),
+    Table(
+      _shelfBooks,
+      _shelfBookColumns,
+      viewName: syncedView(_shelfBooks),
+      indexes: const [
+        Index("shelf", [IndexedColumn("shelf_id")]),
+      ],
+    ),
+    Table.localOnly(
+      _localName(_shelfBooks),
+      _shelfBookColumns,
+      viewName: localView(_shelfBooks),
+    ),
+    Table(
+      _themeQuotes,
+      _themeQuoteColumns,
+      viewName: syncedView(_themeQuotes),
+      indexes: const [
+        Index("theme", [IndexedColumn("theme_id")]),
+      ],
+    ),
+    Table.localOnly(
+      _localName(_themeQuotes),
+      _themeQuoteColumns,
+      viewName: localView(_themeQuotes),
+    ),
     // * server owned and read only here. It has no local only twin: without an
     // * account there is no entitlement to hold
     const Table(_entitlements, _entitlementColumns),
@@ -65,20 +89,21 @@ Schema buildSyncSchema({required bool isSynced}) {
   ]);
 }
 
-Table _table(
-  String name,
-  List<Column> columns, {
-  required bool isLocalOnly,
-  List<Index> indexes = const [],
-}) {
-  return isLocalOnly
-      ? Table.localOnly(name, columns, indexes: indexes)
-      : Table(name, columns, indexes: indexes);
-}
+String _localName(String table) => "local_$table";
 
-// * owner_id is carried even in local only mode, where it stays empty. Keeping
-// * the two shapes identical is what lets the adoption copy be a plain INSERT
-// * SELECT rather than a column-by-column rewrite.
+const _bookColumnNames = [
+  "owner_id",
+  "status",
+  "created_at",
+  "last_used_at",
+  "updated_at",
+  "key_version",
+  "title_cipher",
+  "authors_cipher",
+  "isbn_cipher",
+  "cover_cipher",
+];
+
 const _bookColumns = <Column>[
   Column.text("owner_id"),
   Column.text("status"),
@@ -90,6 +115,22 @@ const _bookColumns = <Column>[
   Column.text("authors_cipher"),
   Column.text("isbn_cipher"),
   Column.text("cover_cipher"),
+];
+
+const _quoteColumnNames = [
+  "owner_id",
+  "book_id",
+  "is_favorite",
+  "created_at",
+  "updated_at",
+  "key_version",
+  "quote_cipher",
+  "note_cipher",
+  "page_numbers_cipher",
+  "pages_cipher",
+  "words_cipher",
+  "marked_word_indexes_cipher",
+  "voice_note_cipher",
 ];
 
 const _quoteColumns = <Column>[
@@ -108,6 +149,16 @@ const _quoteColumns = <Column>[
   Column.text("voice_note_cipher"),
 ];
 
+const _collectionColumnNames = [
+  "owner_id",
+  "accent",
+  "symbol",
+  "created_at",
+  "updated_at",
+  "key_version",
+  "name_cipher",
+];
+
 const _collectionColumns = <Column>[
   Column.text("owner_id"),
   Column.text("accent"),
@@ -118,12 +169,16 @@ const _collectionColumns = <Column>[
   Column.text("name_cipher"),
 ];
 
+const _shelfBookColumnNames = ["owner_id", "shelf_id", "book_id", "updated_at"];
+
 const _shelfBookColumns = <Column>[
   Column.text("owner_id"),
   Column.text("shelf_id"),
   Column.text("book_id"),
   Column.text("updated_at"),
 ];
+
+const _themeQuoteColumnNames = ["owner_id", "theme_id", "quote_id", "updated_at"];
 
 const _themeQuoteColumns = <Column>[
   Column.text("owner_id"),
