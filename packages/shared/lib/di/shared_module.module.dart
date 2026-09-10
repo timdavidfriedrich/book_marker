@@ -6,21 +6,23 @@
 import 'dart:async' as _i687;
 
 import 'package:book_marker_client/book_marker_client.dart' as _i63;
+import 'package:core/security/attachment_cipher.dart' as _i770;
 import 'package:core/security/backup_verifier.dart' as _i93;
 import 'package:core/security/database_key_store.dart' as _i405;
 import 'package:core/security/field_cipher.dart' as _i92;
 import 'package:core/security/master_key_store.dart' as _i375;
+import 'package:core/sync/attachment_service.dart' as _i194;
 import 'package:core/sync/sync_service.dart' as _i336;
 import 'package:dio/dio.dart' as _i361;
 import 'package:injectable/injectable.dart' as _i526;
 import 'package:serverpod_auth_idp_flutter/serverpod_auth_idp_flutter.dart' as _i90;
 import 'package:shared/data/data_sources/app_config_local_data_source.dart' as _i49;
 import 'package:shared/data/data_sources/app_config_remote_data_source.dart' as _i223;
+import 'package:shared/data/data_sources/attachment_remote_data_source.dart' as _i833;
 import 'package:shared/data/data_sources/book_cover_data_source.dart' as _i510;
 import 'package:shared/data/data_sources/book_local_data_source.dart' as _i315;
 import 'package:shared/data/data_sources/entitlement_remote_data_source.dart' as _i1039;
 import 'package:shared/data/data_sources/google_books_data_source.dart' as _i357;
-import 'package:shared/data/data_sources/image_storage_data_source.dart' as _i47;
 import 'package:shared/data/data_sources/ocr_remote_data_source.dart' as _i895;
 import 'package:shared/data/data_sources/open_library_data_source.dart' as _i492;
 import 'package:shared/data/data_sources/quote_local_data_source.dart' as _i516;
@@ -30,8 +32,10 @@ import 'package:shared/data/data_sources/shelf_local_data_source.dart' as _i1026
 import 'package:shared/data/data_sources/sync_remote_data_source.dart' as _i679;
 import 'package:shared/data/data_sources/theme_local_data_source.dart' as _i814;
 import 'package:shared/data/database/app_database.dart' as _i50;
+import 'package:shared/data/database/attachment_paths.dart' as _i258;
 import 'package:shared/data/database/cipher_codec.dart' as _i807;
 import 'package:shared/data/database/database_module.dart' as _i860;
+import 'package:shared/data/database/encrypted_attachment_storage.dart' as _i385;
 import 'package:shared/data/database/power_sync_connector.dart' as _i1035;
 import 'package:shared/data/database/power_sync_service.dart' as _i932;
 import 'package:shared/data/database/sync_database.dart' as _i659;
@@ -68,11 +72,14 @@ class SharedPackageModule extends _i526.MicroPackageModule {
   // initializes the registration of main-scope dependencies inside of GetIt
   @override
   _i687.FutureOr<void> init(_i526.GetItHelper gh) async {
-    final serverpodClientModule = _$ServerpodClientModule();
     final databaseModule = _$DatabaseModule();
+    final serverpodClientModule = _$ServerpodClientModule();
+    await gh.lazySingletonAsync<_i258.AttachmentPaths>(
+      () => databaseModule.attachmentPaths(),
+      preResolve: true,
+    );
     gh.lazySingleton<_i90.FlutterAuthSessionManager>(() => serverpodClientModule.sessionManager());
     gh.lazySingleton<_i533.RouteChangeNotifier>(() => _i533.RouteChangeNotifier());
-    gh.factory<_i47.ImageStorageDataSource>(() => const _i47.ImageStorageDataSourceImpl());
     gh.factory<_i510.BookCoverDataSource>(() => _i510.BookCoverDataSourceImpl(gh<_i361.Dio>()));
     gh.factory<_i492.OpenLibraryDataSource>(() => _i492.OpenLibraryDataSourceImpl(gh<_i361.Dio>()));
     gh.factory<_i357.GoogleBooksDataSource>(() => _i357.GoogleBooksDataSourceImpl(gh<_i361.Dio>()));
@@ -97,6 +104,9 @@ class SharedPackageModule extends _i526.MicroPackageModule {
     gh.factory<_i446.EntitlementRepository>(
       () => _i1011.EntitlementRepositoryImpl(gh<_i1039.EntitlementRemoteDataSource>()),
     );
+    gh.factory<_i833.AttachmentRemoteDataSource>(
+      () => _i833.AttachmentRemoteDataSourceImpl(gh<_i63.Client>()),
+    );
     gh.lazySingleton<_i50.AppDatabase>(() => databaseModule.appDatabase(gh<_i659.SyncDatabase>()));
     gh.factory<_i49.AppConfigLocalDataSource>(
       () => _i49.AppConfigLocalDataSourceImpl(gh<_i50.AppDatabase>()),
@@ -106,6 +116,13 @@ class SharedPackageModule extends _i526.MicroPackageModule {
       () => _i223.AppConfigRemoteDataSourceImpl(gh<_i63.Client>()),
     );
     gh.factory<_i679.SyncRemoteDataSource>(() => _i679.SyncRemoteDataSourceImpl(gh<_i63.Client>()));
+    gh.factory<_i516.QuoteLocalDataSource>(
+      () => _i516.QuoteLocalDataSourceImpl(
+        gh<_i50.AppDatabase>(),
+        gh<_i807.CipherCodec>(),
+        gh<_i258.AttachmentPaths>(),
+      ),
+    );
     gh.lazySingleton<_i336.SyncService>(
       () => _i932.PowerSyncService(
         gh<_i659.SyncDatabase>(),
@@ -127,10 +144,10 @@ class SharedPackageModule extends _i526.MicroPackageModule {
     gh.factory<_i793.ShelfRepository>(
       () => _i812.ShelfRepositoryImpl(gh<_i1026.ShelfLocalDataSource>()),
     );
-    gh.factory<_i516.QuoteLocalDataSource>(
-      () => _i516.QuoteLocalDataSourceImpl(
-        gh<_i50.AppDatabase>(),
-        gh<_i807.CipherCodec>(),
+    gh.lazySingleton<_i385.EncryptedAttachmentStorage>(
+      () => _i385.EncryptedAttachmentStorage(
+        gh<_i833.AttachmentRemoteDataSource>(),
+        gh<_i770.AttachmentCipher>(),
       ),
     );
     gh.factory<_i814.ThemeLocalDataSource>(
@@ -151,15 +168,26 @@ class SharedPackageModule extends _i526.MicroPackageModule {
         gh<_i49.AppConfigLocalDataSource>(),
       ),
     );
+    gh.factory<_i115.SettingsLocalDataSource>(
+      () => _i115.SettingsLocalDataSourceImpl(gh<_i50.AppDatabase>()),
+    );
+    await gh.lazySingletonAsync<_i194.AttachmentService>(
+      () => databaseModule.attachmentService(
+        gh<_i659.SyncDatabase>(),
+        gh<_i385.EncryptedAttachmentStorage>(),
+        gh<_i258.AttachmentPaths>(),
+        gh<_i516.QuoteLocalDataSource>(),
+        gh<_i446.EntitlementRepository>(),
+        gh<_i541.AppConfigRepository>(),
+      ),
+      preResolve: true,
+    );
     gh.factory<_i570.QuoteRepository>(
       () => _i943.QuoteRepositoryImpl(
         gh<_i516.QuoteLocalDataSource>(),
         gh<_i814.ThemeLocalDataSource>(),
-        gh<_i47.ImageStorageDataSource>(),
+        gh<_i194.AttachmentService>(),
       ),
-    );
-    gh.factory<_i115.SettingsLocalDataSource>(
-      () => _i115.SettingsLocalDataSourceImpl(gh<_i50.AppDatabase>()),
     );
     gh.factory<_i56.AppConfigCubit>(() => _i56.AppConfigCubit(gh<_i541.AppConfigRepository>()));
     gh.factory<_i0.SettingsRepository>(
@@ -196,6 +224,9 @@ class SharedPackageModule extends _i526.MicroPackageModule {
         gh<_i1026.ShelfLocalDataSource>(),
       ),
     );
+    gh.factory<_i124.SampleDataRepository>(
+      () => _i136.SampleDataRepositoryImpl(gh<_i716.SampleDataSeeder>()),
+    );
     gh.factory<_i880.AccountBloc>(
       () => _i880.AccountBloc(
         gh<_i1022.AuthRepository>(),
@@ -203,14 +234,12 @@ class SharedPackageModule extends _i526.MicroPackageModule {
         gh<_i93.BackupVerifier>(),
         gh<_i446.EntitlementRepository>(),
         gh<_i336.SyncService>(),
+        gh<_i194.AttachmentService>(),
       ),
-    );
-    gh.factory<_i124.SampleDataRepository>(
-      () => _i136.SampleDataRepositoryImpl(gh<_i716.SampleDataSeeder>()),
     );
   }
 }
 
-class _$ServerpodClientModule extends _i665.ServerpodClientModule {}
-
 class _$DatabaseModule extends _i860.DatabaseModule {}
+
+class _$ServerpodClientModule extends _i665.ServerpodClientModule {}

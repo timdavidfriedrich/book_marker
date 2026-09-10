@@ -1,9 +1,10 @@
 import 'package:core/error/app_error.dart';
 import 'package:core/error/app_result.dart';
+import 'package:core/sync/attachment_service.dart';
 import 'package:injectable/injectable.dart';
-import 'package:shared/data/data_sources/image_storage_data_source.dart';
 import 'package:shared/data/data_sources/quote_local_data_source.dart';
 import 'package:shared/data/data_sources/theme_local_data_source.dart';
+import 'package:shared/data/database/attachment_paths.dart';
 import 'package:shared/data/mappers/quote_mappers.dart';
 import 'package:shared/domain/entities/quote.dart';
 import 'package:shared/domain/entities/quote_page.dart';
@@ -14,7 +15,7 @@ import 'package:shared/domain/repositories/quote_repository.dart';
 class const QuoteRepositoryImpl(
   final QuoteLocalDataSource _localDataSource,
   final ThemeLocalDataSource _themeLocalDataSource,
-  final ImageStorageDataSource _imageStorageDataSource,
+  final AttachmentService _attachments,
 ) implements QuoteRepository {
   @override
   Stream<AppResult<List<Quote>>> watchQuotes() async* {
@@ -31,6 +32,9 @@ class const QuoteRepositoryImpl(
   Future<AppResult<Quote>> getQuote(String id) async {
     try {
       final localQuote = await _localDataSource.readQuote(id);
+      if (localQuote?.voiceNotePath case final path?) {
+        await _attachments.discard(path);
+      }
       if (localQuote == null) return const Failure(NotFoundError());
       return Success(localQuote.toQuote());
     } on Object {
@@ -41,13 +45,16 @@ class const QuoteRepositoryImpl(
   @override
   Future<AppResult<()>> saveQuote(Quote quote) async {
     try {
+      // * the attachment service names the file, not the quote. An id it minted
+      // * is the same on every device; a name built from the quote id would be
+      // * a second, weaker identity for the same bytes
       final storedPages = <QuotePage>[];
-      for (final (index, page) in quote.pages.indexed) {
-        final storedPath = await _imageStorageDataSource.persistImage(
-          page.photoPath,
-          "${quote.id}_$index",
+      for (final page in quote.pages) {
+        storedPages.add(
+          page.copyWith(
+            photoPath: await _attachments.adopt(page.photoPath, photoExtension),
+          ),
         );
-        storedPages.add(page.copyWith(photoPath: storedPath));
       }
       await _localDataSource.insertQuote(quote.copyWith(pages: storedPages).toLocalQuote());
       return const Success(());
@@ -99,7 +106,16 @@ class const QuoteRepositoryImpl(
   @override
   Future<AppResult<()>> setVoiceNote(String id, VoiceNote? voiceNote) async {
     try {
-      await _localDataSource.setVoiceNote(id, voiceNote?.path, voiceNote?.durationMs);
+      // * the recorder writes wherever it likes; adopting moves the file into
+      // * attachment storage and queues it, exactly as a page photograph is
+      final previous = await _localDataSource.readQuote(id);
+      final path = voiceNote == null
+          ? null
+          : await _attachments.adopt(voiceNote.path, voiceNoteExtension);
+      await _localDataSource.setVoiceNote(id, path, voiceNote?.durationMs);
+      if (previous?.voiceNotePath case final replaced?) {
+        await _attachments.discard(replaced);
+      }
       return const Success(());
     } on Object {
       return const Failure(UnexpectedError());
@@ -110,12 +126,15 @@ class const QuoteRepositoryImpl(
   Future<AppResult<()>> deleteQuote(String id) async {
     try {
       final localQuote = await _localDataSource.readQuote(id);
+      if (localQuote?.voiceNotePath case final path?) {
+        await _attachments.discard(path);
+      }
       // * no foreign key cascades from a PowerSync view, so the theme links go
       // * here or they outlive the quote and sync as orphans
       await _themeLocalDataSource.removeQuoteEverywhere(id);
       await _localDataSource.deleteQuote(id);
       for (final page in localQuote?.pages ?? const <QuotePage>[]) {
-        await _imageStorageDataSource.deleteImage(page.photoPath);
+        await _attachments.discard(page.photoPath);
       }
       return const Success(());
     } on Object {

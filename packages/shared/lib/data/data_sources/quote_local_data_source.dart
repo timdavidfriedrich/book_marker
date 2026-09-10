@@ -1,15 +1,19 @@
 import 'package:drift/drift.dart';
 import 'package:injectable/injectable.dart';
 import 'package:shared/data/database/app_database.dart';
+import 'package:shared/data/database/attachment_paths.dart';
 import 'package:shared/data/database/cipher_codec.dart';
 import 'package:shared/data/database/row_defaults.dart';
 import 'package:shared/data/database/timestamp_codec.dart';
 import 'package:shared/data/models/local_quote.dart';
+import 'package:shared/domain/entities/highlight_region.dart';
 import 'package:shared/domain/entities/quote_page.dart';
 import 'package:shared/domain/entities/recognized_word.dart';
 
-const _voiceNotePathKey = "path";
+const _attachmentIdKey = "attachmentId";
 const _voiceNoteDurationKey = "durationMs";
+const _aspectRatioKey = "imageAspectRatio";
+const _highlightsKey = "highlights";
 const _favorite = 1;
 const _notFavorite = 0;
 
@@ -31,12 +35,15 @@ abstract class QuoteLocalDataSource {
   Future<void> setVoiceNote(String id, String? path, int? durationMs);
 
   Future<void> deleteQuote(String id);
+
+  Stream<List<AttachmentReference>> watchAttachmentReferences();
 }
 
 @Injectable(as: QuoteLocalDataSource)
 class const QuoteLocalDataSourceImpl(
   final AppDatabase _database,
   final CipherCodec _codec,
+  final AttachmentPaths _paths,
 ) implements QuoteLocalDataSource {
   @override
   Stream<List<LocalQuote>> watchQuotes() {
@@ -44,6 +51,27 @@ class const QuoteLocalDataSourceImpl(
       ..orderBy([(table) => OrderingTerm.desc(table.createdAt)]);
     return query.watch().asyncMap((rows) => Future.wait(rows.map(_decode)));
   }
+
+  // * the definitive list of what this device references, which is what the
+  // * attachment queue reconciles against. It has to come from decrypted rows,
+  // * because an attachment id is inside the ciphertext like everything else
+  @override
+  Stream<List<AttachmentReference>> watchAttachmentReferences() => watchQuotes().map(
+    (quotes) => [
+      for (final quote in quotes) ...[
+        for (final page in quote.pages)
+          AttachmentReference(
+            id: _paths.idFrom(page.photoPath)!,
+            extension: photoExtension,
+          ),
+        if (quote.voiceNotePath case final path?)
+          AttachmentReference(
+            id: _paths.idFrom(path)!,
+            extension: voiceNoteExtension,
+          ),
+      ],
+    ],
+  );
 
   @override
   Future<LocalQuote?> readQuote(String id) async {
@@ -103,7 +131,7 @@ class const QuoteLocalDataSourceImpl(
       pageNumbers: await _codec.decodeList(row.pageNumbersCipher, (it) => it! as int),
       quote: await _codec.decode(row.quoteCipher),
       note: await _codec.decodeOptional(row.noteCipher),
-      voiceNotePath: voiceNote?[_voiceNotePathKey] as String?,
+      voiceNotePath: _resolve(voiceNote?[_attachmentIdKey] as String?, voiceNoteExtension),
       voiceNoteDurationMs: voiceNote?[_voiceNoteDurationKey] as int?,
       pages: await _codec.decodeList(row.pagesCipher, _toQuotePage),
       words: await _codec.decodeList(row.wordsCipher, _toRecognizedWord),
@@ -128,7 +156,7 @@ class const QuoteLocalDataSourceImpl(
       quoteCipher: await _codec.encode(quote.quote),
       noteCipher: Value(await _codec.encodeOptional(quote.note)),
       pageNumbersCipher: await _codec.encodeJson(quote.pageNumbers),
-      pagesCipher: await _codec.encodeJson(quote.pages.map((it) => it.toMap()).toList()),
+      pagesCipher: await _codec.encodeJson(quote.pages.map(_fromQuotePage).toList()),
       wordsCipher: await _codec.encodeJson(quote.words.map((it) => it.toMap()).toList()),
       markedWordIndexesCipher: await _codec.encodeJson(quote.markedWordIndexes),
       voiceNoteCipher: Value(
@@ -137,13 +165,42 @@ class const QuoteLocalDataSourceImpl(
     );
   }
 
+  // * the id is stored, never the path: a path from another device means
+  // * nothing here, while the id resolves to wherever this device keeps its
+  // * attachments
   Future<String?> _encodeVoiceNote(String? path, int? durationMs) => _codec.encodeOptionalJson(
-    path == null ? null : {_voiceNotePathKey: path, _voiceNoteDurationKey: durationMs},
+    path == null
+        ? null
+        : {
+            _attachmentIdKey: _paths.idFrom(path),
+            _voiceNoteDurationKey: durationMs,
+          },
   );
-}
 
-QuotePage _toQuotePage(Object? element) =>
-    QuotePageMapper.fromMap((element! as Map<dynamic, dynamic>).cast<String, dynamic>());
+  String? _resolve(String? attachmentId, String extension) =>
+      attachmentId == null ? null : _paths.pathFor(attachmentId, extension);
+
+  QuotePage _toQuotePage(Object? element) {
+    final map = (element! as Map<dynamic, dynamic>).cast<String, dynamic>();
+    return QuotePage(
+      photoPath: _paths.pathFor(map[_attachmentIdKey] as String, photoExtension),
+      imageAspectRatio: (map[_aspectRatioKey] as num).toDouble(),
+      highlights: (map[_highlightsKey] as List<dynamic>)
+          .map(
+            (it) => HighlightRegionMapper.fromMap(
+              (it as Map<dynamic, dynamic>).cast<String, dynamic>(),
+            ),
+          )
+          .toList(),
+    );
+  }
+
+  Map<String, Object?> _fromQuotePage(QuotePage page) => {
+    _attachmentIdKey: _paths.idFrom(page.photoPath),
+    _aspectRatioKey: page.imageAspectRatio,
+    _highlightsKey: page.highlights.map((it) => it.toMap()).toList(),
+  };
+}
 
 RecognizedWord _toRecognizedWord(Object? element) =>
     RecognizedWordMapper.fromMap((element! as Map<dynamic, dynamic>).cast<String, dynamic>());

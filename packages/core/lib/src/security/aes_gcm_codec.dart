@@ -35,6 +35,33 @@ Future<String> decryptWithKey(Uint8List key, String ciphertext) async {
   }
 }
 
+// * bytes in, bytes out, for attachment blobs. The string pair above is for
+// * column values, where base64 is what the column holds anyway; running an
+// * image through base64 on the way to an object store would cost a third of
+// * its size for nothing
+Future<Uint8List> encryptBytesWithKey(Uint8List key, List<int> plaintext) async {
+  final box = await _algorithm.encrypt(plaintext, secretKey: SecretKey(key));
+  return Uint8List.fromList([...box.nonce, ...box.cipherText, ...box.mac.bytes]);
+}
+
+Future<Uint8List> decryptBytesWithKey(Uint8List key, Uint8List bytes) async {
+  if (bytes.length < _nonceLength + _macLength) {
+    throw const UndecryptableFieldException();
+  }
+  final box = SecretBox(
+    bytes.sublist(_nonceLength, bytes.length - _macLength),
+    nonce: bytes.sublist(0, _nonceLength),
+    mac: Mac(bytes.sublist(bytes.length - _macLength)),
+  );
+  try {
+    return Uint8List.fromList(
+      await _algorithm.decrypt(box, secretKey: SecretKey(key)),
+    );
+  } on SecretBoxAuthenticationError {
+    throw const UndecryptableFieldException();
+  }
+}
+
 Uint8List? _decode(String value) {
   try {
     return Uint8List.fromList(base64Decode(value));

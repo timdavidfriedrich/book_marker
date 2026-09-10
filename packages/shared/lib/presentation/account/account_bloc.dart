@@ -4,6 +4,7 @@ import 'package:core/error/app_error.dart';
 import 'package:core/error/app_result.dart';
 import 'package:core/security/backup_verifier.dart';
 import 'package:core/security/master_key_store.dart';
+import 'package:core/sync/attachment_service.dart';
 import 'package:core/sync/sync_service.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
@@ -22,6 +23,7 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
     this._backupVerifier,
     this._entitlementRepository,
     this._syncService,
+    this._attachmentService,
   ) : super(const AccountRestoring()) {
     on<AccountStarted>(_onStarted);
     on<AccountUpdated>(_onUpdated);
@@ -37,6 +39,7 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
   final BackupVerifier _backupVerifier;
   final EntitlementRepository _entitlementRepository;
   final SyncService _syncService;
+  final AttachmentService _attachmentService;
   StreamSubscription<AppResult<Account?>>? _accountSubscription;
   bool _isSyncing = false;
   AccountEntitlement? _entitlement;
@@ -56,6 +59,9 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
     // * locked and blocked both stop at disconnect, never at clear: the rows on
     // * this device are the user's whatever the server thinks
     await (isReady ? _syncService.connect() : _syncService.disconnect(clearsLocalData: false));
+    // * attachments have their own gate on top of sync: rows go up for every
+    // * signed in account, files only for a plan that includes them
+    await (isReady ? _attachmentService.refresh() : _attachmentService.stop());
   }
 
   @override

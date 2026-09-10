@@ -6,8 +6,10 @@
 import 'dart:async' as _i687;
 
 import 'package:core/network/dio_module.dart' as _i840;
+import 'package:core/security/aes_gcm_attachment_cipher.dart' as _i421;
 import 'package:core/security/aes_gcm_backup_verifier.dart' as _i70;
 import 'package:core/security/aes_gcm_field_cipher.dart' as _i586;
+import 'package:core/security/attachment_cipher.dart' as _i770;
 import 'package:core/security/backup_verifier.dart' as _i93;
 import 'package:core/security/database_key_store.dart' as _i405;
 import 'package:core/security/field_cipher.dart' as _i92;
@@ -29,6 +31,9 @@ class CorePackageModule extends _i526.MicroPackageModule {
     );
     gh.lazySingleton<_i375.MasterKeyStore>(
       () => _i375.MasterKeyStoreImpl(gh<_i558.FlutterSecureStorage>()),
+    );
+    gh.lazySingleton<_i770.AttachmentCipher>(
+      () => _i421.AesGcmAttachmentCipher(gh<_i375.MasterKeyStore>()),
     );
     gh.lazySingleton<_i93.BackupVerifier>(() => const _i70.AesGcmBackupVerifier());
     gh.lazySingleton<_i92.FieldCipher>(() => _i586.AesGcmFieldCipher(gh<_i375.MasterKeyStore>()));

@@ -1,3 +1,8 @@
+// * PowerSync marks its attachments API experimental; see
+// * encrypted_attachment_storage.dart for why the dependency is taken anyway.
+// ignore_for_file: experimental_member_use
+
+import 'package:powersync/attachments/attachments.dart';
 import 'package:powersync/powersync.dart';
 
 const _books = "books";
@@ -86,6 +91,9 @@ Schema buildSyncSchema({required bool isSynced}) {
     // * never leaves the device in either mode
     const Table.localOnly(settingsTableName, _settingsColumns),
     const Table.localOnly(appConfigCacheTableName, _appConfigCacheColumns),
+    // * the attachment queue's own bookkeeping. Local only in both modes: which
+    // * files this device has downloaded is nobody else's business
+    AttachmentsQueueTable(),
   ]);
 }
 
