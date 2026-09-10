@@ -9,8 +9,11 @@ import 'package:feature_account/presentation/widgets/ink_action_button.dart';
 import 'package:feature_account/presentation/widgets/recovery_code_grid.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:shared/presentation/account/account_bloc.dart';
+import 'package:shared/presentation/account/account_event.dart';
 import 'package:shared/presentation/extensions/context_extensions.dart';
 import 'package:shared/presentation/extensions/screen_layout_extensions.dart';
+import 'package:shared/presentation/navigation/navigation_extensions.dart';
 import 'package:shared/presentation/widgets/loading_indicator.dart';
 
 const _shareButtonWidth = 96.0;
@@ -33,7 +36,14 @@ class const RecoveryCodeScreen({
       },
       child: Scaffold(
         body: SafeArea(
-          child: BlocBuilder<RecoveryCodeBloc, RecoveryCodeState>(
+          child: BlocConsumer<RecoveryCodeBloc, RecoveryCodeState>(
+            // * the key now exists, but AccountBloc resolved its state before
+            // * that, so it has to be asked to look again
+            listenWhen: (previous, current) => current is RecoveryCodeReady && current.isStarting,
+            listener: (context, state) {
+              context.read<AccountBloc>().add(const AccountUnlocked());
+              context.closeScreen();
+            },
             builder: (context, state) => switch (state) {
               RecoveryCodeGenerating() => const LoadingIndicator(),
               RecoveryCodeReady() => _Content(state: state),

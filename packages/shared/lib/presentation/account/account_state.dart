@@ -6,10 +6,14 @@ sealed class AccountState {
 
 class const AccountRestoring() extends AccountState;
 
+enum SignInProvider { google, apple }
+
 class const AccountSignedOut({
-  final bool isSigningIn = false,
+  final SignInProvider? pendingProvider,
   final Object? error,
-}) extends AccountState;
+}) extends AccountState {
+  bool get isSigningIn => pendingProvider != null;
+}
 
 class const AccountLocked({
   required final Account account,

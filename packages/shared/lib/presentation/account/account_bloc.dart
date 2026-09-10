@@ -56,12 +56,12 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
   Future<void> _onGoogleSignInRequested(
     AccountGoogleSignInRequested event,
     Emitter<AccountState> emit,
-  ) => _signIn(emit, _authRepository.signInWithGoogle);
+  ) => _signIn(emit, SignInProvider.google, _authRepository.signInWithGoogle);
 
   Future<void> _onAppleSignInRequested(
     AccountAppleSignInRequested event,
     Emitter<AccountState> emit,
-  ) => _signIn(emit, _authRepository.signInWithApple);
+  ) => _signIn(emit, SignInProvider.apple, _authRepository.signInWithApple);
 
   Future<void> _onSignOutRequested(
     AccountSignOutRequested event,
@@ -79,9 +79,10 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
 
   Future<void> _signIn(
     Emitter<AccountState> emit,
+    SignInProvider provider,
     Future<AppResult<Account>> Function() signIn,
   ) async {
-    emit(const AccountSignedOut(isSigningIn: true));
+    emit(AccountSignedOut(pendingProvider: provider));
     switch (await signIn()) {
       case Success(:final data):
         emit(await _resolve(data));

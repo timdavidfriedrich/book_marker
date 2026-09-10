@@ -1,6 +1,9 @@
 import 'package:book_marker/src/di/service_locator.dart';
 import 'package:book_marker/src/navigation/navigation_shell_container.dart';
 import 'package:book_marker/src/theme/app_theme.dart';
+import 'package:feature_account/presentation/recovery_code/recovery_code_bloc.dart';
+import 'package:feature_account/presentation/recovery_code/recovery_code_event.dart';
+import 'package:feature_account/presentation/recovery_code/recovery_code_screen.dart';
 import 'package:feature_account/presentation/sign_in/sign_in_screen.dart';
 import 'package:feature_capture/presentation/add_book/add_book_bloc.dart';
 import 'package:feature_capture/presentation/add_book/add_book_event.dart';
@@ -83,6 +86,10 @@ class const _AppPage({
       child: const ThemeDetailScreen(),
     ),
     SignIn() => const SignInScreen(),
+    RecoveryCodeSetup() => BlocProvider(
+      create: (_) => sl<RecoveryCodeBloc>()..add(const RecoveryCodeStarted()),
+      child: const RecoveryCodeScreen(),
+    ),
     Settings() => BlocProvider(
       create: (_) => sl<SettingsBloc>()..add(const SettingsStarted()),
       child: const SettingsScreen(),

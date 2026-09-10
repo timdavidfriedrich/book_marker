@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:core/config/build_config.dart';
 import 'package:core/error/app_error.dart';
 import 'package:core/theme/spacing.dart';
@@ -10,6 +12,8 @@ import 'package:shared/presentation/account/account_state.dart';
 import 'package:shared/presentation/extensions/app_error_extensions.dart';
 import 'package:shared/presentation/extensions/context_extensions.dart';
 import 'package:shared/presentation/extensions/screen_layout_extensions.dart';
+import 'package:shared/presentation/navigation/navigation_extensions.dart';
+import 'package:shared/presentation/navigation/routes.dart';
 import 'package:shared/presentation/widgets/circle_icon_button.dart';
 
 const _leadSpacing = Spacing.l;
@@ -24,10 +28,20 @@ class const SignInScreen({
     return Scaffold(
       body: SafeArea(
         child: BlocConsumer<AccountBloc, AccountState>(
+          // * signing in leaves this state entirely, so anything that is not
+          // * signedOut means we are done and should return to settings
           listenWhen: (previous, current) => current is! AccountSignedOut,
-          listener: (context, state) => Navigator.of(context).maybePop(),
+          listener: (context, state) {
+            context.closeScreen();
+            // * locked straight after signing in means there is no key on this
+            // * device yet, so the code has to be generated before anything can
+            // * be secured
+            if (state is AccountLocked) {
+              unawaited(context.appRouter.push(const RecoveryCodeSetup()));
+            }
+          },
           builder: (context, state) => _Content(
-            isSigningIn: state is AccountSignedOut && state.isSigningIn,
+            pendingProvider: state is AccountSignedOut ? state.pendingProvider : null,
             error: state is AccountSignedOut ? state.error : null,
           ),
         ),
@@ -37,12 +51,13 @@ class const SignInScreen({
 }
 
 class const _Content({
-  required final bool _isSigningIn,
+  required final SignInProvider? _pendingProvider,
   required final Object? _error,
 }) extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final error = _error;
+    final isSigningIn = _pendingProvider != null;
     return ListView(
       padding: EdgeInsets.all(context.layout.pageMargin),
       children: [
@@ -50,7 +65,7 @@ class const _Content({
           alignment: AlignmentDirectional.centerStart,
           child: CircleIconButton(
             icon: Icons.arrow_back,
-            onPressed: _isSigningIn ? null : () => Navigator.of(context).maybePop(),
+            onPressed: isSigningIn ? null : context.closeScreen,
           ),
         ),
         const SizedBox(height: Spacing.m),
@@ -68,14 +83,19 @@ class const _Content({
           const SizedBox(height: Spacing.m),
         ],
         Opacity(
-          opacity: _isSigningIn ? _disabledOpacity : 1,
+          opacity: isSigningIn ? _disabledOpacity : 1,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               InkActionButton(
                 glyph: Icons.account_circle_outlined,
-                label: error == null ? context.s.signInWithGoogle : context.s.signInRetry,
-                onPressed: _isSigningIn
+                isBusy: _pendingProvider == SignInProvider.google,
+                label: switch ((_pendingProvider, error)) {
+                  (SignInProvider.google, _) => context.s.signInInProgress,
+                  (_, null) => context.s.signInWithGoogle,
+                  _ => context.s.signInRetry,
+                },
+                onPressed: isSigningIn
                     ? null
                     : () => context.read<AccountBloc>().add(
                         const AccountGoogleSignInRequested(),
@@ -87,9 +107,12 @@ class const _Content({
                 const SizedBox(height: _actionGap),
                 InkActionButton(
                   glyph: Icons.apple,
-                  label: context.s.signInWithApple,
+                  isBusy: _pendingProvider == SignInProvider.apple,
+                  label: _pendingProvider == SignInProvider.apple
+                      ? context.s.signInInProgress
+                      : context.s.signInWithApple,
                   isOutlined: true,
-                  onPressed: _isSigningIn
+                  onPressed: isSigningIn
                       ? null
                       : () => context.read<AccountBloc>().add(
                           const AccountAppleSignInRequested(),

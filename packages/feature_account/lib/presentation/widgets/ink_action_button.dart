@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:shared/presentation/extensions/context_extensions.dart';
 
 const _glyphSize = 20.0;
+const _spinnerSize = 19.0;
+const _spinnerStroke = 2.0;
 const _shape = RoundedRectangleBorder(
   borderRadius: BorderRadius.all(Radius.circular(Spacing.radiusXl)),
 );
@@ -14,6 +16,7 @@ class const InkActionButton({
   required final String _label,
   required final VoidCallback? _onPressed,
   final IconData? _glyph,
+  final bool _isBusy = false,
   final bool _isOutlined = false,
   super.key,
 }) extends StatelessWidget {
@@ -21,15 +24,24 @@ class const InkActionButton({
   Widget build(BuildContext context) {
     final glyph = _glyph;
     final label = Text(_label, overflow: TextOverflow.ellipsis, textAlign: TextAlign.center);
+    final leading = _isBusy
+        ? SizedBox.square(
+            dimension: _spinnerSize,
+            child: CircularProgressIndicator(
+              strokeWidth: _spinnerStroke,
+              color: _isOutlined ? context.c.onSurface : context.c.onInverseSurface,
+            ),
+          )
+        : (glyph == null ? null : Icon(glyph, size: _glyphSize));
     // * Flexible only belongs inside the Row; a button wraps a lone child in an
     // * Align, where it would assert
-    final child = glyph == null
+    final child = leading == null
         ? label
         : Row(
             mainAxisAlignment: MainAxisAlignment.center,
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(glyph, size: _glyphSize),
+              leading,
               const SizedBox(width: Spacing.s),
               Flexible(child: label),
             ],

@@ -40,6 +40,8 @@ class const Settings() extends AppRoute;
 
 class const SignIn() extends AppRoute;
 
+class const RecoveryCodeSetup() extends AppRoute;
+
 class const Capture({
   required final bool addsPage,
 }) extends AppRoute {
