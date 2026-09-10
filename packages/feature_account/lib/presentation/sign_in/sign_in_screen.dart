@@ -28,9 +28,11 @@ class const SignInScreen({
     return Scaffold(
       body: SafeArea(
         child: BlocConsumer<AccountBloc, AccountState>(
-          // * signing in leaves this state entirely, so anything that is not
-          // * signedOut means we are done and should return to settings
-          listenWhen: (previous, current) => current is! AccountSignedOut,
+          // * the transition, not the state: signing in resolves once here and
+          // * again when the account stream notices the new session, and acting
+          // * on both closed this screen twice
+          listenWhen: (previous, current) =>
+              previous is AccountSignedOut && current is! AccountSignedOut,
           listener: (context, state) {
             context.closeScreen();
             // * locked straight after signing in means there is no key on this
