@@ -1,0 +1,76 @@
+name: Debug APK
+
+# Manual only: `gh workflow run debug-apk.yml`.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build debug APK
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    steps:
+      - uses: actions/checkout@v7
+
+      # Temurin 17, the JDK `flutter doctor -v` reports locally. AGP 9.1 on
+      # Gradle 9.3.1 needs 17 or newer.
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      # .fvmrc pins the `stable` channel, so CI follows the same channel.
+      # Swap in `flutter-version: 3.47.1` if a stable bump ever breaks the build.
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+          pub-cache: true
+
+      # * dart_defines.json carries build-time secrets and is gitignored, so it
+      # * has to be rebuilt here. Without the DART_DEFINES_JSON secret the empty
+      # * example keeps the build green, but the APK reaches no server.
+      - name: Restore dart defines
+        env:
+          DART_DEFINES_JSON: ${{ secrets.DART_DEFINES_JSON }}
+        run: |
+          if [ -n "$DART_DEFINES_JSON" ]; then
+            printf '%s' "$DART_DEFINES_JSON" > dart_defines.json
+          else
+            echo "::warning::DART_DEFINES_JSON is unset - building with the empty values from dart_defines.example.json."
+            cp dart_defines.example.json dart_defines.json
+          fi
+
+      - run: flutter --version
+
+      # Resolves the whole pub workspace from the root pubspec.
+      - run: flutter pub get
+
+      # No build_runner or gen-l10n step: service_locator.config.dart,
+      # app_database.g.dart and the generated localizations are committed.
+      # Gradle installs NDK 28.2.13676358 on the first run, which the sqlite3mc
+      # build hook needs to compile the encrypted SQLite.
+      - name: Build debug APK
+        run: flutter build apk --debug --dart-define-from-file=dart_defines.json
+
+      # Names the file after the commit it came from, so several downloads stay
+      # apart in the browser's download folder.
+      - name: Name the APK after the commit
+        id: apk
+        run: |
+          name="book_marker-debug-${GITHUB_SHA::7}.apk"
+          cp build/app/outputs/flutter-apk/app-debug.apk "$name"
+          echo "path=$name" >> "$GITHUB_OUTPUT"
+
+      # archive: false uploads the APK unzipped, so the download is the
+      # installable file rather than a zip. The artifact takes the file's name.
+      - uses: actions/upload-artifact@v7
+        with:
+          path: ${{ steps.apk.outputs.path }}
+          archive: false
+          if-no-files-found: error
+          retention-days: 14
