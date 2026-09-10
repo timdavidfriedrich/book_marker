@@ -28,11 +28,13 @@ List<IdentityProviderBuilder> _identityProviders(final Serverpod pod) {
   final hasGoogle = pod.getPassword('googleClientSecret') != null;
   final hasApple = pod.getPassword('appleServiceIdentifier') != null;
 
-  if (pod.runMode == ServerpodRunMode.production && !(hasGoogle && hasApple)) {
+  // * at least one, not both: Apple can land later. Note that App Store review
+  // * requires Sign in with Apple wherever another social sign-in is offered,
+  // * so an iOS release needs both even though the server does not.
+  if (pod.runMode == ServerpodRunMode.production && !hasGoogle && !hasApple) {
     throw StateError(
-      'Production requires both identity providers. Missing: '
-      '${[if (!hasGoogle) 'googleClientSecret', if (!hasApple) 'apple* keys'].join(', ')} '
-      'in config/passwords.yaml.',
+      'Production needs at least one identity provider. Add googleClientSecret '
+      'or the apple* keys to config/passwords.yaml.',
     );
   }
 

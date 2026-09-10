@@ -14,18 +14,17 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart' as _i558;
 import 'package:injectable/injectable.dart' as _i526;
 
 class CorePackageModule extends _i526.MicroPackageModule {
-// initializes the registration of main-scope dependencies inside of GetIt
+  // initializes the registration of main-scope dependencies inside of GetIt
   @override
   _i687.FutureOr<void> init(_i526.GetItHelper gh) {
     final dioModule = _$DioModule();
     final secureStorageModule = _$SecureStorageModule();
     gh.lazySingleton<_i361.Dio>(() => dioModule.dio());
-    gh.lazySingleton<_i558.FlutterSecureStorage>(
-        () => secureStorageModule.secureStorage());
+    gh.lazySingleton<_i558.FlutterSecureStorage>(() => secureStorageModule.secureStorage());
     gh.lazySingleton<_i375.MasterKeyStore>(
-        () => _i375.MasterKeyStoreImpl(gh<_i558.FlutterSecureStorage>()));
-    gh.lazySingleton<_i92.FieldCipher>(
-        () => _i586.AesGcmFieldCipher(gh<_i375.MasterKeyStore>()));
+      () => _i375.MasterKeyStoreImpl(gh<_i558.FlutterSecureStorage>()),
+    );
+    gh.lazySingleton<_i92.FieldCipher>(() => _i586.AesGcmFieldCipher(gh<_i375.MasterKeyStore>()));
   }
 }
 

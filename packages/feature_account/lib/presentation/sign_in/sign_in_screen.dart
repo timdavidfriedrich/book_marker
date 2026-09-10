@@ -1,3 +1,4 @@
+import 'package:core/config/build_config.dart';
 import 'package:core/error/app_error.dart';
 import 'package:core/theme/spacing.dart';
 import 'package:feature_account/presentation/account/account_bloc.dart';
@@ -80,17 +81,21 @@ class const _Content({
                         const AccountGoogleSignInRequested(),
                       ),
               ),
-              const SizedBox(height: _actionGap),
-              InkActionButton(
-                glyph: Icons.apple,
-                label: context.s.signInWithApple,
-                isOutlined: true,
-                onPressed: _isSigningIn
-                    ? null
-                    : () => context.read<AccountBloc>().add(
-                        const AccountAppleSignInRequested(),
-                      ),
-              ),
+              // * only offered once Apple credentials exist; a button that
+              // * always fails is worse than no button
+              if (hasAppleSignIn) ...[
+                const SizedBox(height: _actionGap),
+                InkActionButton(
+                  glyph: Icons.apple,
+                  label: context.s.signInWithApple,
+                  isOutlined: true,
+                  onPressed: _isSigningIn
+                      ? null
+                      : () => context.read<AccountBloc>().add(
+                          const AccountAppleSignInRequested(),
+                        ),
+                ),
+              ],
             ],
           ),
         ),
