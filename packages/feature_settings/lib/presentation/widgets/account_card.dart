@@ -12,11 +12,11 @@ import 'package:shared/presentation/extensions/context_extensions.dart';
 import 'package:shared/presentation/navigation/navigation_extensions.dart';
 import 'package:shared/presentation/navigation/routes.dart';
 import 'package:shared/presentation/widgets/ink_tap_box.dart';
+import 'package:shared/presentation/widgets/sync_status.dart';
 
 const _groupRadius = Spacing.radiusXl;
 const _groupGap = Spacing.xxxs;
 const _avatarSize = 56.0;
-const _dotSize = 8.0;
 const _tilePadding = EdgeInsets.symmetric(horizontal: Spacing.l, vertical: Spacing.m);
 
 // * one card, not a profile card plus an account section: the identity is the
@@ -165,22 +165,7 @@ class const _SignInTile() extends StatelessWidget {
 class const _SyncedTile() extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final teal = context.palette.resolve(AccentColor.teal);
-    return _Tile(
-      isFirst: false,
-      isLast: false,
-      child: Row(
-        children: [
-          Container(
-            width: _dotSize,
-            height: _dotSize,
-            decoration: BoxDecoration(color: teal.solid, shape: BoxShape.circle),
-          ),
-          const SizedBox(width: Spacing.s),
-          Expanded(child: Text(context.s.sicherungSecured, style: context.typography.label)),
-        ],
-      ),
-    );
+    return const _Tile(isFirst: false, isLast: false, child: SyncStatusRow());
   }
 }
 

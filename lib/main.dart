@@ -17,6 +17,7 @@ import 'package:shared/presentation/extensions/context_extensions.dart';
 import 'package:shared/presentation/extensions/locale_preference_extensions.dart';
 import 'package:shared/presentation/extensions/theme_preference_extensions.dart';
 import 'package:shared/presentation/localization/generated/app_localizations.dart';
+import 'package:shared/presentation/sync/sync_cubit.dart';
 import 'package:shared/presentation/voice_note_cubit.dart';
 
 Future<void> main() async {
@@ -36,6 +37,7 @@ class const App({
         BlocProvider(create: (_) => sl<VoiceNoteCubit>()),
         BlocProvider(create: (_) => sl<AccountBloc>()..add(const AccountStarted())),
         BlocProvider(create: (_) => sl<AppConfigCubit>()..start()),
+        BlocProvider(create: (_) => sl<SyncCubit>()..start()),
       ],
       child: BlocListener<AccountBloc, AccountState>(
         // * the transition, not the state: a refresh that failed at launch is

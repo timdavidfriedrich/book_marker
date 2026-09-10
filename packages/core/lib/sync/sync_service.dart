@@ -4,6 +4,10 @@
 enum SyncConnectionStatus { disconnected, connecting, syncing, synced, failed }
 
 abstract class SyncService {
+  /// When the last full round trip finished, or null if there has not been one
+  /// on this device yet.
+  DateTime? get lastSyncedAt;
+
   Stream<SyncConnectionStatus> watchStatus();
 
   Future<void> connect();

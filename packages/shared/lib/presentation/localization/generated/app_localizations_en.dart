@@ -964,6 +964,30 @@ class AppLocalizationsEn extends AppLocalizations {
   String get sicherungSecured => 'Secured';
 
   @override
+  String get syncStatusSyncing => 'Backing up';
+
+  @override
+  String get syncStatusSynced => 'Backed up';
+
+  @override
+  String get syncStatusOffline => 'Offline · waiting';
+
+  @override
+  String get syncStatusFailed => 'Backup failed';
+
+  @override
+  String get syncStatusRetry => 'Retry';
+
+  @override
+  String get syncStatusOfflineShort => 'Offline';
+
+  @override
+  String get syncStatusFailedShort => 'Failed';
+
+  @override
+  String get syncStatusNever => 'Not backed up yet';
+
+  @override
   String get sicherungLockedTitle => 'Locked on this device';
 
   @override

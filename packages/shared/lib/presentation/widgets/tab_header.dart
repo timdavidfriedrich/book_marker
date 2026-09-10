@@ -11,6 +11,7 @@ const tabHeaderHeight = circleIconButtonSize + Spacing.m + Spacing.s;
 class const TabHeader({
   required final String _title,
   final Widget? _center,
+  final Widget? _badge,
   final double _contentHeight = circleIconButtonSize,
   super.key,
 }) extends StatelessWidget {
@@ -42,7 +43,20 @@ class const TabHeader({
                   child: Align(alignment: Alignment.centerRight, child: center),
                 ),
                 const SizedBox(width: Spacing.m),
-              ] else
+              ] else if (_badge case final Widget badge)
+                // * one Expanded around both, so the badge takes what it needs
+                // * and the title keeps the rest instead of being squeezed to
+                // * an ellipsis by a Spacer competing for the same room
+                Expanded(
+                  child: Row(
+                    children: [
+                      Flexible(child: title),
+                      const SizedBox(width: Spacing.s),
+                      badge,
+                    ],
+                  ),
+                )
+              else
                 Expanded(child: title),
               CircleIconButton(
                 icon: Icons.person_outline,

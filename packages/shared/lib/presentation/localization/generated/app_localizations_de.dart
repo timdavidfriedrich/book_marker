@@ -973,6 +973,30 @@ class AppLocalizationsDe extends AppLocalizations {
   String get sicherungSecured => 'Gesichert';
 
   @override
+  String get syncStatusSyncing => 'Sichert';
+
+  @override
+  String get syncStatusSynced => 'Gesichert';
+
+  @override
+  String get syncStatusOffline => 'Offline · wartet';
+
+  @override
+  String get syncStatusFailed => 'Sicherung fehlgeschlagen';
+
+  @override
+  String get syncStatusRetry => 'Erneut';
+
+  @override
+  String get syncStatusOfflineShort => 'Offline';
+
+  @override
+  String get syncStatusFailedShort => 'Fehler';
+
+  @override
+  String get syncStatusNever => 'Noch nicht gesichert';
+
+  @override
   String get sicherungLockedTitle => 'Gesperrt auf diesem Gerät';
 
   @override

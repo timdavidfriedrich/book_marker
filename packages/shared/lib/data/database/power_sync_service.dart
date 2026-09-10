@@ -10,6 +10,9 @@ class const PowerSyncService(
   final PowerSyncConnector _connector,
 ) implements SyncService {
   @override
+  DateTime? get lastSyncedAt => _syncDatabase.database.currentStatus.lastSyncedAt;
+
+  @override
   Stream<SyncConnectionStatus> watchStatus() => _syncDatabase.database.statusStream.map(_toStatus);
 
   // * adopting first is not optional: while the local only half owns the table

@@ -60,6 +60,7 @@ import 'package:shared/domain/repositories/voice_note_repository.dart' as _i88;
 import 'package:shared/presentation/account/account_bloc.dart' as _i880;
 import 'package:shared/presentation/app_config/app_config_cubit.dart' as _i56;
 import 'package:shared/presentation/navigation/route_change_observer.dart' as _i533;
+import 'package:shared/presentation/sync/sync_cubit.dart' as _i107;
 import 'package:shared/presentation/voice_note_cubit.dart' as _i610;
 
 class SharedPackageModule extends _i526.MicroPackageModule {
@@ -163,6 +164,7 @@ class SharedPackageModule extends _i526.MicroPackageModule {
     gh.factory<_i0.SettingsRepository>(
       () => _i921.SettingsRepositoryImpl(gh<_i115.SettingsLocalDataSource>()),
     );
+    gh.lazySingleton<_i107.SyncCubit>(() => _i107.SyncCubit(gh<_i336.SyncService>()));
     gh.factory<_i640.ThemeRepository>(
       () => _i308.ThemeRepositoryImpl(gh<_i814.ThemeLocalDataSource>()),
     );

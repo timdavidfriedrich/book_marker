@@ -28,6 +28,7 @@ import 'package:shared/presentation/widgets/quote_card.dart';
 import 'package:shared/presentation/widgets/section_label.dart';
 import 'package:shared/presentation/widgets/segmented_toggle.dart';
 import 'package:shared/presentation/widgets/selectable_chip.dart';
+import 'package:shared/presentation/widgets/sync_status.dart';
 import 'package:shared/presentation/widgets/tab_header.dart';
 
 const _searchFieldHeight = 56.0;
@@ -94,7 +95,7 @@ class const _Loaded({
         else if (!_state.isSearching)
           PinnedHeader(
             height: tabHeaderHeight,
-            child: TabHeader(title: context.s.libraryTitle),
+            child: TabHeader(title: context.s.libraryTitle, badge: const SyncStatusChip()),
           ),
         FloatingHeader(
           height: layout.isWide ? _wideHeaderHeight : _headerHeight,

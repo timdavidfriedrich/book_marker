@@ -1653,6 +1653,54 @@ abstract class AppLocalizations {
   /// **'Secured'**
   String get sicherungSecured;
 
+  /// No description provided for @syncStatusSyncing.
+  ///
+  /// In en, this message translates to:
+  /// **'Backing up'**
+  String get syncStatusSyncing;
+
+  /// No description provided for @syncStatusSynced.
+  ///
+  /// In en, this message translates to:
+  /// **'Backed up'**
+  String get syncStatusSynced;
+
+  /// No description provided for @syncStatusOffline.
+  ///
+  /// In en, this message translates to:
+  /// **'Offline · waiting'**
+  String get syncStatusOffline;
+
+  /// No description provided for @syncStatusFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Backup failed'**
+  String get syncStatusFailed;
+
+  /// No description provided for @syncStatusRetry.
+  ///
+  /// In en, this message translates to:
+  /// **'Retry'**
+  String get syncStatusRetry;
+
+  /// No description provided for @syncStatusOfflineShort.
+  ///
+  /// In en, this message translates to:
+  /// **'Offline'**
+  String get syncStatusOfflineShort;
+
+  /// No description provided for @syncStatusFailedShort.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed'**
+  String get syncStatusFailedShort;
+
+  /// No description provided for @syncStatusNever.
+  ///
+  /// In en, this message translates to:
+  /// **'Not backed up yet'**
+  String get syncStatusNever;
+
   /// No description provided for @sicherungLockedTitle.
   ///
   /// In en, this message translates to:
