@@ -9,6 +9,7 @@ resolution: workspace
 
 dependencies:
   jose: ^0.3.5+2
+  yaml: ^3.1.2
   serverpod: 4.0.0-rc.2
   serverpod_auth_idp_server: 4.0.0-rc.2
   serverpod_cloud_storage: 4.0.0-rc.2

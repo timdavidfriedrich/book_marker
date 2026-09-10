@@ -11,6 +11,8 @@
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'dart:async' as _ida;
+import 'package:book_marker_client/src/protocol/config/runtime_config.dart'
+    as _i0ksu74t;
 import 'package:book_marker_client/src/protocol/greetings/greeting.dart'
     as _iistozr7;
 import 'package:http/http.dart' as _i85jenna;
@@ -162,6 +164,27 @@ class EndpointJwtRefresh extends _iacc.EndpointRefreshJwtTokens {
       );
 }
 
+/// Serves the runtime configuration to the app.
+///
+/// Deliberately unauthenticated. `maintenanceMode` and `minSupportedVersion`
+/// have to reach a client that cannot sign in, which is the situation they
+/// exist for, and the file holds nothing that is not already visible in a
+/// decompiled APK.
+/// {@category Endpoint}
+class EndpointConfig extends _isc.EndpointRef {
+  EndpointConfig(_isc.EndpointCaller caller) : super(caller);
+
+  @override
+  String get name => 'config';
+
+  _ida.Future<_i0ksu74t.RuntimeConfig> fetch() =>
+      caller.callServerEndpoint<_i0ksu74t.RuntimeConfig>(
+        'config',
+        'fetch',
+        {},
+      );
+}
+
 /// Hands the client a PowerSync credential. This is the real gate on sync: a
 /// blocked account is refused here, and the 10-minute token lifetime bounds how
 /// long an already-issued one stays usable.
@@ -238,6 +261,7 @@ class Client extends _isc.ServerpodClientShared {
     appleIdp = EndpointAppleIdp(this);
     googleIdp = EndpointGoogleIdp(this);
     jwtRefresh = EndpointJwtRefresh(this);
+    config = EndpointConfig(this);
     powerSync = EndpointPowerSync(this);
     greeting = EndpointGreeting(this);
     modules = Modules(this);
@@ -248,6 +272,8 @@ class Client extends _isc.ServerpodClientShared {
   late final EndpointGoogleIdp googleIdp;
 
   late final EndpointJwtRefresh jwtRefresh;
+
+  late final EndpointConfig config;
 
   late final EndpointPowerSync powerSync;
 
@@ -260,6 +286,7 @@ class Client extends _isc.ServerpodClientShared {
     'appleIdp': appleIdp,
     'googleIdp': googleIdp,
     'jwtRefresh': jwtRefresh,
+    'config': config,
     'powerSync': powerSync,
     'greeting': greeting,
   };

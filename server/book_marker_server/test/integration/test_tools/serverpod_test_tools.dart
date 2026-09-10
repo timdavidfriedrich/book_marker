@@ -13,6 +13,8 @@
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'dart:async' as _ida;
 import 'dart:io' as _idi;
+import 'package:book_marker_server/src/generated/config/runtime_config.dart'
+    as _izn3a0mv;
 import 'package:book_marker_server/src/generated/greetings/greeting.dart'
     as _ilm93xjn;
 import 'package:serverpod/serverpod.dart' as _is;
@@ -153,6 +155,8 @@ class TestEndpoints {
 
   late final _JwtRefreshEndpoint jwtRefresh;
 
+  late final _ConfigEndpoint config;
+
   late final _PowerSyncEndpoint powerSync;
 
   late final _GreetingEndpoint greeting;
@@ -174,6 +178,10 @@ class _InternalTestEndpoints extends TestEndpoints
       serializationManager,
     );
     jwtRefresh = _JwtRefreshEndpoint(
+      endpoints,
+      serializationManager,
+    );
+    config = _ConfigEndpoint(
       endpoints,
       serializationManager,
     );
@@ -413,6 +421,47 @@ class _JwtRefreshEndpoint {
                   _localCallContext.arguments,
                 )
                 as _ida.Future<_iacs.AuthSuccess>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+}
+
+class _ConfigEndpoint {
+  _ConfigEndpoint(
+    this._endpointDispatch,
+    this._serializationManager,
+  );
+
+  final _is.EndpointDispatch _endpointDispatch;
+
+  final _is.SerializationManager _serializationManager;
+
+  _ida.Future<_izn3a0mv.RuntimeConfig> fetch(
+    _ist.TestSessionBuilder sessionBuilder,
+  ) async {
+    return _ist.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'config',
+            method: 'fetch',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'config',
+          methodName: 'fetch',
+          parameters: _ist.testObjectToJson({}),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _ida.Future<_izn3a0mv.RuntimeConfig>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();

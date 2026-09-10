@@ -1,0 +1,7 @@
+### Which text-recognition adapter the OCR proxy uses, and whether the app
+### should default its cloud toggle to on.
+class: RecognitionConfig
+
+fields:
+  provider: String
+  cloudEnabledByDefault: bool

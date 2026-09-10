@@ -1,0 +1,13 @@
+### The tunable numbers for one plan, read from app_config.yaml.
+###
+### The server reads these to ENFORCE and the app reads the same values to
+### DISPLAY. Keeping one copy is what stops a user being refused a scan the UI
+### said they had.
+class: PlanLimits
+
+fields:
+  ocrPerDay: int
+  ocrPerWeek: int
+  ocrPerMonth: int
+  maxImageBytes: int
+  attachmentsEnabled: bool

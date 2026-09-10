@@ -131,6 +131,20 @@ class ShelfBooks extends Table {
   Set<Column<Object>> get primaryKey => {shelfId, bookId};
 }
 
+@DataClassName("LocalAppConfigCache")
+class AppConfigCacheTable extends Table {
+  IntColumn get id => integer().withDefault(const Constant(0))();
+
+  IntColumn get version => integer()();
+
+  DateTimeColumn get fetchedAt => dateTime()();
+
+  TextColumn get payload => text()();
+
+  @override
+  Set<Column<Object>> get primaryKey => {id};
+}
+
 @DataClassName("LocalSettings")
 class SettingsTable extends Table {
   IntColumn get id => integer().withDefault(const Constant(0))();
@@ -147,12 +161,23 @@ class SettingsTable extends Table {
   Set<Column<Object>> get primaryKey => {id};
 }
 
-@DriftDatabase(tables: [Books, Quotes, Themes, ThemeQuotes, Shelves, ShelfBooks, SettingsTable])
+@DriftDatabase(
+  tables: [
+    Books,
+    Quotes,
+    Themes,
+    ThemeQuotes,
+    Shelves,
+    ShelfBooks,
+    SettingsTable,
+    AppConfigCacheTable,
+  ],
+)
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(driftDatabase(name: _databaseName));
 
   @override
-  int get schemaVersion => 12;
+  int get schemaVersion => 13;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -219,6 +244,9 @@ class AppDatabase extends _$AppDatabase {
       if (from < 12) {
         await migrator.addColumn(quotes, quotes.words);
         await migrator.addColumn(quotes, quotes.markedWordIndexes);
+      }
+      if (from < 13) {
+        await migrator.createTable(appConfigCacheTable);
       }
     },
   );

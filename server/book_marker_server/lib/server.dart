@@ -6,6 +6,7 @@ import 'package:serverpod_auth_idp_server/providers/google.dart';
 import 'package:serverpod_cloud_storage/serverpod_cloud_storage.dart';
 
 import 'src/cache_busting.dart';
+import 'src/domain/config_source.dart';
 import 'src/domain/entitlements.dart';
 import 'src/generated/serverpod.dart';
 import 'src/web/routes/app_config_route.dart';
@@ -65,6 +66,11 @@ void run(List<String> args) async {
   // Initialize Serverpod. The generated Serverpod class is already connected
   // with your project's generated code.
   final pod = Serverpod(args);
+
+  // * read once at boot so a missing or malformed app_config.yaml stops the
+  // * deploy instead of failing every request later. docker compose keeps the
+  // * previous containers running when the new one exits.
+  const ConfigSource().read();
 
   // Initialize authentication services for the server.
   // Token managers will be used to validate and issue authentication keys,

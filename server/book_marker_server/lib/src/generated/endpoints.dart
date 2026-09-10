@@ -18,6 +18,7 @@ import 'package:serverpod_auth_idp_server/serverpod_auth_idp_server.dart'
 import '../auth/apple_idp_endpoint.dart' as _ilq63su8;
 import '../auth/google_idp_endpoint.dart' as _i71axiz0;
 import '../auth/jwt_refresh_endpoint.dart' as _inwq3ztq;
+import '../endpoints/config_endpoint.dart' as _i74a5xur;
 import '../endpoints/power_sync_endpoint.dart' as _i61fa217;
 import '../greetings/greeting_endpoint.dart' as _il624ik7;
 
@@ -41,6 +42,12 @@ class Endpoints extends _is.EndpointDispatch {
         ..initialize(
           server,
           'jwtRefresh',
+          null,
+        ),
+      'config': _i74a5xur.ConfigEndpoint()
+        ..initialize(
+          server,
+          'config',
           null,
         ),
       'powerSync': _i61fa217.PowerSyncEndpoint()
@@ -211,6 +218,22 @@ class Endpoints extends _is.EndpointDispatch {
                         session,
                         refreshToken: params['refreshToken'],
                       ),
+        ),
+      },
+    );
+    connectors['config'] = _is.EndpointConnector(
+      name: 'config',
+      endpoint: endpoints['config']!,
+      methodConnectors: {
+        'fetch': _is.MethodConnector(
+          name: 'fetch',
+          params: {},
+          call:
+              (
+                _is.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['config'] as _i74a5xur.ConfigEndpoint)
+                  .fetch(session),
         ),
       },
     );

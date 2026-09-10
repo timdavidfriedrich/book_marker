@@ -1,0 +1,16 @@
+### Everything that can change in production without a deploy or an app release.
+###
+### Not a table. It is parsed from app_config.yaml on the host, which is mounted
+### into the container read-only, so editing it and reloading is the whole
+### procedure. Nothing secret goes in it - it is served unauthenticated.
+###
+### `version` is bumped by hand on every edit so a client can log which revision
+### it is holding.
+class: RuntimeConfig
+
+fields:
+  version: int
+  free: PlanLimits
+  premium: PlanLimits
+  recognition: RecognitionConfig
+  client: ClientConfig

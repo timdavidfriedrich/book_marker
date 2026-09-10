@@ -1,0 +1,9 @@
+### The two levers that can tell an already-shipped app to stand down. They are
+### the reason this endpoint is unauthenticated: both have to work for a client
+### that cannot sign in.
+class: ClientConfig
+
+fields:
+  minSupportedVersion: String
+  maintenanceMode: bool
+  maintenanceMessage: String?

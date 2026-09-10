@@ -17,11 +17,19 @@ import 'package:serverpod_auth_core_server/serverpod_auth_core_server.dart'
     as _iacs;
 import 'package:serverpod_auth_idp_server/serverpod_auth_idp_server.dart'
     as _iais;
+import 'config/client_config.dart' as _ikmgnzhy;
+import 'config/plan_limits.dart' as _ios57rmt;
+import 'config/recognition_config.dart' as _i96enlzs;
+import 'config/runtime_config.dart' as _iadewe5j;
 import 'entitlements/account_blocked_exception.dart' as _i42k8jky;
 import 'entitlements/entitlement.dart' as _id6kwse3;
 import 'entitlements/ocr_usage.dart' as _i13b5r7e;
 import 'greetings/greeting.dart' as _izw8z7ou;
 import 'sync/sync_probe.dart' as _i8t4kps3;
+export 'config/client_config.dart';
+export 'config/plan_limits.dart';
+export 'config/recognition_config.dart';
+export 'config/runtime_config.dart';
 export 'entitlements/account_blocked_exception.dart';
 export 'entitlements/entitlement.dart';
 export 'entitlements/ocr_usage.dart';
@@ -312,6 +320,18 @@ class Protocol extends _is.DatabaseSerializationManager {
       }
     }
 
+    if (t == _ikmgnzhy.ClientConfig) {
+      return _ikmgnzhy.ClientConfig.fromJson(data) as T;
+    }
+    if (t == _ios57rmt.PlanLimits) {
+      return _ios57rmt.PlanLimits.fromJson(data) as T;
+    }
+    if (t == _i96enlzs.RecognitionConfig) {
+      return _i96enlzs.RecognitionConfig.fromJson(data) as T;
+    }
+    if (t == _iadewe5j.RuntimeConfig) {
+      return _iadewe5j.RuntimeConfig.fromJson(data) as T;
+    }
     if (t == _i42k8jky.AccountBlockedException) {
       return _i42k8jky.AccountBlockedException.fromJson(data) as T;
     }
@@ -326,6 +346,20 @@ class Protocol extends _is.DatabaseSerializationManager {
     }
     if (t == _i8t4kps3.SyncProbe) {
       return _i8t4kps3.SyncProbe.fromJson(data) as T;
+    }
+    if (t == _is.getType<_ikmgnzhy.ClientConfig?>()) {
+      return (data != null ? _ikmgnzhy.ClientConfig.fromJson(data) : null) as T;
+    }
+    if (t == _is.getType<_ios57rmt.PlanLimits?>()) {
+      return (data != null ? _ios57rmt.PlanLimits.fromJson(data) : null) as T;
+    }
+    if (t == _is.getType<_i96enlzs.RecognitionConfig?>()) {
+      return (data != null ? _i96enlzs.RecognitionConfig.fromJson(data) : null)
+          as T;
+    }
+    if (t == _is.getType<_iadewe5j.RuntimeConfig?>()) {
+      return (data != null ? _iadewe5j.RuntimeConfig.fromJson(data) : null)
+          as T;
     }
     if (t == _is.getType<_i42k8jky.AccountBlockedException?>()) {
       return (data != null
@@ -359,6 +393,10 @@ class Protocol extends _is.DatabaseSerializationManager {
 
   static String? getClassNameForType(Type type) {
     return switch (type) {
+      _ikmgnzhy.ClientConfig => 'ClientConfig',
+      _ios57rmt.PlanLimits => 'PlanLimits',
+      _i96enlzs.RecognitionConfig => 'RecognitionConfig',
+      _iadewe5j.RuntimeConfig => 'RuntimeConfig',
       _i42k8jky.AccountBlockedException => 'AccountBlockedException',
       _id6kwse3.Entitlement => 'Entitlement',
       _i13b5r7e.OcrUsage => 'OcrUsage',
@@ -378,6 +416,14 @@ class Protocol extends _is.DatabaseSerializationManager {
     }
 
     switch (data) {
+      case _ikmgnzhy.ClientConfig():
+        return 'ClientConfig';
+      case _ios57rmt.PlanLimits():
+        return 'PlanLimits';
+      case _i96enlzs.RecognitionConfig():
+        return 'RecognitionConfig';
+      case _iadewe5j.RuntimeConfig():
+        return 'RuntimeConfig';
       case _i42k8jky.AccountBlockedException():
         return 'AccountBlockedException';
       case _id6kwse3.Entitlement():
@@ -413,6 +459,18 @@ class Protocol extends _is.DatabaseSerializationManager {
     var dataClassName = data['className'];
     if (dataClassName is! String) {
       return super.deserializeByClassName(data);
+    }
+    if (dataClassName == 'ClientConfig') {
+      return deserialize<_ikmgnzhy.ClientConfig>(data['data']);
+    }
+    if (dataClassName == 'PlanLimits') {
+      return deserialize<_ios57rmt.PlanLimits>(data['data']);
+    }
+    if (dataClassName == 'RecognitionConfig') {
+      return deserialize<_i96enlzs.RecognitionConfig>(data['data']);
+    }
+    if (dataClassName == 'RuntimeConfig') {
+      return deserialize<_iadewe5j.RuntimeConfig>(data['data']);
     }
     if (dataClassName == 'AccountBlockedException') {
       return deserialize<_i42k8jky.AccountBlockedException>(data['data']);
