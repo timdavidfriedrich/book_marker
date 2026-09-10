@@ -123,8 +123,33 @@ services:
       timeout: 3s
       retries: 15
 
+  # Encrypted attachment blobs. Every object in here is ciphertext the server
+  # cannot open, so the bucket is private for what it reveals (how many
+  # attachments an account has, and when) rather than for the bytes.
+  #
+  # Nothing published except the console on loopback, reachable with
+  #   ssh -L 9001:127.0.0.1:9001 <vps>
+  minio:
+    image: minio/minio:latest
+    restart: unless-stopped
+    command: ["server", "/data", "--console-address", ":9001"]
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:?set MINIO_ROOT_USER in .env}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:?set MINIO_ROOT_PASSWORD in .env}
+    ports:
+      - "127.0.0.1:9001:9001"
+    volumes:
+      - minio_data:/data
+    networks: [internal]
+    healthcheck:
+      test: ["CMD", "mc", "ready", "local"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
 volumes:
   postgres_data:
+  minio_data:
 
 networks:
   internal:

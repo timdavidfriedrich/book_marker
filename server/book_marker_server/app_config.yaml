@@ -19,12 +19,14 @@ plans:
     ocrPerWeek: 10
     ocrPerMonth: 20
     maxImageBytes: 2097152
+    maxAttachmentBytes: 2097152
     attachmentsEnabled: false
   premium:
     ocrPerDay: 50
     ocrPerWeek: 250
     ocrPerMonth: 500
     maxImageBytes: 2097152
+    maxAttachmentBytes: 2097152
     attachmentsEnabled: true
 
 sync:
@@ -32,6 +34,16 @@ sync:
   # account syncs rows regardless of plan.
   maxWritesPerBatch: 500
   maxRowsPerTable: 100000
+
+attachments:
+  # Read at BOOT, not per request: the storage backend is registered with
+  # Serverpod once at startup, so changing it needs a restart.
+  #
+  # minio, or database to keep blobs in Postgres with no object store at all.
+  provider: database
+  bucket: book-marker-attachments
+  region: us-east-1
+  endpoint: http://minio:9000
 
 recognition:
   # gemini, or echo to exercise the quota path with no API key and no billing

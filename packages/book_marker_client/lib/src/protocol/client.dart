@@ -191,6 +191,45 @@ class EndpointAccount extends _isc.EndpointRef {
   );
 }
 
+/// Encrypted attachment blobs: page photographs and voice notes.
+///
+/// The bytes are already encrypted when they arrive, with a key derived from
+/// the device's master key. This server stores them and cannot read them, the
+/// same posture as every synced row.
+/// {@category Endpoint}
+class EndpointAttachment extends _isc.EndpointRef {
+  EndpointAttachment(_isc.EndpointCaller caller) : super(caller);
+
+  @override
+  String get name => 'attachment';
+
+  _ida.Future<void> upload(
+    String attachmentId,
+    _idt.ByteData bytes,
+  ) => caller.callServerEndpoint<void>(
+    'attachment',
+    'upload',
+    {
+      'attachmentId': attachmentId,
+      'bytes': bytes,
+    },
+  );
+
+  _ida.Future<_idt.ByteData> download(String attachmentId) =>
+      caller.callServerEndpoint<_idt.ByteData>(
+        'attachment',
+        'download',
+        {'attachmentId': attachmentId},
+      );
+
+  _ida.Future<void> delete(String attachmentId) =>
+      caller.callServerEndpoint<void>(
+        'attachment',
+        'delete',
+        {'attachmentId': attachmentId},
+      );
+}
+
 /// Serves the runtime configuration to the app.
 ///
 /// Deliberately unauthenticated. `maintenanceMode` and `minSupportedVersion`
@@ -348,6 +387,7 @@ class Client extends _isc.ServerpodClientShared {
     googleIdp = EndpointGoogleIdp(this);
     jwtRefresh = EndpointJwtRefresh(this);
     account = EndpointAccount(this);
+    attachment = EndpointAttachment(this);
     config = EndpointConfig(this);
     entitlement = EndpointEntitlement(this);
     ocr = EndpointOcr(this);
@@ -363,6 +403,8 @@ class Client extends _isc.ServerpodClientShared {
   late final EndpointJwtRefresh jwtRefresh;
 
   late final EndpointAccount account;
+
+  late final EndpointAttachment attachment;
 
   late final EndpointConfig config;
 
@@ -382,6 +424,7 @@ class Client extends _isc.ServerpodClientShared {
     'googleIdp': googleIdp,
     'jwtRefresh': jwtRefresh,
     'account': account,
+    'attachment': attachment,
     'config': config,
     'entitlement': entitlement,
     'ocr': ocr,

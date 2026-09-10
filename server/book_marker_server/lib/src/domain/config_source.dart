@@ -53,6 +53,7 @@ RuntimeConfig _parse(final String source) {
   final root = _mapAt(loadYaml(source), 'root');
   final plans = _mapAt(root['plans'], 'plans');
   final sync = _mapAt(root['sync'], 'sync');
+  final attachments = _mapAt(root['attachments'], 'attachments');
   final recognition = _mapAt(root['recognition'], 'recognition');
   final client = _mapAt(root['client'], 'client');
 
@@ -66,6 +67,12 @@ RuntimeConfig _parse(final String source) {
         'sync.maxWritesPerBatch',
       ),
       maxRowsPerTable: _intAt(sync['maxRowsPerTable'], 'sync.maxRowsPerTable'),
+    ),
+    attachments: AttachmentConfig(
+      provider: _stringAt(attachments['provider'], 'attachments.provider'),
+      bucket: _stringAt(attachments['bucket'], 'attachments.bucket'),
+      region: _stringAt(attachments['region'], 'attachments.region'),
+      endpoint: _stringAt(attachments['endpoint'], 'attachments.endpoint'),
     ),
     recognition: RecognitionConfig(
       provider: _stringAt(recognition['provider'], 'recognition.provider'),
@@ -99,6 +106,10 @@ PlanLimits _planAt(final Object? value, final String path) {
     ocrPerWeek: _intAt(plan['ocrPerWeek'], '$path.ocrPerWeek'),
     ocrPerMonth: _intAt(plan['ocrPerMonth'], '$path.ocrPerMonth'),
     maxImageBytes: _intAt(plan['maxImageBytes'], '$path.maxImageBytes'),
+    maxAttachmentBytes: _intAt(
+      plan['maxAttachmentBytes'],
+      '$path.maxAttachmentBytes',
+    ),
     attachmentsEnabled: _boolAt(
       plan['attachmentsEnabled'],
       '$path.attachmentsEnabled',

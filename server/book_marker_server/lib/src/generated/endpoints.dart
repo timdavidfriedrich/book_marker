@@ -22,6 +22,7 @@ import '../auth/apple_idp_endpoint.dart' as _ilq63su8;
 import '../auth/google_idp_endpoint.dart' as _i71axiz0;
 import '../auth/jwt_refresh_endpoint.dart' as _inwq3ztq;
 import '../endpoints/account_endpoint.dart' as _iaho7ul5;
+import '../endpoints/attachment_endpoint.dart' as _ilnd62gh;
 import '../endpoints/config_endpoint.dart' as _i74a5xur;
 import '../endpoints/entitlement_endpoint.dart' as _im71ml4a;
 import '../endpoints/ocr_endpoint.dart' as _ixzu59l7;
@@ -54,6 +55,12 @@ class Endpoints extends _is.EndpointDispatch {
         ..initialize(
           server,
           'account',
+          null,
+        ),
+      'attachment': _ilnd62gh.AttachmentEndpoint()
+        ..initialize(
+          server,
+          'attachment',
           null,
         ),
       'config': _i74a5xur.ConfigEndpoint()
@@ -258,6 +265,78 @@ class Endpoints extends _is.EndpointDispatch {
                 Map<String, dynamic> params,
               ) async => (endpoints['account'] as _iaho7ul5.AccountEndpoint)
                   .delete(session),
+        ),
+      },
+    );
+    connectors['attachment'] = _is.EndpointConnector(
+      name: 'attachment',
+      endpoint: endpoints['attachment']!,
+      methodConnectors: {
+        'upload': _is.MethodConnector(
+          name: 'upload',
+          params: {
+            'attachmentId': _is.ParameterDescription(
+              name: 'attachmentId',
+              type: _is.getType<String>(),
+              nullable: false,
+            ),
+            'bytes': _is.ParameterDescription(
+              name: 'bytes',
+              type: _is.getType<_idt.ByteData>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _is.Session session,
+                Map<String, dynamic> params,
+              ) async =>
+                  (endpoints['attachment'] as _ilnd62gh.AttachmentEndpoint)
+                      .upload(
+                        session,
+                        params['attachmentId'],
+                        params['bytes'],
+                      ),
+        ),
+        'download': _is.MethodConnector(
+          name: 'download',
+          params: {
+            'attachmentId': _is.ParameterDescription(
+              name: 'attachmentId',
+              type: _is.getType<String>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _is.Session session,
+                Map<String, dynamic> params,
+              ) async =>
+                  (endpoints['attachment'] as _ilnd62gh.AttachmentEndpoint)
+                      .download(
+                        session,
+                        params['attachmentId'],
+                      ),
+        ),
+        'delete': _is.MethodConnector(
+          name: 'delete',
+          params: {
+            'attachmentId': _is.ParameterDescription(
+              name: 'attachmentId',
+              type: _is.getType<String>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _is.Session session,
+                Map<String, dynamic> params,
+              ) async =>
+                  (endpoints['attachment'] as _ilnd62gh.AttachmentEndpoint)
+                      .delete(
+                        session,
+                        params['attachmentId'],
+                      ),
         ),
       },
     );

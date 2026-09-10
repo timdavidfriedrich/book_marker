@@ -164,6 +164,8 @@ class TestEndpoints {
 
   late final _AccountEndpoint account;
 
+  late final _AttachmentEndpoint attachment;
+
   late final _ConfigEndpoint config;
 
   late final _EntitlementEndpoint entitlement;
@@ -195,6 +197,10 @@ class _InternalTestEndpoints extends TestEndpoints
       serializationManager,
     );
     account = _AccountEndpoint(
+      endpoints,
+      serializationManager,
+    );
+    attachment = _AttachmentEndpoint(
       endpoints,
       serializationManager,
     );
@@ -477,6 +483,114 @@ class _AccountEndpoint {
           endpointPath: 'account',
           methodName: 'delete',
           parameters: _ist.testObjectToJson({}),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _ida.Future<void>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+}
+
+class _AttachmentEndpoint {
+  _AttachmentEndpoint(
+    this._endpointDispatch,
+    this._serializationManager,
+  );
+
+  final _is.EndpointDispatch _endpointDispatch;
+
+  final _is.SerializationManager _serializationManager;
+
+  _ida.Future<void> upload(
+    _ist.TestSessionBuilder sessionBuilder,
+    String attachmentId,
+    _idt.ByteData bytes,
+  ) async {
+    return _ist.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'attachment',
+            method: 'upload',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'attachment',
+          methodName: 'upload',
+          parameters: _ist.testObjectToJson({
+            'attachmentId': attachmentId,
+            'bytes': bytes,
+          }),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _ida.Future<void>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _ida.Future<_idt.ByteData> download(
+    _ist.TestSessionBuilder sessionBuilder,
+    String attachmentId,
+  ) async {
+    return _ist.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'attachment',
+            method: 'download',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'attachment',
+          methodName: 'download',
+          parameters: _ist.testObjectToJson({'attachmentId': attachmentId}),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _ida.Future<_idt.ByteData>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _ida.Future<void> delete(
+    _ist.TestSessionBuilder sessionBuilder,
+    String attachmentId,
+  ) async {
+    return _ist.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'attachment',
+            method: 'delete',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'attachment',
+          methodName: 'delete',
+          parameters: _ist.testObjectToJson({'attachmentId': attachmentId}),
           serializationManager: _serializationManager,
         );
         var _localReturnValue =

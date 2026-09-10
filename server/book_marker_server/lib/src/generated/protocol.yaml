@@ -9,6 +9,10 @@ jwtRefresh:
   - refreshAccessToken:
 account:
   - delete:
+attachment:
+  - upload:
+  - download:
+  - delete:
 config:
   - fetch:
 entitlement:

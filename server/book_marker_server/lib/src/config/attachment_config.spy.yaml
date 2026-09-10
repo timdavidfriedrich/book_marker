@@ -1,0 +1,17 @@
+### Where encrypted attachment blobs are kept.
+###
+### Unlike everything else in app_config.yaml this is read at BOOT, not per
+### request: the storage backend is registered with Serverpod once at startup.
+### Changing it needs a restart, which is honest, because it is infrastructure
+### rather than a tunable.
+class: AttachmentConfig
+
+fields:
+  ### minio, or database to keep blobs in Postgres with no object store at all.
+  ### The database one exists so the whole attachment path can be exercised on a
+  ### machine with no MinIO and no access keys.
+  provider: String
+  bucket: String
+  region: String
+  ### Reached over the internal docker network; never published.
+  endpoint: String

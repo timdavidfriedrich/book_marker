@@ -82,6 +82,33 @@ services:
       timeout: 2s
       retries: 15
 
+  # Object storage for encrypted attachments. Only needed when app_config.yaml
+  # sets attachments.provider to minio; the default `database` provider keeps
+  # blobs in Postgres and needs nothing running here, which is why this sits
+  # behind a profile:
+  #
+  #   docker compose --profile minio up -d
+  minio:
+    image: minio/minio:latest
+    profiles: [minio]
+    restart: unless-stopped
+    command: ["server", "/data", "--console-address", ":9001"]
+    environment:
+      MINIO_ROOT_USER: bookmarker
+      MINIO_ROOT_PASSWORD: "bookmarker-dev-secret"
+    ports:
+      # * loopback only, like everything else here
+      - "127.0.0.1:9000:9000"
+      - "127.0.0.1:9001:9001"
+    volumes:
+      - book_marker_attachments:/data
+    healthcheck:
+      test: ["CMD", "mc", "ready", "local"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
 volumes:
   book_marker_data:
   book_marker_test_data:
+  book_marker_attachments:

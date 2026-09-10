@@ -13,5 +13,6 @@ fields:
   free: PlanLimits
   premium: PlanLimits
   syncLimits: SyncLimits
+  attachments: AttachmentConfig
   recognition: RecognitionConfig
   client: ClientConfig

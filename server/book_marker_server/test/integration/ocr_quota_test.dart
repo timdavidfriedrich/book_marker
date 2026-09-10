@@ -11,6 +11,7 @@ final threePerDay = PlanLimits(
   ocrPerWeek: 10,
   ocrPerMonth: 20,
   maxImageBytes: 2097152,
+  maxAttachmentBytes: 2097152,
   attachmentsEnabled: false,
 );
 
@@ -140,6 +141,7 @@ void main() {
           ocrPerWeek: 10,
           ocrPerMonth: 20,
           maxImageBytes: 2097152,
+          maxAttachmentBytes: 2097152,
           attachmentsEnabled: false,
         );
 

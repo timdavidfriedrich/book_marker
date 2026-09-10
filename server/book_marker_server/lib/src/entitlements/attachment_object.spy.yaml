@@ -1,0 +1,27 @@
+### One row per stored blob.
+###
+### The server cannot read an attachment and cannot infer from a synced row
+### which blobs exist, because every reference to one is inside ciphertext. So
+### it keeps its own index, and that index is what makes two things possible:
+### deleting an account completely, and knowing how much disk an owner is using.
+###
+### It leaks a count and a total size, which is the same shape of structural
+### leak the row tables already accept.
+###
+### Server-only: never added to the `powersync` publication.
+class: AttachmentObject
+table: attachment_objects
+
+fields:
+  id: UuidValue, defaultModel=random, defaultPersist=random
+  ownerId: UuidValue, column=owner_id
+  attachmentId: String, column=attachment_id
+  sizeBytes: int, column=size_bytes
+  createdAt: DateTime, column=created_at
+
+indexes:
+  attachment_objects_owner_idx:
+    fields: ownerId
+  attachment_objects_key_idx:
+    fields: ownerId, attachmentId
+    unique: true

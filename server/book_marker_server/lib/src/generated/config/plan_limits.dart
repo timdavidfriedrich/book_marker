@@ -24,6 +24,7 @@ abstract class PlanLimits
     required this.ocrPerWeek,
     required this.ocrPerMonth,
     required this.maxImageBytes,
+    required this.maxAttachmentBytes,
     required this.attachmentsEnabled,
   });
 
@@ -32,6 +33,7 @@ abstract class PlanLimits
     required int ocrPerWeek,
     required int ocrPerMonth,
     required int maxImageBytes,
+    required int maxAttachmentBytes,
     required bool attachmentsEnabled,
   }) = _PlanLimitsImpl;
 
@@ -41,6 +43,7 @@ abstract class PlanLimits
       ocrPerWeek: jsonSerialization['ocrPerWeek'] as int,
       ocrPerMonth: jsonSerialization['ocrPerMonth'] as int,
       maxImageBytes: jsonSerialization['maxImageBytes'] as int,
+      maxAttachmentBytes: jsonSerialization['maxAttachmentBytes'] as int,
       attachmentsEnabled: _is.BoolJsonExtension.fromJson(
         jsonSerialization['attachmentsEnabled'],
       ),
@@ -55,6 +58,10 @@ abstract class PlanLimits
 
   int maxImageBytes;
 
+  /// Per attachment. maxRequestSize in the Serverpod config is the outer
+  /// guard, and it has to allow for base64 in the envelope.
+  int maxAttachmentBytes;
+
   bool attachmentsEnabled;
 
   /// Returns a shallow copy of this [PlanLimits]
@@ -65,6 +72,7 @@ abstract class PlanLimits
     int? ocrPerWeek,
     int? ocrPerMonth,
     int? maxImageBytes,
+    int? maxAttachmentBytes,
     bool? attachmentsEnabled,
   });
   @override
@@ -75,6 +83,7 @@ abstract class PlanLimits
       'ocrPerWeek': ocrPerWeek,
       'ocrPerMonth': ocrPerMonth,
       'maxImageBytes': maxImageBytes,
+      'maxAttachmentBytes': maxAttachmentBytes,
       'attachmentsEnabled': attachmentsEnabled,
     };
   }
@@ -87,6 +96,7 @@ abstract class PlanLimits
       'ocrPerWeek': ocrPerWeek,
       'ocrPerMonth': ocrPerMonth,
       'maxImageBytes': maxImageBytes,
+      'maxAttachmentBytes': maxAttachmentBytes,
       'attachmentsEnabled': attachmentsEnabled,
     };
   }
@@ -103,12 +113,14 @@ class _PlanLimitsImpl extends PlanLimits {
     required int ocrPerWeek,
     required int ocrPerMonth,
     required int maxImageBytes,
+    required int maxAttachmentBytes,
     required bool attachmentsEnabled,
   }) : super._(
          ocrPerDay: ocrPerDay,
          ocrPerWeek: ocrPerWeek,
          ocrPerMonth: ocrPerMonth,
          maxImageBytes: maxImageBytes,
+         maxAttachmentBytes: maxAttachmentBytes,
          attachmentsEnabled: attachmentsEnabled,
        );
 
@@ -121,6 +133,7 @@ class _PlanLimitsImpl extends PlanLimits {
     int? ocrPerWeek,
     int? ocrPerMonth,
     int? maxImageBytes,
+    int? maxAttachmentBytes,
     bool? attachmentsEnabled,
   }) {
     return PlanLimits(
@@ -128,6 +141,7 @@ class _PlanLimitsImpl extends PlanLimits {
       ocrPerWeek: ocrPerWeek ?? this.ocrPerWeek,
       ocrPerMonth: ocrPerMonth ?? this.ocrPerMonth,
       maxImageBytes: maxImageBytes ?? this.maxImageBytes,
+      maxAttachmentBytes: maxAttachmentBytes ?? this.maxAttachmentBytes,
       attachmentsEnabled: attachmentsEnabled ?? this.attachmentsEnabled,
     );
   }

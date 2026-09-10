@@ -18,12 +18,15 @@ import 'package:serverpod_auth_core_client/serverpod_auth_core_client.dart'
 import 'package:serverpod_auth_idp_client/serverpod_auth_idp_client.dart'
     as _iaic;
 import 'package:serverpod_client/serverpod_client.dart' as _isc;
+import 'config/attachment_config.dart' as _ig66eejy;
 import 'config/client_config.dart' as _ikmgnzhy;
 import 'config/plan_limits.dart' as _ios57rmt;
 import 'config/recognition_config.dart' as _i96enlzs;
 import 'config/runtime_config.dart' as _iadewe5j;
 import 'config/sync_limits.dart' as _ivlkv61n;
 import 'entitlements/account_blocked_exception.dart' as _i42k8jky;
+import 'entitlements/attachment_not_entitled_exception.dart' as _i4lsg8uj;
+import 'entitlements/attachment_object.dart' as _itu2u8jc;
 import 'entitlements/entitlement.dart' as _id6kwse3;
 import 'entitlements/entitlement_view.dart' as _ik9sk60n;
 import 'entitlements/ocr_quota_exhausted_exception.dart' as _ik0msexu;
@@ -39,12 +42,15 @@ import 'sync/sync_result.dart' as _ibtdwinl;
 import 'sync/sync_write.dart' as _it8m259u;
 import 'sync/theme.dart' as _itq42fc1;
 import 'sync/theme_quote.dart' as _ih8stdgt;
+export 'config/attachment_config.dart';
 export 'config/client_config.dart';
 export 'config/plan_limits.dart';
 export 'config/recognition_config.dart';
 export 'config/runtime_config.dart';
 export 'config/sync_limits.dart';
 export 'entitlements/account_blocked_exception.dart';
+export 'entitlements/attachment_not_entitled_exception.dart';
+export 'entitlements/attachment_object.dart';
 export 'entitlements/entitlement.dart';
 export 'entitlements/entitlement_view.dart';
 export 'entitlements/ocr_quota_exhausted_exception.dart';
@@ -96,6 +102,9 @@ class Protocol extends _isc.SerializationManager {
       }
     }
 
+    if (t == _ig66eejy.AttachmentConfig) {
+      return _ig66eejy.AttachmentConfig.fromJson(data) as T;
+    }
     if (t == _ikmgnzhy.ClientConfig) {
       return _ikmgnzhy.ClientConfig.fromJson(data) as T;
     }
@@ -113,6 +122,12 @@ class Protocol extends _isc.SerializationManager {
     }
     if (t == _i42k8jky.AccountBlockedException) {
       return _i42k8jky.AccountBlockedException.fromJson(data) as T;
+    }
+    if (t == _i4lsg8uj.AttachmentNotEntitledException) {
+      return _i4lsg8uj.AttachmentNotEntitledException.fromJson(data) as T;
+    }
+    if (t == _itu2u8jc.AttachmentObject) {
+      return _itu2u8jc.AttachmentObject.fromJson(data) as T;
     }
     if (t == _id6kwse3.Entitlement) {
       return _id6kwse3.Entitlement.fromJson(data) as T;
@@ -159,6 +174,10 @@ class Protocol extends _isc.SerializationManager {
     if (t == _ih8stdgt.SyncedThemeQuote) {
       return _ih8stdgt.SyncedThemeQuote.fromJson(data) as T;
     }
+    if (t == _isc.getType<_ig66eejy.AttachmentConfig?>()) {
+      return (data != null ? _ig66eejy.AttachmentConfig.fromJson(data) : null)
+          as T;
+    }
     if (t == _isc.getType<_ikmgnzhy.ClientConfig?>()) {
       return (data != null ? _ikmgnzhy.ClientConfig.fromJson(data) : null) as T;
     }
@@ -180,6 +199,16 @@ class Protocol extends _isc.SerializationManager {
       return (data != null
               ? _i42k8jky.AccountBlockedException.fromJson(data)
               : null)
+          as T;
+    }
+    if (t == _isc.getType<_i4lsg8uj.AttachmentNotEntitledException?>()) {
+      return (data != null
+              ? _i4lsg8uj.AttachmentNotEntitledException.fromJson(data)
+              : null)
+          as T;
+    }
+    if (t == _isc.getType<_itu2u8jc.AttachmentObject?>()) {
+      return (data != null ? _itu2u8jc.AttachmentObject.fromJson(data) : null)
           as T;
     }
     if (t == _isc.getType<_id6kwse3.Entitlement?>()) {
@@ -256,12 +285,16 @@ class Protocol extends _isc.SerializationManager {
 
   static String? getClassNameForType(Type type) {
     return switch (type) {
+      _ig66eejy.AttachmentConfig => 'AttachmentConfig',
       _ikmgnzhy.ClientConfig => 'ClientConfig',
       _ios57rmt.PlanLimits => 'PlanLimits',
       _i96enlzs.RecognitionConfig => 'RecognitionConfig',
       _iadewe5j.RuntimeConfig => 'RuntimeConfig',
       _ivlkv61n.SyncLimits => 'SyncLimits',
       _i42k8jky.AccountBlockedException => 'AccountBlockedException',
+      _i4lsg8uj.AttachmentNotEntitledException =>
+        'AttachmentNotEntitledException',
+      _itu2u8jc.AttachmentObject => 'AttachmentObject',
       _id6kwse3.Entitlement => 'Entitlement',
       _ik9sk60n.EntitlementView => 'EntitlementView',
       _ik0msexu.OcrQuotaExhaustedException => 'OcrQuotaExhaustedException',
@@ -291,6 +324,8 @@ class Protocol extends _isc.SerializationManager {
     }
 
     switch (data) {
+      case _ig66eejy.AttachmentConfig():
+        return 'AttachmentConfig';
       case _ikmgnzhy.ClientConfig():
         return 'ClientConfig';
       case _ios57rmt.PlanLimits():
@@ -303,6 +338,10 @@ class Protocol extends _isc.SerializationManager {
         return 'SyncLimits';
       case _i42k8jky.AccountBlockedException():
         return 'AccountBlockedException';
+      case _i4lsg8uj.AttachmentNotEntitledException():
+        return 'AttachmentNotEntitledException';
+      case _itu2u8jc.AttachmentObject():
+        return 'AttachmentObject';
       case _id6kwse3.Entitlement():
         return 'Entitlement';
       case _ik9sk60n.EntitlementView():
@@ -355,6 +394,9 @@ class Protocol extends _isc.SerializationManager {
     if (dataClassName is! String) {
       return super.deserializeByClassName(data);
     }
+    if (dataClassName == 'AttachmentConfig') {
+      return deserialize<_ig66eejy.AttachmentConfig>(data['data']);
+    }
     if (dataClassName == 'ClientConfig') {
       return deserialize<_ikmgnzhy.ClientConfig>(data['data']);
     }
@@ -372,6 +414,14 @@ class Protocol extends _isc.SerializationManager {
     }
     if (dataClassName == 'AccountBlockedException') {
       return deserialize<_i42k8jky.AccountBlockedException>(data['data']);
+    }
+    if (dataClassName == 'AttachmentNotEntitledException') {
+      return deserialize<_i4lsg8uj.AttachmentNotEntitledException>(
+        data['data'],
+      );
+    }
+    if (dataClassName == 'AttachmentObject') {
+      return deserialize<_itu2u8jc.AttachmentObject>(data['data']);
     }
     if (dataClassName == 'Entitlement') {
       return deserialize<_id6kwse3.Entitlement>(data['data']);

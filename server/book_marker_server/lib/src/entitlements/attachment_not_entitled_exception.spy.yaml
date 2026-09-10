@@ -1,0 +1,9 @@
+### Thrown when a free account tries to upload an attachment.
+###
+### The client must treat this as PERMANENT, not as a failure to retry. A plain
+### rejection makes the background attachment queue hammer the server forever,
+### which is the failure mode this exception exists to make impossible to miss.
+exception: AttachmentNotEntitledException
+
+fields:
+  reason: String

@@ -1,6 +1,8 @@
 import 'dart:convert';
+import 'dart:typed_data';
 
 import 'package:book_marker_server/src/domain/account_deletion.dart';
+import 'package:book_marker_server/src/domain/attachments.dart';
 import 'package:book_marker_server/src/domain/entitlements.dart';
 import 'package:book_marker_server/src/domain/ocr_quota.dart';
 import 'package:book_marker_server/src/domain/sync_writes.dart';
@@ -27,7 +29,21 @@ void main() {
         final theirs = await const AuthUsers().create(session);
 
         Future<void> seed(UuidValue owner, String title) async {
-          await entitlements.createForUser(session, owner, transaction: null);
+          final entitlement = await entitlements.createForUser(
+            session,
+            owner,
+            transaction: null,
+          );
+          await Entitlement.db.updateRow(
+            session,
+            entitlement.copyWith(plan: planPremium),
+          );
+          await const Attachments().store(
+            session,
+            owner,
+            'page-one',
+            ByteData.view(Uint8List.fromList('BLOB'.codeUnits).buffer),
+          );
           await OcrUsage.db.insertRow(
             session,
             OcrUsage(
@@ -77,6 +93,13 @@ void main() {
           isEmpty,
         );
         expect(await entitlements.findForUser(session, mine.id), isNull);
+        expect(
+          await AttachmentObject.db.find(
+            session,
+            where: (t) => t.ownerId.equals(mine.id),
+          ),
+          isEmpty,
+        );
         expect(await AuthUser.db.findById(session, mine.id), isNull);
 
         final survivors = await SyncedBook.db.find(
@@ -85,6 +108,13 @@ void main() {
         );
         expect(survivors.single.titleCipher, 'THEIRS');
         expect(await entitlements.findForUser(session, theirs.id), isNotNull);
+        expect(
+          await AttachmentObject.db.find(
+            session,
+            where: (t) => t.ownerId.equals(theirs.id),
+          ),
+          hasLength(1),
+        );
         expect(await AuthUser.db.findById(session, theirs.id), isNotNull);
       },
     );

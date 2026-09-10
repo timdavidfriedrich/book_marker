@@ -192,6 +192,34 @@ The replication slot must show `active = t`. An inactive slot accumulates WAL
 until the disk fills, it is the most likely way this stack breaks, so it belongs
 in whatever monitoring you add.
 
+## Attachments
+
+Off by default: `app_config.yaml` ships `attachments.provider: database`, which
+keeps blobs in Postgres. That is wrong at scale and exactly right for getting
+the stack running, so switch it deliberately.
+
+To use MinIO instead, once:
+
+1. Set `MINIO_ROOT_USER` / `MINIO_ROOT_PASSWORD` in `.env` and bring the service
+   up. Reach the console through an SSH tunnel, never a public port:
+   `ssh -L 9001:127.0.0.1:9001 <vps>` then http://localhost:9001.
+2. Create the bucket `book-marker-attachments`, **private**. Every object in it
+   is ciphertext this server cannot open, but a public bucket would still leak
+   how many attachments an account has and when.
+3. Create a **separate access key** scoped to that bucket. The root pair is not
+   what the server should use.
+4. Put it in `passwords.yaml` under `production:` as `minioAccessKey` and
+   `minioSecretKey`.
+5. Set `attachments.provider: minio` in `app_config.yaml` and **restart**. This
+   one value is read at boot, unlike everything else in that file, because
+   Serverpod binds storage backends at startup.
+6. Add a lifecycle rule expiring incomplete multipart uploads after a day, so an
+   interrupted upload does not sit there forever.
+
+Verify by uploading a page from a premium account, then fetching the object
+directly from the console. **If it renders as an image, the encryption failed**
+and the phase is not done.
+
 ## Keeping it alive
 
 Two cron entries, both scripts in this folder, both silent when healthy so cron

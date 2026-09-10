@@ -1,11 +1,16 @@
 import 'package:serverpod/serverpod.dart';
 import 'package:serverpod_auth_idp_server/core.dart';
 
+import 'attachments.dart';
+
 // * everything on this server that is keyed by owner. Deleting is by column
 // * rather than by model so a table added later without being listed here is a
 // * compile-time nothing but a review-time obvious omission: the list is the
 // * documentation of what "delete my account" actually covers.
+const _attachments = Attachments();
+
 const _ownedTables = [
+  'attachment_objects',
   'quotes',
   'books',
   'shelf_books',
@@ -26,6 +31,12 @@ class AccountDeletion {
   const AccountDeletion();
 
   Future<void> delete(final Session session, final UuidValue ownerId) async {
+    // * before the transaction, because object storage is not part of it. A
+    // * blob left behind after the row that indexed it is gone is unreachable
+    // * forever, so the blobs go first and a failure here stops the deletion
+    // * with everything still consistent
+    await _attachments.removeAll(session, ownerId);
+
     // * rows first, then the auth user, and all of it in one transaction. The
     // * other order risks an account that is gone while its rows remain, which
     // * nothing would ever reach again to clean up

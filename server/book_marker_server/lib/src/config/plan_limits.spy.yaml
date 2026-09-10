@@ -10,4 +10,7 @@ fields:
   ocrPerWeek: int
   ocrPerMonth: int
   maxImageBytes: int
+  ### Per attachment. maxRequestSize in the Serverpod config is the outer
+  ### guard, and it has to allow for base64 in the envelope.
+  maxAttachmentBytes: int
   attachmentsEnabled: bool

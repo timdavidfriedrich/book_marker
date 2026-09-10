@@ -3,9 +3,9 @@ import 'dart:io';
 import 'package:serverpod_auth_idp_server/core.dart';
 import 'package:serverpod_auth_idp_server/providers/apple.dart';
 import 'package:serverpod_auth_idp_server/providers/google.dart';
-import 'package:serverpod_cloud_storage/serverpod_cloud_storage.dart';
 
 import 'src/cache_busting.dart';
+import 'src/composition.dart';
 import 'src/domain/config_source.dart';
 import 'src/domain/entitlements.dart';
 import 'src/generated/serverpod.dart';
@@ -133,20 +133,13 @@ void run(List<String> args) async {
     );
   }
 
-  // Configure cloud storage.
-  // This setup works with Serverpod Cloud without extra configuration.
-  // If you want to use a custom provider for cloud storage, replace these
-  // with your preferred provider.
-  pod.addCloudStorage(
-    await ServerpodCloudProvider.private(
-      fallback: () => DatabaseCloudStorage('private'),
-    ),
-  );
-  pod.addCloudStorage(
-    await ServerpodCloudProvider.public(
-      fallback: () => DatabaseCloudStorage('public'),
-    ),
-  );
+  // * the attachment store, chosen from app_config.yaml. Registered here
+  // * rather than per request because Serverpod binds storage backends at
+  // * startup, so switching providers needs a restart.
+  pod.addCloudStorage(const Composition().attachmentStorage());
+  // * nothing of ours is public; this exists because Serverpod's own modules
+  // * expect a storage with this id to be present
+  pod.addCloudStorage(DatabaseCloudStorage('public'));
 
   // Start the server.
   await pod.start();
