@@ -42,6 +42,8 @@ class const SignIn() extends AppRoute;
 
 class const RecoveryCodeSetup() extends AppRoute;
 
+class const RecoveryCodeUnlock() extends AppRoute;
+
 class const Capture({
   required final bool addsPage,
 }) extends AppRoute {

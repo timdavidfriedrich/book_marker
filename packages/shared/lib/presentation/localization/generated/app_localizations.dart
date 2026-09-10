@@ -1563,6 +1563,72 @@ abstract class AppLocalizations {
   /// **'That code is not right. Check your entry and try again.'**
   String get unlockWrongCode;
 
+  /// No description provided for @unlockUnreachableTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Server unreachable'**
+  String get unlockUnreachableTitle;
+
+  /// No description provided for @unlockUnreachableBody.
+  ///
+  /// In en, this message translates to:
+  /// **'The code is checked against your backup, and that needs a connection for a moment.'**
+  String get unlockUnreachableBody;
+
+  /// No description provided for @unlockUnreachableAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Try again'**
+  String get unlockUnreachableAction;
+
+  /// No description provided for @unlockNoBackupTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No backup yet'**
+  String get unlockNoBackupTitle;
+
+  /// No description provided for @unlockNoBackupBody.
+  ///
+  /// In en, this message translates to:
+  /// **'No code has been created for this account. Set up the backup and your library is stored encrypted on the server.'**
+  String get unlockNoBackupBody;
+
+  /// No description provided for @unlockNoBackupAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Set up backup'**
+  String get unlockNoBackupAction;
+
+  /// No description provided for @sicherungSetUpTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Backup not finished'**
+  String get sicherungSetUpTitle;
+
+  /// No description provided for @sicherungSetUpBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Your library lives on this device only. Create the recovery code so you can get it back after switching devices.'**
+  String get sicherungSetUpBody;
+
+  /// No description provided for @sicherungSetUpCta.
+  ///
+  /// In en, this message translates to:
+  /// **'Create code'**
+  String get sicherungSetUpCta;
+
+  /// No description provided for @recoveryCodeUnreachable.
+  ///
+  /// In en, this message translates to:
+  /// **'The server cannot be reached. The backup cannot be started without it.'**
+  String get recoveryCodeUnreachable;
+
+  /// No description provided for @recoveryCodeAlreadySecured.
+  ///
+  /// In en, this message translates to:
+  /// **'This account already has a backup. Enter the existing code.'**
+  String get recoveryCodeAlreadySecured;
+
   /// No description provided for @sicherungLabel.
   ///
   /// In en, this message translates to:

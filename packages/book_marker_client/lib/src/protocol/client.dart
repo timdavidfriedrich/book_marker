@@ -13,6 +13,8 @@
 import 'dart:async' as _ida;
 import 'package:book_marker_client/src/protocol/config/runtime_config.dart'
     as _i0ksu74t;
+import 'package:book_marker_client/src/protocol/entitlements/entitlement_view.dart'
+    as _i54kjtar;
 import 'package:book_marker_client/src/protocol/greetings/greeting.dart'
     as _iistozr7;
 import 'package:http/http.dart' as _i85jenna;
@@ -185,6 +187,43 @@ class EndpointConfig extends _isc.EndpointRef {
       );
 }
 
+/// Plan, account status and cloud OCR usage, read straight from the database.
+///
+/// This is the path that works before PowerSync connects, which is the only
+/// path available at sign-in: the master key has to be resolved before the
+/// encrypted local database can be opened, so sync cannot answer it.
+/// {@category Endpoint}
+class EndpointEntitlement extends _isc.EndpointRef {
+  EndpointEntitlement(_isc.EndpointCaller caller) : super(caller);
+
+  @override
+  String get name => 'entitlement';
+
+  /// Deliberately does NOT refuse a blocked account. The client has to read the
+  /// status to explain the block; refusing here would leave it with nothing to
+  /// show but a generic error.
+  _ida.Future<_i54kjtar.EntitlementView> fetch() =>
+      caller.callServerEndpoint<_i54kjtar.EntitlementView>(
+        'entitlement',
+        'fetch',
+        {},
+      );
+
+  /// Also allowed while blocked, unlike every other write. It consumes nothing
+  /// and grants nothing; withholding it would leave a device holding a key the
+  /// server has no record of, which is the one state that loses data later.
+  ///
+  /// Returns the row as it stands afterwards. A caller whose verifier is not
+  /// the one that came back lost a race with another device and must not keep
+  /// its own key.
+  _ida.Future<_i54kjtar.EntitlementView> registerBackup(String verifier) =>
+      caller.callServerEndpoint<_i54kjtar.EntitlementView>(
+        'entitlement',
+        'registerBackup',
+        {'verifier': verifier},
+      );
+}
+
 /// Hands the client a PowerSync credential. This is the real gate on sync: a
 /// blocked account is refused here, and the 10-minute token lifetime bounds how
 /// long an already-issued one stays usable.
@@ -262,6 +301,7 @@ class Client extends _isc.ServerpodClientShared {
     googleIdp = EndpointGoogleIdp(this);
     jwtRefresh = EndpointJwtRefresh(this);
     config = EndpointConfig(this);
+    entitlement = EndpointEntitlement(this);
     powerSync = EndpointPowerSync(this);
     greeting = EndpointGreeting(this);
     modules = Modules(this);
@@ -275,6 +315,8 @@ class Client extends _isc.ServerpodClientShared {
 
   late final EndpointConfig config;
 
+  late final EndpointEntitlement entitlement;
+
   late final EndpointPowerSync powerSync;
 
   late final EndpointGreeting greeting;
@@ -287,6 +329,7 @@ class Client extends _isc.ServerpodClientShared {
     'googleIdp': googleIdp,
     'jwtRefresh': jwtRefresh,
     'config': config,
+    'entitlement': entitlement,
     'powerSync': powerSync,
     'greeting': greeting,
   };

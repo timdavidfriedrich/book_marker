@@ -35,11 +35,16 @@ class const SignInScreen({
               previous is AccountSignedOut && current is! AccountSignedOut,
           listener: (context, state) {
             context.closeScreen();
-            // * locked straight after signing in means there is no key on this
-            // * device yet, so the code has to be generated before anything can
-            // * be secured
-            if (state is AccountLocked) {
-              unawaited(context.appRouter.push(const RecoveryCodeSetup()));
+            // * locked straight after signing in means this device holds no
+            // * key. Which screen follows depends on whether the account
+            // * already has a backup somewhere else
+            if (state case AccountLocked(:final reason)) {
+              unawaited(
+                context.appRouter.push(switch (reason) {
+                  LockedReason.setUpBackup => const RecoveryCodeSetup(),
+                  LockedReason.enterCode => const RecoveryCodeUnlock(),
+                }),
+              );
             }
           },
           builder: (context, state) => _Content(

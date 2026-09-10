@@ -14,6 +14,7 @@ import 'package:shared/presentation/account/account_event.dart';
 import 'package:shared/presentation/extensions/context_extensions.dart';
 import 'package:shared/presentation/extensions/screen_layout_extensions.dart';
 import 'package:shared/presentation/navigation/navigation_extensions.dart';
+import 'package:shared/presentation/navigation/routes.dart';
 import 'package:shared/presentation/widgets/loading_indicator.dart';
 
 const _shareButtonWidth = 96.0;
@@ -37,15 +38,25 @@ class const RecoveryCodeScreen({
       child: Scaffold(
         body: SafeArea(
           child: BlocConsumer<RecoveryCodeBloc, RecoveryCodeState>(
-            // * the key now exists, but AccountBloc resolved its state before
-            // * that, so it has to be asked to look again
-            listenWhen: (previous, current) => current is RecoveryCodeReady && current.isStarting,
+            listenWhen: (previous, current) =>
+                current is RecoveryCodeCommitted ||
+                (current is RecoveryCodeReady &&
+                    current.failure == RecoveryCodeFailure.backupExists),
             listener: (context, state) {
+              // * another device already registered a backup, so this device
+              // * has to use that code instead of the one it just generated
+              if (state is RecoveryCodeReady) {
+                context.closeScreen();
+                unawaited(context.appRouter.push(const RecoveryCodeUnlock()));
+                return;
+              }
+              // * the key now exists, but AccountBloc resolved its state before
+              // * that, so it has to be asked to look again
               context.read<AccountBloc>().add(const AccountUnlocked());
               context.closeScreen();
             },
             builder: (context, state) => switch (state) {
-              RecoveryCodeGenerating() => const LoadingIndicator(),
+              RecoveryCodeGenerating() || RecoveryCodeCommitted() => const LoadingIndicator(),
               RecoveryCodeReady() => _Content(state: state),
             },
           ),
@@ -127,14 +138,36 @@ class const _Content({
           isConfirmed: _state.isConfirmed,
           onToggle: () => bloc.add(const RecoveryCodeConfirmationToggled()),
         ),
+        if (_state.failure == RecoveryCodeFailure.unreachable) ...[
+          const SizedBox(height: Spacing.m),
+          const _FailureTile(),
+        ],
         const SizedBox(height: Spacing.m),
         InkActionButton(
           label: _state.isConfirmed ? context.s.recoveryCodeStart : context.s.recoveryCodeContinue,
+          isBusy: _state.isStarting,
           onPressed: _state.isConfirmed && !_state.isStarting
               ? () => bloc.add(const RecoveryCodeAccepted())
               : null,
         ),
       ],
+    );
+  }
+}
+
+class const _FailureTile() extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(Spacing.m),
+      decoration: BoxDecoration(
+        color: context.c.errorContainer,
+        borderRadius: const BorderRadius.all(Radius.circular(Spacing.radiusL)),
+      ),
+      child: Text(
+        context.s.recoveryCodeUnreachable,
+        style: context.t.bodyMedium?.copyWith(color: context.c.onErrorContainer),
+      ),
     );
   }
 }

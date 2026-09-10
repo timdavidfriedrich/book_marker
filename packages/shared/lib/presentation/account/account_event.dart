@@ -18,3 +18,5 @@ class const AccountSignOutRequested({
 }) extends AccountEvent;
 
 class const AccountUnlocked() extends AccountEvent;
+
+class const AccountEntitlementRefreshed() extends AccountEvent;

@@ -15,9 +15,7 @@ class PowerSyncEndpoint extends Endpoint {
   bool get requireLogin => true;
 
   Future<String> createToken(final Session session) async {
-    // * userIdentifier is the AuthUser id as a UUID string; it is what
-    // * auth.user_id() resolves to in the PowerSync sync streams
-    final userId = UuidValue.fromString(session.authenticated!.userIdentifier);
+    final userId = authenticatedOwnerId(session);
     final entitlement = await _entitlements.ensureForUser(
       session,
       userId,

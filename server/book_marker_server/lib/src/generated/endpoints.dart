@@ -19,6 +19,7 @@ import '../auth/apple_idp_endpoint.dart' as _ilq63su8;
 import '../auth/google_idp_endpoint.dart' as _i71axiz0;
 import '../auth/jwt_refresh_endpoint.dart' as _inwq3ztq;
 import '../endpoints/config_endpoint.dart' as _i74a5xur;
+import '../endpoints/entitlement_endpoint.dart' as _im71ml4a;
 import '../endpoints/power_sync_endpoint.dart' as _i61fa217;
 import '../greetings/greeting_endpoint.dart' as _il624ik7;
 
@@ -48,6 +49,12 @@ class Endpoints extends _is.EndpointDispatch {
         ..initialize(
           server,
           'config',
+          null,
+        ),
+      'entitlement': _im71ml4a.EntitlementEndpoint()
+        ..initialize(
+          server,
+          'entitlement',
           null,
         ),
       'powerSync': _i61fa217.PowerSyncEndpoint()
@@ -234,6 +241,43 @@ class Endpoints extends _is.EndpointDispatch {
                 Map<String, dynamic> params,
               ) async => (endpoints['config'] as _i74a5xur.ConfigEndpoint)
                   .fetch(session),
+        ),
+      },
+    );
+    connectors['entitlement'] = _is.EndpointConnector(
+      name: 'entitlement',
+      endpoint: endpoints['entitlement']!,
+      methodConnectors: {
+        'fetch': _is.MethodConnector(
+          name: 'fetch',
+          params: {},
+          call:
+              (
+                _is.Session session,
+                Map<String, dynamic> params,
+              ) async =>
+                  (endpoints['entitlement'] as _im71ml4a.EntitlementEndpoint)
+                      .fetch(session),
+        ),
+        'registerBackup': _is.MethodConnector(
+          name: 'registerBackup',
+          params: {
+            'verifier': _is.ParameterDescription(
+              name: 'verifier',
+              type: _is.getType<String>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _is.Session session,
+                Map<String, dynamic> params,
+              ) async =>
+                  (endpoints['entitlement'] as _im71ml4a.EntitlementEndpoint)
+                      .registerBackup(
+                        session,
+                        params['verifier'],
+                      ),
         ),
       },
     );

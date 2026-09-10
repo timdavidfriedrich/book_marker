@@ -15,6 +15,8 @@ import 'dart:async' as _ida;
 import 'dart:io' as _idi;
 import 'package:book_marker_server/src/generated/config/runtime_config.dart'
     as _izn3a0mv;
+import 'package:book_marker_server/src/generated/entitlements/entitlement_view.dart'
+    as _iy7x57jb;
 import 'package:book_marker_server/src/generated/greetings/greeting.dart'
     as _ilm93xjn;
 import 'package:serverpod/serverpod.dart' as _is;
@@ -157,6 +159,8 @@ class TestEndpoints {
 
   late final _ConfigEndpoint config;
 
+  late final _EntitlementEndpoint entitlement;
+
   late final _PowerSyncEndpoint powerSync;
 
   late final _GreetingEndpoint greeting;
@@ -182,6 +186,10 @@ class _InternalTestEndpoints extends TestEndpoints
       serializationManager,
     );
     config = _ConfigEndpoint(
+      endpoints,
+      serializationManager,
+    );
+    entitlement = _EntitlementEndpoint(
       endpoints,
       serializationManager,
     );
@@ -462,6 +470,78 @@ class _ConfigEndpoint {
                   _localCallContext.arguments,
                 )
                 as _ida.Future<_izn3a0mv.RuntimeConfig>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+}
+
+class _EntitlementEndpoint {
+  _EntitlementEndpoint(
+    this._endpointDispatch,
+    this._serializationManager,
+  );
+
+  final _is.EndpointDispatch _endpointDispatch;
+
+  final _is.SerializationManager _serializationManager;
+
+  _ida.Future<_iy7x57jb.EntitlementView> fetch(
+    _ist.TestSessionBuilder sessionBuilder,
+  ) async {
+    return _ist.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'entitlement',
+            method: 'fetch',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'entitlement',
+          methodName: 'fetch',
+          parameters: _ist.testObjectToJson({}),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _ida.Future<_iy7x57jb.EntitlementView>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _ida.Future<_iy7x57jb.EntitlementView> registerBackup(
+    _ist.TestSessionBuilder sessionBuilder,
+    String verifier,
+  ) async {
+    return _ist.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _ist.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'entitlement',
+            method: 'registerBackup',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'entitlement',
+          methodName: 'registerBackup',
+          parameters: _ist.testObjectToJson({'verifier': verifier}),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _ida.Future<_iy7x57jb.EntitlementView>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();

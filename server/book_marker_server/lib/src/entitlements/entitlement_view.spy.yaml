@@ -1,0 +1,19 @@
+### What the device is allowed to know about its own entitlement.
+###
+### A narrower shape than the `entitlements` row on purpose: the purchase
+### columns are bookkeeping the client has no use for. This is also the read
+### path that works BEFORE PowerSync connects, which matters because the master
+### key has to be resolved first and sync cannot help with that.
+class: EntitlementView
+
+fields:
+  plan: String
+  status: String
+  blockedReason: String?
+  ### Null means no backup exists yet, so this device should generate a code
+  ### rather than ask for one. See entitlement.spy.yaml for why handing it out
+  ### is safe.
+  backupVerifier: String?
+  usedDay: int
+  usedWeek: int
+  usedMonth: int

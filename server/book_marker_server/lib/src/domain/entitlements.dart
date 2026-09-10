@@ -8,6 +8,11 @@ const planPremium = 'premium';
 const statusActive = 'active';
 const statusBlocked = 'blocked';
 
+/// The AuthUser id as a UUID. It is what `auth.user_id()` resolves to in the
+/// PowerSync sync streams, and the owner of every row this server stores.
+UuidValue authenticatedOwnerId(final Session session) =>
+    UuidValue.fromString(session.authenticated!.userIdentifier);
+
 /// Creation and lookup of the per-user entitlement row.
 ///
 /// Every account must have exactly one. It is created in the same transaction
@@ -52,6 +57,57 @@ class Entitlements {
     return createForUser(session, ownerId, transaction: transaction);
   }
 
+  /// Registers the backup verifier written by the first device to finish key
+  /// setup. One-way: an existing verifier is never overwritten, because that
+  /// would orphan everything already encrypted under the first key.
+  ///
+  /// The advisory lock closes the one race that loses data, two devices both
+  /// finding no verifier and both writing one. It is transaction scoped, per
+  /// user, and released at commit.
+  ///
+  /// Returns the row as it stands afterwards, so a caller that lost the race
+  /// sees the verifier that won and can route the user to unlock instead.
+  Future<Entitlement> registerBackup(
+    final Session session,
+    final UuidValue ownerId,
+    final String verifier,
+  ) {
+    return session.db.transaction((final transaction) async {
+      await _lockOwner(session, ownerId, transaction);
+      final entitlement = await ensureForUser(
+        session,
+        ownerId,
+        transaction: transaction,
+      );
+      if (entitlement.backupVerifier != null) return entitlement;
+      final now = DateTime.now().toUtc();
+      return Entitlement.db.updateRow(
+        session,
+        entitlement.copyWith(
+          backupVerifier: verifier,
+          backupInitializedAt: now,
+          updatedAt: now,
+        ),
+        transaction: transaction,
+      );
+    });
+  }
+
+  /// The narrower shape the device is allowed to see. The purchase columns and
+  /// the setup timestamp stay on the server; the device needs the verifier and
+  /// nothing else about the backup.
+  EntitlementView toView(final Entitlement entitlement) {
+    return EntitlementView(
+      plan: entitlement.plan,
+      status: entitlement.status,
+      blockedReason: entitlement.blockedReason,
+      backupVerifier: entitlement.backupVerifier,
+      usedDay: entitlement.usedDay,
+      usedWeek: entitlement.usedWeek,
+      usedMonth: entitlement.usedMonth,
+    );
+  }
+
   Future<Entitlement?> findForUser(
     final Session session,
     final UuidValue ownerId, {
@@ -63,4 +119,16 @@ class Entitlements {
       transaction: transaction,
     );
   }
+}
+
+Future<void> _lockOwner(
+  final Session session,
+  final UuidValue ownerId,
+  final Transaction transaction,
+) async {
+  await session.db.unsafeQuery(
+    'SELECT pg_advisory_xact_lock(hashtext(@owner))',
+    parameters: QueryParameters.named({'owner': ownerId.toString()}),
+    transaction: transaction,
+  );
 }

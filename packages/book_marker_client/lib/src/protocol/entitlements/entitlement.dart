@@ -29,6 +29,8 @@ abstract class Entitlement
     String? status,
     this.blockedReason,
     this.blockedAt,
+    this.backupVerifier,
+    this.backupInitializedAt,
     int? usedDay,
     int? usedWeek,
     int? usedMonth,
@@ -52,6 +54,8 @@ abstract class Entitlement
     String? status,
     String? blockedReason,
     DateTime? blockedAt,
+    String? backupVerifier,
+    DateTime? backupInitializedAt,
     int? usedDay,
     int? usedWeek,
     int? usedMonth,
@@ -77,6 +81,12 @@ abstract class Entitlement
       blockedAt: jsonSerialization['blockedAt'] == null
           ? null
           : _isc.DateTimeJsonExtension.fromJson(jsonSerialization['blockedAt']),
+      backupVerifier: jsonSerialization['backupVerifier'] as String?,
+      backupInitializedAt: jsonSerialization['backupInitializedAt'] == null
+          ? null
+          : _isc.DateTimeJsonExtension.fromJson(
+              jsonSerialization['backupInitializedAt'],
+            ),
       usedDay: jsonSerialization['usedDay'] as int?,
       usedWeek: jsonSerialization['usedWeek'] as int?,
       usedMonth: jsonSerialization['usedMonth'] as int?,
@@ -112,6 +122,21 @@ abstract class Entitlement
 
   DateTime? blockedAt;
 
+  /// A known string encrypted under the master key, written once by the first
+  /// device to complete setup and never overwritten. NOT key material: AES-GCM
+  /// is secure against a chosen plaintext, so this reveals nothing about a
+  /// 128 bit random key, and the server still cannot read a single quote.
+  ///
+  /// It does two jobs. Non-null answers "does a backup already exist", which is
+  /// what stops a keyless device generating a second code and orphaning
+  /// everything encrypted under the first. And it lets the device tell a wrong
+  /// recovery code from a right one immediately, rather than after a sync round
+  /// trip has produced garbage.
+  String? backupVerifier;
+
+  /// Diagnostics only, written together with the verifier.
+  DateTime? backupInitializedAt;
+
   int usedDay;
 
   int usedWeek;
@@ -142,6 +167,8 @@ abstract class Entitlement
     String? status,
     String? blockedReason,
     DateTime? blockedAt,
+    String? backupVerifier,
+    DateTime? backupInitializedAt,
     int? usedDay,
     int? usedWeek,
     int? usedMonth,
@@ -162,6 +189,9 @@ abstract class Entitlement
       'status': status,
       if (blockedReason != null) 'blockedReason': blockedReason,
       if (blockedAt != null) 'blockedAt': blockedAt?.toJson(),
+      if (backupVerifier != null) 'backupVerifier': backupVerifier,
+      if (backupInitializedAt != null)
+        'backupInitializedAt': backupInitializedAt?.toJson(),
       'usedDay': usedDay,
       'usedWeek': usedWeek,
       'usedMonth': usedMonth,
@@ -184,6 +214,9 @@ abstract class Entitlement
       'status': status,
       if (blockedReason != null) 'blockedReason': blockedReason,
       if (blockedAt != null) 'blockedAt': blockedAt?.toJson(),
+      if (backupVerifier != null) 'backupVerifier': backupVerifier,
+      if (backupInitializedAt != null)
+        'backupInitializedAt': backupInitializedAt?.toJson(),
       'usedDay': usedDay,
       'usedWeek': usedWeek,
       'usedMonth': usedMonth,
@@ -212,6 +245,8 @@ class _EntitlementImpl extends Entitlement {
     String? status,
     String? blockedReason,
     DateTime? blockedAt,
+    String? backupVerifier,
+    DateTime? backupInitializedAt,
     int? usedDay,
     int? usedWeek,
     int? usedMonth,
@@ -228,6 +263,8 @@ class _EntitlementImpl extends Entitlement {
          status: status,
          blockedReason: blockedReason,
          blockedAt: blockedAt,
+         backupVerifier: backupVerifier,
+         backupInitializedAt: backupInitializedAt,
          usedDay: usedDay,
          usedWeek: usedWeek,
          usedMonth: usedMonth,
@@ -250,6 +287,8 @@ class _EntitlementImpl extends Entitlement {
     String? status,
     Object? blockedReason = _Undefined,
     Object? blockedAt = _Undefined,
+    Object? backupVerifier = _Undefined,
+    Object? backupInitializedAt = _Undefined,
     int? usedDay,
     int? usedWeek,
     int? usedMonth,
@@ -269,6 +308,12 @@ class _EntitlementImpl extends Entitlement {
           ? blockedReason
           : this.blockedReason,
       blockedAt: blockedAt is DateTime? ? blockedAt : this.blockedAt,
+      backupVerifier: backupVerifier is String?
+          ? backupVerifier
+          : this.backupVerifier,
+      backupInitializedAt: backupInitializedAt is DateTime?
+          ? backupInitializedAt
+          : this.backupInitializedAt,
       usedDay: usedDay ?? this.usedDay,
       usedWeek: usedWeek ?? this.usedWeek,
       usedMonth: usedMonth ?? this.usedMonth,

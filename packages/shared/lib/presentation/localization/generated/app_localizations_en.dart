@@ -914,6 +914,44 @@ class AppLocalizationsEn extends AppLocalizations {
   String get unlockWrongCode => 'That code is not right. Check your entry and try again.';
 
   @override
+  String get unlockUnreachableTitle => 'Server unreachable';
+
+  @override
+  String get unlockUnreachableBody =>
+      'The code is checked against your backup, and that needs a connection for a moment.';
+
+  @override
+  String get unlockUnreachableAction => 'Try again';
+
+  @override
+  String get unlockNoBackupTitle => 'No backup yet';
+
+  @override
+  String get unlockNoBackupBody =>
+      'No code has been created for this account. Set up the backup and your library is stored encrypted on the server.';
+
+  @override
+  String get unlockNoBackupAction => 'Set up backup';
+
+  @override
+  String get sicherungSetUpTitle => 'Backup not finished';
+
+  @override
+  String get sicherungSetUpBody =>
+      'Your library lives on this device only. Create the recovery code so you can get it back after switching devices.';
+
+  @override
+  String get sicherungSetUpCta => 'Create code';
+
+  @override
+  String get recoveryCodeUnreachable =>
+      'The server cannot be reached. The backup cannot be started without it.';
+
+  @override
+  String get recoveryCodeAlreadySecured =>
+      'This account already has a backup. Enter the existing code.';
+
+  @override
   String get sicherungLabel => 'Backup';
 
   @override

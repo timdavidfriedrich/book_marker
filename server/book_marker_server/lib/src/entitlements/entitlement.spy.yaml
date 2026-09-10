@@ -17,6 +17,19 @@ fields:
   status: String, default='active'
   blockedReason: String?
   blockedAt: DateTime?
+  ### A known string encrypted under the master key, written once by the first
+  ### device to complete setup and never overwritten. NOT key material: AES-GCM
+  ### is secure against a chosen plaintext, so this reveals nothing about a
+  ### 128 bit random key, and the server still cannot read a single quote.
+  ###
+  ### It does two jobs. Non-null answers "does a backup already exist", which is
+  ### what stops a keyless device generating a second code and orphaning
+  ### everything encrypted under the first. And it lets the device tell a wrong
+  ### recovery code from a right one immediately, rather than after a sync round
+  ### trip has produced garbage.
+  backupVerifier: String?
+  ### Diagnostics only, written together with the verifier.
+  backupInitializedAt: DateTime?
   usedDay: int, default=0
   usedWeek: int, default=0
   usedMonth: int, default=0

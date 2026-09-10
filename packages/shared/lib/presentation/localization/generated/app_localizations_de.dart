@@ -923,6 +923,44 @@ class AppLocalizationsDe extends AppLocalizations {
   String get unlockWrongCode => 'Der Code stimmt nicht. Prüfe die Eingabe und versuche es erneut.';
 
   @override
+  String get unlockUnreachableTitle => 'Server nicht erreichbar';
+
+  @override
+  String get unlockUnreachableBody =>
+      'Der Code wird gegen deine Sicherung geprüft. Dafür braucht Commonplace kurz eine Verbindung.';
+
+  @override
+  String get unlockUnreachableAction => 'Erneut versuchen';
+
+  @override
+  String get unlockNoBackupTitle => 'Noch keine Sicherung';
+
+  @override
+  String get unlockNoBackupBody =>
+      'Für dieses Konto wurde noch kein Code erstellt. Richte die Sicherung ein, dann liegt deine Bibliothek verschlüsselt auf dem Server.';
+
+  @override
+  String get unlockNoBackupAction => 'Sicherung einrichten';
+
+  @override
+  String get sicherungSetUpTitle => 'Sicherung nicht abgeschlossen';
+
+  @override
+  String get sicherungSetUpBody =>
+      'Deine Bibliothek liegt nur auf diesem Gerät. Erstelle den Wiederherstellungs-Code, damit du sie nach einem Gerätewechsel zurückholen kannst.';
+
+  @override
+  String get sicherungSetUpCta => 'Code erstellen';
+
+  @override
+  String get recoveryCodeUnreachable =>
+      'Der Server ist nicht erreichbar. Ohne ihn lässt sich die Sicherung nicht starten.';
+
+  @override
+  String get recoveryCodeAlreadySecured =>
+      'Für dieses Konto gibt es bereits eine Sicherung. Gib den vorhandenen Code ein.';
+
+  @override
   String get sicherungLabel => 'Sicherung';
 
   @override

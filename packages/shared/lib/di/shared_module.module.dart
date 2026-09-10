@@ -6,6 +6,7 @@
 import 'dart:async' as _i687;
 
 import 'package:book_marker_client/book_marker_client.dart' as _i63;
+import 'package:core/security/backup_verifier.dart' as _i93;
 import 'package:core/security/master_key_store.dart' as _i375;
 import 'package:dio/dio.dart' as _i361;
 import 'package:injectable/injectable.dart' as _i526;
@@ -17,6 +18,8 @@ import 'package:shared/data/data_sources/app_config_remote_data_source.dart'
     as _i223;
 import 'package:shared/data/data_sources/book_cover_data_source.dart' as _i510;
 import 'package:shared/data/data_sources/book_local_data_source.dart' as _i315;
+import 'package:shared/data/data_sources/entitlement_remote_data_source.dart'
+    as _i1039;
 import 'package:shared/data/data_sources/google_books_data_source.dart'
     as _i357;
 import 'package:shared/data/data_sources/image_storage_data_source.dart'
@@ -38,6 +41,8 @@ import 'package:shared/data/repositories/app_config_repository_impl.dart'
     as _i509;
 import 'package:shared/data/repositories/auth_repository_impl.dart' as _i674;
 import 'package:shared/data/repositories/book_repository_impl.dart' as _i245;
+import 'package:shared/data/repositories/entitlement_repository_impl.dart'
+    as _i1011;
 import 'package:shared/data/repositories/quote_repository_impl.dart' as _i943;
 import 'package:shared/data/repositories/sample_data_repository_impl.dart'
     as _i136;
@@ -51,6 +56,8 @@ import 'package:shared/data/sample_data_seeder.dart' as _i716;
 import 'package:shared/domain/repositories/app_config_repository.dart' as _i541;
 import 'package:shared/domain/repositories/auth_repository.dart' as _i1022;
 import 'package:shared/domain/repositories/book_repository.dart' as _i748;
+import 'package:shared/domain/repositories/entitlement_repository.dart'
+    as _i446;
 import 'package:shared/domain/repositories/quote_repository.dart' as _i570;
 import 'package:shared/domain/repositories/sample_data_repository.dart'
     as _i124;
@@ -124,6 +131,11 @@ class SharedPackageModule extends _i526.MicroPackageModule {
         ));
     gh.lazySingleton<_i63.Client>(() =>
         serverpodClientModule.client(gh<_i90.FlutterAuthSessionManager>()));
+    gh.factory<_i1039.EntitlementRemoteDataSource>(
+        () => _i1039.EntitlementRemoteDataSourceImpl(gh<_i63.Client>()));
+    gh.factory<_i446.EntitlementRepository>(() =>
+        _i1011.EntitlementRepositoryImpl(
+            gh<_i1039.EntitlementRemoteDataSource>()));
     gh.factory<_i223.AppConfigRemoteDataSource>(
         () => _i223.AppConfigRemoteDataSourceImpl(gh<_i63.Client>()));
     gh.factory<_i124.SampleDataRepository>(
@@ -144,6 +156,8 @@ class SharedPackageModule extends _i526.MicroPackageModule {
     gh.factory<_i880.AccountBloc>(() => _i880.AccountBloc(
           gh<_i1022.AuthRepository>(),
           gh<_i375.MasterKeyStore>(),
+          gh<_i93.BackupVerifier>(),
+          gh<_i446.EntitlementRepository>(),
         ));
   }
 }

@@ -9,6 +9,9 @@ jwtRefresh:
   - refreshAccessToken:
 config:
   - fetch:
+entitlement:
+  - fetch:
+  - registerBackup:
 powerSync:
   - createToken:
 greeting:

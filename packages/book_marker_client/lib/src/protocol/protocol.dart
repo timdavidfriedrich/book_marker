@@ -22,6 +22,7 @@ import 'config/recognition_config.dart' as _i96enlzs;
 import 'config/runtime_config.dart' as _iadewe5j;
 import 'entitlements/account_blocked_exception.dart' as _i42k8jky;
 import 'entitlements/entitlement.dart' as _id6kwse3;
+import 'entitlements/entitlement_view.dart' as _ik9sk60n;
 import 'entitlements/ocr_usage.dart' as _i13b5r7e;
 import 'greetings/greeting.dart' as _izw8z7ou;
 import 'sync/sync_probe.dart' as _i8t4kps3;
@@ -31,6 +32,7 @@ export 'config/recognition_config.dart';
 export 'config/runtime_config.dart';
 export 'entitlements/account_blocked_exception.dart';
 export 'entitlements/entitlement.dart';
+export 'entitlements/entitlement_view.dart';
 export 'entitlements/ocr_usage.dart';
 export 'greetings/greeting.dart';
 export 'sync/sync_probe.dart';
@@ -88,6 +90,9 @@ class Protocol extends _isc.SerializationManager {
     if (t == _id6kwse3.Entitlement) {
       return _id6kwse3.Entitlement.fromJson(data) as T;
     }
+    if (t == _ik9sk60n.EntitlementView) {
+      return _ik9sk60n.EntitlementView.fromJson(data) as T;
+    }
     if (t == _i13b5r7e.OcrUsage) {
       return _i13b5r7e.OcrUsage.fromJson(data) as T;
     }
@@ -120,6 +125,10 @@ class Protocol extends _isc.SerializationManager {
     if (t == _isc.getType<_id6kwse3.Entitlement?>()) {
       return (data != null ? _id6kwse3.Entitlement.fromJson(data) : null) as T;
     }
+    if (t == _isc.getType<_ik9sk60n.EntitlementView?>()) {
+      return (data != null ? _ik9sk60n.EntitlementView.fromJson(data) : null)
+          as T;
+    }
     if (t == _isc.getType<_i13b5r7e.OcrUsage?>()) {
       return (data != null ? _i13b5r7e.OcrUsage.fromJson(data) : null) as T;
     }
@@ -146,6 +155,7 @@ class Protocol extends _isc.SerializationManager {
       _iadewe5j.RuntimeConfig => 'RuntimeConfig',
       _i42k8jky.AccountBlockedException => 'AccountBlockedException',
       _id6kwse3.Entitlement => 'Entitlement',
+      _ik9sk60n.EntitlementView => 'EntitlementView',
       _i13b5r7e.OcrUsage => 'OcrUsage',
       _izw8z7ou.Greeting => 'Greeting',
       _i8t4kps3.SyncProbe => 'SyncProbe',
@@ -175,6 +185,8 @@ class Protocol extends _isc.SerializationManager {
         return 'AccountBlockedException';
       case _id6kwse3.Entitlement():
         return 'Entitlement';
+      case _ik9sk60n.EntitlementView():
+        return 'EntitlementView';
       case _i13b5r7e.OcrUsage():
         return 'OcrUsage';
       case _izw8z7ou.Greeting():
@@ -220,6 +232,9 @@ class Protocol extends _isc.SerializationManager {
     }
     if (dataClassName == 'Entitlement') {
       return deserialize<_id6kwse3.Entitlement>(data['data']);
+    }
+    if (dataClassName == 'EntitlementView') {
+      return deserialize<_ik9sk60n.EntitlementView>(data['data']);
     }
     if (dataClassName == 'OcrUsage') {
       return deserialize<_i13b5r7e.OcrUsage>(data['data']);

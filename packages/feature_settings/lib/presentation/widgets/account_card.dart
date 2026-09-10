@@ -44,13 +44,20 @@ class const AccountCard({
               AccountRestoring() => const <Widget>[],
               AccountSignedOut() => const [SizedBox(height: _groupGap), _SignInTile()],
               AccountReady() => const [SizedBox(height: _groupGap), _SyncedTile()],
-              AccountLocked() => const [
-                SizedBox(height: _groupGap),
-                _NoticeTile(isBlocked: false),
+              AccountLocked(:final reason) => [
+                const SizedBox(height: _groupGap),
+                _NoticeTile(
+                  kind: switch (reason) {
+                    LockedReason.setUpBackup => _NoticeKind.setUpBackup,
+                    LockedReason.enterCode => _NoticeKind.locked,
+                  },
+                ),
+                const SizedBox(height: _groupGap),
+                _LockedCta(reason: reason),
               ],
               AccountBlocked(:final reason) => [
                 const SizedBox(height: _groupGap),
-                _NoticeTile(isBlocked: true, reason: reason),
+                _NoticeTile(kind: _NoticeKind.blocked, reason: reason),
               ],
             },
             // * always reachable while signed in, and especially while locked or
@@ -204,34 +211,46 @@ class const _SignOutTile() extends StatelessWidget {
 }
 
 // * locked and blocked must never share a treatment: one is self serve and says
-// * the data is intact, the other points at support and says local use continues
+// * the data is intact, the other points at support and says local use
+// * continues. setUpBackup is a third case the handoff did not draw, reachable
+// * whenever someone leaves the code screen before finishing
+enum _NoticeKind { setUpBackup, locked, blocked }
+
 class const _NoticeTile({
-  required final bool _isBlocked,
+  required final _NoticeKind _kind,
   final String? _reason,
 }) extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final amber = context.palette.resolve(AccentColor.amber);
-    final background = _isBlocked ? context.c.errorContainer : amber.fill;
-    final foreground = _isBlocked ? context.c.onErrorContainer : amber.onFill;
+    final isBlocked = _kind == _NoticeKind.blocked;
+    final foreground = isBlocked ? context.c.onErrorContainer : amber.onFill;
     return _Tile(
       isFirst: false,
       isLast: false,
-      color: background,
+      color: isBlocked ? context.c.errorContainer : amber.fill,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
               Icon(
-                _isBlocked ? Icons.block : Icons.lock_outline,
+                switch (_kind) {
+                  _NoticeKind.setUpBackup => Icons.shield_outlined,
+                  _NoticeKind.locked => Icons.lock_outline,
+                  _NoticeKind.blocked => Icons.block,
+                },
                 size: Spacing.iconS,
                 color: foreground,
               ),
               const SizedBox(width: Spacing.s),
               Expanded(
                 child: Text(
-                  _isBlocked ? context.s.sicherungBlockedTitle : context.s.sicherungLockedTitle,
+                  switch (_kind) {
+                    _NoticeKind.setUpBackup => context.s.sicherungSetUpTitle,
+                    _NoticeKind.locked => context.s.sicherungLockedTitle,
+                    _NoticeKind.blocked => context.s.sicherungBlockedTitle,
+                  },
                   style: context.t.titleSmall?.copyWith(color: foreground),
                 ),
               ),
@@ -240,9 +259,45 @@ class const _NoticeTile({
           const SizedBox(height: Spacing.xs),
           Text(
             _reason ??
-                (_isBlocked ? context.s.sicherungBlockedBody : context.s.sicherungLockedBody),
+                switch (_kind) {
+                  _NoticeKind.setUpBackup => context.s.sicherungSetUpBody,
+                  _NoticeKind.locked => context.s.sicherungLockedBody,
+                  _NoticeKind.blocked => context.s.sicherungBlockedBody,
+                },
             style: context.t.bodySmall?.copyWith(color: foreground),
           ),
+        ],
+      ),
+    );
+  }
+}
+
+class const _LockedCta({
+  required final LockedReason _reason,
+}) extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final amber = context.palette.resolve(AccentColor.amber);
+    return _Tile(
+      isFirst: false,
+      isLast: false,
+      color: amber.solid,
+      onTap: () => context.appRouter.push(switch (_reason) {
+        LockedReason.setUpBackup => const RecoveryCodeSetup(),
+        LockedReason.enterCode => const RecoveryCodeUnlock(),
+      }),
+      child: Row(
+        children: [
+          Expanded(
+            child: Text(
+              switch (_reason) {
+                LockedReason.setUpBackup => context.s.sicherungSetUpCta,
+                LockedReason.enterCode => context.s.sicherungLockedCta,
+              },
+              style: context.t.titleSmall?.copyWith(color: amber.onSolid),
+            ),
+          ),
+          Icon(Icons.chevron_right, color: amber.onSolid, size: Spacing.iconM),
         ],
       ),
     );

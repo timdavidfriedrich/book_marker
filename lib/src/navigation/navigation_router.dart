@@ -5,6 +5,9 @@ import 'package:feature_account/presentation/recovery_code/recovery_code_bloc.da
 import 'package:feature_account/presentation/recovery_code/recovery_code_event.dart';
 import 'package:feature_account/presentation/recovery_code/recovery_code_screen.dart';
 import 'package:feature_account/presentation/sign_in/sign_in_screen.dart';
+import 'package:feature_account/presentation/unlock/unlock_bloc.dart';
+import 'package:feature_account/presentation/unlock/unlock_event.dart';
+import 'package:feature_account/presentation/unlock/unlock_screen.dart';
 import 'package:feature_capture/presentation/add_book/add_book_bloc.dart';
 import 'package:feature_capture/presentation/add_book/add_book_event.dart';
 import 'package:feature_capture/presentation/add_book/add_book_screen.dart';
@@ -89,6 +92,10 @@ class const _AppPage({
     RecoveryCodeSetup() => BlocProvider(
       create: (_) => sl<RecoveryCodeBloc>()..add(const RecoveryCodeStarted()),
       child: const RecoveryCodeScreen(),
+    ),
+    RecoveryCodeUnlock() => BlocProvider(
+      create: (_) => sl<UnlockBloc>()..add(const UnlockStarted()),
+      child: const UnlockScreen(),
     ),
     Settings() => BlocProvider(
       create: (_) => sl<SettingsBloc>()..add(const SettingsStarted()),

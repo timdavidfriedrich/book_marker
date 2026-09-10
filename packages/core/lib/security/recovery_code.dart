@@ -24,6 +24,11 @@ class const RecoveryCode({
   static const int groupCount = _groupCount;
   static const int groupSize = _groupSize;
 
+  /// Folds what people actually type onto the alphabet, so an input field and
+  /// [tryParse] agree on what a character means instead of each having its own
+  /// idea of it.
+  static String normalise(String input) => _normalise(input);
+
   static RecoveryCode generate() {
     final random = Random.secure();
     return fromKey(Uint8List.fromList(List.generate(_keyBytes, (_) => random.nextInt(_byteRange))));

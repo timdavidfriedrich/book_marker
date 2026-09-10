@@ -1,3 +1,5 @@
+import 'package:core/error/app_result.dart';
+import 'package:core/security/backup_verifier.dart';
 import 'package:core/security/master_key_store.dart';
 import 'package:core/security/recovery_code.dart';
 import 'package:feature_account/presentation/recovery_code/recovery_code_event.dart';
@@ -5,10 +7,12 @@ import 'package:feature_account/presentation/recovery_code/recovery_code_state.d
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
+import 'package:shared/domain/repositories/entitlement_repository.dart';
 
 @injectable
 class RecoveryCodeBloc extends Bloc<RecoveryCodeEvent, RecoveryCodeState> {
-  RecoveryCodeBloc(this._masterKeyStore) : super(const RecoveryCodeGenerating()) {
+  RecoveryCodeBloc(this._masterKeyStore, this._backupVerifier, this._entitlementRepository)
+    : super(const RecoveryCodeGenerating()) {
     on<RecoveryCodeStarted>(_onStarted);
     on<RecoveryCodeCopied>(_onCopied);
     on<RecoveryCodeConfirmationToggled>(_onConfirmationToggled);
@@ -16,9 +20,9 @@ class RecoveryCodeBloc extends Bloc<RecoveryCodeEvent, RecoveryCodeState> {
   }
 
   final MasterKeyStore _masterKeyStore;
+  final BackupVerifier _backupVerifier;
+  final EntitlementRepository _entitlementRepository;
   RecoveryCode? _code;
-
-  Uint8List? get key => _code?.key;
 
   void _onStarted(RecoveryCodeStarted event, Emitter<RecoveryCodeState> emit) {
     final code = _code ??= RecoveryCode.generate();
@@ -28,6 +32,7 @@ class RecoveryCodeBloc extends Bloc<RecoveryCodeEvent, RecoveryCodeState> {
         isCopied: false,
         isConfirmed: false,
         isStarting: false,
+        failure: null,
       ),
     );
   }
@@ -37,7 +42,7 @@ class RecoveryCodeBloc extends Bloc<RecoveryCodeEvent, RecoveryCodeState> {
     if (code == null) return;
     if (state case final RecoveryCodeReady ready) {
       await Clipboard.setData(ClipboardData(text: code.formatted));
-      emit(ready.copyWith(isCopied: true));
+      emit(_copy(ready, isCopied: true));
     }
   }
 
@@ -46,30 +51,46 @@ class RecoveryCodeBloc extends Bloc<RecoveryCodeEvent, RecoveryCodeState> {
     Emitter<RecoveryCodeState> emit,
   ) {
     if (state case final RecoveryCodeReady ready) {
-      emit(ready.copyWith(isConfirmed: !ready.isConfirmed));
+      emit(_copy(ready, isConfirmed: !ready.isConfirmed));
     }
   }
 
-  // * the key is only written once the user confirms they saved the code, so an
-  // * abandoned setup leaves nothing behind that could later be mistaken for a
-  // * usable backup
+  // * server first, keystore second. A key the server has no record of is the
+  // * one state that loses data later: the next device would be told no backup
+  // * exists, generate a second code, and orphan everything under the first
   Future<void> _onAccepted(RecoveryCodeAccepted event, Emitter<RecoveryCodeState> emit) async {
     final code = _code;
     if (code == null) return;
-    if (state case final RecoveryCodeReady ready when ready.isConfirmed) {
-      emit(ready.copyWith(isStarting: true));
-      await _masterKeyStore.write(code.key);
+    if (state case final RecoveryCodeReady ready when ready.isConfirmed && !ready.isStarting) {
+      emit(_copy(ready, isStarting: true));
+      final verifier = await _backupVerifier.create(code.key);
+      switch (await _entitlementRepository.registerBackup(verifier)) {
+        case Failure():
+          emit(_copy(ready, failure: RecoveryCodeFailure.unreachable));
+        case Success(:final data) when data.backupVerifier != verifier:
+          emit(_copy(ready, failure: RecoveryCodeFailure.backupExists));
+        case Success():
+          await _masterKeyStore.write(code.key);
+          emit(const RecoveryCodeCommitted());
+      }
     }
   }
 }
 
-extension on RecoveryCodeReady {
-  RecoveryCodeReady copyWith({bool? isCopied, bool? isConfirmed, bool? isStarting}) {
-    return RecoveryCodeReady(
-      groups: groups,
-      isCopied: isCopied ?? this.isCopied,
-      isConfirmed: isConfirmed ?? this.isConfirmed,
-      isStarting: isStarting ?? this.isStarting,
-    );
-  }
+// * failure is always passed explicitly rather than inherited, so a stale
+// * rejection cannot survive an unrelated change
+RecoveryCodeReady _copy(
+  RecoveryCodeReady base, {
+  bool? isCopied,
+  bool? isConfirmed,
+  bool isStarting = false,
+  RecoveryCodeFailure? failure,
+}) {
+  return RecoveryCodeReady(
+    groups: base.groups,
+    isCopied: isCopied ?? base.isCopied,
+    isConfirmed: isConfirmed ?? base.isConfirmed,
+    isStarting: isStarting,
+    failure: failure,
+  );
 }
