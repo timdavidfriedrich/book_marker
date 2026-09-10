@@ -1,9 +1,12 @@
 import 'package:core/theme/corner_radii.dart';
 import 'package:core/theme/spacing.dart';
 import 'package:core/theme/theme_extensions.dart';
+import 'package:feature_settings/presentation/widgets/sign_out_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:shared/domain/entities/account.dart';
 import 'package:shared/presentation/account/account_bloc.dart';
+import 'package:shared/presentation/account/account_event.dart';
 import 'package:shared/presentation/account/account_state.dart';
 import 'package:shared/presentation/extensions/context_extensions.dart';
 import 'package:shared/presentation/navigation/navigation_extensions.dart';
@@ -12,84 +15,112 @@ import 'package:shared/presentation/widgets/ink_tap_box.dart';
 
 const _groupRadius = Spacing.radiusXl;
 const _groupGap = Spacing.xxxs;
-const _avatarSize = 48.0;
+const _avatarSize = 56.0;
 const _dotSize = 8.0;
 const _tilePadding = EdgeInsets.symmetric(horizontal: Spacing.l, vertical: Spacing.m);
 
-class const SicherungSection({
+// * one card, not a profile card plus an account section: the identity is the
+// * same thing whether it came from a local name or from a signed in account
+class const AccountCard({
+  required final Widget _nameField,
+  required final String _stats,
   super.key,
 }) extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<AccountBloc, AccountState>(
-      builder: (context, state) => Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          _IdentityTile(state: state),
-          const SizedBox(height: _groupGap),
-          ...switch (state) {
-            AccountRestoring() || AccountSignedOut() => [const _SignInTile()],
-            AccountLocked() => [const _NoticeTile(isBlocked: false), const _UnlockTile()],
-            AccountBlocked(:final reason) => [
-              _NoticeTile(isBlocked: true, reason: reason),
-              const _SupportTile(),
+      builder: (context, state) {
+        final account = state.account;
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            _IdentityTile(
+              account: account,
+              nameField: _nameField,
+              stats: _stats,
+              isAlone: state is AccountRestoring,
+            ),
+            ...switch (state) {
+              AccountRestoring() => const <Widget>[],
+              AccountSignedOut() => const [SizedBox(height: _groupGap), _SignInTile()],
+              AccountReady() => const [SizedBox(height: _groupGap), _SyncedTile()],
+              AccountLocked() => const [
+                SizedBox(height: _groupGap),
+                _NoticeTile(isBlocked: false),
+              ],
+              AccountBlocked(:final reason) => [
+                const SizedBox(height: _groupGap),
+                _NoticeTile(isBlocked: true, reason: reason),
+              ],
+            },
+            // * always reachable while signed in, and especially while locked or
+            // * blocked: those are the states a user can otherwise be stuck in
+            if (account != null) ...[
+              const SizedBox(height: _groupGap),
+              const _SignOutTile(),
             ],
-            AccountReady() => [const _SyncedTile()],
-          },
-        ],
-      ),
+          ],
+        );
+      },
     );
   }
 }
 
+extension on AccountState {
+  Account? get account => switch (this) {
+    AccountLocked(:final account) ||
+    AccountBlocked(:final account) ||
+    AccountReady(:final account) => account,
+    _ => null,
+  };
+}
+
 class const _IdentityTile({
-  required final AccountState _state,
+  required final Account? _account,
+  required final Widget _nameField,
+  required final String _stats,
+  required final bool _isAlone,
 }) extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final account = switch (_state) {
-      AccountLocked(:final account) ||
-      AccountBlocked(:final account) ||
-      AccountReady(:final account) => account,
-      _ => null,
-    };
+    final account = _account;
     return _Tile(
       isFirst: true,
-      isLast: false,
+      isLast: _isAlone,
       child: Row(
         children: [
           Container(
             width: _avatarSize,
             height: _avatarSize,
+            alignment: Alignment.center,
             decoration: BoxDecoration(
               color: context.c.surfaceContainerHigh,
               shape: BoxShape.circle,
             ),
             child: Icon(
               Icons.person_outline,
-              color: context.palette.paperTextFaint,
-              size: Spacing.iconM,
+              size: Spacing.iconL,
+              color: context.c.onSurfaceVariant,
             ),
           ),
           const SizedBox(width: Spacing.m),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
               children: [
+                // * a signed in account owns the name; the editable local one is
+                // * only meaningful while there is no account behind it
+                if (account?.displayName case final name?)
+                  Text(name, style: context.t.titleLarge, overflow: TextOverflow.ellipsis)
+                else
+                  _nameField,
+                const SizedBox(height: Spacing.xxs),
                 Text(
-                  account?.displayName ?? context.s.sicherungSignedOut,
-                  style: context.t.titleSmall,
+                  account?.email ?? _stats,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: context.typography.label.copyWith(color: context.c.onSurfaceVariant),
                 ),
-                if (account?.email case final email?) ...[
-                  const SizedBox(height: Spacing.xxxs),
-                  Text(
-                    email,
-                    style: context.typography.caption.copyWith(
-                      color: context.c.onSurfaceVariant,
-                    ),
-                  ),
-                ],
               ],
             ),
           ),
@@ -128,7 +159,7 @@ class const _SyncedTile() extends StatelessWidget {
     final teal = context.palette.resolve(AccentColor.teal);
     return _Tile(
       isFirst: false,
-      isLast: true,
+      isLast: false,
       child: Row(
         children: [
           Container(
@@ -144,47 +175,35 @@ class const _SyncedTile() extends StatelessWidget {
   }
 }
 
-class const _UnlockTile() extends StatelessWidget {
+class const _SignOutTile() extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final amber = context.palette.resolve(AccentColor.amber);
     return _Tile(
       isFirst: false,
       isLast: true,
-      color: amber.solid,
-      onTap: null,
+      onTap: () async {
+        final removesLocalData = await showSignOutDialog(context);
+        if (removesLocalData == null || !context.mounted) return;
+        context.read<AccountBloc>().add(
+          AccountSignOutRequested(removesLocalData: removesLocalData),
+        );
+      },
       child: Row(
         children: [
           Expanded(
             child: Text(
-              context.s.sicherungLockedCta,
-              style: context.t.titleSmall?.copyWith(color: amber.onSolid),
+              context.s.sicherungSignOut,
+              style: context.t.titleMedium?.copyWith(color: context.c.error),
             ),
           ),
-          Icon(Icons.chevron_right, color: amber.onSolid, size: Spacing.iconM),
+          Icon(Icons.logout, size: Spacing.iconM, color: context.c.error),
         ],
       ),
     );
   }
 }
 
-class const _SupportTile() extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return _Tile(
-      isFirst: false,
-      isLast: true,
-      child: Row(
-        children: [
-          Expanded(child: Text(context.s.sicherungBlockedCta, style: context.t.titleSmall)),
-          Icon(Icons.open_in_new, size: Spacing.iconS, color: context.c.onSurfaceVariant),
-        ],
-      ),
-    );
-  }
-}
-
-// * locked and blocked must never share a treatment: one is self-serve and says
+// * locked and blocked must never share a treatment: one is self serve and says
 // * the data is intact, the other points at support and says local use continues
 class const _NoticeTile({
   required final bool _isBlocked,
@@ -195,13 +214,10 @@ class const _NoticeTile({
     final amber = context.palette.resolve(AccentColor.amber);
     final background = _isBlocked ? context.c.errorContainer : amber.fill;
     final foreground = _isBlocked ? context.c.onErrorContainer : amber.onFill;
-    return Container(
-      margin: const EdgeInsets.only(bottom: _groupGap),
-      padding: _tilePadding,
-      decoration: BoxDecoration(
-        color: background,
-        borderRadius: const BorderRadius.all(Radius.circular(Spacing.radiusS)),
-      ),
+    return _Tile(
+      isFirst: false,
+      isLast: false,
+      color: background,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

@@ -313,5 +313,22 @@
   "sicherungBlockedTitle": "Konto gesperrt",
   "sicherungBlockedBody": "Sync und Cloud-OCR sind angehalten. Auf diesem Gerät funktioniert alles weiter: lesen, erfassen, bearbeiten, exportieren.",
   "sicherungBlockedCta": "Support kontaktieren",
-  "sicherungSignOut": "Abmelden"
+  "sicherungSignOut": "Abmelden",
+  "signOutTitle": "Abmelden",
+  "signOutQuestion": "Was soll mit der Bibliothek auf diesem Gerät passieren?",
+  "signOutKeepTitle": "Auf dem Gerät behalten",
+  "signOutKeepBody": "Lokale Daten bleiben, Sicherung pausiert",
+  "signOutRemoveTitle": "Vom Gerät entfernen",
+  "signOutRemoveBody": "Lokal alles löschen, Sicherung pausiert",
+  "signOutRemoveWarning": "Nur dieses Gerät wird geleert. Die Sicherung bleibt bestehen, mit dem Code holst du sie zurück.",
+  "signOutConfirmHint": "Tippe {word}, um fortzufahren",
+  "@signOutConfirmHint": {
+    "placeholders": {
+      "word": {
+        "type": "String"
+      }
+    }
+  },
+  "signOutConfirmWord": "BESTÄTIGEN",
+  "signOutRemoveAction": "Entfernen und abmelden"
 }

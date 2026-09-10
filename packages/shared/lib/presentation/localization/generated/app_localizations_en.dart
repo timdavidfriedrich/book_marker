@@ -947,4 +947,37 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get sicherungSignOut => 'Sign out';
+
+  @override
+  String get signOutTitle => 'Sign out';
+
+  @override
+  String get signOutQuestion => 'What should happen to the library on this device?';
+
+  @override
+  String get signOutKeepTitle => 'Keep on this device';
+
+  @override
+  String get signOutKeepBody => 'Local data stays, backup pauses';
+
+  @override
+  String get signOutRemoveTitle => 'Remove from this device';
+
+  @override
+  String get signOutRemoveBody => 'Delete everything locally, backup pauses';
+
+  @override
+  String get signOutRemoveWarning =>
+      'Only this device is emptied. The backup remains, and your code brings it back.';
+
+  @override
+  String signOutConfirmHint(String word) {
+    return 'Type $word to continue';
+  }
+
+  @override
+  String get signOutConfirmWord => 'CONFIRM';
+
+  @override
+  String get signOutRemoveAction => 'Remove and sign out';
 }

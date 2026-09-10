@@ -956,4 +956,37 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get sicherungSignOut => 'Abmelden';
+
+  @override
+  String get signOutTitle => 'Abmelden';
+
+  @override
+  String get signOutQuestion => 'Was soll mit der Bibliothek auf diesem Gerät passieren?';
+
+  @override
+  String get signOutKeepTitle => 'Auf dem Gerät behalten';
+
+  @override
+  String get signOutKeepBody => 'Lokale Daten bleiben, Sicherung pausiert';
+
+  @override
+  String get signOutRemoveTitle => 'Vom Gerät entfernen';
+
+  @override
+  String get signOutRemoveBody => 'Lokal alles löschen, Sicherung pausiert';
+
+  @override
+  String get signOutRemoveWarning =>
+      'Nur dieses Gerät wird geleert. Die Sicherung bleibt bestehen, mit dem Code holst du sie zurück.';
+
+  @override
+  String signOutConfirmHint(String word) {
+    return 'Tippe $word, um fortzufahren';
+  }
+
+  @override
+  String get signOutConfirmWord => 'BESTÄTIGEN';
+
+  @override
+  String get signOutRemoveAction => 'Entfernen und abmelden';
 }

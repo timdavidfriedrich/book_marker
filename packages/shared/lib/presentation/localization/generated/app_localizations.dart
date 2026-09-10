@@ -1628,6 +1628,66 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Sign out'**
   String get sicherungSignOut;
+
+  /// No description provided for @signOutTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign out'**
+  String get signOutTitle;
+
+  /// No description provided for @signOutQuestion.
+  ///
+  /// In en, this message translates to:
+  /// **'What should happen to the library on this device?'**
+  String get signOutQuestion;
+
+  /// No description provided for @signOutKeepTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep on this device'**
+  String get signOutKeepTitle;
+
+  /// No description provided for @signOutKeepBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Local data stays, backup pauses'**
+  String get signOutKeepBody;
+
+  /// No description provided for @signOutRemoveTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove from this device'**
+  String get signOutRemoveTitle;
+
+  /// No description provided for @signOutRemoveBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete everything locally, backup pauses'**
+  String get signOutRemoveBody;
+
+  /// No description provided for @signOutRemoveWarning.
+  ///
+  /// In en, this message translates to:
+  /// **'Only this device is emptied. The backup remains, and your code brings it back.'**
+  String get signOutRemoveWarning;
+
+  /// No description provided for @signOutConfirmHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Type {word} to continue'**
+  String signOutConfirmHint(String word);
+
+  /// No description provided for @signOutConfirmWord.
+  ///
+  /// In en, this message translates to:
+  /// **'CONFIRM'**
+  String get signOutConfirmWord;
+
+  /// No description provided for @signOutRemoveAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove and sign out'**
+  String get signOutRemoveAction;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

@@ -479,5 +479,22 @@
   "sicherungBlockedTitle": "Account suspended",
   "sicherungBlockedBody": "Sync and cloud OCR are paused. Everything still works on this device: reading, capturing, editing, exporting.",
   "sicherungBlockedCta": "Contact support",
-  "sicherungSignOut": "Sign out"
+  "sicherungSignOut": "Sign out",
+  "signOutTitle": "Sign out",
+  "signOutQuestion": "What should happen to the library on this device?",
+  "signOutKeepTitle": "Keep on this device",
+  "signOutKeepBody": "Local data stays, backup pauses",
+  "signOutRemoveTitle": "Remove from this device",
+  "signOutRemoveBody": "Delete everything locally, backup pauses",
+  "signOutRemoveWarning": "Only this device is emptied. The backup remains, and your code brings it back.",
+  "signOutConfirmHint": "Type {word} to continue",
+  "@signOutConfirmHint": {
+    "placeholders": {
+      "word": {
+        "type": "String"
+      }
+    }
+  },
+  "signOutConfirmWord": "CONFIRM",
+  "signOutRemoveAction": "Remove and sign out"
 }

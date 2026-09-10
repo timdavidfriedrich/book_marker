@@ -4,6 +4,7 @@ import 'package:core/theme/spacing.dart';
 import 'package:feature_settings/presentation/settings/settings_bloc.dart';
 import 'package:feature_settings/presentation/settings/settings_event.dart';
 import 'package:feature_settings/presentation/settings/settings_state.dart';
+import 'package:feature_settings/presentation/widgets/account_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -15,9 +16,7 @@ import 'package:shared/presentation/navigation/navigation_extensions.dart';
 import 'package:shared/presentation/widgets/circle_icon_button.dart';
 import 'package:shared/presentation/widgets/ink_tap_box.dart';
 import 'package:shared/presentation/widgets/segmented_toggle.dart';
-import 'package:shared/presentation/widgets/sicherung_section.dart';
 
-const _avatarSize = 56.0;
 const _groupRadius = Spacing.radiusXl;
 const _groupGap = Spacing.xxxs;
 const _actionButtonWidth = 72.0;
@@ -72,11 +71,17 @@ class const _Content({
       ],
     );
     final appearance = <Widget>[
-      _ProfileCard(state: state, controller: controller),
-      const SizedBox(height: Spacing.xl),
-      _SectionLabel(text: context.s.sicherungLabel),
-      const SizedBox(height: Spacing.s),
-      const SicherungSection(),
+      AccountCard(
+        nameField: _NameField(state: state, controller: controller),
+        stats: switch (state) {
+          null => "",
+          final loaded => context.s.settingsStats(
+            loaded.bookCount,
+            loaded.quoteCount,
+            loaded.themeCount,
+          ),
+        },
+      ),
       const SizedBox(height: Spacing.xl),
       _SectionLabel(text: context.s.settingsAppearanceLabel),
       const SizedBox(height: Spacing.s),
@@ -214,76 +219,28 @@ class const _GroupTile({
   }
 }
 
-class const _ProfileCard({
+class const _NameField({
   required final SettingsLoaded? _state,
   required final TextEditingController _controller,
 }) extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(Spacing.m),
-      decoration: BoxDecoration(
-        color: context.c.surfaceContainer,
-        borderRadius: BorderRadius.circular(_groupRadius),
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: _avatarSize,
-            height: _avatarSize,
-            alignment: Alignment.center,
-            decoration: BoxDecoration(
-              color: context.c.surfaceContainerHigh,
-              shape: BoxShape.circle,
-            ),
-            child: Icon(
-              Icons.person_outline,
-              size: Spacing.iconL,
-              color: context.c.onSurfaceVariant,
-            ),
-          ),
-          const SizedBox(width: Spacing.m),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                TextField(
-                  controller: _controller,
-                  enabled: _state != null,
-                  textCapitalization: TextCapitalization.words,
-                  style: context.t.titleLarge,
-                  onChanged: (value) =>
-                      context.read<SettingsBloc>().add(SettingsNameChanged(value)),
-                  decoration: InputDecoration(
-                    isDense: true,
-                    filled: false,
-                    border: InputBorder.none,
-                    enabledBorder: InputBorder.none,
-                    focusedBorder: InputBorder.none,
-                    disabledBorder: InputBorder.none,
-                    contentPadding: EdgeInsets.zero,
-                    hintText: context.s.settingsProfileNameHint,
-                    hintStyle: context.t.titleLarge?.copyWith(color: context.c.onSurfaceVariant),
-                  ),
-                ),
-                const SizedBox(height: Spacing.xxs),
-                Text(
-                  switch (_state) {
-                    null => "",
-                    final state => context.s.settingsStats(
-                      state.bookCount,
-                      state.quoteCount,
-                      state.themeCount,
-                    ),
-                  },
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: context.typography.label.copyWith(color: context.c.onSurfaceVariant),
-                ),
-              ],
-            ),
-          ),
-        ],
+    return TextField(
+      controller: _controller,
+      enabled: _state != null,
+      textCapitalization: TextCapitalization.words,
+      style: context.t.titleLarge,
+      onChanged: (value) => context.read<SettingsBloc>().add(SettingsNameChanged(value)),
+      decoration: InputDecoration(
+        isDense: true,
+        filled: false,
+        border: InputBorder.none,
+        enabledBorder: InputBorder.none,
+        focusedBorder: InputBorder.none,
+        disabledBorder: InputBorder.none,
+        contentPadding: EdgeInsets.zero,
+        hintText: context.s.settingsProfileNameHint,
+        hintStyle: context.t.titleLarge?.copyWith(color: context.c.onSurfaceVariant),
       ),
     );
   }
