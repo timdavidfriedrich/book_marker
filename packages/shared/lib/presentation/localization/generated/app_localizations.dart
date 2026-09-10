@@ -1641,6 +1641,24 @@ abstract class AppLocalizations {
   /// **'Sign in to secure your data'**
   String get sicherungSignInCta;
 
+  /// No description provided for @backupPromptTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Ten quotes already. Shall we back them up?'**
+  String get backupPromptTitle;
+
+  /// No description provided for @backupPromptSetUp.
+  ///
+  /// In en, this message translates to:
+  /// **'Set up'**
+  String get backupPromptSetUp;
+
+  /// No description provided for @backupPromptLater.
+  ///
+  /// In en, this message translates to:
+  /// **'Not now'**
+  String get backupPromptLater;
+
   /// No description provided for @sicherungSignedOut.
   ///
   /// In en, this message translates to:

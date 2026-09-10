@@ -37,6 +37,12 @@ class const SettingsRepositoryImpl(
   Future<AppResult<()>> setContrastPreference(ContrastPreference preference) =>
       _update((current) => current.copyWith(contrastPreference: preference));
 
+  // * one way. The prompt is shown exactly once, and "Nicht jetzt" means never
+  // * again rather than not this launch
+  @override
+  Future<AppResult<()>> dismissBackupPrompt() =>
+      _update((current) => current.copyWith(hasDismissedBackupPrompt: true));
+
   Future<AppResult<()>> _update(UserSettings Function(UserSettings current) change) async {
     try {
       final row = await _localDataSource.readSettings();

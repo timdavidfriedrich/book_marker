@@ -17,6 +17,7 @@ class const UserSettings({
   required final LocalePreference localePreference,
   required final ThemePreference themePreference,
   required final ContrastPreference contrastPreference,
+  required final bool hasDismissedBackupPrompt,
 }) with UserSettingsMappable;
 
 const defaultUserSettings = UserSettings(
@@ -24,4 +25,5 @@ const defaultUserSettings = UserSettings(
   localePreference: LocalePreference.system,
   themePreference: ThemePreference.system,
   contrastPreference: ContrastPreference.system,
+  hasDismissedBackupPrompt: false,
 );

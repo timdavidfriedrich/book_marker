@@ -967,6 +967,15 @@ class AppLocalizationsDe extends AppLocalizations {
   String get sicherungSignInCta => 'Anmeldung, um Daten zu sichern';
 
   @override
+  String get backupPromptTitle => 'Wow, 10 Zitate! Willst du sie sichern?';
+
+  @override
+  String get backupPromptSetUp => 'Einrichten';
+
+  @override
+  String get backupPromptLater => 'Nicht jetzt';
+
+  @override
   String get sicherungSignedOut => 'Nicht angemeldet';
 
   @override

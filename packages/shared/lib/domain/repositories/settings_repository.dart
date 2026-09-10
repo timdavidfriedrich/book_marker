@@ -11,4 +11,6 @@ abstract class SettingsRepository {
   Future<AppResult<()>> setThemePreference(ThemePreference preference);
 
   Future<AppResult<()>> setContrastPreference(ContrastPreference preference);
+
+  Future<AppResult<()>> dismissBackupPrompt();
 }

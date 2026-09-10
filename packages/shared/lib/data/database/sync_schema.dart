@@ -211,6 +211,7 @@ const _settingsColumns = <Column>[
   Column.text("locale_preference"),
   Column.text("theme_preference"),
   Column.text("contrast_preference"),
+  Column.integer("backup_prompt_dismissed"),
 ];
 
 const _appConfigCacheColumns = <Column>[

@@ -1,5 +1,6 @@
 import 'package:core/error/app_error.dart';
 import 'package:core/theme/corner_radii.dart';
+import 'package:core/theme/screen_layout.dart';
 import 'package:core/theme/spacing.dart';
 import 'package:feature_library/presentation/extensions/book_status_extensions.dart';
 import 'package:feature_library/presentation/library/library_bloc.dart';
@@ -8,6 +9,7 @@ import 'package:feature_library/presentation/library/library_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:shared/presentation/backup_prompt/backup_prompt_cubit.dart';
 import 'package:shared/presentation/extensions/app_error_extensions.dart';
 import 'package:shared/presentation/extensions/context_extensions.dart';
 import 'package:shared/presentation/extensions/page_number_extensions.dart';
@@ -15,6 +17,7 @@ import 'package:shared/presentation/extensions/screen_layout_extensions.dart';
 import 'package:shared/presentation/extensions/stat_label_extensions.dart';
 import 'package:shared/presentation/navigation/navigation_extensions.dart';
 import 'package:shared/presentation/navigation/routes.dart';
+import 'package:shared/presentation/widgets/backup_prompt.dart';
 import 'package:shared/presentation/widgets/book_card.dart';
 import 'package:shared/presentation/widgets/book_cover.dart';
 import 'package:shared/presentation/widgets/collection_mark.dart';
@@ -75,6 +78,41 @@ class const _Loaded({
   @override
   Widget build(BuildContext context) {
     final layout = context.layout;
+    return _BackupPromptHost(
+      child: _Content(state: _state, controller: _controller, layout: layout),
+    );
+  }
+}
+
+// * the sheet is shown here, over the library, but the decision is not made
+// * here: the cubit watches the quote count, the account and the dismissal flag
+class const _BackupPromptHost({
+  required final Widget _child,
+}) extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return BlocListener<BackupPromptCubit, bool>(
+      listenWhen: (previous, current) => !previous && current,
+      // * after this frame, not during it: a modal route cannot be pushed while
+      // * the tree that pushes it is still building
+      listener: (context, _) => WidgetsBinding.instance.addPostFrameCallback((_) async {
+        if (!context.mounted) return;
+        await context.read<BackupPromptCubit>().dismiss();
+        if (context.mounted) await showBackupPrompt(context);
+      }),
+      child: _child,
+    );
+  }
+}
+
+class const _Content({
+  required final LibraryLoaded _state,
+  required final TextEditingController _controller,
+  required final ScreenLayout _layout,
+}) extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final layout = _layout;
     return CustomScrollView(
       slivers: [
         if (layout.isWide)

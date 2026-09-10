@@ -174,6 +174,8 @@ class SettingsTable extends Table {
 
   TextColumn get contrastPreference => text().nullable()();
 
+  IntColumn get backupPromptDismissed => integer().nullable()();
+
   @override
   Set<Column<Object>> get primaryKey => {id};
 }

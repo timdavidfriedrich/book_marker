@@ -958,6 +958,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get sicherungSignInCta => 'Sign in to secure your data';
 
   @override
+  String get backupPromptTitle => 'Ten quotes already. Shall we back them up?';
+
+  @override
+  String get backupPromptSetUp => 'Set up';
+
+  @override
+  String get backupPromptLater => 'Not now';
+
+  @override
   String get sicherungSignedOut => 'Not signed in';
 
   @override

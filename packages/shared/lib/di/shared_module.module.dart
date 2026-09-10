@@ -59,6 +59,7 @@ import 'package:shared/domain/repositories/theme_repository.dart' as _i640;
 import 'package:shared/domain/repositories/voice_note_repository.dart' as _i88;
 import 'package:shared/presentation/account/account_bloc.dart' as _i880;
 import 'package:shared/presentation/app_config/app_config_cubit.dart' as _i56;
+import 'package:shared/presentation/backup_prompt/backup_prompt_cubit.dart' as _i673;
 import 'package:shared/presentation/navigation/route_change_observer.dart' as _i533;
 import 'package:shared/presentation/sync/sync_cubit.dart' as _i107;
 import 'package:shared/presentation/voice_note_cubit.dart' as _i610;
@@ -178,6 +179,13 @@ class SharedPackageModule extends _i526.MicroPackageModule {
         gh<_i492.OpenLibraryDataSource>(),
         gh<_i510.BookCoverDataSource>(),
         gh<_i1026.ShelfLocalDataSource>(),
+      ),
+    );
+    gh.lazySingleton<_i673.BackupPromptCubit>(
+      () => _i673.BackupPromptCubit(
+        gh<_i570.QuoteRepository>(),
+        gh<_i0.SettingsRepository>(),
+        gh<_i1022.AuthRepository>(),
       ),
     );
     gh.lazySingleton<_i716.SampleDataSeeder>(

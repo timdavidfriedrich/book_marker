@@ -3283,6 +3283,17 @@ class $SettingsTableTable extends SettingsTable with TableInfo<$SettingsTableTab
     type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _backupPromptDismissedMeta = const VerificationMeta(
+    'backupPromptDismissed',
+  );
+  @override
+  late final GeneratedColumn<int> backupPromptDismissed = GeneratedColumn<int>(
+    'backup_prompt_dismissed',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -3290,6 +3301,7 @@ class $SettingsTableTable extends SettingsTable with TableInfo<$SettingsTableTab
     localePreference,
     themePreference,
     contrastPreference,
+    backupPromptDismissed,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -3344,6 +3356,15 @@ class $SettingsTableTable extends SettingsTable with TableInfo<$SettingsTableTab
         ),
       );
     }
+    if (data.containsKey('backup_prompt_dismissed')) {
+      context.handle(
+        _backupPromptDismissedMeta,
+        backupPromptDismissed.isAcceptableOrUnknown(
+          data['backup_prompt_dismissed']!,
+          _backupPromptDismissedMeta,
+        ),
+      );
+    }
     return context;
   }
 
@@ -3373,6 +3394,10 @@ class $SettingsTableTable extends SettingsTable with TableInfo<$SettingsTableTab
         DriftSqlType.string,
         data['${effectivePrefix}contrast_preference'],
       ),
+      backupPromptDismissed: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}backup_prompt_dismissed'],
+      ),
     );
   }
 
@@ -3388,12 +3413,14 @@ class LocalSettings extends DataClass implements Insertable<LocalSettings> {
   final String? localePreference;
   final String? themePreference;
   final String? contrastPreference;
+  final int? backupPromptDismissed;
   const LocalSettings({
     required this.id,
     this.displayName,
     this.localePreference,
     this.themePreference,
     this.contrastPreference,
+    this.backupPromptDismissed,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -3411,6 +3438,9 @@ class LocalSettings extends DataClass implements Insertable<LocalSettings> {
     if (!nullToAbsent || contrastPreference != null) {
       map['contrast_preference'] = Variable<String>(contrastPreference);
     }
+    if (!nullToAbsent || backupPromptDismissed != null) {
+      map['backup_prompt_dismissed'] = Variable<int>(backupPromptDismissed);
+    }
     return map;
   }
 
@@ -3427,6 +3457,9 @@ class LocalSettings extends DataClass implements Insertable<LocalSettings> {
       contrastPreference: contrastPreference == null && nullToAbsent
           ? const Value.absent()
           : Value(contrastPreference),
+      backupPromptDismissed: backupPromptDismissed == null && nullToAbsent
+          ? const Value.absent()
+          : Value(backupPromptDismissed),
     );
   }
 
@@ -3443,6 +3476,9 @@ class LocalSettings extends DataClass implements Insertable<LocalSettings> {
       contrastPreference: serializer.fromJson<String?>(
         json['contrastPreference'],
       ),
+      backupPromptDismissed: serializer.fromJson<int?>(
+        json['backupPromptDismissed'],
+      ),
     );
   }
   @override
@@ -3454,6 +3490,7 @@ class LocalSettings extends DataClass implements Insertable<LocalSettings> {
       'localePreference': serializer.toJson<String?>(localePreference),
       'themePreference': serializer.toJson<String?>(themePreference),
       'contrastPreference': serializer.toJson<String?>(contrastPreference),
+      'backupPromptDismissed': serializer.toJson<int?>(backupPromptDismissed),
     };
   }
 
@@ -3463,6 +3500,7 @@ class LocalSettings extends DataClass implements Insertable<LocalSettings> {
     Value<String?> localePreference = const Value.absent(),
     Value<String?> themePreference = const Value.absent(),
     Value<String?> contrastPreference = const Value.absent(),
+    Value<int?> backupPromptDismissed = const Value.absent(),
   }) => LocalSettings(
     id: id ?? this.id,
     displayName: displayName.present ? displayName.value : this.displayName,
@@ -3471,6 +3509,9 @@ class LocalSettings extends DataClass implements Insertable<LocalSettings> {
     contrastPreference: contrastPreference.present
         ? contrastPreference.value
         : this.contrastPreference,
+    backupPromptDismissed: backupPromptDismissed.present
+        ? backupPromptDismissed.value
+        : this.backupPromptDismissed,
   );
   LocalSettings copyWithCompanion(SettingsTableCompanion data) {
     return LocalSettings(
@@ -3485,6 +3526,9 @@ class LocalSettings extends DataClass implements Insertable<LocalSettings> {
       contrastPreference: data.contrastPreference.present
           ? data.contrastPreference.value
           : this.contrastPreference,
+      backupPromptDismissed: data.backupPromptDismissed.present
+          ? data.backupPromptDismissed.value
+          : this.backupPromptDismissed,
     );
   }
 
@@ -3495,7 +3539,8 @@ class LocalSettings extends DataClass implements Insertable<LocalSettings> {
           ..write('displayName: $displayName, ')
           ..write('localePreference: $localePreference, ')
           ..write('themePreference: $themePreference, ')
-          ..write('contrastPreference: $contrastPreference')
+          ..write('contrastPreference: $contrastPreference, ')
+          ..write('backupPromptDismissed: $backupPromptDismissed')
           ..write(')'))
         .toString();
   }
@@ -3507,6 +3552,7 @@ class LocalSettings extends DataClass implements Insertable<LocalSettings> {
     localePreference,
     themePreference,
     contrastPreference,
+    backupPromptDismissed,
   );
   @override
   bool operator ==(Object other) =>
@@ -3516,7 +3562,8 @@ class LocalSettings extends DataClass implements Insertable<LocalSettings> {
           other.displayName == this.displayName &&
           other.localePreference == this.localePreference &&
           other.themePreference == this.themePreference &&
-          other.contrastPreference == this.contrastPreference);
+          other.contrastPreference == this.contrastPreference &&
+          other.backupPromptDismissed == this.backupPromptDismissed);
 }
 
 class SettingsTableCompanion extends UpdateCompanion<LocalSettings> {
@@ -3525,6 +3572,7 @@ class SettingsTableCompanion extends UpdateCompanion<LocalSettings> {
   final Value<String?> localePreference;
   final Value<String?> themePreference;
   final Value<String?> contrastPreference;
+  final Value<int?> backupPromptDismissed;
   final Value<int> rowid;
   const SettingsTableCompanion({
     this.id = const Value.absent(),
@@ -3532,6 +3580,7 @@ class SettingsTableCompanion extends UpdateCompanion<LocalSettings> {
     this.localePreference = const Value.absent(),
     this.themePreference = const Value.absent(),
     this.contrastPreference = const Value.absent(),
+    this.backupPromptDismissed = const Value.absent(),
     this.rowid = const Value.absent(),
   });
   SettingsTableCompanion.insert({
@@ -3540,6 +3589,7 @@ class SettingsTableCompanion extends UpdateCompanion<LocalSettings> {
     this.localePreference = const Value.absent(),
     this.themePreference = const Value.absent(),
     this.contrastPreference = const Value.absent(),
+    this.backupPromptDismissed = const Value.absent(),
     this.rowid = const Value.absent(),
   }) : id = Value(id);
   static Insertable<LocalSettings> custom({
@@ -3548,6 +3598,7 @@ class SettingsTableCompanion extends UpdateCompanion<LocalSettings> {
     Expression<String>? localePreference,
     Expression<String>? themePreference,
     Expression<String>? contrastPreference,
+    Expression<int>? backupPromptDismissed,
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
@@ -3556,6 +3607,7 @@ class SettingsTableCompanion extends UpdateCompanion<LocalSettings> {
       if (localePreference != null) 'locale_preference': localePreference,
       if (themePreference != null) 'theme_preference': themePreference,
       if (contrastPreference != null) 'contrast_preference': contrastPreference,
+      if (backupPromptDismissed != null) 'backup_prompt_dismissed': backupPromptDismissed,
       if (rowid != null) 'rowid': rowid,
     });
   }
@@ -3566,6 +3618,7 @@ class SettingsTableCompanion extends UpdateCompanion<LocalSettings> {
     Value<String?>? localePreference,
     Value<String?>? themePreference,
     Value<String?>? contrastPreference,
+    Value<int?>? backupPromptDismissed,
     Value<int>? rowid,
   }) {
     return SettingsTableCompanion(
@@ -3574,6 +3627,7 @@ class SettingsTableCompanion extends UpdateCompanion<LocalSettings> {
       localePreference: localePreference ?? this.localePreference,
       themePreference: themePreference ?? this.themePreference,
       contrastPreference: contrastPreference ?? this.contrastPreference,
+      backupPromptDismissed: backupPromptDismissed ?? this.backupPromptDismissed,
       rowid: rowid ?? this.rowid,
     );
   }
@@ -3596,6 +3650,11 @@ class SettingsTableCompanion extends UpdateCompanion<LocalSettings> {
     if (contrastPreference.present) {
       map['contrast_preference'] = Variable<String>(contrastPreference.value);
     }
+    if (backupPromptDismissed.present) {
+      map['backup_prompt_dismissed'] = Variable<int>(
+        backupPromptDismissed.value,
+      );
+    }
     if (rowid.present) {
       map['rowid'] = Variable<int>(rowid.value);
     }
@@ -3610,6 +3669,7 @@ class SettingsTableCompanion extends UpdateCompanion<LocalSettings> {
           ..write('localePreference: $localePreference, ')
           ..write('themePreference: $themePreference, ')
           ..write('contrastPreference: $contrastPreference, ')
+          ..write('backupPromptDismissed: $backupPromptDismissed, ')
           ..write('rowid: $rowid')
           ..write(')'))
         .toString();
@@ -5523,6 +5583,7 @@ typedef $$SettingsTableTableCreateCompanionBuilder = SettingsTableCompanion Func
   Value<String?> localePreference,
   Value<String?> themePreference,
   Value<String?> contrastPreference,
+  Value<int?> backupPromptDismissed,
   Value<int> rowid,
 });
 typedef $$SettingsTableTableUpdateCompanionBuilder = SettingsTableCompanion Function({
@@ -5531,6 +5592,7 @@ typedef $$SettingsTableTableUpdateCompanionBuilder = SettingsTableCompanion Func
   Value<String?> localePreference,
   Value<String?> themePreference,
   Value<String?> contrastPreference,
+  Value<int?> backupPromptDismissed,
   Value<int> rowid,
 });
 
@@ -5564,6 +5626,11 @@ class $$SettingsTableTableFilterComposer extends Composer<_$AppDatabase, $Settin
 
   ColumnFilters<String> get contrastPreference => $composableBuilder(
     column: $table.contrastPreference,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get backupPromptDismissed => $composableBuilder(
+    column: $table.backupPromptDismissed,
     builder: (column) => ColumnFilters(column),
   );
 }
@@ -5600,6 +5667,11 @@ class $$SettingsTableTableOrderingComposer extends Composer<_$AppDatabase, $Sett
     column: $table.contrastPreference,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<int> get backupPromptDismissed => $composableBuilder(
+    column: $table.backupPromptDismissed,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$SettingsTableTableAnnotationComposer extends Composer<_$AppDatabase, $SettingsTableTable> {
@@ -5630,6 +5702,11 @@ class $$SettingsTableTableAnnotationComposer extends Composer<_$AppDatabase, $Se
 
   GeneratedColumn<String> get contrastPreference => $composableBuilder(
     column: $table.contrastPreference,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get backupPromptDismissed => $composableBuilder(
+    column: $table.backupPromptDismissed,
     builder: (column) => column,
   );
 }
@@ -5669,6 +5746,7 @@ class $$SettingsTableTableTableManager
                 Value<String?> localePreference = const Value.absent(),
                 Value<String?> themePreference = const Value.absent(),
                 Value<String?> contrastPreference = const Value.absent(),
+                Value<int?> backupPromptDismissed = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => SettingsTableCompanion(
                 id: id,
@@ -5676,6 +5754,7 @@ class $$SettingsTableTableTableManager
                 localePreference: localePreference,
                 themePreference: themePreference,
                 contrastPreference: contrastPreference,
+                backupPromptDismissed: backupPromptDismissed,
                 rowid: rowid,
               ),
           createCompanionCallback:
@@ -5685,6 +5764,7 @@ class $$SettingsTableTableTableManager
                 Value<String?> localePreference = const Value.absent(),
                 Value<String?> themePreference = const Value.absent(),
                 Value<String?> contrastPreference = const Value.absent(),
+                Value<int?> backupPromptDismissed = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => SettingsTableCompanion.insert(
                 id: id,
@@ -5692,6 +5772,7 @@ class $$SettingsTableTableTableManager
                 localePreference: localePreference,
                 themePreference: themePreference,
                 contrastPreference: contrastPreference,
+                backupPromptDismissed: backupPromptDismissed,
                 rowid: rowid,
               ),
           withReferenceMapper: (p0) =>

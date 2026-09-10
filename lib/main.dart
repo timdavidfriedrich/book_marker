@@ -13,6 +13,7 @@ import 'package:shared/presentation/account/account_bloc.dart';
 import 'package:shared/presentation/account/account_event.dart';
 import 'package:shared/presentation/account/account_state.dart';
 import 'package:shared/presentation/app_config/app_config_cubit.dart';
+import 'package:shared/presentation/backup_prompt/backup_prompt_cubit.dart';
 import 'package:shared/presentation/extensions/context_extensions.dart';
 import 'package:shared/presentation/extensions/locale_preference_extensions.dart';
 import 'package:shared/presentation/extensions/theme_preference_extensions.dart';
@@ -38,6 +39,7 @@ class const App({
         BlocProvider(create: (_) => sl<AccountBloc>()..add(const AccountStarted())),
         BlocProvider(create: (_) => sl<AppConfigCubit>()..start()),
         BlocProvider(create: (_) => sl<SyncCubit>()..start()),
+        BlocProvider(create: (_) => sl<BackupPromptCubit>()..start()),
       ],
       child: BlocListener<AccountBloc, AccountState>(
         // * the transition, not the state: a refresh that failed at launch is

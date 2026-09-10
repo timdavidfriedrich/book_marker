@@ -193,6 +193,12 @@ class UserSettingsMapper extends ClassMapperBase<UserSettings> {
       v.contrastPreference;
   static const Field<UserSettings, ContrastPreference> _f$contrastPreference =
       Field('contrastPreference', _$contrastPreference);
+  static bool _$hasDismissedBackupPrompt(UserSettings v) =>
+      v.hasDismissedBackupPrompt;
+  static const Field<UserSettings, bool> _f$hasDismissedBackupPrompt = Field(
+    'hasDismissedBackupPrompt',
+    _$hasDismissedBackupPrompt,
+  );
 
   @override
   final MappableFields<UserSettings> fields = const {
@@ -200,6 +206,7 @@ class UserSettingsMapper extends ClassMapperBase<UserSettings> {
     #localePreference: _f$localePreference,
     #themePreference: _f$themePreference,
     #contrastPreference: _f$contrastPreference,
+    #hasDismissedBackupPrompt: _f$hasDismissedBackupPrompt,
   };
 
   static UserSettings _instantiate(DecodingData data) {
@@ -208,6 +215,7 @@ class UserSettingsMapper extends ClassMapperBase<UserSettings> {
       localePreference: data.dec(_f$localePreference),
       themePreference: data.dec(_f$themePreference),
       contrastPreference: data.dec(_f$contrastPreference),
+      hasDismissedBackupPrompt: data.dec(_f$hasDismissedBackupPrompt),
     );
   }
 
@@ -278,6 +286,7 @@ abstract class UserSettingsCopyWith<$R, $In extends UserSettings, $Out>
     LocalePreference? localePreference,
     ThemePreference? themePreference,
     ContrastPreference? contrastPreference,
+    bool? hasDismissedBackupPrompt,
   });
   UserSettingsCopyWith<$R2, $In, $Out2> $chain<$R2, $Out2>(Then<$Out2, $R2> t);
 }
@@ -296,12 +305,15 @@ class _UserSettingsCopyWithImpl<$R, $Out>
     LocalePreference? localePreference,
     ThemePreference? themePreference,
     ContrastPreference? contrastPreference,
+    bool? hasDismissedBackupPrompt,
   }) => $apply(
     FieldCopyWithData({
       if (displayName != $none) #displayName: displayName,
       if (localePreference != null) #localePreference: localePreference,
       if (themePreference != null) #themePreference: themePreference,
       if (contrastPreference != null) #contrastPreference: contrastPreference,
+      if (hasDismissedBackupPrompt != null)
+        #hasDismissedBackupPrompt: hasDismissedBackupPrompt,
     }),
   );
   @override
@@ -312,6 +324,10 @@ class _UserSettingsCopyWithImpl<$R, $Out>
     contrastPreference: data.get(
       #contrastPreference,
       or: $value.contrastPreference,
+    ),
+    hasDismissedBackupPrompt: data.get(
+      #hasDismissedBackupPrompt,
+      or: $value.hasDismissedBackupPrompt,
     ),
   );
 
