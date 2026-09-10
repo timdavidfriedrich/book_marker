@@ -25,38 +25,33 @@ sync_config:
     config:
       edition: 3
     streams:
-      # Phase 1 only: proves replication works before the real tables exist.
-      # Remove together with the SyncProbe model in phase 4.
-      probe:
+      # Every stream is scoped to the authenticated user. There is no
+      # cross-user query anywhere, and `owner_id` is overwritten from the
+      # session on the way up, so a forged field changes nothing.
+      library:
         auto_subscribe: true
-        query: SELECT * FROM sync_probes WHERE owner_id = auth.user_id()
+        query: SELECT * FROM books WHERE owner_id = auth.user_id()
+      quotes:
+        auto_subscribe: true
+        query: SELECT * FROM quotes WHERE owner_id = auth.user_id()
+      shelves:
+        auto_subscribe: true
+        query: SELECT * FROM shelves WHERE owner_id = auth.user_id()
+      themes:
+        auto_subscribe: true
+        query: SELECT * FROM themes WHERE owner_id = auth.user_id()
+      shelf_books:
+        auto_subscribe: true
+        query: SELECT * FROM shelf_books WHERE owner_id = auth.user_id()
+      theme_quotes:
+        auto_subscribe: true
+        query: SELECT * FROM theme_quotes WHERE owner_id = auth.user_id()
 
       # Server-owned, read-only on the device. Carries plan, account status
       # and usage counters so the app can show remaining quota offline.
       entitlements:
         auto_subscribe: true
         query: SELECT * FROM entitlements WHERE owner_id = auth.user_id()
-
-      # Phase 4 - uncomment each as its table lands. Every stream is scoped to
-      # the authenticated user; there is no cross-user query anywhere.
-      # library:
-      #   auto_subscribe: true
-      #   query: SELECT * FROM books WHERE owner_id = auth.user_id()
-      # quotes:
-      #   auto_subscribe: true
-      #   query: SELECT * FROM quotes WHERE owner_id = auth.user_id()
-      # shelves:
-      #   auto_subscribe: true
-      #   query: SELECT * FROM shelves WHERE owner_id = auth.user_id()
-      # themes:
-      #   auto_subscribe: true
-      #   query: SELECT * FROM themes WHERE owner_id = auth.user_id()
-      # shelf_books:
-      #   auto_subscribe: true
-      #   query: SELECT * FROM shelf_books WHERE owner_id = auth.user_id()
-      # theme_quotes:
-      #   auto_subscribe: true
-      #   query: SELECT * FROM theme_quotes WHERE owner_id = auth.user_id()
 
 client_auth:
   # PowerSync validates tokens that Serverpod signed, against this static key.

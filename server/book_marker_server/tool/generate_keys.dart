@@ -6,7 +6,11 @@
 //
 // The public half (n, e, kid) goes into .env for the powersync container.
 // The private half goes into config/passwords.yaml as powerSyncSigningKey and
-// is never committed.
+// is never committed. The key id needs no separate entry: it is inside the
+// private key, and jose puts it in the JWS header where PowerSync looks.
+//
+// Development and production get DIFFERENT pairs. The production one is
+// generated on the VPS so its private half never reaches a laptop.
 
 import 'dart:convert';
 import 'dart:math';
@@ -33,7 +37,6 @@ Add to .env (public half - safe to commit only as an example):
 Add to config/passwords.yaml under the relevant run mode (SECRET - never commit):
 
   powerSyncSigningKey: '$private'
-  powerSyncKeyId: '${key['kid']}'
 ''');
 }
 

@@ -1,0 +1,36 @@
+### A book, as the server stores it: structure in the clear, content encrypted.
+###
+### `status`, `createdAt` and `lastUsedAt` stay plaintext so PowerSync can bucket
+### by owner and Drift can order in SQL. Everything a person wrote or looked up
+### is ciphertext the server has no key for.
+###
+### Column names are snake_case via `column=`, not Serverpod's default camelCase.
+### The sync stream SQL, the PowerSync client schema and Drift's default column
+### naming all use snake_case, and one convention across the three is worth more
+### than matching the Dart field names.
+class: SyncedBook
+table: books
+
+fields:
+  ### UUID, not the default bigint serial. PowerSync requires a text id, and the
+  ### app mints ids client-side while offline, so the database must never assign
+  ### them. Every synced model needs this line.
+  id: UuidValue, defaultModel=random, defaultPersist=random
+  ownerId: UuidValue, column=owner_id
+  status: String
+  createdAt: DateTime, column=created_at
+  lastUsedAt: DateTime, column=last_used_at
+  updatedAt: DateTime, column=updated_at
+  ### Which key encrypted this row. Present from the start so re-encryption is a
+  ### migration rather than a rewrite.
+  keyVersion: int, default=1, column=key_version
+  titleCipher: String, column=title_cipher
+  authorsCipher: String, column=authors_cipher
+  isbnCipher: String?, column=isbn_cipher
+  ### Cover URL and the id of the local cover file, encrypted together. The
+  ### attachment itself does not exist until phase 7.
+  coverCipher: String?, column=cover_cipher
+
+indexes:
+  books_owner_idx:
+    fields: ownerId

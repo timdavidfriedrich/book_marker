@@ -453,8 +453,9 @@ class EntitlementTable extends _is.Table<_is.UuidValue> {
   EntitlementTable({super.tableRelation}) : super(tableName: 'entitlements') {
     updateTable = EntitlementUpdateTable(this);
     ownerId = _is.ColumnUuid(
-      'ownerId',
+      'owner_id',
       this,
+      fieldName: 'ownerId',
     );
     plan = _is.ColumnString(
       'plan',
@@ -467,59 +468,71 @@ class EntitlementTable extends _is.Table<_is.UuidValue> {
       hasDefault: true,
     );
     blockedReason = _is.ColumnString(
-      'blockedReason',
+      'blocked_reason',
       this,
+      fieldName: 'blockedReason',
     );
     blockedAt = _is.ColumnDateTime(
-      'blockedAt',
+      'blocked_at',
       this,
+      fieldName: 'blockedAt',
     );
     backupVerifier = _is.ColumnString(
-      'backupVerifier',
+      'backup_verifier',
       this,
+      fieldName: 'backupVerifier',
     );
     backupInitializedAt = _is.ColumnDateTime(
-      'backupInitializedAt',
+      'backup_initialized_at',
       this,
+      fieldName: 'backupInitializedAt',
     );
     usedDay = _is.ColumnInt(
-      'usedDay',
+      'used_day',
       this,
       hasDefault: true,
+      fieldName: 'usedDay',
     );
     usedWeek = _is.ColumnInt(
-      'usedWeek',
+      'used_week',
       this,
       hasDefault: true,
+      fieldName: 'usedWeek',
     );
     usedMonth = _is.ColumnInt(
-      'usedMonth',
+      'used_month',
       this,
       hasDefault: true,
+      fieldName: 'usedMonth',
     );
     updatedAt = _is.ColumnDateTime(
-      'updatedAt',
+      'updated_at',
       this,
+      fieldName: 'updatedAt',
     );
     store = _is.ColumnString(
       'store',
       this,
     );
     productId = _is.ColumnString(
-      'productId',
+      'product_id',
       this,
+      fieldName: 'productId',
     );
     purchaseToken = _is.ColumnString(
-      'purchaseToken',
+      'purchase_token',
       this,
+      fieldName: 'purchaseToken',
     );
     purchasedAt = _is.ColumnDateTime(
-      'purchasedAt',
+      'purchased_at',
       this,
+      fieldName: 'purchasedAt',
     );
     refundedAt = _is.ColumnDateTime(
-      'refundedAt',
+      'refunded_at',
       this,
+      fieldName: 'refundedAt',
     );
   }
 

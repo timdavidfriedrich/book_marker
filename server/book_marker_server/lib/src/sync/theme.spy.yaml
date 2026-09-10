@@ -1,0 +1,18 @@
+### A theme. Same shape as a shelf: the name is content, the rest is
+### presentation.
+class: SyncedTheme
+table: themes
+
+fields:
+  id: UuidValue, defaultModel=random, defaultPersist=random
+  ownerId: UuidValue, column=owner_id
+  accent: String?
+  symbol: String?
+  createdAt: DateTime, column=created_at
+  updatedAt: DateTime, column=updated_at
+  keyVersion: int, default=1, column=key_version
+  nameCipher: String, column=name_cipher
+
+indexes:
+  themes_owner_idx:
+    fields: ownerId

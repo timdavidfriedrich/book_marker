@@ -12,103 +12,139 @@
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _is;
 
-/// Temporary table used to verify the PowerSync replication path end to end.
-/// Delete this together with its sync stream once the real synced tables land
-/// in phase 4.
-abstract class SyncProbe
+/// A shelf. Only the name is content; the accent and symbol are presentation
+/// and stay plaintext, which is what the plan's leak table allows.
+abstract class SyncedShelf
     implements _is.TableRow<_is.UuidValue>, _is.ProtocolSerialization {
-  SyncProbe._({
+  SyncedShelf._({
     _is.UuidValue? id,
     required this.ownerId,
-    required this.note,
+    this.accent,
+    this.symbol,
+    required this.createdAt,
     required this.updatedAt,
-  }) : id = id ?? const _is.Uuid().v4obj();
+    int? keyVersion,
+    required this.nameCipher,
+  }) : id = id ?? const _is.Uuid().v4obj(),
+       keyVersion = keyVersion ?? 1;
 
-  factory SyncProbe({
+  factory SyncedShelf({
     _is.UuidValue? id,
-    required String ownerId,
-    required String note,
+    required _is.UuidValue ownerId,
+    String? accent,
+    String? symbol,
+    required DateTime createdAt,
     required DateTime updatedAt,
-  }) = _SyncProbeImpl;
+    int? keyVersion,
+    required String nameCipher,
+  }) = _SyncedShelfImpl;
 
-  factory SyncProbe.fromJson(Map<String, dynamic> jsonSerialization) {
-    return SyncProbe(
+  factory SyncedShelf.fromJson(Map<String, dynamic> jsonSerialization) {
+    return SyncedShelf(
       id: jsonSerialization['id'] == null
           ? null
           : _is.UuidValueJsonExtension.fromJson(jsonSerialization['id']),
-      ownerId: jsonSerialization['ownerId'] as String,
-      note: jsonSerialization['note'] as String,
+      ownerId: _is.UuidValueJsonExtension.fromJson(
+        jsonSerialization['ownerId'],
+      ),
+      accent: jsonSerialization['accent'] as String?,
+      symbol: jsonSerialization['symbol'] as String?,
+      createdAt: _is.DateTimeJsonExtension.fromJson(
+        jsonSerialization['createdAt'],
+      ),
       updatedAt: _is.DateTimeJsonExtension.fromJson(
         jsonSerialization['updatedAt'],
       ),
+      keyVersion: jsonSerialization['keyVersion'] as int?,
+      nameCipher: jsonSerialization['nameCipher'] as String,
     );
   }
 
-  static final t = SyncProbeTable();
+  static final t = SyncedShelfTable();
 
-  static const db = SyncProbeRepository._();
+  static const db = SyncedShelfRepository._();
 
   @override
   _is.UuidValue id;
 
-  String ownerId;
+  _is.UuidValue ownerId;
 
-  String note;
+  String? accent;
+
+  String? symbol;
+
+  DateTime createdAt;
 
   DateTime updatedAt;
+
+  int keyVersion;
+
+  String nameCipher;
 
   @override
   _is.Table<_is.UuidValue> get table => t;
 
-  /// Returns a shallow copy of this [SyncProbe]
+  /// Returns a shallow copy of this [SyncedShelf]
   /// with some or all fields replaced by the given arguments.
   @_is.useResult
-  SyncProbe copyWith({
+  SyncedShelf copyWith({
     _is.UuidValue? id,
-    String? ownerId,
-    String? note,
+    _is.UuidValue? ownerId,
+    String? accent,
+    String? symbol,
+    DateTime? createdAt,
     DateTime? updatedAt,
+    int? keyVersion,
+    String? nameCipher,
   });
   @override
   Map<String, dynamic> toJson() {
     return {
-      '__className__': 'SyncProbe',
+      '__className__': 'SyncedShelf',
       'id': id.toJson(),
-      'ownerId': ownerId,
-      'note': note,
+      'ownerId': ownerId.toJson(),
+      if (accent != null) 'accent': accent,
+      if (symbol != null) 'symbol': symbol,
+      'createdAt': createdAt.toJson(),
       'updatedAt': updatedAt.toJson(),
+      'keyVersion': keyVersion,
+      'nameCipher': nameCipher,
     };
   }
 
   @override
   Map<String, dynamic> toJsonForProtocol() {
     return {
-      '__className__': 'SyncProbe',
+      '__className__': 'SyncedShelf',
       'id': id.toJson(),
-      'ownerId': ownerId,
-      'note': note,
+      'ownerId': ownerId.toJson(),
+      if (accent != null) 'accent': accent,
+      if (symbol != null) 'symbol': symbol,
+      'createdAt': createdAt.toJson(),
       'updatedAt': updatedAt.toJson(),
+      'keyVersion': keyVersion,
+      'nameCipher': nameCipher,
     };
   }
 
-  static SyncProbeInclude include() {
-    return SyncProbeInclude._();
+  static SyncedShelfInclude include() {
+    return SyncedShelfInclude._();
   }
 
-  static SyncProbeIncludeList includeList({
-    _is.WhereExpressionBuilder<SyncProbeTable>? where,
+  static SyncedShelfIncludeList includeList({
+    _is.WhereExpressionBuilder<SyncedShelfTable>? where,
     int? limit,
     int? offset,
-    _is.OrderByBuilder<SyncProbeTable>? orderBy,
-    _is.OrderByListBuilder<SyncProbeTable>? orderByList,
-    SyncProbeInclude? include,
+    _is.OrderByBuilder<SyncedShelfTable>? orderBy,
+    _is.OrderByListBuilder<SyncedShelfTable>? orderByList,
+    SyncedShelfInclude? include,
   }) {
-    return SyncProbeIncludeList._(
+    return SyncedShelfIncludeList._(
       where: where,
       limit: limit,
       offset: offset,
-      orderBy: orderBy?.call(SyncProbe.t),
-      orderByList: orderByList?.call(SyncProbe.t),
+      orderBy: orderBy?.call(SyncedShelf.t),
+      orderByList: orderByList?.call(SyncedShelf.t),
       include: include,
     );
   }
@@ -119,125 +155,199 @@ abstract class SyncProbe
   }
 }
 
-class _SyncProbeImpl extends SyncProbe {
-  _SyncProbeImpl({
+class _Undefined {}
+
+class _SyncedShelfImpl extends SyncedShelf {
+  _SyncedShelfImpl({
     _is.UuidValue? id,
-    required String ownerId,
-    required String note,
+    required _is.UuidValue ownerId,
+    String? accent,
+    String? symbol,
+    required DateTime createdAt,
     required DateTime updatedAt,
+    int? keyVersion,
+    required String nameCipher,
   }) : super._(
          id: id,
          ownerId: ownerId,
-         note: note,
+         accent: accent,
+         symbol: symbol,
+         createdAt: createdAt,
          updatedAt: updatedAt,
+         keyVersion: keyVersion,
+         nameCipher: nameCipher,
        );
 
-  /// Returns a shallow copy of this [SyncProbe]
+  /// Returns a shallow copy of this [SyncedShelf]
   /// with some or all fields replaced by the given arguments.
   @_is.useResult
   @override
-  SyncProbe copyWith({
+  SyncedShelf copyWith({
     _is.UuidValue? id,
-    String? ownerId,
-    String? note,
+    _is.UuidValue? ownerId,
+    Object? accent = _Undefined,
+    Object? symbol = _Undefined,
+    DateTime? createdAt,
     DateTime? updatedAt,
+    int? keyVersion,
+    String? nameCipher,
   }) {
-    return SyncProbe(
+    return SyncedShelf(
       id: id ?? this.id,
       ownerId: ownerId ?? this.ownerId,
-      note: note ?? this.note,
+      accent: accent is String? ? accent : this.accent,
+      symbol: symbol is String? ? symbol : this.symbol,
+      createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
+      keyVersion: keyVersion ?? this.keyVersion,
+      nameCipher: nameCipher ?? this.nameCipher,
     );
   }
 }
 
-class SyncProbeUpdateTable extends _is.UpdateTable<SyncProbeTable> {
-  SyncProbeUpdateTable(super.table);
+class SyncedShelfUpdateTable extends _is.UpdateTable<SyncedShelfTable> {
+  SyncedShelfUpdateTable(super.table);
 
-  _is.ColumnValue<String, String> ownerId(String value) => _is.ColumnValue(
-    table.ownerId,
+  _is.ColumnValue<_is.UuidValue, _is.UuidValue> ownerId(_is.UuidValue value) =>
+      _is.ColumnValue(
+        table.ownerId,
+        value,
+      );
+
+  _is.ColumnValue<String, String> accent(String? value) => _is.ColumnValue(
+    table.accent,
     value,
   );
 
-  _is.ColumnValue<String, String> note(String value) => _is.ColumnValue(
-    table.note,
+  _is.ColumnValue<String, String> symbol(String? value) => _is.ColumnValue(
+    table.symbol,
     value,
   );
+
+  _is.ColumnValue<DateTime, DateTime> createdAt(DateTime value) =>
+      _is.ColumnValue(
+        table.createdAt,
+        value,
+      );
 
   _is.ColumnValue<DateTime, DateTime> updatedAt(DateTime value) =>
       _is.ColumnValue(
         table.updatedAt,
         value,
       );
+
+  _is.ColumnValue<int, int> keyVersion(int value) => _is.ColumnValue(
+    table.keyVersion,
+    value,
+  );
+
+  _is.ColumnValue<String, String> nameCipher(String value) => _is.ColumnValue(
+    table.nameCipher,
+    value,
+  );
 }
 
-class SyncProbeTable extends _is.Table<_is.UuidValue> {
-  SyncProbeTable({super.tableRelation}) : super(tableName: 'sync_probes') {
-    updateTable = SyncProbeUpdateTable(this);
-    ownerId = _is.ColumnString(
-      'ownerId',
+class SyncedShelfTable extends _is.Table<_is.UuidValue> {
+  SyncedShelfTable({super.tableRelation}) : super(tableName: 'shelves') {
+    updateTable = SyncedShelfUpdateTable(this);
+    ownerId = _is.ColumnUuid(
+      'owner_id',
+      this,
+      fieldName: 'ownerId',
+    );
+    accent = _is.ColumnString(
+      'accent',
       this,
     );
-    note = _is.ColumnString(
-      'note',
+    symbol = _is.ColumnString(
+      'symbol',
       this,
+    );
+    createdAt = _is.ColumnDateTime(
+      'created_at',
+      this,
+      fieldName: 'createdAt',
     );
     updatedAt = _is.ColumnDateTime(
-      'updatedAt',
+      'updated_at',
       this,
+      fieldName: 'updatedAt',
+    );
+    keyVersion = _is.ColumnInt(
+      'key_version',
+      this,
+      hasDefault: true,
+      fieldName: 'keyVersion',
+    );
+    nameCipher = _is.ColumnString(
+      'name_cipher',
+      this,
+      fieldName: 'nameCipher',
     );
   }
 
-  late final SyncProbeUpdateTable updateTable;
+  late final SyncedShelfUpdateTable updateTable;
 
-  late final _is.ColumnString ownerId;
+  late final _is.ColumnUuid ownerId;
 
-  late final _is.ColumnString note;
+  late final _is.ColumnString accent;
+
+  late final _is.ColumnString symbol;
+
+  late final _is.ColumnDateTime createdAt;
 
   late final _is.ColumnDateTime updatedAt;
+
+  late final _is.ColumnInt keyVersion;
+
+  late final _is.ColumnString nameCipher;
 
   @override
   List<_is.Column> get columns => [
     id,
     ownerId,
-    note,
+    accent,
+    symbol,
+    createdAt,
     updatedAt,
+    keyVersion,
+    nameCipher,
   ];
 }
 
-class SyncProbeInclude extends _is.IncludeObject {
-  SyncProbeInclude._();
+class SyncedShelfInclude extends _is.IncludeObject {
+  SyncedShelfInclude._();
 
   @override
   Map<String, _is.Include?> get includes => {};
 
   @override
-  _is.Table<_is.UuidValue> get table => SyncProbe.t;
+  _is.Table<_is.UuidValue> get table => SyncedShelf.t;
 }
 
-class SyncProbeIncludeList extends _is.IncludeList {
-  SyncProbeIncludeList._({
-    _is.WhereExpressionBuilder<SyncProbeTable>? where,
+class SyncedShelfIncludeList extends _is.IncludeList {
+  SyncedShelfIncludeList._({
+    _is.WhereExpressionBuilder<SyncedShelfTable>? where,
     super.limit,
     super.offset,
     super.orderBy,
     super.orderByList,
     super.include,
   }) {
-    super.where = where?.call(SyncProbe.t);
+    super.where = where?.call(SyncedShelf.t);
   }
 
   @override
   Map<String, _is.Include?> get includes => include?.includes ?? {};
 
   @override
-  _is.Table<_is.UuidValue> get table => SyncProbe.t;
+  _is.Table<_is.UuidValue> get table => SyncedShelf.t;
 }
 
-class SyncProbeRepository {
-  const SyncProbeRepository._();
+class SyncedShelfRepository {
+  const SyncedShelfRepository._();
 
-  /// Returns a list of [SyncProbe]s matching the given query parameters.
+  /// Returns a list of [SyncedShelf]s matching the given query parameters.
   ///
   /// Use [where] to specify which items to include in the return value.
   /// If none is specified, all items will be returned.
@@ -259,21 +369,21 @@ class SyncProbeRepository {
   ///   limit: 100,
   /// );
   /// ```
-  Future<List<SyncProbe>> find(
+  Future<List<SyncedShelf>> find(
     _is.DatabaseSession session, {
-    _is.WhereExpressionBuilder<SyncProbeTable>? where,
+    _is.WhereExpressionBuilder<SyncedShelfTable>? where,
     int? limit,
     int? offset,
-    _is.OrderByBuilder<SyncProbeTable>? orderBy,
-    _is.OrderByListBuilder<SyncProbeTable>? orderByList,
+    _is.OrderByBuilder<SyncedShelfTable>? orderBy,
+    _is.OrderByListBuilder<SyncedShelfTable>? orderByList,
     _is.Transaction? transaction,
     _is.LockMode? lockMode,
     _is.LockBehavior? lockBehavior,
   }) async {
-    return session.db.find<SyncProbe>(
-      where: where?.call(SyncProbe.t),
-      orderBy: orderBy?.call(SyncProbe.t),
-      orderByList: orderByList?.call(SyncProbe.t),
+    return session.db.find<SyncedShelf>(
+      where: where?.call(SyncedShelf.t),
+      orderBy: orderBy?.call(SyncedShelf.t),
+      orderByList: orderByList?.call(SyncedShelf.t),
       limit: limit,
       offset: offset,
       transaction: transaction,
@@ -282,7 +392,7 @@ class SyncProbeRepository {
     );
   }
 
-  /// Returns the first matching [SyncProbe] matching the given query parameters.
+  /// Returns the first matching [SyncedShelf] matching the given query parameters.
   ///
   /// Use [where] to specify which items to include in the return value.
   /// If none is specified, all items will be returned.
@@ -299,20 +409,20 @@ class SyncProbeRepository {
   ///   orderBy: (t) => t.age,
   /// );
   /// ```
-  Future<SyncProbe?> findFirstRow(
+  Future<SyncedShelf?> findFirstRow(
     _is.DatabaseSession session, {
-    _is.WhereExpressionBuilder<SyncProbeTable>? where,
+    _is.WhereExpressionBuilder<SyncedShelfTable>? where,
     int? offset,
-    _is.OrderByBuilder<SyncProbeTable>? orderBy,
-    _is.OrderByListBuilder<SyncProbeTable>? orderByList,
+    _is.OrderByBuilder<SyncedShelfTable>? orderBy,
+    _is.OrderByListBuilder<SyncedShelfTable>? orderByList,
     _is.Transaction? transaction,
     _is.LockMode? lockMode,
     _is.LockBehavior? lockBehavior,
   }) async {
-    return session.db.findFirstRow<SyncProbe>(
-      where: where?.call(SyncProbe.t),
-      orderBy: orderBy?.call(SyncProbe.t),
-      orderByList: orderByList?.call(SyncProbe.t),
+    return session.db.findFirstRow<SyncedShelf>(
+      where: where?.call(SyncedShelf.t),
+      orderBy: orderBy?.call(SyncedShelf.t),
+      orderByList: orderByList?.call(SyncedShelf.t),
       offset: offset,
       transaction: transaction,
       lockMode: lockMode,
@@ -320,15 +430,15 @@ class SyncProbeRepository {
     );
   }
 
-  /// Finds a single [SyncProbe] by its [id] or null if no such row exists.
-  Future<SyncProbe?> findById(
+  /// Finds a single [SyncedShelf] by its [id] or null if no such row exists.
+  Future<SyncedShelf?> findById(
     _is.DatabaseSession session,
     _is.UuidValue id, {
     _is.Transaction? transaction,
     _is.LockMode? lockMode,
     _is.LockBehavior? lockBehavior,
   }) async {
-    return session.db.findById<SyncProbe>(
+    return session.db.findById<SyncedShelf>(
       id,
       transaction: transaction,
       lockMode: lockMode,
@@ -336,9 +446,9 @@ class SyncProbeRepository {
     );
   }
 
-  /// Inserts all [SyncProbe]s in the list and returns the inserted rows.
+  /// Inserts all [SyncedShelf]s in the list and returns the inserted rows.
   ///
-  /// The returned [SyncProbe]s will have their `id` fields set.
+  /// The returned [SyncedShelf]s will have their `id` fields set.
   ///
   /// This is an atomic operation, meaning that if one of the rows fails to
   /// insert, none of the rows will be inserted.
@@ -350,14 +460,14 @@ class SyncProbeRepository {
   /// If [noReturn] is set to `true`, the inserted rows are not read back from
   /// the database and an empty list is returned. This avoids the overhead of
   /// transferring and deserializing the rows when the result is not needed.
-  Future<List<SyncProbe>> insert(
+  Future<List<SyncedShelf>> insert(
     _is.DatabaseSession session,
-    List<SyncProbe> rows, {
+    List<SyncedShelf> rows, {
     _is.Transaction? transaction,
     bool ignoreConflicts = false,
     bool noReturn = false,
   }) async {
-    return session.db.insert<SyncProbe>(
+    return session.db.insert<SyncedShelf>(
       rows,
       transaction: transaction,
       ignoreConflicts: ignoreConflicts,
@@ -365,21 +475,21 @@ class SyncProbeRepository {
     );
   }
 
-  /// Inserts a single [SyncProbe] and returns the inserted row.
+  /// Inserts a single [SyncedShelf] and returns the inserted row.
   ///
-  /// The returned [SyncProbe] will have its `id` field set.
-  Future<SyncProbe> insertRow(
+  /// The returned [SyncedShelf] will have its `id` field set.
+  Future<SyncedShelf> insertRow(
     _is.DatabaseSession session,
-    SyncProbe row, {
+    SyncedShelf row, {
     _is.Transaction? transaction,
   }) async {
-    return session.db.insertRow<SyncProbe>(
+    return session.db.insertRow<SyncedShelf>(
       row,
       transaction: transaction,
     );
   }
 
-  /// Upserts all [SyncProbe]s in the list and returns the resulting rows.
+  /// Upserts all [SyncedShelf]s in the list and returns the resulting rows.
   ///
   /// If a row conflicts on the given [conflictColumns], the existing row is
   /// updated with the new values. Otherwise, a new row is inserted.
@@ -391,7 +501,7 @@ class SyncProbeRepository {
   /// given expression. Conflicting rows that don't match are skipped and not
   /// returned, so the resulting list may be shorter than [rows].
   ///
-  /// The returned [SyncProbe]s will have their `id` fields set.
+  /// The returned [SyncedShelf]s will have their `id` fields set.
   ///
   /// This is an atomic operation, meaning that if one of the rows fails,
   /// none of the rows will be affected.
@@ -399,26 +509,26 @@ class SyncProbeRepository {
   /// If [noReturn] is set to `true`, the resulting rows are not read back from
   /// the database and an empty list is returned. This avoids the overhead of
   /// transferring and deserializing the rows when the result is not needed.
-  Future<List<SyncProbe>> upsert(
+  Future<List<SyncedShelf>> upsert(
     _is.DatabaseSession session,
-    List<SyncProbe> rows, {
-    required _is.ColumnSelections<SyncProbeTable> conflictColumns,
-    _is.ColumnSelections<SyncProbeTable>? updateColumns,
-    _is.WhereExpressionBuilder<SyncProbeTable>? updateWhere,
+    List<SyncedShelf> rows, {
+    required _is.ColumnSelections<SyncedShelfTable> conflictColumns,
+    _is.ColumnSelections<SyncedShelfTable>? updateColumns,
+    _is.WhereExpressionBuilder<SyncedShelfTable>? updateWhere,
     _is.Transaction? transaction,
     bool noReturn = false,
   }) async {
-    return session.db.upsert<SyncProbe>(
+    return session.db.upsert<SyncedShelf>(
       rows,
-      conflictColumns: conflictColumns(SyncProbe.t),
-      updateColumns: updateColumns?.call(SyncProbe.t),
-      updateWhere: updateWhere?.call(SyncProbe.t),
+      conflictColumns: conflictColumns(SyncedShelf.t),
+      updateColumns: updateColumns?.call(SyncedShelf.t),
+      updateWhere: updateWhere?.call(SyncedShelf.t),
       transaction: transaction,
       noReturn: noReturn,
     );
   }
 
-  /// Upserts a single [SyncProbe] and returns the resulting row.
+  /// Upserts a single [SyncedShelf] and returns the resulting row.
   ///
   /// If the row conflicts on the given [conflictColumns], the existing row is
   /// updated. Otherwise, a new row is inserted.
@@ -430,25 +540,25 @@ class SyncProbeRepository {
   /// row matches the expression. Returns `null` if no row was affected — for
   /// example when [updateWhere] does not match the conflicting row.
   ///
-  /// The returned [SyncProbe] will have its `id` field set.
-  Future<SyncProbe?> upsertRow(
+  /// The returned [SyncedShelf] will have its `id` field set.
+  Future<SyncedShelf?> upsertRow(
     _is.DatabaseSession session,
-    SyncProbe row, {
-    required _is.ColumnSelections<SyncProbeTable> conflictColumns,
-    _is.ColumnSelections<SyncProbeTable>? updateColumns,
-    _is.WhereExpressionBuilder<SyncProbeTable>? updateWhere,
+    SyncedShelf row, {
+    required _is.ColumnSelections<SyncedShelfTable> conflictColumns,
+    _is.ColumnSelections<SyncedShelfTable>? updateColumns,
+    _is.WhereExpressionBuilder<SyncedShelfTable>? updateWhere,
     _is.Transaction? transaction,
   }) async {
-    return session.db.upsertRow<SyncProbe>(
+    return session.db.upsertRow<SyncedShelf>(
       row,
-      conflictColumns: conflictColumns(SyncProbe.t),
-      updateColumns: updateColumns?.call(SyncProbe.t),
-      updateWhere: updateWhere?.call(SyncProbe.t),
+      conflictColumns: conflictColumns(SyncedShelf.t),
+      updateColumns: updateColumns?.call(SyncedShelf.t),
+      updateWhere: updateWhere?.call(SyncedShelf.t),
       transaction: transaction,
     );
   }
 
-  /// Updates all [SyncProbe]s in the list and returns the updated rows. If
+  /// Updates all [SyncedShelf]s in the list and returns the updated rows. If
   /// [columns] is provided, only those columns will be updated. Defaults to
   /// all columns.
   /// This is an atomic operation, meaning that if one of the rows fails to
@@ -457,82 +567,82 @@ class SyncProbeRepository {
   /// If [noReturn] is set to `true`, the updated rows are not read back from
   /// the database and an empty list is returned. This avoids the overhead of
   /// transferring and deserializing the rows when the result is not needed.
-  Future<List<SyncProbe>> update(
+  Future<List<SyncedShelf>> update(
     _is.DatabaseSession session,
-    List<SyncProbe> rows, {
-    _is.ColumnSelections<SyncProbeTable>? columns,
+    List<SyncedShelf> rows, {
+    _is.ColumnSelections<SyncedShelfTable>? columns,
     _is.Transaction? transaction,
     bool noReturn = false,
   }) async {
-    return session.db.update<SyncProbe>(
+    return session.db.update<SyncedShelf>(
       rows,
-      columns: columns?.call(SyncProbe.t),
+      columns: columns?.call(SyncedShelf.t),
       transaction: transaction,
       noReturn: noReturn,
     );
   }
 
-  /// Updates a single [SyncProbe]. The row needs to have its id set.
+  /// Updates a single [SyncedShelf]. The row needs to have its id set.
   /// Optionally, a list of [columns] can be provided to only update those
   /// columns. Defaults to all columns.
-  Future<SyncProbe> updateRow(
+  Future<SyncedShelf> updateRow(
     _is.DatabaseSession session,
-    SyncProbe row, {
-    _is.ColumnSelections<SyncProbeTable>? columns,
+    SyncedShelf row, {
+    _is.ColumnSelections<SyncedShelfTable>? columns,
     _is.Transaction? transaction,
   }) async {
-    return session.db.updateRow<SyncProbe>(
+    return session.db.updateRow<SyncedShelf>(
       row,
-      columns: columns?.call(SyncProbe.t),
+      columns: columns?.call(SyncedShelf.t),
       transaction: transaction,
     );
   }
 
-  /// Updates a single [SyncProbe] by its [id] with the specified [columnValues].
+  /// Updates a single [SyncedShelf] by its [id] with the specified [columnValues].
   /// Returns the updated row or null if no row with the given id exists.
-  Future<SyncProbe?> updateById(
+  Future<SyncedShelf?> updateById(
     _is.DatabaseSession session,
     _is.UuidValue id, {
-    required _is.ColumnValueListBuilder<SyncProbeUpdateTable> columnValues,
+    required _is.ColumnValueListBuilder<SyncedShelfUpdateTable> columnValues,
     _is.Transaction? transaction,
   }) async {
-    return session.db.updateById<SyncProbe>(
+    return session.db.updateById<SyncedShelf>(
       id,
-      columnValues: columnValues(SyncProbe.t.updateTable),
+      columnValues: columnValues(SyncedShelf.t.updateTable),
       transaction: transaction,
     );
   }
 
-  /// Updates all [SyncProbe]s matching the [where] expression with the specified [columnValues].
+  /// Updates all [SyncedShelf]s matching the [where] expression with the specified [columnValues].
   /// Returns the list of updated rows.
   ///
   /// If [noReturn] is set to `true`, the updated rows are not read back from
   /// the database and an empty list is returned. This avoids the overhead of
   /// transferring and deserializing the rows when the result is not needed.
-  Future<List<SyncProbe>> updateWhere(
+  Future<List<SyncedShelf>> updateWhere(
     _is.DatabaseSession session, {
-    required _is.ColumnValueListBuilder<SyncProbeUpdateTable> columnValues,
-    required _is.WhereExpressionBuilder<SyncProbeTable> where,
+    required _is.ColumnValueListBuilder<SyncedShelfUpdateTable> columnValues,
+    required _is.WhereExpressionBuilder<SyncedShelfTable> where,
     int? limit,
     int? offset,
-    _is.OrderByBuilder<SyncProbeTable>? orderBy,
-    _is.OrderByListBuilder<SyncProbeTable>? orderByList,
+    _is.OrderByBuilder<SyncedShelfTable>? orderBy,
+    _is.OrderByListBuilder<SyncedShelfTable>? orderByList,
     _is.Transaction? transaction,
     bool noReturn = false,
   }) async {
-    return session.db.updateWhere<SyncProbe>(
-      columnValues: columnValues(SyncProbe.t.updateTable),
-      where: where(SyncProbe.t),
+    return session.db.updateWhere<SyncedShelf>(
+      columnValues: columnValues(SyncedShelf.t.updateTable),
+      where: where(SyncedShelf.t),
       limit: limit,
       offset: offset,
-      orderBy: orderBy?.call(SyncProbe.t),
-      orderByList: orderByList?.call(SyncProbe.t),
+      orderBy: orderBy?.call(SyncedShelf.t),
+      orderByList: orderByList?.call(SyncedShelf.t),
       transaction: transaction,
       noReturn: noReturn,
     );
   }
 
-  /// Deletes all [SyncProbe]s in the list and returns the deleted rows.
+  /// Deletes all [SyncedShelf]s in the list and returns the deleted rows.
   ///
   /// To specify the order of the returned rows use [orderBy] or [orderByList]
   /// when sorting by multiple columns.
@@ -543,30 +653,30 @@ class SyncProbeRepository {
   /// If [noReturn] is set to `true`, the deleted rows are not read back from
   /// the database and an empty list is returned. This avoids the overhead of
   /// transferring and deserializing the rows when the result is not needed.
-  Future<List<SyncProbe>> delete(
+  Future<List<SyncedShelf>> delete(
     _is.DatabaseSession session,
-    List<SyncProbe> rows, {
-    _is.OrderByBuilder<SyncProbeTable>? orderBy,
-    _is.OrderByListBuilder<SyncProbeTable>? orderByList,
+    List<SyncedShelf> rows, {
+    _is.OrderByBuilder<SyncedShelfTable>? orderBy,
+    _is.OrderByListBuilder<SyncedShelfTable>? orderByList,
     _is.Transaction? transaction,
     bool noReturn = false,
   }) async {
-    return session.db.delete<SyncProbe>(
+    return session.db.delete<SyncedShelf>(
       rows,
-      orderBy: orderBy?.call(SyncProbe.t),
-      orderByList: orderByList?.call(SyncProbe.t),
+      orderBy: orderBy?.call(SyncedShelf.t),
+      orderByList: orderByList?.call(SyncedShelf.t),
       transaction: transaction,
       noReturn: noReturn,
     );
   }
 
-  /// Deletes a single [SyncProbe].
-  Future<SyncProbe> deleteRow(
+  /// Deletes a single [SyncedShelf].
+  Future<SyncedShelf> deleteRow(
     _is.DatabaseSession session,
-    SyncProbe row, {
+    SyncedShelf row, {
     _is.Transaction? transaction,
   }) async {
-    return session.db.deleteRow<SyncProbe>(
+    return session.db.deleteRow<SyncedShelf>(
       row,
       transaction: transaction,
     );
@@ -580,18 +690,18 @@ class SyncProbeRepository {
   /// If [noReturn] is set to `true`, the deleted rows are not read back from
   /// the database and an empty list is returned. This avoids the overhead of
   /// transferring and deserializing the rows when the result is not needed.
-  Future<List<SyncProbe>> deleteWhere(
+  Future<List<SyncedShelf>> deleteWhere(
     _is.DatabaseSession session, {
-    required _is.WhereExpressionBuilder<SyncProbeTable> where,
-    _is.OrderByBuilder<SyncProbeTable>? orderBy,
-    _is.OrderByListBuilder<SyncProbeTable>? orderByList,
+    required _is.WhereExpressionBuilder<SyncedShelfTable> where,
+    _is.OrderByBuilder<SyncedShelfTable>? orderBy,
+    _is.OrderByListBuilder<SyncedShelfTable>? orderByList,
     _is.Transaction? transaction,
     bool noReturn = false,
   }) async {
-    return session.db.deleteWhere<SyncProbe>(
-      where: where(SyncProbe.t),
-      orderBy: orderBy?.call(SyncProbe.t),
-      orderByList: orderByList?.call(SyncProbe.t),
+    return session.db.deleteWhere<SyncedShelf>(
+      where: where(SyncedShelf.t),
+      orderBy: orderBy?.call(SyncedShelf.t),
+      orderByList: orderByList?.call(SyncedShelf.t),
       transaction: transaction,
       noReturn: noReturn,
     );
@@ -601,27 +711,27 @@ class SyncProbeRepository {
   /// will return the count of all rows in the table.
   Future<int> count(
     _is.DatabaseSession session, {
-    _is.WhereExpressionBuilder<SyncProbeTable>? where,
+    _is.WhereExpressionBuilder<SyncedShelfTable>? where,
     int? limit,
     _is.Transaction? transaction,
   }) async {
-    return session.db.count<SyncProbe>(
-      where: where?.call(SyncProbe.t),
+    return session.db.count<SyncedShelf>(
+      where: where?.call(SyncedShelf.t),
       limit: limit,
       transaction: transaction,
     );
   }
 
-  /// Acquires row-level locks on [SyncProbe] rows matching the [where] expression.
+  /// Acquires row-level locks on [SyncedShelf] rows matching the [where] expression.
   Future<void> lockRows(
     _is.DatabaseSession session, {
-    required _is.WhereExpressionBuilder<SyncProbeTable> where,
+    required _is.WhereExpressionBuilder<SyncedShelfTable> where,
     required _is.LockMode lockMode,
     required _is.Transaction transaction,
     _is.LockBehavior lockBehavior = _is.LockBehavior.wait,
   }) async {
-    return session.db.lockRows<SyncProbe>(
-      where: where(SyncProbe.t),
+    return session.db.lockRows<SyncedShelf>(
+      where: where(SyncedShelf.t),
       lockMode: lockMode,
       lockBehavior: lockBehavior,
       transaction: transaction,

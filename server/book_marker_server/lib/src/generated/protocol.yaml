@@ -14,5 +14,3 @@ entitlement:
   - registerBackup:
 powerSync:
   - createToken:
-greeting:
-  - hello:

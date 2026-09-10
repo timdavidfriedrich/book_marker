@@ -45,6 +45,21 @@ User content is **end-to-end encrypted**. Content columns hold ciphertext the
 server cannot read; only structure (ids, foreign keys, timestamps, flags) is
 plaintext. Do not add server logic that reads a `*Cipher` column.
 
+The one exception is `entitlements.backupVerifier`, a known string encrypted
+under the master key. It is not key material and the server never decrypts it;
+it exists so a device can tell "a backup already exists" from "no backup yet",
+and a right recovery code from a wrong one. See the plan.
+
+**Column names are snake_case, set with `column=` in every model.** Serverpod
+would otherwise emit camelCase, and the PowerSync sync rules, the PowerSync
+client schema and Drift's default column naming are all snake_case. One
+convention across the three beats matching the Dart field names.
+
+**Synced tables carry no foreign keys.** PowerSync replicates rows
+independently, so a batch can carry a quote whose book the server has not seen;
+a constraint would reject the write rather than store an opaque string.
+Referential integrity lives on the device, where the cascades are.
+
 ## Structure rules
 
 Four layers, and the boundaries are the point:
@@ -73,7 +88,12 @@ The Serverpod MCP server is not configured in this repo; use the CLI.
   (`--force` for destructive changes).
 - `dart run bin/main.dart --role maintenance --apply-migrations`, apply them.
 - `docker compose up --detach`, Postgres, Redis and PowerSync.
-- `dart run tool/generate_keys.dart`, the PowerSync JWT keypair.
+- `dart run tool/generate_keys.dart`, the PowerSync JWT keypair. Development and
+  production get different pairs; production's is generated on the VPS.
+- `dart run tool/mint_powersync_token.dart <auth-user-uuid>`, a token for
+  checking the sync path without a signed-in device:
+  `curl -m 5 -X POST http://localhost:8095/sync/stream -H "Authorization: Bearer $TOKEN" -H 'Content-Type: application/json' -d '{"raw_data":true}'`
+  should answer with one bucket per stream, and only that user's rows.
 - `dart test` in `book_marker_server`, tests need no Docker; `config/test.yaml`
   points at an embedded Postgres.
 
@@ -90,6 +110,15 @@ Cluster-level objects (the `powersync_role`, the `powersync` publication) are
 **not** in migrations, they live in `powersync/setup_replication.sql` and are run
 by hand. Migrations are per-database; roles and publications are per-cluster, and
 putting a database password in a committed migration would leak it.
+
+**After any `create-migration --force`, check the publication.** A destructive
+migration recreates the table, which silently drops it from the publication, and
+sync then goes quiet with no error anywhere:
+
+```sql
+SELECT tablename FROM pg_publication_tables WHERE pubname='powersync';
+ALTER PUBLICATION powersync ADD TABLE <t>;
+```
 
 ## Checklist after changes
 

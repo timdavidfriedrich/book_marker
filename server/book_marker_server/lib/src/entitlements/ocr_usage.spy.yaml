@@ -12,12 +12,12 @@ table: ocr_usage
 
 fields:
   id: UuidValue, defaultModel=random, defaultPersist=random
-  ownerId: UuidValue
-  createdAt: DateTime
+  ownerId: UuidValue, column=owner_id
+  createdAt: DateTime, column=created_at
   engine: String
   status: String, default='reserved'
-  inputTokens: int?
-  outputTokens: int?
+  inputTokens: int?, column=input_tokens
+  outputTokens: int?, column=output_tokens
 
 indexes:
   ocr_usage_owner_time_idx:

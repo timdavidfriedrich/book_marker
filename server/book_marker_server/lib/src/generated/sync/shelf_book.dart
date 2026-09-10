@@ -12,136 +12,117 @@
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _is;
 
-/// Append-only log of cloud OCR requests. The source of truth for rate limits.
+/// Which books sit on which shelf.
 ///
-/// Server-only: never added to the `powersync` publication. The device sees the
-/// denormalised counters on `entitlements` instead.
-///
-/// `status` drives the admission protocol: a row is inserted as `reserved`
-/// inside the advisory-locked transaction, then flipped to `completed` or
-/// `failed` once the provider responds. Counting includes `reserved`, so an
-/// in-flight scan holds its slot.
-abstract class OcrUsage
+/// The local table has a composite primary key and no id column, which
+/// PowerSync cannot sync, so this one gains a UUID id and keeps the pair unique
+/// through an index instead. No keyVersion: there is no ciphertext here.
+abstract class SyncedShelfBook
     implements _is.TableRow<_is.UuidValue>, _is.ProtocolSerialization {
-  OcrUsage._({
+  SyncedShelfBook._({
     _is.UuidValue? id,
     required this.ownerId,
-    required this.createdAt,
-    required this.engine,
-    String? status,
-    this.inputTokens,
-    this.outputTokens,
-  }) : id = id ?? const _is.Uuid().v4obj(),
-       status = status ?? 'reserved';
+    required this.shelfId,
+    required this.bookId,
+    required this.updatedAt,
+  }) : id = id ?? const _is.Uuid().v4obj();
 
-  factory OcrUsage({
+  factory SyncedShelfBook({
     _is.UuidValue? id,
     required _is.UuidValue ownerId,
-    required DateTime createdAt,
-    required String engine,
-    String? status,
-    int? inputTokens,
-    int? outputTokens,
-  }) = _OcrUsageImpl;
+    required _is.UuidValue shelfId,
+    required _is.UuidValue bookId,
+    required DateTime updatedAt,
+  }) = _SyncedShelfBookImpl;
 
-  factory OcrUsage.fromJson(Map<String, dynamic> jsonSerialization) {
-    return OcrUsage(
+  factory SyncedShelfBook.fromJson(Map<String, dynamic> jsonSerialization) {
+    return SyncedShelfBook(
       id: jsonSerialization['id'] == null
           ? null
           : _is.UuidValueJsonExtension.fromJson(jsonSerialization['id']),
       ownerId: _is.UuidValueJsonExtension.fromJson(
         jsonSerialization['ownerId'],
       ),
-      createdAt: _is.DateTimeJsonExtension.fromJson(
-        jsonSerialization['createdAt'],
+      shelfId: _is.UuidValueJsonExtension.fromJson(
+        jsonSerialization['shelfId'],
       ),
-      engine: jsonSerialization['engine'] as String,
-      status: jsonSerialization['status'] as String?,
-      inputTokens: jsonSerialization['inputTokens'] as int?,
-      outputTokens: jsonSerialization['outputTokens'] as int?,
+      bookId: _is.UuidValueJsonExtension.fromJson(jsonSerialization['bookId']),
+      updatedAt: _is.DateTimeJsonExtension.fromJson(
+        jsonSerialization['updatedAt'],
+      ),
     );
   }
 
-  static final t = OcrUsageTable();
+  static final t = SyncedShelfBookTable();
 
-  static const db = OcrUsageRepository._();
+  static const db = SyncedShelfBookRepository._();
 
   @override
   _is.UuidValue id;
 
   _is.UuidValue ownerId;
 
-  DateTime createdAt;
+  _is.UuidValue shelfId;
 
-  String engine;
+  _is.UuidValue bookId;
 
-  String status;
-
-  int? inputTokens;
-
-  int? outputTokens;
+  DateTime updatedAt;
 
   @override
   _is.Table<_is.UuidValue> get table => t;
 
-  /// Returns a shallow copy of this [OcrUsage]
+  /// Returns a shallow copy of this [SyncedShelfBook]
   /// with some or all fields replaced by the given arguments.
   @_is.useResult
-  OcrUsage copyWith({
+  SyncedShelfBook copyWith({
     _is.UuidValue? id,
     _is.UuidValue? ownerId,
-    DateTime? createdAt,
-    String? engine,
-    String? status,
-    int? inputTokens,
-    int? outputTokens,
+    _is.UuidValue? shelfId,
+    _is.UuidValue? bookId,
+    DateTime? updatedAt,
   });
   @override
   Map<String, dynamic> toJson() {
     return {
-      '__className__': 'OcrUsage',
+      '__className__': 'SyncedShelfBook',
       'id': id.toJson(),
       'ownerId': ownerId.toJson(),
-      'createdAt': createdAt.toJson(),
-      'engine': engine,
-      'status': status,
-      if (inputTokens != null) 'inputTokens': inputTokens,
-      if (outputTokens != null) 'outputTokens': outputTokens,
+      'shelfId': shelfId.toJson(),
+      'bookId': bookId.toJson(),
+      'updatedAt': updatedAt.toJson(),
     };
   }
 
   @override
   Map<String, dynamic> toJsonForProtocol() {
     return {
-      '__className__': 'OcrUsage',
+      '__className__': 'SyncedShelfBook',
       'id': id.toJson(),
       'ownerId': ownerId.toJson(),
-      'createdAt': createdAt.toJson(),
-      'engine': engine,
-      'status': status,
-      if (inputTokens != null) 'inputTokens': inputTokens,
-      if (outputTokens != null) 'outputTokens': outputTokens,
+      'shelfId': shelfId.toJson(),
+      'bookId': bookId.toJson(),
+      'updatedAt': updatedAt.toJson(),
     };
   }
 
-  static OcrUsageInclude include() {
-    return OcrUsageInclude._();
+  static SyncedShelfBookInclude include() {
+    return SyncedShelfBookInclude._();
   }
 
-  static OcrUsageIncludeList includeList({
-    _is.WhereExpressionBuilder<OcrUsageTable>? where,
+  static SyncedShelfBookIncludeList includeList({
+    _is.WhereExpressionBuilder<SyncedShelfBookTable>? where,
     int? limit,
     int? offset,
-    _is.OrderByBuilder<OcrUsageTable>? orderBy,
-    _is.OrderByListBuilder<OcrUsageTable>? orderByList,
-    OcrUsageInclude? include,
+    _is.OrderByBuilder<SyncedShelfBookTable>? orderBy,
+    _is.OrderByListBuilder<SyncedShelfBookTable>? orderByList,
+    SyncedShelfBookInclude? include,
   }) {
-    return OcrUsageIncludeList._(
+    return SyncedShelfBookIncludeList._(
       where: where,
       limit: limit,
       offset: offset,
-      orderBy: orderBy?.call(OcrUsage.t),
-      orderByList: orderByList?.call(OcrUsage.t),
+      orderBy: orderBy?.call(SyncedShelfBook.t),
+      orderByList: orderByList?.call(SyncedShelfBook.t),
       include: include,
     );
   }
@@ -152,54 +133,44 @@ abstract class OcrUsage
   }
 }
 
-class _Undefined {}
-
-class _OcrUsageImpl extends OcrUsage {
-  _OcrUsageImpl({
+class _SyncedShelfBookImpl extends SyncedShelfBook {
+  _SyncedShelfBookImpl({
     _is.UuidValue? id,
     required _is.UuidValue ownerId,
-    required DateTime createdAt,
-    required String engine,
-    String? status,
-    int? inputTokens,
-    int? outputTokens,
+    required _is.UuidValue shelfId,
+    required _is.UuidValue bookId,
+    required DateTime updatedAt,
   }) : super._(
          id: id,
          ownerId: ownerId,
-         createdAt: createdAt,
-         engine: engine,
-         status: status,
-         inputTokens: inputTokens,
-         outputTokens: outputTokens,
+         shelfId: shelfId,
+         bookId: bookId,
+         updatedAt: updatedAt,
        );
 
-  /// Returns a shallow copy of this [OcrUsage]
+  /// Returns a shallow copy of this [SyncedShelfBook]
   /// with some or all fields replaced by the given arguments.
   @_is.useResult
   @override
-  OcrUsage copyWith({
+  SyncedShelfBook copyWith({
     _is.UuidValue? id,
     _is.UuidValue? ownerId,
-    DateTime? createdAt,
-    String? engine,
-    String? status,
-    Object? inputTokens = _Undefined,
-    Object? outputTokens = _Undefined,
+    _is.UuidValue? shelfId,
+    _is.UuidValue? bookId,
+    DateTime? updatedAt,
   }) {
-    return OcrUsage(
+    return SyncedShelfBook(
       id: id ?? this.id,
       ownerId: ownerId ?? this.ownerId,
-      createdAt: createdAt ?? this.createdAt,
-      engine: engine ?? this.engine,
-      status: status ?? this.status,
-      inputTokens: inputTokens is int? ? inputTokens : this.inputTokens,
-      outputTokens: outputTokens is int? ? outputTokens : this.outputTokens,
+      shelfId: shelfId ?? this.shelfId,
+      bookId: bookId ?? this.bookId,
+      updatedAt: updatedAt ?? this.updatedAt,
     );
   }
 }
 
-class OcrUsageUpdateTable extends _is.UpdateTable<OcrUsageTable> {
-  OcrUsageUpdateTable(super.table);
+class SyncedShelfBookUpdateTable extends _is.UpdateTable<SyncedShelfBookTable> {
+  SyncedShelfBookUpdateTable(super.table);
 
   _is.ColumnValue<_is.UuidValue, _is.UuidValue> ownerId(_is.UuidValue value) =>
       _is.ColumnValue(
@@ -207,126 +178,104 @@ class OcrUsageUpdateTable extends _is.UpdateTable<OcrUsageTable> {
         value,
       );
 
-  _is.ColumnValue<DateTime, DateTime> createdAt(DateTime value) =>
+  _is.ColumnValue<_is.UuidValue, _is.UuidValue> shelfId(_is.UuidValue value) =>
       _is.ColumnValue(
-        table.createdAt,
+        table.shelfId,
         value,
       );
 
-  _is.ColumnValue<String, String> engine(String value) => _is.ColumnValue(
-    table.engine,
-    value,
-  );
+  _is.ColumnValue<_is.UuidValue, _is.UuidValue> bookId(_is.UuidValue value) =>
+      _is.ColumnValue(
+        table.bookId,
+        value,
+      );
 
-  _is.ColumnValue<String, String> status(String value) => _is.ColumnValue(
-    table.status,
-    value,
-  );
-
-  _is.ColumnValue<int, int> inputTokens(int? value) => _is.ColumnValue(
-    table.inputTokens,
-    value,
-  );
-
-  _is.ColumnValue<int, int> outputTokens(int? value) => _is.ColumnValue(
-    table.outputTokens,
-    value,
-  );
+  _is.ColumnValue<DateTime, DateTime> updatedAt(DateTime value) =>
+      _is.ColumnValue(
+        table.updatedAt,
+        value,
+      );
 }
 
-class OcrUsageTable extends _is.Table<_is.UuidValue> {
-  OcrUsageTable({super.tableRelation}) : super(tableName: 'ocr_usage') {
-    updateTable = OcrUsageUpdateTable(this);
+class SyncedShelfBookTable extends _is.Table<_is.UuidValue> {
+  SyncedShelfBookTable({super.tableRelation})
+    : super(tableName: 'shelf_books') {
+    updateTable = SyncedShelfBookUpdateTable(this);
     ownerId = _is.ColumnUuid(
       'owner_id',
       this,
       fieldName: 'ownerId',
     );
-    createdAt = _is.ColumnDateTime(
-      'created_at',
+    shelfId = _is.ColumnUuid(
+      'shelf_id',
       this,
-      fieldName: 'createdAt',
+      fieldName: 'shelfId',
     );
-    engine = _is.ColumnString(
-      'engine',
+    bookId = _is.ColumnUuid(
+      'book_id',
       this,
+      fieldName: 'bookId',
     );
-    status = _is.ColumnString(
-      'status',
+    updatedAt = _is.ColumnDateTime(
+      'updated_at',
       this,
-      hasDefault: true,
-    );
-    inputTokens = _is.ColumnInt(
-      'input_tokens',
-      this,
-      fieldName: 'inputTokens',
-    );
-    outputTokens = _is.ColumnInt(
-      'output_tokens',
-      this,
-      fieldName: 'outputTokens',
+      fieldName: 'updatedAt',
     );
   }
 
-  late final OcrUsageUpdateTable updateTable;
+  late final SyncedShelfBookUpdateTable updateTable;
 
   late final _is.ColumnUuid ownerId;
 
-  late final _is.ColumnDateTime createdAt;
+  late final _is.ColumnUuid shelfId;
 
-  late final _is.ColumnString engine;
+  late final _is.ColumnUuid bookId;
 
-  late final _is.ColumnString status;
-
-  late final _is.ColumnInt inputTokens;
-
-  late final _is.ColumnInt outputTokens;
+  late final _is.ColumnDateTime updatedAt;
 
   @override
   List<_is.Column> get columns => [
     id,
     ownerId,
-    createdAt,
-    engine,
-    status,
-    inputTokens,
-    outputTokens,
+    shelfId,
+    bookId,
+    updatedAt,
   ];
 }
 
-class OcrUsageInclude extends _is.IncludeObject {
-  OcrUsageInclude._();
+class SyncedShelfBookInclude extends _is.IncludeObject {
+  SyncedShelfBookInclude._();
 
   @override
   Map<String, _is.Include?> get includes => {};
 
   @override
-  _is.Table<_is.UuidValue> get table => OcrUsage.t;
+  _is.Table<_is.UuidValue> get table => SyncedShelfBook.t;
 }
 
-class OcrUsageIncludeList extends _is.IncludeList {
-  OcrUsageIncludeList._({
-    _is.WhereExpressionBuilder<OcrUsageTable>? where,
+class SyncedShelfBookIncludeList extends _is.IncludeList {
+  SyncedShelfBookIncludeList._({
+    _is.WhereExpressionBuilder<SyncedShelfBookTable>? where,
     super.limit,
     super.offset,
     super.orderBy,
     super.orderByList,
     super.include,
   }) {
-    super.where = where?.call(OcrUsage.t);
+    super.where = where?.call(SyncedShelfBook.t);
   }
 
   @override
   Map<String, _is.Include?> get includes => include?.includes ?? {};
 
   @override
-  _is.Table<_is.UuidValue> get table => OcrUsage.t;
+  _is.Table<_is.UuidValue> get table => SyncedShelfBook.t;
 }
 
-class OcrUsageRepository {
-  const OcrUsageRepository._();
+class SyncedShelfBookRepository {
+  const SyncedShelfBookRepository._();
 
-  /// Returns a list of [OcrUsage]s matching the given query parameters.
+  /// Returns a list of [SyncedShelfBook]s matching the given query parameters.
   ///
   /// Use [where] to specify which items to include in the return value.
   /// If none is specified, all items will be returned.
@@ -348,21 +297,21 @@ class OcrUsageRepository {
   ///   limit: 100,
   /// );
   /// ```
-  Future<List<OcrUsage>> find(
+  Future<List<SyncedShelfBook>> find(
     _is.DatabaseSession session, {
-    _is.WhereExpressionBuilder<OcrUsageTable>? where,
+    _is.WhereExpressionBuilder<SyncedShelfBookTable>? where,
     int? limit,
     int? offset,
-    _is.OrderByBuilder<OcrUsageTable>? orderBy,
-    _is.OrderByListBuilder<OcrUsageTable>? orderByList,
+    _is.OrderByBuilder<SyncedShelfBookTable>? orderBy,
+    _is.OrderByListBuilder<SyncedShelfBookTable>? orderByList,
     _is.Transaction? transaction,
     _is.LockMode? lockMode,
     _is.LockBehavior? lockBehavior,
   }) async {
-    return session.db.find<OcrUsage>(
-      where: where?.call(OcrUsage.t),
-      orderBy: orderBy?.call(OcrUsage.t),
-      orderByList: orderByList?.call(OcrUsage.t),
+    return session.db.find<SyncedShelfBook>(
+      where: where?.call(SyncedShelfBook.t),
+      orderBy: orderBy?.call(SyncedShelfBook.t),
+      orderByList: orderByList?.call(SyncedShelfBook.t),
       limit: limit,
       offset: offset,
       transaction: transaction,
@@ -371,7 +320,7 @@ class OcrUsageRepository {
     );
   }
 
-  /// Returns the first matching [OcrUsage] matching the given query parameters.
+  /// Returns the first matching [SyncedShelfBook] matching the given query parameters.
   ///
   /// Use [where] to specify which items to include in the return value.
   /// If none is specified, all items will be returned.
@@ -388,20 +337,20 @@ class OcrUsageRepository {
   ///   orderBy: (t) => t.age,
   /// );
   /// ```
-  Future<OcrUsage?> findFirstRow(
+  Future<SyncedShelfBook?> findFirstRow(
     _is.DatabaseSession session, {
-    _is.WhereExpressionBuilder<OcrUsageTable>? where,
+    _is.WhereExpressionBuilder<SyncedShelfBookTable>? where,
     int? offset,
-    _is.OrderByBuilder<OcrUsageTable>? orderBy,
-    _is.OrderByListBuilder<OcrUsageTable>? orderByList,
+    _is.OrderByBuilder<SyncedShelfBookTable>? orderBy,
+    _is.OrderByListBuilder<SyncedShelfBookTable>? orderByList,
     _is.Transaction? transaction,
     _is.LockMode? lockMode,
     _is.LockBehavior? lockBehavior,
   }) async {
-    return session.db.findFirstRow<OcrUsage>(
-      where: where?.call(OcrUsage.t),
-      orderBy: orderBy?.call(OcrUsage.t),
-      orderByList: orderByList?.call(OcrUsage.t),
+    return session.db.findFirstRow<SyncedShelfBook>(
+      where: where?.call(SyncedShelfBook.t),
+      orderBy: orderBy?.call(SyncedShelfBook.t),
+      orderByList: orderByList?.call(SyncedShelfBook.t),
       offset: offset,
       transaction: transaction,
       lockMode: lockMode,
@@ -409,15 +358,15 @@ class OcrUsageRepository {
     );
   }
 
-  /// Finds a single [OcrUsage] by its [id] or null if no such row exists.
-  Future<OcrUsage?> findById(
+  /// Finds a single [SyncedShelfBook] by its [id] or null if no such row exists.
+  Future<SyncedShelfBook?> findById(
     _is.DatabaseSession session,
     _is.UuidValue id, {
     _is.Transaction? transaction,
     _is.LockMode? lockMode,
     _is.LockBehavior? lockBehavior,
   }) async {
-    return session.db.findById<OcrUsage>(
+    return session.db.findById<SyncedShelfBook>(
       id,
       transaction: transaction,
       lockMode: lockMode,
@@ -425,9 +374,9 @@ class OcrUsageRepository {
     );
   }
 
-  /// Inserts all [OcrUsage]s in the list and returns the inserted rows.
+  /// Inserts all [SyncedShelfBook]s in the list and returns the inserted rows.
   ///
-  /// The returned [OcrUsage]s will have their `id` fields set.
+  /// The returned [SyncedShelfBook]s will have their `id` fields set.
   ///
   /// This is an atomic operation, meaning that if one of the rows fails to
   /// insert, none of the rows will be inserted.
@@ -439,14 +388,14 @@ class OcrUsageRepository {
   /// If [noReturn] is set to `true`, the inserted rows are not read back from
   /// the database and an empty list is returned. This avoids the overhead of
   /// transferring and deserializing the rows when the result is not needed.
-  Future<List<OcrUsage>> insert(
+  Future<List<SyncedShelfBook>> insert(
     _is.DatabaseSession session,
-    List<OcrUsage> rows, {
+    List<SyncedShelfBook> rows, {
     _is.Transaction? transaction,
     bool ignoreConflicts = false,
     bool noReturn = false,
   }) async {
-    return session.db.insert<OcrUsage>(
+    return session.db.insert<SyncedShelfBook>(
       rows,
       transaction: transaction,
       ignoreConflicts: ignoreConflicts,
@@ -454,21 +403,21 @@ class OcrUsageRepository {
     );
   }
 
-  /// Inserts a single [OcrUsage] and returns the inserted row.
+  /// Inserts a single [SyncedShelfBook] and returns the inserted row.
   ///
-  /// The returned [OcrUsage] will have its `id` field set.
-  Future<OcrUsage> insertRow(
+  /// The returned [SyncedShelfBook] will have its `id` field set.
+  Future<SyncedShelfBook> insertRow(
     _is.DatabaseSession session,
-    OcrUsage row, {
+    SyncedShelfBook row, {
     _is.Transaction? transaction,
   }) async {
-    return session.db.insertRow<OcrUsage>(
+    return session.db.insertRow<SyncedShelfBook>(
       row,
       transaction: transaction,
     );
   }
 
-  /// Upserts all [OcrUsage]s in the list and returns the resulting rows.
+  /// Upserts all [SyncedShelfBook]s in the list and returns the resulting rows.
   ///
   /// If a row conflicts on the given [conflictColumns], the existing row is
   /// updated with the new values. Otherwise, a new row is inserted.
@@ -480,7 +429,7 @@ class OcrUsageRepository {
   /// given expression. Conflicting rows that don't match are skipped and not
   /// returned, so the resulting list may be shorter than [rows].
   ///
-  /// The returned [OcrUsage]s will have their `id` fields set.
+  /// The returned [SyncedShelfBook]s will have their `id` fields set.
   ///
   /// This is an atomic operation, meaning that if one of the rows fails,
   /// none of the rows will be affected.
@@ -488,26 +437,26 @@ class OcrUsageRepository {
   /// If [noReturn] is set to `true`, the resulting rows are not read back from
   /// the database and an empty list is returned. This avoids the overhead of
   /// transferring and deserializing the rows when the result is not needed.
-  Future<List<OcrUsage>> upsert(
+  Future<List<SyncedShelfBook>> upsert(
     _is.DatabaseSession session,
-    List<OcrUsage> rows, {
-    required _is.ColumnSelections<OcrUsageTable> conflictColumns,
-    _is.ColumnSelections<OcrUsageTable>? updateColumns,
-    _is.WhereExpressionBuilder<OcrUsageTable>? updateWhere,
+    List<SyncedShelfBook> rows, {
+    required _is.ColumnSelections<SyncedShelfBookTable> conflictColumns,
+    _is.ColumnSelections<SyncedShelfBookTable>? updateColumns,
+    _is.WhereExpressionBuilder<SyncedShelfBookTable>? updateWhere,
     _is.Transaction? transaction,
     bool noReturn = false,
   }) async {
-    return session.db.upsert<OcrUsage>(
+    return session.db.upsert<SyncedShelfBook>(
       rows,
-      conflictColumns: conflictColumns(OcrUsage.t),
-      updateColumns: updateColumns?.call(OcrUsage.t),
-      updateWhere: updateWhere?.call(OcrUsage.t),
+      conflictColumns: conflictColumns(SyncedShelfBook.t),
+      updateColumns: updateColumns?.call(SyncedShelfBook.t),
+      updateWhere: updateWhere?.call(SyncedShelfBook.t),
       transaction: transaction,
       noReturn: noReturn,
     );
   }
 
-  /// Upserts a single [OcrUsage] and returns the resulting row.
+  /// Upserts a single [SyncedShelfBook] and returns the resulting row.
   ///
   /// If the row conflicts on the given [conflictColumns], the existing row is
   /// updated. Otherwise, a new row is inserted.
@@ -519,25 +468,25 @@ class OcrUsageRepository {
   /// row matches the expression. Returns `null` if no row was affected — for
   /// example when [updateWhere] does not match the conflicting row.
   ///
-  /// The returned [OcrUsage] will have its `id` field set.
-  Future<OcrUsage?> upsertRow(
+  /// The returned [SyncedShelfBook] will have its `id` field set.
+  Future<SyncedShelfBook?> upsertRow(
     _is.DatabaseSession session,
-    OcrUsage row, {
-    required _is.ColumnSelections<OcrUsageTable> conflictColumns,
-    _is.ColumnSelections<OcrUsageTable>? updateColumns,
-    _is.WhereExpressionBuilder<OcrUsageTable>? updateWhere,
+    SyncedShelfBook row, {
+    required _is.ColumnSelections<SyncedShelfBookTable> conflictColumns,
+    _is.ColumnSelections<SyncedShelfBookTable>? updateColumns,
+    _is.WhereExpressionBuilder<SyncedShelfBookTable>? updateWhere,
     _is.Transaction? transaction,
   }) async {
-    return session.db.upsertRow<OcrUsage>(
+    return session.db.upsertRow<SyncedShelfBook>(
       row,
-      conflictColumns: conflictColumns(OcrUsage.t),
-      updateColumns: updateColumns?.call(OcrUsage.t),
-      updateWhere: updateWhere?.call(OcrUsage.t),
+      conflictColumns: conflictColumns(SyncedShelfBook.t),
+      updateColumns: updateColumns?.call(SyncedShelfBook.t),
+      updateWhere: updateWhere?.call(SyncedShelfBook.t),
       transaction: transaction,
     );
   }
 
-  /// Updates all [OcrUsage]s in the list and returns the updated rows. If
+  /// Updates all [SyncedShelfBook]s in the list and returns the updated rows. If
   /// [columns] is provided, only those columns will be updated. Defaults to
   /// all columns.
   /// This is an atomic operation, meaning that if one of the rows fails to
@@ -546,82 +495,84 @@ class OcrUsageRepository {
   /// If [noReturn] is set to `true`, the updated rows are not read back from
   /// the database and an empty list is returned. This avoids the overhead of
   /// transferring and deserializing the rows when the result is not needed.
-  Future<List<OcrUsage>> update(
+  Future<List<SyncedShelfBook>> update(
     _is.DatabaseSession session,
-    List<OcrUsage> rows, {
-    _is.ColumnSelections<OcrUsageTable>? columns,
+    List<SyncedShelfBook> rows, {
+    _is.ColumnSelections<SyncedShelfBookTable>? columns,
     _is.Transaction? transaction,
     bool noReturn = false,
   }) async {
-    return session.db.update<OcrUsage>(
+    return session.db.update<SyncedShelfBook>(
       rows,
-      columns: columns?.call(OcrUsage.t),
+      columns: columns?.call(SyncedShelfBook.t),
       transaction: transaction,
       noReturn: noReturn,
     );
   }
 
-  /// Updates a single [OcrUsage]. The row needs to have its id set.
+  /// Updates a single [SyncedShelfBook]. The row needs to have its id set.
   /// Optionally, a list of [columns] can be provided to only update those
   /// columns. Defaults to all columns.
-  Future<OcrUsage> updateRow(
+  Future<SyncedShelfBook> updateRow(
     _is.DatabaseSession session,
-    OcrUsage row, {
-    _is.ColumnSelections<OcrUsageTable>? columns,
+    SyncedShelfBook row, {
+    _is.ColumnSelections<SyncedShelfBookTable>? columns,
     _is.Transaction? transaction,
   }) async {
-    return session.db.updateRow<OcrUsage>(
+    return session.db.updateRow<SyncedShelfBook>(
       row,
-      columns: columns?.call(OcrUsage.t),
+      columns: columns?.call(SyncedShelfBook.t),
       transaction: transaction,
     );
   }
 
-  /// Updates a single [OcrUsage] by its [id] with the specified [columnValues].
+  /// Updates a single [SyncedShelfBook] by its [id] with the specified [columnValues].
   /// Returns the updated row or null if no row with the given id exists.
-  Future<OcrUsage?> updateById(
+  Future<SyncedShelfBook?> updateById(
     _is.DatabaseSession session,
     _is.UuidValue id, {
-    required _is.ColumnValueListBuilder<OcrUsageUpdateTable> columnValues,
+    required _is.ColumnValueListBuilder<SyncedShelfBookUpdateTable>
+    columnValues,
     _is.Transaction? transaction,
   }) async {
-    return session.db.updateById<OcrUsage>(
+    return session.db.updateById<SyncedShelfBook>(
       id,
-      columnValues: columnValues(OcrUsage.t.updateTable),
+      columnValues: columnValues(SyncedShelfBook.t.updateTable),
       transaction: transaction,
     );
   }
 
-  /// Updates all [OcrUsage]s matching the [where] expression with the specified [columnValues].
+  /// Updates all [SyncedShelfBook]s matching the [where] expression with the specified [columnValues].
   /// Returns the list of updated rows.
   ///
   /// If [noReturn] is set to `true`, the updated rows are not read back from
   /// the database and an empty list is returned. This avoids the overhead of
   /// transferring and deserializing the rows when the result is not needed.
-  Future<List<OcrUsage>> updateWhere(
+  Future<List<SyncedShelfBook>> updateWhere(
     _is.DatabaseSession session, {
-    required _is.ColumnValueListBuilder<OcrUsageUpdateTable> columnValues,
-    required _is.WhereExpressionBuilder<OcrUsageTable> where,
+    required _is.ColumnValueListBuilder<SyncedShelfBookUpdateTable>
+    columnValues,
+    required _is.WhereExpressionBuilder<SyncedShelfBookTable> where,
     int? limit,
     int? offset,
-    _is.OrderByBuilder<OcrUsageTable>? orderBy,
-    _is.OrderByListBuilder<OcrUsageTable>? orderByList,
+    _is.OrderByBuilder<SyncedShelfBookTable>? orderBy,
+    _is.OrderByListBuilder<SyncedShelfBookTable>? orderByList,
     _is.Transaction? transaction,
     bool noReturn = false,
   }) async {
-    return session.db.updateWhere<OcrUsage>(
-      columnValues: columnValues(OcrUsage.t.updateTable),
-      where: where(OcrUsage.t),
+    return session.db.updateWhere<SyncedShelfBook>(
+      columnValues: columnValues(SyncedShelfBook.t.updateTable),
+      where: where(SyncedShelfBook.t),
       limit: limit,
       offset: offset,
-      orderBy: orderBy?.call(OcrUsage.t),
-      orderByList: orderByList?.call(OcrUsage.t),
+      orderBy: orderBy?.call(SyncedShelfBook.t),
+      orderByList: orderByList?.call(SyncedShelfBook.t),
       transaction: transaction,
       noReturn: noReturn,
     );
   }
 
-  /// Deletes all [OcrUsage]s in the list and returns the deleted rows.
+  /// Deletes all [SyncedShelfBook]s in the list and returns the deleted rows.
   ///
   /// To specify the order of the returned rows use [orderBy] or [orderByList]
   /// when sorting by multiple columns.
@@ -632,30 +583,30 @@ class OcrUsageRepository {
   /// If [noReturn] is set to `true`, the deleted rows are not read back from
   /// the database and an empty list is returned. This avoids the overhead of
   /// transferring and deserializing the rows when the result is not needed.
-  Future<List<OcrUsage>> delete(
+  Future<List<SyncedShelfBook>> delete(
     _is.DatabaseSession session,
-    List<OcrUsage> rows, {
-    _is.OrderByBuilder<OcrUsageTable>? orderBy,
-    _is.OrderByListBuilder<OcrUsageTable>? orderByList,
+    List<SyncedShelfBook> rows, {
+    _is.OrderByBuilder<SyncedShelfBookTable>? orderBy,
+    _is.OrderByListBuilder<SyncedShelfBookTable>? orderByList,
     _is.Transaction? transaction,
     bool noReturn = false,
   }) async {
-    return session.db.delete<OcrUsage>(
+    return session.db.delete<SyncedShelfBook>(
       rows,
-      orderBy: orderBy?.call(OcrUsage.t),
-      orderByList: orderByList?.call(OcrUsage.t),
+      orderBy: orderBy?.call(SyncedShelfBook.t),
+      orderByList: orderByList?.call(SyncedShelfBook.t),
       transaction: transaction,
       noReturn: noReturn,
     );
   }
 
-  /// Deletes a single [OcrUsage].
-  Future<OcrUsage> deleteRow(
+  /// Deletes a single [SyncedShelfBook].
+  Future<SyncedShelfBook> deleteRow(
     _is.DatabaseSession session,
-    OcrUsage row, {
+    SyncedShelfBook row, {
     _is.Transaction? transaction,
   }) async {
-    return session.db.deleteRow<OcrUsage>(
+    return session.db.deleteRow<SyncedShelfBook>(
       row,
       transaction: transaction,
     );
@@ -669,18 +620,18 @@ class OcrUsageRepository {
   /// If [noReturn] is set to `true`, the deleted rows are not read back from
   /// the database and an empty list is returned. This avoids the overhead of
   /// transferring and deserializing the rows when the result is not needed.
-  Future<List<OcrUsage>> deleteWhere(
+  Future<List<SyncedShelfBook>> deleteWhere(
     _is.DatabaseSession session, {
-    required _is.WhereExpressionBuilder<OcrUsageTable> where,
-    _is.OrderByBuilder<OcrUsageTable>? orderBy,
-    _is.OrderByListBuilder<OcrUsageTable>? orderByList,
+    required _is.WhereExpressionBuilder<SyncedShelfBookTable> where,
+    _is.OrderByBuilder<SyncedShelfBookTable>? orderBy,
+    _is.OrderByListBuilder<SyncedShelfBookTable>? orderByList,
     _is.Transaction? transaction,
     bool noReturn = false,
   }) async {
-    return session.db.deleteWhere<OcrUsage>(
-      where: where(OcrUsage.t),
-      orderBy: orderBy?.call(OcrUsage.t),
-      orderByList: orderByList?.call(OcrUsage.t),
+    return session.db.deleteWhere<SyncedShelfBook>(
+      where: where(SyncedShelfBook.t),
+      orderBy: orderBy?.call(SyncedShelfBook.t),
+      orderByList: orderByList?.call(SyncedShelfBook.t),
       transaction: transaction,
       noReturn: noReturn,
     );
@@ -690,27 +641,27 @@ class OcrUsageRepository {
   /// will return the count of all rows in the table.
   Future<int> count(
     _is.DatabaseSession session, {
-    _is.WhereExpressionBuilder<OcrUsageTable>? where,
+    _is.WhereExpressionBuilder<SyncedShelfBookTable>? where,
     int? limit,
     _is.Transaction? transaction,
   }) async {
-    return session.db.count<OcrUsage>(
-      where: where?.call(OcrUsage.t),
+    return session.db.count<SyncedShelfBook>(
+      where: where?.call(SyncedShelfBook.t),
       limit: limit,
       transaction: transaction,
     );
   }
 
-  /// Acquires row-level locks on [OcrUsage] rows matching the [where] expression.
+  /// Acquires row-level locks on [SyncedShelfBook] rows matching the [where] expression.
   Future<void> lockRows(
     _is.DatabaseSession session, {
-    required _is.WhereExpressionBuilder<OcrUsageTable> where,
+    required _is.WhereExpressionBuilder<SyncedShelfBookTable> where,
     required _is.LockMode lockMode,
     required _is.Transaction transaction,
     _is.LockBehavior lockBehavior = _is.LockBehavior.wait,
   }) async {
-    return session.db.lockRows<OcrUsage>(
-      where: where(OcrUsage.t),
+    return session.db.lockRows<SyncedShelfBook>(
+      where: where(SyncedShelfBook.t),
       lockMode: lockMode,
       lockBehavior: lockBehavior,
       transaction: transaction,

@@ -1,0 +1,18 @@
+### A shelf. Only the name is content; the accent and symbol are presentation
+### and stay plaintext, which is what the plan's leak table allows.
+class: SyncedShelf
+table: shelves
+
+fields:
+  id: UuidValue, defaultModel=random, defaultPersist=random
+  ownerId: UuidValue, column=owner_id
+  accent: String?
+  symbol: String?
+  createdAt: DateTime, column=created_at
+  updatedAt: DateTime, column=updated_at
+  keyVersion: int, default=1, column=key_version
+  nameCipher: String, column=name_cipher
+
+indexes:
+  shelves_owner_idx:
+    fields: ownerId

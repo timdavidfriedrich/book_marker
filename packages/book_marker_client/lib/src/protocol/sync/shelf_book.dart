@@ -12,65 +12,76 @@
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod_client/serverpod_client.dart' as _isc;
 
-/// Temporary table used to verify the PowerSync replication path end to end.
-/// Delete this together with its sync stream once the real synced tables land
-/// in phase 4.
-abstract class SyncProbe
+/// Which books sit on which shelf.
+///
+/// The local table has a composite primary key and no id column, which
+/// PowerSync cannot sync, so this one gains a UUID id and keeps the pair unique
+/// through an index instead. No keyVersion: there is no ciphertext here.
+abstract class SyncedShelfBook
     implements _isc.SerializableModel, _isc.ProtocolSerialization {
-  SyncProbe._({
+  SyncedShelfBook._({
     _isc.UuidValue? id,
     required this.ownerId,
-    required this.note,
+    required this.shelfId,
+    required this.bookId,
     required this.updatedAt,
   }) : id = id ?? const _isc.Uuid().v4obj();
 
-  factory SyncProbe({
+  factory SyncedShelfBook({
     _isc.UuidValue? id,
-    required String ownerId,
-    required String note,
+    required _isc.UuidValue ownerId,
+    required _isc.UuidValue shelfId,
+    required _isc.UuidValue bookId,
     required DateTime updatedAt,
-  }) = _SyncProbeImpl;
+  }) = _SyncedShelfBookImpl;
 
-  factory SyncProbe.fromJson(Map<String, dynamic> jsonSerialization) {
-    return SyncProbe(
+  factory SyncedShelfBook.fromJson(Map<String, dynamic> jsonSerialization) {
+    return SyncedShelfBook(
       id: jsonSerialization['id'] == null
           ? null
           : _isc.UuidValueJsonExtension.fromJson(jsonSerialization['id']),
-      ownerId: jsonSerialization['ownerId'] as String,
-      note: jsonSerialization['note'] as String,
+      ownerId: _isc.UuidValueJsonExtension.fromJson(
+        jsonSerialization['ownerId'],
+      ),
+      shelfId: _isc.UuidValueJsonExtension.fromJson(
+        jsonSerialization['shelfId'],
+      ),
+      bookId: _isc.UuidValueJsonExtension.fromJson(jsonSerialization['bookId']),
       updatedAt: _isc.DateTimeJsonExtension.fromJson(
         jsonSerialization['updatedAt'],
       ),
     );
   }
 
-  /// UUID, not the default bigint serial. PowerSync requires a text id, and the
-  /// app mints ids client-side while offline, so the database must never assign
-  /// them. Every synced model needs this line.
+  /// The id of the object.
   _isc.UuidValue id;
 
-  String ownerId;
+  _isc.UuidValue ownerId;
 
-  String note;
+  _isc.UuidValue shelfId;
+
+  _isc.UuidValue bookId;
 
   DateTime updatedAt;
 
-  /// Returns a shallow copy of this [SyncProbe]
+  /// Returns a shallow copy of this [SyncedShelfBook]
   /// with some or all fields replaced by the given arguments.
   @_isc.useResult
-  SyncProbe copyWith({
+  SyncedShelfBook copyWith({
     _isc.UuidValue? id,
-    String? ownerId,
-    String? note,
+    _isc.UuidValue? ownerId,
+    _isc.UuidValue? shelfId,
+    _isc.UuidValue? bookId,
     DateTime? updatedAt,
   });
   @override
   Map<String, dynamic> toJson() {
     return {
-      '__className__': 'SyncProbe',
+      '__className__': 'SyncedShelfBook',
       'id': id.toJson(),
-      'ownerId': ownerId,
-      'note': note,
+      'ownerId': ownerId.toJson(),
+      'shelfId': shelfId.toJson(),
+      'bookId': bookId.toJson(),
       'updatedAt': updatedAt.toJson(),
     };
   }
@@ -78,10 +89,11 @@ abstract class SyncProbe
   @override
   Map<String, dynamic> toJsonForProtocol() {
     return {
-      '__className__': 'SyncProbe',
+      '__className__': 'SyncedShelfBook',
       'id': id.toJson(),
-      'ownerId': ownerId,
-      'note': note,
+      'ownerId': ownerId.toJson(),
+      'shelfId': shelfId.toJson(),
+      'bookId': bookId.toJson(),
       'updatedAt': updatedAt.toJson(),
     };
   }
@@ -92,33 +104,37 @@ abstract class SyncProbe
   }
 }
 
-class _SyncProbeImpl extends SyncProbe {
-  _SyncProbeImpl({
+class _SyncedShelfBookImpl extends SyncedShelfBook {
+  _SyncedShelfBookImpl({
     _isc.UuidValue? id,
-    required String ownerId,
-    required String note,
+    required _isc.UuidValue ownerId,
+    required _isc.UuidValue shelfId,
+    required _isc.UuidValue bookId,
     required DateTime updatedAt,
   }) : super._(
          id: id,
          ownerId: ownerId,
-         note: note,
+         shelfId: shelfId,
+         bookId: bookId,
          updatedAt: updatedAt,
        );
 
-  /// Returns a shallow copy of this [SyncProbe]
+  /// Returns a shallow copy of this [SyncedShelfBook]
   /// with some or all fields replaced by the given arguments.
   @_isc.useResult
   @override
-  SyncProbe copyWith({
+  SyncedShelfBook copyWith({
     _isc.UuidValue? id,
-    String? ownerId,
-    String? note,
+    _isc.UuidValue? ownerId,
+    _isc.UuidValue? shelfId,
+    _isc.UuidValue? bookId,
     DateTime? updatedAt,
   }) {
-    return SyncProbe(
+    return SyncedShelfBook(
       id: id ?? this.id,
       ownerId: ownerId ?? this.ownerId,
-      note: note ?? this.note,
+      shelfId: shelfId ?? this.shelfId,
+      bookId: bookId ?? this.bookId,
       updatedAt: updatedAt ?? this.updatedAt,
     );
   }

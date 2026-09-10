@@ -12,11 +12,11 @@ table: entitlements
 fields:
   ### UUID, not the default bigint serial: PowerSync requires a text id.
   id: UuidValue, defaultModel=random, defaultPersist=random
-  ownerId: UuidValue
+  ownerId: UuidValue, column=owner_id
   plan: String, default='free'
   status: String, default='active'
-  blockedReason: String?
-  blockedAt: DateTime?
+  blockedReason: String?, column=blocked_reason
+  blockedAt: DateTime?, column=blocked_at
   ### A known string encrypted under the master key, written once by the first
   ### device to complete setup and never overwritten. NOT key material: AES-GCM
   ### is secure against a chosen plaintext, so this reveals nothing about a
@@ -27,20 +27,20 @@ fields:
   ### everything encrypted under the first. And it lets the device tell a wrong
   ### recovery code from a right one immediately, rather than after a sync round
   ### trip has produced garbage.
-  backupVerifier: String?
+  backupVerifier: String?, column=backup_verifier
   ### Diagnostics only, written together with the verifier.
-  backupInitializedAt: DateTime?
-  usedDay: int, default=0
-  usedWeek: int, default=0
-  usedMonth: int, default=0
-  updatedAt: DateTime
+  backupInitializedAt: DateTime?, column=backup_initialized_at
+  usedDay: int, default=0, column=used_day
+  usedWeek: int, default=0, column=used_week
+  usedMonth: int, default=0, column=used_month
+  updatedAt: DateTime, column=updated_at
   ### Purchase fields, unused until phase 6. Nullable and present from the start
   ### so enabling purchases is not a migration on a database with real users.
   store: String?
-  productId: String?
-  purchaseToken: String?
-  purchasedAt: DateTime?
-  refundedAt: DateTime?
+  productId: String?, column=product_id
+  purchaseToken: String?, column=purchase_token
+  purchasedAt: DateTime?, column=purchased_at
+  refundedAt: DateTime?, column=refunded_at
 
 indexes:
   entitlements_owner_idx:

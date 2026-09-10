@@ -25,8 +25,12 @@ import 'entitlements/account_blocked_exception.dart' as _i42k8jky;
 import 'entitlements/entitlement.dart' as _id6kwse3;
 import 'entitlements/entitlement_view.dart' as _ik9sk60n;
 import 'entitlements/ocr_usage.dart' as _i13b5r7e;
-import 'greetings/greeting.dart' as _izw8z7ou;
-import 'sync/sync_probe.dart' as _i8t4kps3;
+import 'sync/book.dart' as _i8t9sm2n;
+import 'sync/quote.dart' as _ivf4v01a;
+import 'sync/shelf.dart' as _ibxgxncl;
+import 'sync/shelf_book.dart' as _isij2asi;
+import 'sync/theme.dart' as _itq42fc1;
+import 'sync/theme_quote.dart' as _ih8stdgt;
 export 'config/client_config.dart';
 export 'config/plan_limits.dart';
 export 'config/recognition_config.dart';
@@ -35,8 +39,12 @@ export 'entitlements/account_blocked_exception.dart';
 export 'entitlements/entitlement.dart';
 export 'entitlements/entitlement_view.dart';
 export 'entitlements/ocr_usage.dart';
-export 'greetings/greeting.dart';
-export 'sync/sync_probe.dart';
+export 'sync/book.dart';
+export 'sync/quote.dart';
+export 'sync/shelf.dart';
+export 'sync/shelf_book.dart';
+export 'sync/theme.dart';
+export 'sync/theme_quote.dart';
 
 class Protocol extends _is.DatabaseSerializationManager {
   Protocol._();
@@ -46,6 +54,99 @@ class Protocol extends _is.DatabaseSerializationManager {
   static final Protocol _instance = Protocol._().._registerHostProtocols();
 
   static List<_isp.TableDefinition> get targetTableDefinitions => [
+    _isp.TableDefinition(
+      name: 'books',
+      dartName: 'SyncedBook',
+      schema: 'public',
+      module: 'book_marker',
+      columns: [
+        _isp.ColumnDefinition(
+          name: 'id',
+          columnType: _isp.ColumnType.uuid,
+          isNullable: false,
+          dartType: 'UuidValue',
+          columnDefault: 'random',
+        ),
+        _isp.ColumnDefinition(
+          name: 'owner_id',
+          columnType: _isp.ColumnType.uuid,
+          isNullable: false,
+          dartType: 'UuidValue',
+        ),
+        _isp.ColumnDefinition(
+          name: 'status',
+          columnType: _isp.ColumnType.text,
+          isNullable: false,
+          dartType: 'String',
+        ),
+        _isp.ColumnDefinition(
+          name: 'created_at',
+          columnType: _isp.ColumnType.timestampWithoutTimeZone,
+          isNullable: false,
+          dartType: 'DateTime',
+        ),
+        _isp.ColumnDefinition(
+          name: 'last_used_at',
+          columnType: _isp.ColumnType.timestampWithoutTimeZone,
+          isNullable: false,
+          dartType: 'DateTime',
+        ),
+        _isp.ColumnDefinition(
+          name: 'updated_at',
+          columnType: _isp.ColumnType.timestampWithoutTimeZone,
+          isNullable: false,
+          dartType: 'DateTime',
+        ),
+        _isp.ColumnDefinition(
+          name: 'key_version',
+          columnType: _isp.ColumnType.bigint,
+          isNullable: false,
+          dartType: 'int',
+          columnDefault: '1',
+        ),
+        _isp.ColumnDefinition(
+          name: 'title_cipher',
+          columnType: _isp.ColumnType.text,
+          isNullable: false,
+          dartType: 'String',
+        ),
+        _isp.ColumnDefinition(
+          name: 'authors_cipher',
+          columnType: _isp.ColumnType.text,
+          isNullable: false,
+          dartType: 'String',
+        ),
+        _isp.ColumnDefinition(
+          name: 'isbn_cipher',
+          columnType: _isp.ColumnType.text,
+          isNullable: true,
+          dartType: 'String?',
+        ),
+        _isp.ColumnDefinition(
+          name: 'cover_cipher',
+          columnType: _isp.ColumnType.text,
+          isNullable: true,
+          dartType: 'String?',
+        ),
+      ],
+      foreignKeys: [],
+      indexes: [
+        _isp.IndexDefinition(
+          indexName: 'books_owner_idx',
+          tableSpace: null,
+          elements: [
+            _isp.IndexElementDefinition(
+              type: _isp.IndexElementDefinitionType.column,
+              definition: 'owner_id',
+            ),
+          ],
+          type: 'btree',
+          isUnique: false,
+          isPrimary: false,
+        ),
+      ],
+      managed: true,
+    ),
     _isp.TableDefinition(
       name: 'entitlements',
       dartName: 'Entitlement',
@@ -60,7 +161,7 @@ class Protocol extends _is.DatabaseSerializationManager {
           columnDefault: 'random',
         ),
         _isp.ColumnDefinition(
-          name: 'ownerId',
+          name: 'owner_id',
           columnType: _isp.ColumnType.uuid,
           isNullable: false,
           dartType: 'UuidValue',
@@ -80,52 +181,52 @@ class Protocol extends _is.DatabaseSerializationManager {
           columnDefault: '\'active\'',
         ),
         _isp.ColumnDefinition(
-          name: 'blockedReason',
+          name: 'blocked_reason',
           columnType: _isp.ColumnType.text,
           isNullable: true,
           dartType: 'String?',
         ),
         _isp.ColumnDefinition(
-          name: 'blockedAt',
+          name: 'blocked_at',
           columnType: _isp.ColumnType.timestampWithoutTimeZone,
           isNullable: true,
           dartType: 'DateTime?',
         ),
         _isp.ColumnDefinition(
-          name: 'backupVerifier',
+          name: 'backup_verifier',
           columnType: _isp.ColumnType.text,
           isNullable: true,
           dartType: 'String?',
         ),
         _isp.ColumnDefinition(
-          name: 'backupInitializedAt',
+          name: 'backup_initialized_at',
           columnType: _isp.ColumnType.timestampWithoutTimeZone,
           isNullable: true,
           dartType: 'DateTime?',
         ),
         _isp.ColumnDefinition(
-          name: 'usedDay',
+          name: 'used_day',
           columnType: _isp.ColumnType.bigint,
           isNullable: false,
           dartType: 'int',
           columnDefault: '0',
         ),
         _isp.ColumnDefinition(
-          name: 'usedWeek',
+          name: 'used_week',
           columnType: _isp.ColumnType.bigint,
           isNullable: false,
           dartType: 'int',
           columnDefault: '0',
         ),
         _isp.ColumnDefinition(
-          name: 'usedMonth',
+          name: 'used_month',
           columnType: _isp.ColumnType.bigint,
           isNullable: false,
           dartType: 'int',
           columnDefault: '0',
         ),
         _isp.ColumnDefinition(
-          name: 'updatedAt',
+          name: 'updated_at',
           columnType: _isp.ColumnType.timestampWithoutTimeZone,
           isNullable: false,
           dartType: 'DateTime',
@@ -137,25 +238,25 @@ class Protocol extends _is.DatabaseSerializationManager {
           dartType: 'String?',
         ),
         _isp.ColumnDefinition(
-          name: 'productId',
+          name: 'product_id',
           columnType: _isp.ColumnType.text,
           isNullable: true,
           dartType: 'String?',
         ),
         _isp.ColumnDefinition(
-          name: 'purchaseToken',
+          name: 'purchase_token',
           columnType: _isp.ColumnType.text,
           isNullable: true,
           dartType: 'String?',
         ),
         _isp.ColumnDefinition(
-          name: 'purchasedAt',
+          name: 'purchased_at',
           columnType: _isp.ColumnType.timestampWithoutTimeZone,
           isNullable: true,
           dartType: 'DateTime?',
         ),
         _isp.ColumnDefinition(
-          name: 'refundedAt',
+          name: 'refunded_at',
           columnType: _isp.ColumnType.timestampWithoutTimeZone,
           isNullable: true,
           dartType: 'DateTime?',
@@ -169,7 +270,7 @@ class Protocol extends _is.DatabaseSerializationManager {
           elements: [
             _isp.IndexElementDefinition(
               type: _isp.IndexElementDefinitionType.column,
-              definition: 'ownerId',
+              definition: 'owner_id',
             ),
           ],
           type: 'btree',
@@ -193,13 +294,13 @@ class Protocol extends _is.DatabaseSerializationManager {
           columnDefault: 'random',
         ),
         _isp.ColumnDefinition(
-          name: 'ownerId',
+          name: 'owner_id',
           columnType: _isp.ColumnType.uuid,
           isNullable: false,
           dartType: 'UuidValue',
         ),
         _isp.ColumnDefinition(
-          name: 'createdAt',
+          name: 'created_at',
           columnType: _isp.ColumnType.timestampWithoutTimeZone,
           isNullable: false,
           dartType: 'DateTime',
@@ -218,13 +319,13 @@ class Protocol extends _is.DatabaseSerializationManager {
           columnDefault: '\'reserved\'',
         ),
         _isp.ColumnDefinition(
-          name: 'inputTokens',
+          name: 'input_tokens',
           columnType: _isp.ColumnType.bigint,
           isNullable: true,
           dartType: 'int?',
         ),
         _isp.ColumnDefinition(
-          name: 'outputTokens',
+          name: 'output_tokens',
           columnType: _isp.ColumnType.bigint,
           isNullable: true,
           dartType: 'int?',
@@ -238,11 +339,11 @@ class Protocol extends _is.DatabaseSerializationManager {
           elements: [
             _isp.IndexElementDefinition(
               type: _isp.IndexElementDefinitionType.column,
-              definition: 'ownerId',
+              definition: 'owner_id',
             ),
             _isp.IndexElementDefinition(
               type: _isp.IndexElementDefinitionType.column,
-              definition: 'createdAt',
+              definition: 'created_at',
             ),
           ],
           type: 'btree',
@@ -253,8 +354,8 @@ class Protocol extends _is.DatabaseSerializationManager {
       managed: true,
     ),
     _isp.TableDefinition(
-      name: 'sync_probes',
-      dartName: 'SyncProbe',
+      name: 'quotes',
+      dartName: 'SyncedQuote',
       schema: 'public',
       module: 'book_marker',
       columns: [
@@ -266,19 +367,150 @@ class Protocol extends _is.DatabaseSerializationManager {
           columnDefault: 'random',
         ),
         _isp.ColumnDefinition(
-          name: 'ownerId',
+          name: 'owner_id',
+          columnType: _isp.ColumnType.uuid,
+          isNullable: false,
+          dartType: 'UuidValue',
+        ),
+        _isp.ColumnDefinition(
+          name: 'book_id',
+          columnType: _isp.ColumnType.uuid,
+          isNullable: false,
+          dartType: 'UuidValue',
+        ),
+        _isp.ColumnDefinition(
+          name: 'is_favorite',
+          columnType: _isp.ColumnType.boolean,
+          isNullable: false,
+          dartType: 'bool',
+          columnDefault: 'false',
+        ),
+        _isp.ColumnDefinition(
+          name: 'created_at',
+          columnType: _isp.ColumnType.timestampWithoutTimeZone,
+          isNullable: false,
+          dartType: 'DateTime',
+        ),
+        _isp.ColumnDefinition(
+          name: 'updated_at',
+          columnType: _isp.ColumnType.timestampWithoutTimeZone,
+          isNullable: false,
+          dartType: 'DateTime',
+        ),
+        _isp.ColumnDefinition(
+          name: 'key_version',
+          columnType: _isp.ColumnType.bigint,
+          isNullable: false,
+          dartType: 'int',
+          columnDefault: '1',
+        ),
+        _isp.ColumnDefinition(
+          name: 'quote_cipher',
           columnType: _isp.ColumnType.text,
           isNullable: false,
           dartType: 'String',
         ),
         _isp.ColumnDefinition(
-          name: 'note',
+          name: 'note_cipher',
+          columnType: _isp.ColumnType.text,
+          isNullable: true,
+          dartType: 'String?',
+        ),
+        _isp.ColumnDefinition(
+          name: 'page_numbers_cipher',
           columnType: _isp.ColumnType.text,
           isNullable: false,
           dartType: 'String',
         ),
         _isp.ColumnDefinition(
-          name: 'updatedAt',
+          name: 'pages_cipher',
+          columnType: _isp.ColumnType.text,
+          isNullable: false,
+          dartType: 'String',
+        ),
+        _isp.ColumnDefinition(
+          name: 'words_cipher',
+          columnType: _isp.ColumnType.text,
+          isNullable: false,
+          dartType: 'String',
+        ),
+        _isp.ColumnDefinition(
+          name: 'marked_word_indexes_cipher',
+          columnType: _isp.ColumnType.text,
+          isNullable: false,
+          dartType: 'String',
+        ),
+        _isp.ColumnDefinition(
+          name: 'voice_note_cipher',
+          columnType: _isp.ColumnType.text,
+          isNullable: true,
+          dartType: 'String?',
+        ),
+      ],
+      foreignKeys: [],
+      indexes: [
+        _isp.IndexDefinition(
+          indexName: 'quotes_owner_idx',
+          tableSpace: null,
+          elements: [
+            _isp.IndexElementDefinition(
+              type: _isp.IndexElementDefinitionType.column,
+              definition: 'owner_id',
+            ),
+          ],
+          type: 'btree',
+          isUnique: false,
+          isPrimary: false,
+        ),
+        _isp.IndexDefinition(
+          indexName: 'quotes_book_idx',
+          tableSpace: null,
+          elements: [
+            _isp.IndexElementDefinition(
+              type: _isp.IndexElementDefinitionType.column,
+              definition: 'book_id',
+            ),
+          ],
+          type: 'btree',
+          isUnique: false,
+          isPrimary: false,
+        ),
+      ],
+      managed: true,
+    ),
+    _isp.TableDefinition(
+      name: 'shelf_books',
+      dartName: 'SyncedShelfBook',
+      schema: 'public',
+      module: 'book_marker',
+      columns: [
+        _isp.ColumnDefinition(
+          name: 'id',
+          columnType: _isp.ColumnType.uuid,
+          isNullable: false,
+          dartType: 'UuidValue',
+          columnDefault: 'random',
+        ),
+        _isp.ColumnDefinition(
+          name: 'owner_id',
+          columnType: _isp.ColumnType.uuid,
+          isNullable: false,
+          dartType: 'UuidValue',
+        ),
+        _isp.ColumnDefinition(
+          name: 'shelf_id',
+          columnType: _isp.ColumnType.uuid,
+          isNullable: false,
+          dartType: 'UuidValue',
+        ),
+        _isp.ColumnDefinition(
+          name: 'book_id',
+          columnType: _isp.ColumnType.uuid,
+          isNullable: false,
+          dartType: 'UuidValue',
+        ),
+        _isp.ColumnDefinition(
+          name: 'updated_at',
           columnType: _isp.ColumnType.timestampWithoutTimeZone,
           isNullable: false,
           dartType: 'DateTime',
@@ -287,12 +519,252 @@ class Protocol extends _is.DatabaseSerializationManager {
       foreignKeys: [],
       indexes: [
         _isp.IndexDefinition(
-          indexName: 'sync_probes_owner_idx',
+          indexName: 'shelf_books_owner_idx',
           tableSpace: null,
           elements: [
             _isp.IndexElementDefinition(
               type: _isp.IndexElementDefinitionType.column,
-              definition: 'ownerId',
+              definition: 'owner_id',
+            ),
+          ],
+          type: 'btree',
+          isUnique: false,
+          isPrimary: false,
+        ),
+        _isp.IndexDefinition(
+          indexName: 'shelf_books_pair_idx',
+          tableSpace: null,
+          elements: [
+            _isp.IndexElementDefinition(
+              type: _isp.IndexElementDefinitionType.column,
+              definition: 'shelf_id',
+            ),
+            _isp.IndexElementDefinition(
+              type: _isp.IndexElementDefinitionType.column,
+              definition: 'book_id',
+            ),
+          ],
+          type: 'btree',
+          isUnique: true,
+          isPrimary: false,
+        ),
+      ],
+      managed: true,
+    ),
+    _isp.TableDefinition(
+      name: 'shelves',
+      dartName: 'SyncedShelf',
+      schema: 'public',
+      module: 'book_marker',
+      columns: [
+        _isp.ColumnDefinition(
+          name: 'id',
+          columnType: _isp.ColumnType.uuid,
+          isNullable: false,
+          dartType: 'UuidValue',
+          columnDefault: 'random',
+        ),
+        _isp.ColumnDefinition(
+          name: 'owner_id',
+          columnType: _isp.ColumnType.uuid,
+          isNullable: false,
+          dartType: 'UuidValue',
+        ),
+        _isp.ColumnDefinition(
+          name: 'accent',
+          columnType: _isp.ColumnType.text,
+          isNullable: true,
+          dartType: 'String?',
+        ),
+        _isp.ColumnDefinition(
+          name: 'symbol',
+          columnType: _isp.ColumnType.text,
+          isNullable: true,
+          dartType: 'String?',
+        ),
+        _isp.ColumnDefinition(
+          name: 'created_at',
+          columnType: _isp.ColumnType.timestampWithoutTimeZone,
+          isNullable: false,
+          dartType: 'DateTime',
+        ),
+        _isp.ColumnDefinition(
+          name: 'updated_at',
+          columnType: _isp.ColumnType.timestampWithoutTimeZone,
+          isNullable: false,
+          dartType: 'DateTime',
+        ),
+        _isp.ColumnDefinition(
+          name: 'key_version',
+          columnType: _isp.ColumnType.bigint,
+          isNullable: false,
+          dartType: 'int',
+          columnDefault: '1',
+        ),
+        _isp.ColumnDefinition(
+          name: 'name_cipher',
+          columnType: _isp.ColumnType.text,
+          isNullable: false,
+          dartType: 'String',
+        ),
+      ],
+      foreignKeys: [],
+      indexes: [
+        _isp.IndexDefinition(
+          indexName: 'shelves_owner_idx',
+          tableSpace: null,
+          elements: [
+            _isp.IndexElementDefinition(
+              type: _isp.IndexElementDefinitionType.column,
+              definition: 'owner_id',
+            ),
+          ],
+          type: 'btree',
+          isUnique: false,
+          isPrimary: false,
+        ),
+      ],
+      managed: true,
+    ),
+    _isp.TableDefinition(
+      name: 'theme_quotes',
+      dartName: 'SyncedThemeQuote',
+      schema: 'public',
+      module: 'book_marker',
+      columns: [
+        _isp.ColumnDefinition(
+          name: 'id',
+          columnType: _isp.ColumnType.uuid,
+          isNullable: false,
+          dartType: 'UuidValue',
+          columnDefault: 'random',
+        ),
+        _isp.ColumnDefinition(
+          name: 'owner_id',
+          columnType: _isp.ColumnType.uuid,
+          isNullable: false,
+          dartType: 'UuidValue',
+        ),
+        _isp.ColumnDefinition(
+          name: 'theme_id',
+          columnType: _isp.ColumnType.uuid,
+          isNullable: false,
+          dartType: 'UuidValue',
+        ),
+        _isp.ColumnDefinition(
+          name: 'quote_id',
+          columnType: _isp.ColumnType.uuid,
+          isNullable: false,
+          dartType: 'UuidValue',
+        ),
+        _isp.ColumnDefinition(
+          name: 'updated_at',
+          columnType: _isp.ColumnType.timestampWithoutTimeZone,
+          isNullable: false,
+          dartType: 'DateTime',
+        ),
+      ],
+      foreignKeys: [],
+      indexes: [
+        _isp.IndexDefinition(
+          indexName: 'theme_quotes_owner_idx',
+          tableSpace: null,
+          elements: [
+            _isp.IndexElementDefinition(
+              type: _isp.IndexElementDefinitionType.column,
+              definition: 'owner_id',
+            ),
+          ],
+          type: 'btree',
+          isUnique: false,
+          isPrimary: false,
+        ),
+        _isp.IndexDefinition(
+          indexName: 'theme_quotes_pair_idx',
+          tableSpace: null,
+          elements: [
+            _isp.IndexElementDefinition(
+              type: _isp.IndexElementDefinitionType.column,
+              definition: 'theme_id',
+            ),
+            _isp.IndexElementDefinition(
+              type: _isp.IndexElementDefinitionType.column,
+              definition: 'quote_id',
+            ),
+          ],
+          type: 'btree',
+          isUnique: true,
+          isPrimary: false,
+        ),
+      ],
+      managed: true,
+    ),
+    _isp.TableDefinition(
+      name: 'themes',
+      dartName: 'SyncedTheme',
+      schema: 'public',
+      module: 'book_marker',
+      columns: [
+        _isp.ColumnDefinition(
+          name: 'id',
+          columnType: _isp.ColumnType.uuid,
+          isNullable: false,
+          dartType: 'UuidValue',
+          columnDefault: 'random',
+        ),
+        _isp.ColumnDefinition(
+          name: 'owner_id',
+          columnType: _isp.ColumnType.uuid,
+          isNullable: false,
+          dartType: 'UuidValue',
+        ),
+        _isp.ColumnDefinition(
+          name: 'accent',
+          columnType: _isp.ColumnType.text,
+          isNullable: true,
+          dartType: 'String?',
+        ),
+        _isp.ColumnDefinition(
+          name: 'symbol',
+          columnType: _isp.ColumnType.text,
+          isNullable: true,
+          dartType: 'String?',
+        ),
+        _isp.ColumnDefinition(
+          name: 'created_at',
+          columnType: _isp.ColumnType.timestampWithoutTimeZone,
+          isNullable: false,
+          dartType: 'DateTime',
+        ),
+        _isp.ColumnDefinition(
+          name: 'updated_at',
+          columnType: _isp.ColumnType.timestampWithoutTimeZone,
+          isNullable: false,
+          dartType: 'DateTime',
+        ),
+        _isp.ColumnDefinition(
+          name: 'key_version',
+          columnType: _isp.ColumnType.bigint,
+          isNullable: false,
+          dartType: 'int',
+          columnDefault: '1',
+        ),
+        _isp.ColumnDefinition(
+          name: 'name_cipher',
+          columnType: _isp.ColumnType.text,
+          isNullable: false,
+          dartType: 'String',
+        ),
+      ],
+      foreignKeys: [],
+      indexes: [
+        _isp.IndexDefinition(
+          indexName: 'themes_owner_idx',
+          tableSpace: null,
+          elements: [
+            _isp.IndexElementDefinition(
+              type: _isp.IndexElementDefinitionType.column,
+              definition: 'owner_id',
             ),
           ],
           type: 'btree',
@@ -358,11 +830,23 @@ class Protocol extends _is.DatabaseSerializationManager {
     if (t == _i13b5r7e.OcrUsage) {
       return _i13b5r7e.OcrUsage.fromJson(data) as T;
     }
-    if (t == _izw8z7ou.Greeting) {
-      return _izw8z7ou.Greeting.fromJson(data) as T;
+    if (t == _i8t9sm2n.SyncedBook) {
+      return _i8t9sm2n.SyncedBook.fromJson(data) as T;
     }
-    if (t == _i8t4kps3.SyncProbe) {
-      return _i8t4kps3.SyncProbe.fromJson(data) as T;
+    if (t == _ivf4v01a.SyncedQuote) {
+      return _ivf4v01a.SyncedQuote.fromJson(data) as T;
+    }
+    if (t == _ibxgxncl.SyncedShelf) {
+      return _ibxgxncl.SyncedShelf.fromJson(data) as T;
+    }
+    if (t == _isij2asi.SyncedShelfBook) {
+      return _isij2asi.SyncedShelfBook.fromJson(data) as T;
+    }
+    if (t == _itq42fc1.SyncedTheme) {
+      return _itq42fc1.SyncedTheme.fromJson(data) as T;
+    }
+    if (t == _ih8stdgt.SyncedThemeQuote) {
+      return _ih8stdgt.SyncedThemeQuote.fromJson(data) as T;
     }
     if (t == _is.getType<_ikmgnzhy.ClientConfig?>()) {
       return (data != null ? _ikmgnzhy.ClientConfig.fromJson(data) : null) as T;
@@ -394,11 +878,25 @@ class Protocol extends _is.DatabaseSerializationManager {
     if (t == _is.getType<_i13b5r7e.OcrUsage?>()) {
       return (data != null ? _i13b5r7e.OcrUsage.fromJson(data) : null) as T;
     }
-    if (t == _is.getType<_izw8z7ou.Greeting?>()) {
-      return (data != null ? _izw8z7ou.Greeting.fromJson(data) : null) as T;
+    if (t == _is.getType<_i8t9sm2n.SyncedBook?>()) {
+      return (data != null ? _i8t9sm2n.SyncedBook.fromJson(data) : null) as T;
     }
-    if (t == _is.getType<_i8t4kps3.SyncProbe?>()) {
-      return (data != null ? _i8t4kps3.SyncProbe.fromJson(data) : null) as T;
+    if (t == _is.getType<_ivf4v01a.SyncedQuote?>()) {
+      return (data != null ? _ivf4v01a.SyncedQuote.fromJson(data) : null) as T;
+    }
+    if (t == _is.getType<_ibxgxncl.SyncedShelf?>()) {
+      return (data != null ? _ibxgxncl.SyncedShelf.fromJson(data) : null) as T;
+    }
+    if (t == _is.getType<_isij2asi.SyncedShelfBook?>()) {
+      return (data != null ? _isij2asi.SyncedShelfBook.fromJson(data) : null)
+          as T;
+    }
+    if (t == _is.getType<_itq42fc1.SyncedTheme?>()) {
+      return (data != null ? _itq42fc1.SyncedTheme.fromJson(data) : null) as T;
+    }
+    if (t == _is.getType<_ih8stdgt.SyncedThemeQuote?>()) {
+      return (data != null ? _ih8stdgt.SyncedThemeQuote.fromJson(data) : null)
+          as T;
     }
     try {
       return _iais.Protocol().deserialize<T>(data, t);
@@ -422,8 +920,12 @@ class Protocol extends _is.DatabaseSerializationManager {
       _id6kwse3.Entitlement => 'Entitlement',
       _ik9sk60n.EntitlementView => 'EntitlementView',
       _i13b5r7e.OcrUsage => 'OcrUsage',
-      _izw8z7ou.Greeting => 'Greeting',
-      _i8t4kps3.SyncProbe => 'SyncProbe',
+      _i8t9sm2n.SyncedBook => 'SyncedBook',
+      _ivf4v01a.SyncedQuote => 'SyncedQuote',
+      _ibxgxncl.SyncedShelf => 'SyncedShelf',
+      _isij2asi.SyncedShelfBook => 'SyncedShelfBook',
+      _itq42fc1.SyncedTheme => 'SyncedTheme',
+      _ih8stdgt.SyncedThemeQuote => 'SyncedThemeQuote',
       _ => null,
     };
   }
@@ -454,10 +956,18 @@ class Protocol extends _is.DatabaseSerializationManager {
         return 'EntitlementView';
       case _i13b5r7e.OcrUsage():
         return 'OcrUsage';
-      case _izw8z7ou.Greeting():
-        return 'Greeting';
-      case _i8t4kps3.SyncProbe():
-        return 'SyncProbe';
+      case _i8t9sm2n.SyncedBook():
+        return 'SyncedBook';
+      case _ivf4v01a.SyncedQuote():
+        return 'SyncedQuote';
+      case _ibxgxncl.SyncedShelf():
+        return 'SyncedShelf';
+      case _isij2asi.SyncedShelfBook():
+        return 'SyncedShelfBook';
+      case _itq42fc1.SyncedTheme():
+        return 'SyncedTheme';
+      case _ih8stdgt.SyncedThemeQuote():
+        return 'SyncedThemeQuote';
     }
     className = _iais.Protocol().getClassNameForObject(data);
     if (className != null) {
@@ -508,11 +1018,23 @@ class Protocol extends _is.DatabaseSerializationManager {
     if (dataClassName == 'OcrUsage') {
       return deserialize<_i13b5r7e.OcrUsage>(data['data']);
     }
-    if (dataClassName == 'Greeting') {
-      return deserialize<_izw8z7ou.Greeting>(data['data']);
+    if (dataClassName == 'SyncedBook') {
+      return deserialize<_i8t9sm2n.SyncedBook>(data['data']);
     }
-    if (dataClassName == 'SyncProbe') {
-      return deserialize<_i8t4kps3.SyncProbe>(data['data']);
+    if (dataClassName == 'SyncedQuote') {
+      return deserialize<_ivf4v01a.SyncedQuote>(data['data']);
+    }
+    if (dataClassName == 'SyncedShelf') {
+      return deserialize<_ibxgxncl.SyncedShelf>(data['data']);
+    }
+    if (dataClassName == 'SyncedShelfBook') {
+      return deserialize<_isij2asi.SyncedShelfBook>(data['data']);
+    }
+    if (dataClassName == 'SyncedTheme') {
+      return deserialize<_itq42fc1.SyncedTheme>(data['data']);
+    }
+    if (dataClassName == 'SyncedThemeQuote') {
+      return deserialize<_ih8stdgt.SyncedThemeQuote>(data['data']);
     }
     if (dataClassName.startsWith('serverpod_auth_idp.')) {
       data['className'] = dataClassName.substring(19);
@@ -559,8 +1081,18 @@ class Protocol extends _is.DatabaseSerializationManager {
         return _id6kwse3.Entitlement.t;
       case _i13b5r7e.OcrUsage:
         return _i13b5r7e.OcrUsage.t;
-      case _i8t4kps3.SyncProbe:
-        return _i8t4kps3.SyncProbe.t;
+      case _i8t9sm2n.SyncedBook:
+        return _i8t9sm2n.SyncedBook.t;
+      case _ivf4v01a.SyncedQuote:
+        return _ivf4v01a.SyncedQuote.t;
+      case _ibxgxncl.SyncedShelf:
+        return _ibxgxncl.SyncedShelf.t;
+      case _isij2asi.SyncedShelfBook:
+        return _isij2asi.SyncedShelfBook.t;
+      case _itq42fc1.SyncedTheme:
+        return _itq42fc1.SyncedTheme.t;
+      case _ih8stdgt.SyncedThemeQuote:
+        return _ih8stdgt.SyncedThemeQuote.t;
     }
     return null;
   }

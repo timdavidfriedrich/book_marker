@@ -17,9 +17,8 @@ class PowerSyncTokens {
 
   Future<String> issue(final UuidValue userId) {
     final signingKey = _password('powerSyncSigningKey');
-    final keyId = _password('powerSyncKeyId');
     // * signing is CPU-bound; keep it off the request isolate
-    return Isolate.run(() => _sign(userId.toString(), signingKey, keyId));
+    return Isolate.run(() => _sign(userId.toString(), signingKey));
   }
 }
 
@@ -31,11 +30,7 @@ String _password(final String key) {
   return value;
 }
 
-String _sign(
-  final String subject,
-  final String signingKey,
-  final String keyId,
-) {
+String _sign(final String subject, final String signingKey) {
   final decoded = json.decode(utf8.decode(base64.decode(signingKey)));
   final key = JsonWebKey.fromJson(decoded as Map<String, Object?>);
   final now = DateTime.now();
@@ -46,8 +41,9 @@ String _sign(
       'iat': now.millisecondsSinceEpoch ~/ 1000,
       'exp': now.add(_lifetime).millisecondsSinceEpoch ~/ 1000,
       'aud': [_audience],
-      'kid': keyId,
     }
+    // * the key id travels in the JWS header, which is where PowerSync looks
+    // * for it when picking a JWK; jose takes it from the key itself
     ..addRecipient(key, algorithm: 'RS256');
 
   return builder.build().toCompactSerialization();

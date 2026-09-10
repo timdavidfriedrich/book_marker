@@ -12,136 +12,115 @@
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _is;
 
-/// Append-only log of cloud OCR requests. The source of truth for rate limits.
-///
-/// Server-only: never added to the `powersync` publication. The device sees the
-/// denormalised counters on `entitlements` instead.
-///
-/// `status` drives the admission protocol: a row is inserted as `reserved`
-/// inside the advisory-locked transaction, then flipped to `completed` or
-/// `failed` once the provider responds. Counting includes `reserved`, so an
-/// in-flight scan holds its slot.
-abstract class OcrUsage
+/// Which quotes belong to which theme. Same reasoning as shelf_books.
+abstract class SyncedThemeQuote
     implements _is.TableRow<_is.UuidValue>, _is.ProtocolSerialization {
-  OcrUsage._({
+  SyncedThemeQuote._({
     _is.UuidValue? id,
     required this.ownerId,
-    required this.createdAt,
-    required this.engine,
-    String? status,
-    this.inputTokens,
-    this.outputTokens,
-  }) : id = id ?? const _is.Uuid().v4obj(),
-       status = status ?? 'reserved';
+    required this.themeId,
+    required this.quoteId,
+    required this.updatedAt,
+  }) : id = id ?? const _is.Uuid().v4obj();
 
-  factory OcrUsage({
+  factory SyncedThemeQuote({
     _is.UuidValue? id,
     required _is.UuidValue ownerId,
-    required DateTime createdAt,
-    required String engine,
-    String? status,
-    int? inputTokens,
-    int? outputTokens,
-  }) = _OcrUsageImpl;
+    required _is.UuidValue themeId,
+    required _is.UuidValue quoteId,
+    required DateTime updatedAt,
+  }) = _SyncedThemeQuoteImpl;
 
-  factory OcrUsage.fromJson(Map<String, dynamic> jsonSerialization) {
-    return OcrUsage(
+  factory SyncedThemeQuote.fromJson(Map<String, dynamic> jsonSerialization) {
+    return SyncedThemeQuote(
       id: jsonSerialization['id'] == null
           ? null
           : _is.UuidValueJsonExtension.fromJson(jsonSerialization['id']),
       ownerId: _is.UuidValueJsonExtension.fromJson(
         jsonSerialization['ownerId'],
       ),
-      createdAt: _is.DateTimeJsonExtension.fromJson(
-        jsonSerialization['createdAt'],
+      themeId: _is.UuidValueJsonExtension.fromJson(
+        jsonSerialization['themeId'],
       ),
-      engine: jsonSerialization['engine'] as String,
-      status: jsonSerialization['status'] as String?,
-      inputTokens: jsonSerialization['inputTokens'] as int?,
-      outputTokens: jsonSerialization['outputTokens'] as int?,
+      quoteId: _is.UuidValueJsonExtension.fromJson(
+        jsonSerialization['quoteId'],
+      ),
+      updatedAt: _is.DateTimeJsonExtension.fromJson(
+        jsonSerialization['updatedAt'],
+      ),
     );
   }
 
-  static final t = OcrUsageTable();
+  static final t = SyncedThemeQuoteTable();
 
-  static const db = OcrUsageRepository._();
+  static const db = SyncedThemeQuoteRepository._();
 
   @override
   _is.UuidValue id;
 
   _is.UuidValue ownerId;
 
-  DateTime createdAt;
+  _is.UuidValue themeId;
 
-  String engine;
+  _is.UuidValue quoteId;
 
-  String status;
-
-  int? inputTokens;
-
-  int? outputTokens;
+  DateTime updatedAt;
 
   @override
   _is.Table<_is.UuidValue> get table => t;
 
-  /// Returns a shallow copy of this [OcrUsage]
+  /// Returns a shallow copy of this [SyncedThemeQuote]
   /// with some or all fields replaced by the given arguments.
   @_is.useResult
-  OcrUsage copyWith({
+  SyncedThemeQuote copyWith({
     _is.UuidValue? id,
     _is.UuidValue? ownerId,
-    DateTime? createdAt,
-    String? engine,
-    String? status,
-    int? inputTokens,
-    int? outputTokens,
+    _is.UuidValue? themeId,
+    _is.UuidValue? quoteId,
+    DateTime? updatedAt,
   });
   @override
   Map<String, dynamic> toJson() {
     return {
-      '__className__': 'OcrUsage',
+      '__className__': 'SyncedThemeQuote',
       'id': id.toJson(),
       'ownerId': ownerId.toJson(),
-      'createdAt': createdAt.toJson(),
-      'engine': engine,
-      'status': status,
-      if (inputTokens != null) 'inputTokens': inputTokens,
-      if (outputTokens != null) 'outputTokens': outputTokens,
+      'themeId': themeId.toJson(),
+      'quoteId': quoteId.toJson(),
+      'updatedAt': updatedAt.toJson(),
     };
   }
 
   @override
   Map<String, dynamic> toJsonForProtocol() {
     return {
-      '__className__': 'OcrUsage',
+      '__className__': 'SyncedThemeQuote',
       'id': id.toJson(),
       'ownerId': ownerId.toJson(),
-      'createdAt': createdAt.toJson(),
-      'engine': engine,
-      'status': status,
-      if (inputTokens != null) 'inputTokens': inputTokens,
-      if (outputTokens != null) 'outputTokens': outputTokens,
+      'themeId': themeId.toJson(),
+      'quoteId': quoteId.toJson(),
+      'updatedAt': updatedAt.toJson(),
     };
   }
 
-  static OcrUsageInclude include() {
-    return OcrUsageInclude._();
+  static SyncedThemeQuoteInclude include() {
+    return SyncedThemeQuoteInclude._();
   }
 
-  static OcrUsageIncludeList includeList({
-    _is.WhereExpressionBuilder<OcrUsageTable>? where,
+  static SyncedThemeQuoteIncludeList includeList({
+    _is.WhereExpressionBuilder<SyncedThemeQuoteTable>? where,
     int? limit,
     int? offset,
-    _is.OrderByBuilder<OcrUsageTable>? orderBy,
-    _is.OrderByListBuilder<OcrUsageTable>? orderByList,
-    OcrUsageInclude? include,
+    _is.OrderByBuilder<SyncedThemeQuoteTable>? orderBy,
+    _is.OrderByListBuilder<SyncedThemeQuoteTable>? orderByList,
+    SyncedThemeQuoteInclude? include,
   }) {
-    return OcrUsageIncludeList._(
+    return SyncedThemeQuoteIncludeList._(
       where: where,
       limit: limit,
       offset: offset,
-      orderBy: orderBy?.call(OcrUsage.t),
-      orderByList: orderByList?.call(OcrUsage.t),
+      orderBy: orderBy?.call(SyncedThemeQuote.t),
+      orderByList: orderByList?.call(SyncedThemeQuote.t),
       include: include,
     );
   }
@@ -152,54 +131,45 @@ abstract class OcrUsage
   }
 }
 
-class _Undefined {}
-
-class _OcrUsageImpl extends OcrUsage {
-  _OcrUsageImpl({
+class _SyncedThemeQuoteImpl extends SyncedThemeQuote {
+  _SyncedThemeQuoteImpl({
     _is.UuidValue? id,
     required _is.UuidValue ownerId,
-    required DateTime createdAt,
-    required String engine,
-    String? status,
-    int? inputTokens,
-    int? outputTokens,
+    required _is.UuidValue themeId,
+    required _is.UuidValue quoteId,
+    required DateTime updatedAt,
   }) : super._(
          id: id,
          ownerId: ownerId,
-         createdAt: createdAt,
-         engine: engine,
-         status: status,
-         inputTokens: inputTokens,
-         outputTokens: outputTokens,
+         themeId: themeId,
+         quoteId: quoteId,
+         updatedAt: updatedAt,
        );
 
-  /// Returns a shallow copy of this [OcrUsage]
+  /// Returns a shallow copy of this [SyncedThemeQuote]
   /// with some or all fields replaced by the given arguments.
   @_is.useResult
   @override
-  OcrUsage copyWith({
+  SyncedThemeQuote copyWith({
     _is.UuidValue? id,
     _is.UuidValue? ownerId,
-    DateTime? createdAt,
-    String? engine,
-    String? status,
-    Object? inputTokens = _Undefined,
-    Object? outputTokens = _Undefined,
+    _is.UuidValue? themeId,
+    _is.UuidValue? quoteId,
+    DateTime? updatedAt,
   }) {
-    return OcrUsage(
+    return SyncedThemeQuote(
       id: id ?? this.id,
       ownerId: ownerId ?? this.ownerId,
-      createdAt: createdAt ?? this.createdAt,
-      engine: engine ?? this.engine,
-      status: status ?? this.status,
-      inputTokens: inputTokens is int? ? inputTokens : this.inputTokens,
-      outputTokens: outputTokens is int? ? outputTokens : this.outputTokens,
+      themeId: themeId ?? this.themeId,
+      quoteId: quoteId ?? this.quoteId,
+      updatedAt: updatedAt ?? this.updatedAt,
     );
   }
 }
 
-class OcrUsageUpdateTable extends _is.UpdateTable<OcrUsageTable> {
-  OcrUsageUpdateTable(super.table);
+class SyncedThemeQuoteUpdateTable
+    extends _is.UpdateTable<SyncedThemeQuoteTable> {
+  SyncedThemeQuoteUpdateTable(super.table);
 
   _is.ColumnValue<_is.UuidValue, _is.UuidValue> ownerId(_is.UuidValue value) =>
       _is.ColumnValue(
@@ -207,126 +177,104 @@ class OcrUsageUpdateTable extends _is.UpdateTable<OcrUsageTable> {
         value,
       );
 
-  _is.ColumnValue<DateTime, DateTime> createdAt(DateTime value) =>
+  _is.ColumnValue<_is.UuidValue, _is.UuidValue> themeId(_is.UuidValue value) =>
       _is.ColumnValue(
-        table.createdAt,
+        table.themeId,
         value,
       );
 
-  _is.ColumnValue<String, String> engine(String value) => _is.ColumnValue(
-    table.engine,
-    value,
-  );
+  _is.ColumnValue<_is.UuidValue, _is.UuidValue> quoteId(_is.UuidValue value) =>
+      _is.ColumnValue(
+        table.quoteId,
+        value,
+      );
 
-  _is.ColumnValue<String, String> status(String value) => _is.ColumnValue(
-    table.status,
-    value,
-  );
-
-  _is.ColumnValue<int, int> inputTokens(int? value) => _is.ColumnValue(
-    table.inputTokens,
-    value,
-  );
-
-  _is.ColumnValue<int, int> outputTokens(int? value) => _is.ColumnValue(
-    table.outputTokens,
-    value,
-  );
+  _is.ColumnValue<DateTime, DateTime> updatedAt(DateTime value) =>
+      _is.ColumnValue(
+        table.updatedAt,
+        value,
+      );
 }
 
-class OcrUsageTable extends _is.Table<_is.UuidValue> {
-  OcrUsageTable({super.tableRelation}) : super(tableName: 'ocr_usage') {
-    updateTable = OcrUsageUpdateTable(this);
+class SyncedThemeQuoteTable extends _is.Table<_is.UuidValue> {
+  SyncedThemeQuoteTable({super.tableRelation})
+    : super(tableName: 'theme_quotes') {
+    updateTable = SyncedThemeQuoteUpdateTable(this);
     ownerId = _is.ColumnUuid(
       'owner_id',
       this,
       fieldName: 'ownerId',
     );
-    createdAt = _is.ColumnDateTime(
-      'created_at',
+    themeId = _is.ColumnUuid(
+      'theme_id',
       this,
-      fieldName: 'createdAt',
+      fieldName: 'themeId',
     );
-    engine = _is.ColumnString(
-      'engine',
+    quoteId = _is.ColumnUuid(
+      'quote_id',
       this,
+      fieldName: 'quoteId',
     );
-    status = _is.ColumnString(
-      'status',
+    updatedAt = _is.ColumnDateTime(
+      'updated_at',
       this,
-      hasDefault: true,
-    );
-    inputTokens = _is.ColumnInt(
-      'input_tokens',
-      this,
-      fieldName: 'inputTokens',
-    );
-    outputTokens = _is.ColumnInt(
-      'output_tokens',
-      this,
-      fieldName: 'outputTokens',
+      fieldName: 'updatedAt',
     );
   }
 
-  late final OcrUsageUpdateTable updateTable;
+  late final SyncedThemeQuoteUpdateTable updateTable;
 
   late final _is.ColumnUuid ownerId;
 
-  late final _is.ColumnDateTime createdAt;
+  late final _is.ColumnUuid themeId;
 
-  late final _is.ColumnString engine;
+  late final _is.ColumnUuid quoteId;
 
-  late final _is.ColumnString status;
-
-  late final _is.ColumnInt inputTokens;
-
-  late final _is.ColumnInt outputTokens;
+  late final _is.ColumnDateTime updatedAt;
 
   @override
   List<_is.Column> get columns => [
     id,
     ownerId,
-    createdAt,
-    engine,
-    status,
-    inputTokens,
-    outputTokens,
+    themeId,
+    quoteId,
+    updatedAt,
   ];
 }
 
-class OcrUsageInclude extends _is.IncludeObject {
-  OcrUsageInclude._();
+class SyncedThemeQuoteInclude extends _is.IncludeObject {
+  SyncedThemeQuoteInclude._();
 
   @override
   Map<String, _is.Include?> get includes => {};
 
   @override
-  _is.Table<_is.UuidValue> get table => OcrUsage.t;
+  _is.Table<_is.UuidValue> get table => SyncedThemeQuote.t;
 }
 
-class OcrUsageIncludeList extends _is.IncludeList {
-  OcrUsageIncludeList._({
-    _is.WhereExpressionBuilder<OcrUsageTable>? where,
+class SyncedThemeQuoteIncludeList extends _is.IncludeList {
+  SyncedThemeQuoteIncludeList._({
+    _is.WhereExpressionBuilder<SyncedThemeQuoteTable>? where,
     super.limit,
     super.offset,
     super.orderBy,
     super.orderByList,
     super.include,
   }) {
-    super.where = where?.call(OcrUsage.t);
+    super.where = where?.call(SyncedThemeQuote.t);
   }
 
   @override
   Map<String, _is.Include?> get includes => include?.includes ?? {};
 
   @override
-  _is.Table<_is.UuidValue> get table => OcrUsage.t;
+  _is.Table<_is.UuidValue> get table => SyncedThemeQuote.t;
 }
 
-class OcrUsageRepository {
-  const OcrUsageRepository._();
+class SyncedThemeQuoteRepository {
+  const SyncedThemeQuoteRepository._();
 
-  /// Returns a list of [OcrUsage]s matching the given query parameters.
+  /// Returns a list of [SyncedThemeQuote]s matching the given query parameters.
   ///
   /// Use [where] to specify which items to include in the return value.
   /// If none is specified, all items will be returned.
@@ -348,21 +296,21 @@ class OcrUsageRepository {
   ///   limit: 100,
   /// );
   /// ```
-  Future<List<OcrUsage>> find(
+  Future<List<SyncedThemeQuote>> find(
     _is.DatabaseSession session, {
-    _is.WhereExpressionBuilder<OcrUsageTable>? where,
+    _is.WhereExpressionBuilder<SyncedThemeQuoteTable>? where,
     int? limit,
     int? offset,
-    _is.OrderByBuilder<OcrUsageTable>? orderBy,
-    _is.OrderByListBuilder<OcrUsageTable>? orderByList,
+    _is.OrderByBuilder<SyncedThemeQuoteTable>? orderBy,
+    _is.OrderByListBuilder<SyncedThemeQuoteTable>? orderByList,
     _is.Transaction? transaction,
     _is.LockMode? lockMode,
     _is.LockBehavior? lockBehavior,
   }) async {
-    return session.db.find<OcrUsage>(
-      where: where?.call(OcrUsage.t),
-      orderBy: orderBy?.call(OcrUsage.t),
-      orderByList: orderByList?.call(OcrUsage.t),
+    return session.db.find<SyncedThemeQuote>(
+      where: where?.call(SyncedThemeQuote.t),
+      orderBy: orderBy?.call(SyncedThemeQuote.t),
+      orderByList: orderByList?.call(SyncedThemeQuote.t),
       limit: limit,
       offset: offset,
       transaction: transaction,
@@ -371,7 +319,7 @@ class OcrUsageRepository {
     );
   }
 
-  /// Returns the first matching [OcrUsage] matching the given query parameters.
+  /// Returns the first matching [SyncedThemeQuote] matching the given query parameters.
   ///
   /// Use [where] to specify which items to include in the return value.
   /// If none is specified, all items will be returned.
@@ -388,20 +336,20 @@ class OcrUsageRepository {
   ///   orderBy: (t) => t.age,
   /// );
   /// ```
-  Future<OcrUsage?> findFirstRow(
+  Future<SyncedThemeQuote?> findFirstRow(
     _is.DatabaseSession session, {
-    _is.WhereExpressionBuilder<OcrUsageTable>? where,
+    _is.WhereExpressionBuilder<SyncedThemeQuoteTable>? where,
     int? offset,
-    _is.OrderByBuilder<OcrUsageTable>? orderBy,
-    _is.OrderByListBuilder<OcrUsageTable>? orderByList,
+    _is.OrderByBuilder<SyncedThemeQuoteTable>? orderBy,
+    _is.OrderByListBuilder<SyncedThemeQuoteTable>? orderByList,
     _is.Transaction? transaction,
     _is.LockMode? lockMode,
     _is.LockBehavior? lockBehavior,
   }) async {
-    return session.db.findFirstRow<OcrUsage>(
-      where: where?.call(OcrUsage.t),
-      orderBy: orderBy?.call(OcrUsage.t),
-      orderByList: orderByList?.call(OcrUsage.t),
+    return session.db.findFirstRow<SyncedThemeQuote>(
+      where: where?.call(SyncedThemeQuote.t),
+      orderBy: orderBy?.call(SyncedThemeQuote.t),
+      orderByList: orderByList?.call(SyncedThemeQuote.t),
       offset: offset,
       transaction: transaction,
       lockMode: lockMode,
@@ -409,15 +357,15 @@ class OcrUsageRepository {
     );
   }
 
-  /// Finds a single [OcrUsage] by its [id] or null if no such row exists.
-  Future<OcrUsage?> findById(
+  /// Finds a single [SyncedThemeQuote] by its [id] or null if no such row exists.
+  Future<SyncedThemeQuote?> findById(
     _is.DatabaseSession session,
     _is.UuidValue id, {
     _is.Transaction? transaction,
     _is.LockMode? lockMode,
     _is.LockBehavior? lockBehavior,
   }) async {
-    return session.db.findById<OcrUsage>(
+    return session.db.findById<SyncedThemeQuote>(
       id,
       transaction: transaction,
       lockMode: lockMode,
@@ -425,9 +373,9 @@ class OcrUsageRepository {
     );
   }
 
-  /// Inserts all [OcrUsage]s in the list and returns the inserted rows.
+  /// Inserts all [SyncedThemeQuote]s in the list and returns the inserted rows.
   ///
-  /// The returned [OcrUsage]s will have their `id` fields set.
+  /// The returned [SyncedThemeQuote]s will have their `id` fields set.
   ///
   /// This is an atomic operation, meaning that if one of the rows fails to
   /// insert, none of the rows will be inserted.
@@ -439,14 +387,14 @@ class OcrUsageRepository {
   /// If [noReturn] is set to `true`, the inserted rows are not read back from
   /// the database and an empty list is returned. This avoids the overhead of
   /// transferring and deserializing the rows when the result is not needed.
-  Future<List<OcrUsage>> insert(
+  Future<List<SyncedThemeQuote>> insert(
     _is.DatabaseSession session,
-    List<OcrUsage> rows, {
+    List<SyncedThemeQuote> rows, {
     _is.Transaction? transaction,
     bool ignoreConflicts = false,
     bool noReturn = false,
   }) async {
-    return session.db.insert<OcrUsage>(
+    return session.db.insert<SyncedThemeQuote>(
       rows,
       transaction: transaction,
       ignoreConflicts: ignoreConflicts,
@@ -454,21 +402,21 @@ class OcrUsageRepository {
     );
   }
 
-  /// Inserts a single [OcrUsage] and returns the inserted row.
+  /// Inserts a single [SyncedThemeQuote] and returns the inserted row.
   ///
-  /// The returned [OcrUsage] will have its `id` field set.
-  Future<OcrUsage> insertRow(
+  /// The returned [SyncedThemeQuote] will have its `id` field set.
+  Future<SyncedThemeQuote> insertRow(
     _is.DatabaseSession session,
-    OcrUsage row, {
+    SyncedThemeQuote row, {
     _is.Transaction? transaction,
   }) async {
-    return session.db.insertRow<OcrUsage>(
+    return session.db.insertRow<SyncedThemeQuote>(
       row,
       transaction: transaction,
     );
   }
 
-  /// Upserts all [OcrUsage]s in the list and returns the resulting rows.
+  /// Upserts all [SyncedThemeQuote]s in the list and returns the resulting rows.
   ///
   /// If a row conflicts on the given [conflictColumns], the existing row is
   /// updated with the new values. Otherwise, a new row is inserted.
@@ -480,7 +428,7 @@ class OcrUsageRepository {
   /// given expression. Conflicting rows that don't match are skipped and not
   /// returned, so the resulting list may be shorter than [rows].
   ///
-  /// The returned [OcrUsage]s will have their `id` fields set.
+  /// The returned [SyncedThemeQuote]s will have their `id` fields set.
   ///
   /// This is an atomic operation, meaning that if one of the rows fails,
   /// none of the rows will be affected.
@@ -488,26 +436,26 @@ class OcrUsageRepository {
   /// If [noReturn] is set to `true`, the resulting rows are not read back from
   /// the database and an empty list is returned. This avoids the overhead of
   /// transferring and deserializing the rows when the result is not needed.
-  Future<List<OcrUsage>> upsert(
+  Future<List<SyncedThemeQuote>> upsert(
     _is.DatabaseSession session,
-    List<OcrUsage> rows, {
-    required _is.ColumnSelections<OcrUsageTable> conflictColumns,
-    _is.ColumnSelections<OcrUsageTable>? updateColumns,
-    _is.WhereExpressionBuilder<OcrUsageTable>? updateWhere,
+    List<SyncedThemeQuote> rows, {
+    required _is.ColumnSelections<SyncedThemeQuoteTable> conflictColumns,
+    _is.ColumnSelections<SyncedThemeQuoteTable>? updateColumns,
+    _is.WhereExpressionBuilder<SyncedThemeQuoteTable>? updateWhere,
     _is.Transaction? transaction,
     bool noReturn = false,
   }) async {
-    return session.db.upsert<OcrUsage>(
+    return session.db.upsert<SyncedThemeQuote>(
       rows,
-      conflictColumns: conflictColumns(OcrUsage.t),
-      updateColumns: updateColumns?.call(OcrUsage.t),
-      updateWhere: updateWhere?.call(OcrUsage.t),
+      conflictColumns: conflictColumns(SyncedThemeQuote.t),
+      updateColumns: updateColumns?.call(SyncedThemeQuote.t),
+      updateWhere: updateWhere?.call(SyncedThemeQuote.t),
       transaction: transaction,
       noReturn: noReturn,
     );
   }
 
-  /// Upserts a single [OcrUsage] and returns the resulting row.
+  /// Upserts a single [SyncedThemeQuote] and returns the resulting row.
   ///
   /// If the row conflicts on the given [conflictColumns], the existing row is
   /// updated. Otherwise, a new row is inserted.
@@ -519,25 +467,25 @@ class OcrUsageRepository {
   /// row matches the expression. Returns `null` if no row was affected — for
   /// example when [updateWhere] does not match the conflicting row.
   ///
-  /// The returned [OcrUsage] will have its `id` field set.
-  Future<OcrUsage?> upsertRow(
+  /// The returned [SyncedThemeQuote] will have its `id` field set.
+  Future<SyncedThemeQuote?> upsertRow(
     _is.DatabaseSession session,
-    OcrUsage row, {
-    required _is.ColumnSelections<OcrUsageTable> conflictColumns,
-    _is.ColumnSelections<OcrUsageTable>? updateColumns,
-    _is.WhereExpressionBuilder<OcrUsageTable>? updateWhere,
+    SyncedThemeQuote row, {
+    required _is.ColumnSelections<SyncedThemeQuoteTable> conflictColumns,
+    _is.ColumnSelections<SyncedThemeQuoteTable>? updateColumns,
+    _is.WhereExpressionBuilder<SyncedThemeQuoteTable>? updateWhere,
     _is.Transaction? transaction,
   }) async {
-    return session.db.upsertRow<OcrUsage>(
+    return session.db.upsertRow<SyncedThemeQuote>(
       row,
-      conflictColumns: conflictColumns(OcrUsage.t),
-      updateColumns: updateColumns?.call(OcrUsage.t),
-      updateWhere: updateWhere?.call(OcrUsage.t),
+      conflictColumns: conflictColumns(SyncedThemeQuote.t),
+      updateColumns: updateColumns?.call(SyncedThemeQuote.t),
+      updateWhere: updateWhere?.call(SyncedThemeQuote.t),
       transaction: transaction,
     );
   }
 
-  /// Updates all [OcrUsage]s in the list and returns the updated rows. If
+  /// Updates all [SyncedThemeQuote]s in the list and returns the updated rows. If
   /// [columns] is provided, only those columns will be updated. Defaults to
   /// all columns.
   /// This is an atomic operation, meaning that if one of the rows fails to
@@ -546,82 +494,84 @@ class OcrUsageRepository {
   /// If [noReturn] is set to `true`, the updated rows are not read back from
   /// the database and an empty list is returned. This avoids the overhead of
   /// transferring and deserializing the rows when the result is not needed.
-  Future<List<OcrUsage>> update(
+  Future<List<SyncedThemeQuote>> update(
     _is.DatabaseSession session,
-    List<OcrUsage> rows, {
-    _is.ColumnSelections<OcrUsageTable>? columns,
+    List<SyncedThemeQuote> rows, {
+    _is.ColumnSelections<SyncedThemeQuoteTable>? columns,
     _is.Transaction? transaction,
     bool noReturn = false,
   }) async {
-    return session.db.update<OcrUsage>(
+    return session.db.update<SyncedThemeQuote>(
       rows,
-      columns: columns?.call(OcrUsage.t),
+      columns: columns?.call(SyncedThemeQuote.t),
       transaction: transaction,
       noReturn: noReturn,
     );
   }
 
-  /// Updates a single [OcrUsage]. The row needs to have its id set.
+  /// Updates a single [SyncedThemeQuote]. The row needs to have its id set.
   /// Optionally, a list of [columns] can be provided to only update those
   /// columns. Defaults to all columns.
-  Future<OcrUsage> updateRow(
+  Future<SyncedThemeQuote> updateRow(
     _is.DatabaseSession session,
-    OcrUsage row, {
-    _is.ColumnSelections<OcrUsageTable>? columns,
+    SyncedThemeQuote row, {
+    _is.ColumnSelections<SyncedThemeQuoteTable>? columns,
     _is.Transaction? transaction,
   }) async {
-    return session.db.updateRow<OcrUsage>(
+    return session.db.updateRow<SyncedThemeQuote>(
       row,
-      columns: columns?.call(OcrUsage.t),
+      columns: columns?.call(SyncedThemeQuote.t),
       transaction: transaction,
     );
   }
 
-  /// Updates a single [OcrUsage] by its [id] with the specified [columnValues].
+  /// Updates a single [SyncedThemeQuote] by its [id] with the specified [columnValues].
   /// Returns the updated row or null if no row with the given id exists.
-  Future<OcrUsage?> updateById(
+  Future<SyncedThemeQuote?> updateById(
     _is.DatabaseSession session,
     _is.UuidValue id, {
-    required _is.ColumnValueListBuilder<OcrUsageUpdateTable> columnValues,
+    required _is.ColumnValueListBuilder<SyncedThemeQuoteUpdateTable>
+    columnValues,
     _is.Transaction? transaction,
   }) async {
-    return session.db.updateById<OcrUsage>(
+    return session.db.updateById<SyncedThemeQuote>(
       id,
-      columnValues: columnValues(OcrUsage.t.updateTable),
+      columnValues: columnValues(SyncedThemeQuote.t.updateTable),
       transaction: transaction,
     );
   }
 
-  /// Updates all [OcrUsage]s matching the [where] expression with the specified [columnValues].
+  /// Updates all [SyncedThemeQuote]s matching the [where] expression with the specified [columnValues].
   /// Returns the list of updated rows.
   ///
   /// If [noReturn] is set to `true`, the updated rows are not read back from
   /// the database and an empty list is returned. This avoids the overhead of
   /// transferring and deserializing the rows when the result is not needed.
-  Future<List<OcrUsage>> updateWhere(
+  Future<List<SyncedThemeQuote>> updateWhere(
     _is.DatabaseSession session, {
-    required _is.ColumnValueListBuilder<OcrUsageUpdateTable> columnValues,
-    required _is.WhereExpressionBuilder<OcrUsageTable> where,
+    required _is.ColumnValueListBuilder<SyncedThemeQuoteUpdateTable>
+    columnValues,
+    required _is.WhereExpressionBuilder<SyncedThemeQuoteTable> where,
     int? limit,
     int? offset,
-    _is.OrderByBuilder<OcrUsageTable>? orderBy,
-    _is.OrderByListBuilder<OcrUsageTable>? orderByList,
+    _is.OrderByBuilder<SyncedThemeQuoteTable>? orderBy,
+    _is.OrderByListBuilder<SyncedThemeQuoteTable>? orderByList,
     _is.Transaction? transaction,
     bool noReturn = false,
   }) async {
-    return session.db.updateWhere<OcrUsage>(
-      columnValues: columnValues(OcrUsage.t.updateTable),
-      where: where(OcrUsage.t),
+    return session.db.updateWhere<SyncedThemeQuote>(
+      columnValues: columnValues(SyncedThemeQuote.t.updateTable),
+      where: where(SyncedThemeQuote.t),
       limit: limit,
       offset: offset,
-      orderBy: orderBy?.call(OcrUsage.t),
-      orderByList: orderByList?.call(OcrUsage.t),
+      orderBy: orderBy?.call(SyncedThemeQuote.t),
+      orderByList: orderByList?.call(SyncedThemeQuote.t),
       transaction: transaction,
       noReturn: noReturn,
     );
   }
 
-  /// Deletes all [OcrUsage]s in the list and returns the deleted rows.
+  /// Deletes all [SyncedThemeQuote]s in the list and returns the deleted rows.
   ///
   /// To specify the order of the returned rows use [orderBy] or [orderByList]
   /// when sorting by multiple columns.
@@ -632,30 +582,30 @@ class OcrUsageRepository {
   /// If [noReturn] is set to `true`, the deleted rows are not read back from
   /// the database and an empty list is returned. This avoids the overhead of
   /// transferring and deserializing the rows when the result is not needed.
-  Future<List<OcrUsage>> delete(
+  Future<List<SyncedThemeQuote>> delete(
     _is.DatabaseSession session,
-    List<OcrUsage> rows, {
-    _is.OrderByBuilder<OcrUsageTable>? orderBy,
-    _is.OrderByListBuilder<OcrUsageTable>? orderByList,
+    List<SyncedThemeQuote> rows, {
+    _is.OrderByBuilder<SyncedThemeQuoteTable>? orderBy,
+    _is.OrderByListBuilder<SyncedThemeQuoteTable>? orderByList,
     _is.Transaction? transaction,
     bool noReturn = false,
   }) async {
-    return session.db.delete<OcrUsage>(
+    return session.db.delete<SyncedThemeQuote>(
       rows,
-      orderBy: orderBy?.call(OcrUsage.t),
-      orderByList: orderByList?.call(OcrUsage.t),
+      orderBy: orderBy?.call(SyncedThemeQuote.t),
+      orderByList: orderByList?.call(SyncedThemeQuote.t),
       transaction: transaction,
       noReturn: noReturn,
     );
   }
 
-  /// Deletes a single [OcrUsage].
-  Future<OcrUsage> deleteRow(
+  /// Deletes a single [SyncedThemeQuote].
+  Future<SyncedThemeQuote> deleteRow(
     _is.DatabaseSession session,
-    OcrUsage row, {
+    SyncedThemeQuote row, {
     _is.Transaction? transaction,
   }) async {
-    return session.db.deleteRow<OcrUsage>(
+    return session.db.deleteRow<SyncedThemeQuote>(
       row,
       transaction: transaction,
     );
@@ -669,18 +619,18 @@ class OcrUsageRepository {
   /// If [noReturn] is set to `true`, the deleted rows are not read back from
   /// the database and an empty list is returned. This avoids the overhead of
   /// transferring and deserializing the rows when the result is not needed.
-  Future<List<OcrUsage>> deleteWhere(
+  Future<List<SyncedThemeQuote>> deleteWhere(
     _is.DatabaseSession session, {
-    required _is.WhereExpressionBuilder<OcrUsageTable> where,
-    _is.OrderByBuilder<OcrUsageTable>? orderBy,
-    _is.OrderByListBuilder<OcrUsageTable>? orderByList,
+    required _is.WhereExpressionBuilder<SyncedThemeQuoteTable> where,
+    _is.OrderByBuilder<SyncedThemeQuoteTable>? orderBy,
+    _is.OrderByListBuilder<SyncedThemeQuoteTable>? orderByList,
     _is.Transaction? transaction,
     bool noReturn = false,
   }) async {
-    return session.db.deleteWhere<OcrUsage>(
-      where: where(OcrUsage.t),
-      orderBy: orderBy?.call(OcrUsage.t),
-      orderByList: orderByList?.call(OcrUsage.t),
+    return session.db.deleteWhere<SyncedThemeQuote>(
+      where: where(SyncedThemeQuote.t),
+      orderBy: orderBy?.call(SyncedThemeQuote.t),
+      orderByList: orderByList?.call(SyncedThemeQuote.t),
       transaction: transaction,
       noReturn: noReturn,
     );
@@ -690,27 +640,27 @@ class OcrUsageRepository {
   /// will return the count of all rows in the table.
   Future<int> count(
     _is.DatabaseSession session, {
-    _is.WhereExpressionBuilder<OcrUsageTable>? where,
+    _is.WhereExpressionBuilder<SyncedThemeQuoteTable>? where,
     int? limit,
     _is.Transaction? transaction,
   }) async {
-    return session.db.count<OcrUsage>(
-      where: where?.call(OcrUsage.t),
+    return session.db.count<SyncedThemeQuote>(
+      where: where?.call(SyncedThemeQuote.t),
       limit: limit,
       transaction: transaction,
     );
   }
 
-  /// Acquires row-level locks on [OcrUsage] rows matching the [where] expression.
+  /// Acquires row-level locks on [SyncedThemeQuote] rows matching the [where] expression.
   Future<void> lockRows(
     _is.DatabaseSession session, {
-    required _is.WhereExpressionBuilder<OcrUsageTable> where,
+    required _is.WhereExpressionBuilder<SyncedThemeQuoteTable> where,
     required _is.LockMode lockMode,
     required _is.Transaction transaction,
     _is.LockBehavior lockBehavior = _is.LockBehavior.wait,
   }) async {
-    return session.db.lockRows<OcrUsage>(
-      where: where(OcrUsage.t),
+    return session.db.lockRows<SyncedThemeQuote>(
+      where: where(SyncedThemeQuote.t),
       lockMode: lockMode,
       lockBehavior: lockBehavior,
       transaction: transaction,

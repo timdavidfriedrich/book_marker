@@ -1,0 +1,21 @@
+### Which books sit on which shelf.
+###
+### The local table has a composite primary key and no id column, which
+### PowerSync cannot sync, so this one gains a UUID id and keeps the pair unique
+### through an index instead. No keyVersion: there is no ciphertext here.
+class: SyncedShelfBook
+table: shelf_books
+
+fields:
+  id: UuidValue, defaultModel=random, defaultPersist=random
+  ownerId: UuidValue, column=owner_id
+  shelfId: UuidValue, column=shelf_id
+  bookId: UuidValue, column=book_id
+  updatedAt: DateTime, column=updated_at
+
+indexes:
+  shelf_books_owner_idx:
+    fields: ownerId
+  shelf_books_pair_idx:
+    fields: shelfId, bookId
+    unique: true

@@ -24,8 +24,12 @@ import 'entitlements/account_blocked_exception.dart' as _i42k8jky;
 import 'entitlements/entitlement.dart' as _id6kwse3;
 import 'entitlements/entitlement_view.dart' as _ik9sk60n;
 import 'entitlements/ocr_usage.dart' as _i13b5r7e;
-import 'greetings/greeting.dart' as _izw8z7ou;
-import 'sync/sync_probe.dart' as _i8t4kps3;
+import 'sync/book.dart' as _i8t9sm2n;
+import 'sync/quote.dart' as _ivf4v01a;
+import 'sync/shelf.dart' as _ibxgxncl;
+import 'sync/shelf_book.dart' as _isij2asi;
+import 'sync/theme.dart' as _itq42fc1;
+import 'sync/theme_quote.dart' as _ih8stdgt;
 export 'config/client_config.dart';
 export 'config/plan_limits.dart';
 export 'config/recognition_config.dart';
@@ -34,8 +38,12 @@ export 'entitlements/account_blocked_exception.dart';
 export 'entitlements/entitlement.dart';
 export 'entitlements/entitlement_view.dart';
 export 'entitlements/ocr_usage.dart';
-export 'greetings/greeting.dart';
-export 'sync/sync_probe.dart';
+export 'sync/book.dart';
+export 'sync/quote.dart';
+export 'sync/shelf.dart';
+export 'sync/shelf_book.dart';
+export 'sync/theme.dart';
+export 'sync/theme_quote.dart';
 export 'client.dart';
 
 class Protocol extends _isc.SerializationManager {
@@ -96,11 +104,23 @@ class Protocol extends _isc.SerializationManager {
     if (t == _i13b5r7e.OcrUsage) {
       return _i13b5r7e.OcrUsage.fromJson(data) as T;
     }
-    if (t == _izw8z7ou.Greeting) {
-      return _izw8z7ou.Greeting.fromJson(data) as T;
+    if (t == _i8t9sm2n.SyncedBook) {
+      return _i8t9sm2n.SyncedBook.fromJson(data) as T;
     }
-    if (t == _i8t4kps3.SyncProbe) {
-      return _i8t4kps3.SyncProbe.fromJson(data) as T;
+    if (t == _ivf4v01a.SyncedQuote) {
+      return _ivf4v01a.SyncedQuote.fromJson(data) as T;
+    }
+    if (t == _ibxgxncl.SyncedShelf) {
+      return _ibxgxncl.SyncedShelf.fromJson(data) as T;
+    }
+    if (t == _isij2asi.SyncedShelfBook) {
+      return _isij2asi.SyncedShelfBook.fromJson(data) as T;
+    }
+    if (t == _itq42fc1.SyncedTheme) {
+      return _itq42fc1.SyncedTheme.fromJson(data) as T;
+    }
+    if (t == _ih8stdgt.SyncedThemeQuote) {
+      return _ih8stdgt.SyncedThemeQuote.fromJson(data) as T;
     }
     if (t == _isc.getType<_ikmgnzhy.ClientConfig?>()) {
       return (data != null ? _ikmgnzhy.ClientConfig.fromJson(data) : null) as T;
@@ -132,11 +152,25 @@ class Protocol extends _isc.SerializationManager {
     if (t == _isc.getType<_i13b5r7e.OcrUsage?>()) {
       return (data != null ? _i13b5r7e.OcrUsage.fromJson(data) : null) as T;
     }
-    if (t == _isc.getType<_izw8z7ou.Greeting?>()) {
-      return (data != null ? _izw8z7ou.Greeting.fromJson(data) : null) as T;
+    if (t == _isc.getType<_i8t9sm2n.SyncedBook?>()) {
+      return (data != null ? _i8t9sm2n.SyncedBook.fromJson(data) : null) as T;
     }
-    if (t == _isc.getType<_i8t4kps3.SyncProbe?>()) {
-      return (data != null ? _i8t4kps3.SyncProbe.fromJson(data) : null) as T;
+    if (t == _isc.getType<_ivf4v01a.SyncedQuote?>()) {
+      return (data != null ? _ivf4v01a.SyncedQuote.fromJson(data) : null) as T;
+    }
+    if (t == _isc.getType<_ibxgxncl.SyncedShelf?>()) {
+      return (data != null ? _ibxgxncl.SyncedShelf.fromJson(data) : null) as T;
+    }
+    if (t == _isc.getType<_isij2asi.SyncedShelfBook?>()) {
+      return (data != null ? _isij2asi.SyncedShelfBook.fromJson(data) : null)
+          as T;
+    }
+    if (t == _isc.getType<_itq42fc1.SyncedTheme?>()) {
+      return (data != null ? _itq42fc1.SyncedTheme.fromJson(data) : null) as T;
+    }
+    if (t == _isc.getType<_ih8stdgt.SyncedThemeQuote?>()) {
+      return (data != null ? _ih8stdgt.SyncedThemeQuote.fromJson(data) : null)
+          as T;
     }
     try {
       return _iaic.Protocol().deserialize<T>(data, t);
@@ -157,8 +191,12 @@ class Protocol extends _isc.SerializationManager {
       _id6kwse3.Entitlement => 'Entitlement',
       _ik9sk60n.EntitlementView => 'EntitlementView',
       _i13b5r7e.OcrUsage => 'OcrUsage',
-      _izw8z7ou.Greeting => 'Greeting',
-      _i8t4kps3.SyncProbe => 'SyncProbe',
+      _i8t9sm2n.SyncedBook => 'SyncedBook',
+      _ivf4v01a.SyncedQuote => 'SyncedQuote',
+      _ibxgxncl.SyncedShelf => 'SyncedShelf',
+      _isij2asi.SyncedShelfBook => 'SyncedShelfBook',
+      _itq42fc1.SyncedTheme => 'SyncedTheme',
+      _ih8stdgt.SyncedThemeQuote => 'SyncedThemeQuote',
       _ => null,
     };
   }
@@ -189,10 +227,18 @@ class Protocol extends _isc.SerializationManager {
         return 'EntitlementView';
       case _i13b5r7e.OcrUsage():
         return 'OcrUsage';
-      case _izw8z7ou.Greeting():
-        return 'Greeting';
-      case _i8t4kps3.SyncProbe():
-        return 'SyncProbe';
+      case _i8t9sm2n.SyncedBook():
+        return 'SyncedBook';
+      case _ivf4v01a.SyncedQuote():
+        return 'SyncedQuote';
+      case _ibxgxncl.SyncedShelf():
+        return 'SyncedShelf';
+      case _isij2asi.SyncedShelfBook():
+        return 'SyncedShelfBook';
+      case _itq42fc1.SyncedTheme():
+        return 'SyncedTheme';
+      case _ih8stdgt.SyncedThemeQuote():
+        return 'SyncedThemeQuote';
     }
     className = _iaic.Protocol().getClassNameForObject(data);
     if (className != null) {
@@ -239,11 +285,23 @@ class Protocol extends _isc.SerializationManager {
     if (dataClassName == 'OcrUsage') {
       return deserialize<_i13b5r7e.OcrUsage>(data['data']);
     }
-    if (dataClassName == 'Greeting') {
-      return deserialize<_izw8z7ou.Greeting>(data['data']);
+    if (dataClassName == 'SyncedBook') {
+      return deserialize<_i8t9sm2n.SyncedBook>(data['data']);
     }
-    if (dataClassName == 'SyncProbe') {
-      return deserialize<_i8t4kps3.SyncProbe>(data['data']);
+    if (dataClassName == 'SyncedQuote') {
+      return deserialize<_ivf4v01a.SyncedQuote>(data['data']);
+    }
+    if (dataClassName == 'SyncedShelf') {
+      return deserialize<_ibxgxncl.SyncedShelf>(data['data']);
+    }
+    if (dataClassName == 'SyncedShelfBook') {
+      return deserialize<_isij2asi.SyncedShelfBook>(data['data']);
+    }
+    if (dataClassName == 'SyncedTheme') {
+      return deserialize<_itq42fc1.SyncedTheme>(data['data']);
+    }
+    if (dataClassName == 'SyncedThemeQuote') {
+      return deserialize<_ih8stdgt.SyncedThemeQuote>(data['data']);
     }
     if (dataClassName.startsWith('serverpod_auth_idp.')) {
       data['className'] = dataClassName.substring(19);

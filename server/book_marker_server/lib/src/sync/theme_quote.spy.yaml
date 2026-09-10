@@ -1,0 +1,17 @@
+### Which quotes belong to which theme. Same reasoning as shelf_books.
+class: SyncedThemeQuote
+table: theme_quotes
+
+fields:
+  id: UuidValue, defaultModel=random, defaultPersist=random
+  ownerId: UuidValue, column=owner_id
+  themeId: UuidValue, column=theme_id
+  quoteId: UuidValue, column=quote_id
+  updatedAt: DateTime, column=updated_at
+
+indexes:
+  theme_quotes_owner_idx:
+    fields: ownerId
+  theme_quotes_pair_idx:
+    fields: themeId, quoteId
+    unique: true

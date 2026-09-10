@@ -21,7 +21,6 @@ import '../auth/jwt_refresh_endpoint.dart' as _inwq3ztq;
 import '../endpoints/config_endpoint.dart' as _i74a5xur;
 import '../endpoints/entitlement_endpoint.dart' as _im71ml4a;
 import '../endpoints/power_sync_endpoint.dart' as _i61fa217;
-import '../greetings/greeting_endpoint.dart' as _il624ik7;
 
 class Endpoints extends _is.EndpointDispatch {
   @override
@@ -61,12 +60,6 @@ class Endpoints extends _is.EndpointDispatch {
         ..initialize(
           server,
           'powerSync',
-          null,
-        ),
-      'greeting': _il624ik7.GreetingEndpoint()
-        ..initialize(
-          server,
-          'greeting',
           null,
         ),
     };
@@ -294,31 +287,6 @@ class Endpoints extends _is.EndpointDispatch {
                 Map<String, dynamic> params,
               ) async => (endpoints['powerSync'] as _i61fa217.PowerSyncEndpoint)
                   .createToken(session),
-        ),
-      },
-    );
-    connectors['greeting'] = _is.EndpointConnector(
-      name: 'greeting',
-      endpoint: endpoints['greeting']!,
-      methodConnectors: {
-        'hello': _is.MethodConnector(
-          name: 'hello',
-          params: {
-            'name': _is.ParameterDescription(
-              name: 'name',
-              type: _is.getType<String>(),
-              nullable: false,
-            ),
-          },
-          call:
-              (
-                _is.Session session,
-                Map<String, dynamic> params,
-              ) async =>
-                  (endpoints['greeting'] as _il624ik7.GreetingEndpoint).hello(
-                    session,
-                    params['name'],
-                  ),
         ),
       },
     );

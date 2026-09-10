@@ -1,0 +1,32 @@
+### A quote. Every word of it is ciphertext, including the page numbers and the
+### recognised word boxes, which would otherwise leak the shape of the text.
+###
+### There is deliberately NO foreign key to books. PowerSync replicates rows
+### independently and a batch can carry a quote whose book the server has not
+### seen yet; a constraint would reject the write instead of storing an opaque
+### string. Referential integrity is kept on the device, where the cascades are.
+class: SyncedQuote
+table: quotes
+
+fields:
+  id: UuidValue, defaultModel=random, defaultPersist=random
+  ownerId: UuidValue, column=owner_id
+  bookId: UuidValue, column=book_id
+  isFavorite: bool, default=false, column=is_favorite
+  createdAt: DateTime, column=created_at
+  updatedAt: DateTime, column=updated_at
+  keyVersion: int, default=1, column=key_version
+  quoteCipher: String, column=quote_cipher
+  noteCipher: String?, column=note_cipher
+  pageNumbersCipher: String, column=page_numbers_cipher
+  pagesCipher: String, column=pages_cipher
+  wordsCipher: String, column=words_cipher
+  markedWordIndexesCipher: String, column=marked_word_indexes_cipher
+  ### Duration and the id of the local recording, encrypted together.
+  voiceNoteCipher: String?, column=voice_note_cipher
+
+indexes:
+  quotes_owner_idx:
+    fields: ownerId
+  quotes_book_idx:
+    fields: bookId

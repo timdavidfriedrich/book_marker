@@ -22,13 +22,16 @@ ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT SELECT ON TABLES TO powersync_ro
 --
 --    Explicit table list, NOT "FOR ALL TABLES". Replicating everything would
 --    pull Serverpod's auth and session tables, migration bookkeeping, the OCR
---    usage log and (later) attachment bytes into the sync buckets.
+--    usage log and (later) attachment bytes into the sync buckets. A bare
+--    scaffold has 34 tables; this publication covers seven.
 --
---    Phase 1 has only the probe table. As each real table lands in phase 4:
---      ALTER PUBLICATION powersync ADD TABLE books;
---    and drop the probe:
---      ALTER PUBLICATION powersync DROP TABLE sync_probes;
-CREATE PUBLICATION powersync FOR TABLE sync_probes, entitlements;
+--    A DESTRUCTIVE migration silently drops its table from the publication,
+--    because it recreates the table, and sync then goes quiet with no error
+--    anywhere. After any `create-migration --force`, run:
+--      ALTER PUBLICATION powersync ADD TABLE <t>;
+--    and check the grant with has_table_privilege('powersync_role', ...).
+CREATE PUBLICATION powersync FOR TABLE
+  books, quotes, shelves, themes, shelf_books, theme_quotes, entitlements;
 
 -- 3. PowerSync's bucket storage lives in its own database. It will NOT create
 --    this for you.

@@ -15,8 +15,6 @@ import 'package:book_marker_client/src/protocol/config/runtime_config.dart'
     as _i0ksu74t;
 import 'package:book_marker_client/src/protocol/entitlements/entitlement_view.dart'
     as _i54kjtar;
-import 'package:book_marker_client/src/protocol/greetings/greeting.dart'
-    as _iistozr7;
 import 'package:http/http.dart' as _i85jenna;
 import 'package:serverpod_auth_core_client/serverpod_auth_core_client.dart'
     as _iacc;
@@ -241,24 +239,6 @@ class EndpointPowerSync extends _isc.EndpointRef {
   );
 }
 
-/// This is an example endpoint that returns a greeting message through
-/// its [hello] method.
-/// {@category Endpoint}
-class EndpointGreeting extends _isc.EndpointRef {
-  EndpointGreeting(_isc.EndpointCaller caller) : super(caller);
-
-  @override
-  String get name => 'greeting';
-
-  /// Returns a personalized greeting message: "Hello {name}".
-  _ida.Future<_iistozr7.Greeting> hello(String name) =>
-      caller.callServerEndpoint<_iistozr7.Greeting>(
-        'greeting',
-        'hello',
-        {'name': name},
-      );
-}
-
 class Modules {
   Modules(Client client) {
     serverpod_auth_idp = _iaic.Caller(client);
@@ -303,7 +283,6 @@ class Client extends _isc.ServerpodClientShared {
     config = EndpointConfig(this);
     entitlement = EndpointEntitlement(this);
     powerSync = EndpointPowerSync(this);
-    greeting = EndpointGreeting(this);
     modules = Modules(this);
   }
 
@@ -319,8 +298,6 @@ class Client extends _isc.ServerpodClientShared {
 
   late final EndpointPowerSync powerSync;
 
-  late final EndpointGreeting greeting;
-
   late final Modules modules;
 
   @override
@@ -331,7 +308,6 @@ class Client extends _isc.ServerpodClientShared {
     'config': config,
     'entitlement': entitlement,
     'powerSync': powerSync,
-    'greeting': greeting,
   };
 
   @override
