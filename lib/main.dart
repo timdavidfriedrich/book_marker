@@ -3,6 +3,8 @@ import 'package:book_marker/src/navigation/navigation_router.dart';
 import 'package:book_marker/src/settings/app_settings_cubit.dart';
 import 'package:book_marker/src/theme/app_theme.dart';
 import 'package:core/theme/theme_extensions.dart';
+import 'package:feature_account/presentation/account/account_bloc.dart';
+import 'package:feature_account/presentation/account/account_event.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -28,6 +30,7 @@ class const App({
       providers: [
         BlocProvider(create: (_) => sl<AppSettingsCubit>()..start()),
         BlocProvider(create: (_) => sl<VoiceNoteCubit>()),
+        BlocProvider(create: (_) => sl<AccountBloc>()..add(const AccountStarted())),
       ],
       child: BlocBuilder<AppSettingsCubit, UserSettings>(
         builder: (context, settings) {

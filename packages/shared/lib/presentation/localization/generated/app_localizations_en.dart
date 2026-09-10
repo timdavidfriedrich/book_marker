@@ -822,4 +822,26 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get errorSignInCancelled => 'Cancelled. Nothing changed.';
+
+  @override
+  String get signInTitle => 'Secure your data';
+
+  @override
+  String get signInLead =>
+      'Your library sits encrypted on the server. You will not notice it day to day. You only need the code from the next step when restoring on a new device.';
+
+  @override
+  String get signInWithGoogle => 'Continue with Google';
+
+  @override
+  String get signInWithApple => 'Continue with Apple';
+
+  @override
+  String get signInRetry => 'Try again';
+
+  @override
+  String get signInCancel => 'Cancel';
+
+  @override
+  String get signInInProgress => 'Signing in…';
 }

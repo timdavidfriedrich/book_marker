@@ -30,7 +30,7 @@ dependencies:
   feature_library:
   feature_themes:
   feature_settings:
-  feature_account:
+  feature_account: ^0.0.1
   flutter_bloc: ^9.1.1
   get_it: ^9.2.1
   kaisel: ^1.1.0

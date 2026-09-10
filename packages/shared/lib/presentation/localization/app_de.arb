@@ -273,5 +273,12 @@
   "showMore": "mehr anzeigen",
   "showLess": "weniger anzeigen",
   "errorAccountBlocked": "Konto gesperrt. Sync und Cloud-OCR sind angehalten.",
-  "errorSignInCancelled": "Abgebrochen. Es hat sich nichts geändert."
+  "errorSignInCancelled": "Abgebrochen. Es hat sich nichts geändert.",
+  "signInTitle": "Daten sichern",
+  "signInLead": "Deine Bibliothek liegt verschlüsselt auf dem Server. Im Alltag merkst du davon nichts. Den Code aus dem nächsten Schritt brauchst du nur, wenn du sie auf einem neuen Gerät wiederherstellst.",
+  "signInWithGoogle": "Mit Google anmelden",
+  "signInWithApple": "Mit Apple anmelden",
+  "signInRetry": "Erneut versuchen",
+  "signInCancel": "Abbrechen",
+  "signInInProgress": "Anmelden…"
 }

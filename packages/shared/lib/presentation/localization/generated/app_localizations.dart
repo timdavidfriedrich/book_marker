@@ -1388,6 +1388,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Cancelled. Nothing changed.'**
   String get errorSignInCancelled;
+
+  /// No description provided for @signInTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Secure your data'**
+  String get signInTitle;
+
+  /// No description provided for @signInLead.
+  ///
+  /// In en, this message translates to:
+  /// **'Your library sits encrypted on the server. You will not notice it day to day. You only need the code from the next step when restoring on a new device.'**
+  String get signInLead;
+
+  /// No description provided for @signInWithGoogle.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue with Google'**
+  String get signInWithGoogle;
+
+  /// No description provided for @signInWithApple.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue with Apple'**
+  String get signInWithApple;
+
+  /// No description provided for @signInRetry.
+  ///
+  /// In en, this message translates to:
+  /// **'Try again'**
+  String get signInRetry;
+
+  /// No description provided for @signInCancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get signInCancel;
+
+  /// No description provided for @signInInProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'Signing in…'**
+  String get signInInProgress;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

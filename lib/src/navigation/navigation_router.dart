@@ -1,6 +1,7 @@
 import 'package:book_marker/src/di/service_locator.dart';
 import 'package:book_marker/src/navigation/navigation_shell_container.dart';
 import 'package:book_marker/src/theme/app_theme.dart';
+import 'package:feature_account/presentation/sign_in/sign_in_screen.dart';
 import 'package:feature_capture/presentation/add_book/add_book_bloc.dart';
 import 'package:feature_capture/presentation/add_book/add_book_event.dart';
 import 'package:feature_capture/presentation/add_book/add_book_screen.dart';
@@ -81,6 +82,7 @@ class const _AppPage({
       create: (_) => sl<ThemeDetailBloc>(param1: themeId)..add(const ThemeDetailStarted()),
       child: const ThemeDetailScreen(),
     ),
+    SignIn() => const SignInScreen(),
     Settings() => BlocProvider(
       create: (_) => sl<SettingsBloc>()..add(const SettingsStarted()),
       child: const SettingsScreen(),

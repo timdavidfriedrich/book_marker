@@ -439,5 +439,12 @@
   "showMore": "show more",
   "showLess": "show less",
   "errorAccountBlocked": "Account suspended. Sync and cloud OCR are paused.",
-  "errorSignInCancelled": "Cancelled. Nothing changed."
+  "errorSignInCancelled": "Cancelled. Nothing changed.",
+  "signInTitle": "Secure your data",
+  "signInLead": "Your library sits encrypted on the server. You will not notice it day to day. You only need the code from the next step when restoring on a new device.",
+  "signInWithGoogle": "Continue with Google",
+  "signInWithApple": "Continue with Apple",
+  "signInRetry": "Try again",
+  "signInCancel": "Cancel",
+  "signInInProgress": "Signing in…"
 }

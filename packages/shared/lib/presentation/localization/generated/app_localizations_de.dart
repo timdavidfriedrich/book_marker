@@ -827,4 +827,26 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get errorSignInCancelled => 'Abgebrochen. Es hat sich nichts geändert.';
+
+  @override
+  String get signInTitle => 'Daten sichern';
+
+  @override
+  String get signInLead =>
+      'Deine Bibliothek liegt verschlüsselt auf dem Server. Im Alltag merkst du davon nichts. Den Code aus dem nächsten Schritt brauchst du nur, wenn du sie auf einem neuen Gerät wiederherstellst.';
+
+  @override
+  String get signInWithGoogle => 'Mit Google anmelden';
+
+  @override
+  String get signInWithApple => 'Mit Apple anmelden';
+
+  @override
+  String get signInRetry => 'Erneut versuchen';
+
+  @override
+  String get signInCancel => 'Abbrechen';
+
+  @override
+  String get signInInProgress => 'Anmelden…';
 }

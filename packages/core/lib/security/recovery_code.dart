@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'dart:typed_data';
 
 // * Crockford base32: no I, L, O or U, so 1/I/L and 0/O cannot be confused and
@@ -14,6 +15,7 @@ const _crcSeed = 0xFFFFFFFF;
 const _byteMask = 0xFF;
 const _bitsPerByte = 8;
 const _symbolMask = 0x1F;
+const _byteRange = 256;
 
 class const RecoveryCode({
   required final Uint8List key,
@@ -21,6 +23,11 @@ class const RecoveryCode({
 }) {
   static const int groupCount = _groupCount;
   static const int groupSize = _groupSize;
+
+  static RecoveryCode generate() {
+    final random = Random.secure();
+    return fromKey(Uint8List.fromList(List.generate(_keyBytes, (_) => random.nextInt(_byteRange))));
+  }
 
   static RecoveryCode fromKey(Uint8List key) {
     final payload = Uint8List(_keyBytes + _checksumBytes)

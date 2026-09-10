@@ -236,7 +236,8 @@ class $BooksTable extends Books with TableInfo<$BooksTable, LocalBook> {
     return $BooksTable(attachedDatabase, alias);
   }
 
-  static TypeConverter<List<String>, String> $converterauthors = const StringListConverter();
+  static TypeConverter<List<String>, String> $converterauthors =
+      const StringListConverter();
 }
 
 class LocalBook extends DataClass implements Insertable<LocalBook> {
@@ -294,7 +295,9 @@ class LocalBook extends DataClass implements Insertable<LocalBook> {
       thumbnailUrl: thumbnailUrl == null && nullToAbsent
           ? const Value.absent()
           : Value(thumbnailUrl),
-      coverPath: coverPath == null && nullToAbsent ? const Value.absent() : Value(coverPath),
+      coverPath: coverPath == null && nullToAbsent
+          ? const Value.absent()
+          : Value(coverPath),
       status: Value(status),
       createdAt: Value(createdAt),
       lastUsedAt: Value(lastUsedAt),
@@ -361,11 +364,15 @@ class LocalBook extends DataClass implements Insertable<LocalBook> {
       title: data.title.present ? data.title.value : this.title,
       authors: data.authors.present ? data.authors.value : this.authors,
       isbn: data.isbn.present ? data.isbn.value : this.isbn,
-      thumbnailUrl: data.thumbnailUrl.present ? data.thumbnailUrl.value : this.thumbnailUrl,
+      thumbnailUrl: data.thumbnailUrl.present
+          ? data.thumbnailUrl.value
+          : this.thumbnailUrl,
       coverPath: data.coverPath.present ? data.coverPath.value : this.coverPath,
       status: data.status.present ? data.status.value : this.status,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
-      lastUsedAt: data.lastUsedAt.present ? data.lastUsedAt.value : this.lastUsedAt,
+      lastUsedAt: data.lastUsedAt.present
+          ? data.lastUsedAt.value
+          : this.lastUsedAt,
     );
   }
 
@@ -623,9 +630,8 @@ class $QuotesTable extends Quotes with TableInfo<$QuotesTable, LocalQuote> {
     type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
-  static const VerificationMeta _voiceNoteDurationMsMeta = const VerificationMeta(
-    'voiceNoteDurationMs',
-  );
+  static const VerificationMeta _voiceNoteDurationMsMeta =
+      const VerificationMeta('voiceNoteDurationMs');
   @override
   late final GeneratedColumn<int> voiceNoteDurationMs = GeneratedColumn<int>(
     'voice_note_duration_ms',
@@ -644,25 +650,25 @@ class $QuotesTable extends Quotes with TableInfo<$QuotesTable, LocalQuote> {
         requiredDuringInsert: true,
       ).withConverter<List<QuotePage>>($QuotesTable.$converterpages);
   @override
-  late final GeneratedColumnWithTypeConverter<List<RecognizedWord>, String> words =
-      GeneratedColumn<String>(
-        'words',
-        aliasedName,
-        false,
-        type: DriftSqlType.string,
-        requiredDuringInsert: false,
-        defaultValue: const Constant(_emptyJsonList),
-      ).withConverter<List<RecognizedWord>>($QuotesTable.$converterwords);
+  late final GeneratedColumnWithTypeConverter<List<RecognizedWord>, String>
+  words = GeneratedColumn<String>(
+    'words',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(_emptyJsonList),
+  ).withConverter<List<RecognizedWord>>($QuotesTable.$converterwords);
   @override
-  late final GeneratedColumnWithTypeConverter<List<int>, String> markedWordIndexes =
-      GeneratedColumn<String>(
-        'marked_word_indexes',
-        aliasedName,
-        false,
-        type: DriftSqlType.string,
-        requiredDuringInsert: false,
-        defaultValue: const Constant(_emptyJsonList),
-      ).withConverter<List<int>>($QuotesTable.$convertermarkedWordIndexes);
+  late final GeneratedColumnWithTypeConverter<List<int>, String>
+  markedWordIndexes = GeneratedColumn<String>(
+    'marked_word_indexes',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(_emptyJsonList),
+  ).withConverter<List<int>>($QuotesTable.$convertermarkedWordIndexes);
   static const VerificationMeta _isFavoriteMeta = const VerificationMeta(
     'isFavorite',
   );
@@ -848,11 +854,14 @@ class $QuotesTable extends Quotes with TableInfo<$QuotesTable, LocalQuote> {
     return $QuotesTable(attachedDatabase, alias);
   }
 
-  static TypeConverter<List<int>, String> $converterpageNumbers = const IntListConverter();
-  static TypeConverter<List<QuotePage>, String> $converterpages = const QuotePageListConverter();
+  static TypeConverter<List<int>, String> $converterpageNumbers =
+      const IntListConverter();
+  static TypeConverter<List<QuotePage>, String> $converterpages =
+      const QuotePageListConverter();
   static TypeConverter<List<RecognizedWord>, String> $converterwords =
       const RecognizedWordListConverter();
-  static TypeConverter<List<int>, String> $convertermarkedWordIndexes = const IntListConverter();
+  static TypeConverter<List<int>, String> $convertermarkedWordIndexes =
+      const IntListConverter();
 }
 
 class LocalQuote extends DataClass implements Insertable<LocalQuote> {
@@ -1005,7 +1014,9 @@ class LocalQuote extends DataClass implements Insertable<LocalQuote> {
     pageNumbers: pageNumbers ?? this.pageNumbers,
     quote: quote ?? this.quote,
     note: note.present ? note.value : this.note,
-    voiceNotePath: voiceNotePath.present ? voiceNotePath.value : this.voiceNotePath,
+    voiceNotePath: voiceNotePath.present
+        ? voiceNotePath.value
+        : this.voiceNotePath,
     voiceNoteDurationMs: voiceNoteDurationMs.present
         ? voiceNoteDurationMs.value
         : this.voiceNoteDurationMs,
@@ -1019,10 +1030,14 @@ class LocalQuote extends DataClass implements Insertable<LocalQuote> {
     return LocalQuote(
       id: data.id.present ? data.id.value : this.id,
       bookId: data.bookId.present ? data.bookId.value : this.bookId,
-      pageNumbers: data.pageNumbers.present ? data.pageNumbers.value : this.pageNumbers,
+      pageNumbers: data.pageNumbers.present
+          ? data.pageNumbers.value
+          : this.pageNumbers,
       quote: data.quote.present ? data.quote.value : this.quote,
       note: data.note.present ? data.note.value : this.note,
-      voiceNotePath: data.voiceNotePath.present ? data.voiceNotePath.value : this.voiceNotePath,
+      voiceNotePath: data.voiceNotePath.present
+          ? data.voiceNotePath.value
+          : this.voiceNotePath,
       voiceNoteDurationMs: data.voiceNoteDurationMs.present
           ? data.voiceNoteDurationMs.value
           : this.voiceNoteDurationMs,
@@ -1031,7 +1046,9 @@ class LocalQuote extends DataClass implements Insertable<LocalQuote> {
       markedWordIndexes: data.markedWordIndexes.present
           ? data.markedWordIndexes.value
           : this.markedWordIndexes,
-      isFavorite: data.isFavorite.present ? data.isFavorite.value : this.isFavorite,
+      isFavorite: data.isFavorite.present
+          ? data.isFavorite.value
+          : this.isFavorite,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
     );
   }
@@ -1159,7 +1176,8 @@ class QuotesCompanion extends UpdateCompanion<LocalQuote> {
       if (quote != null) 'quote': quote,
       if (note != null) 'note': note,
       if (voiceNotePath != null) 'voice_note_path': voiceNotePath,
-      if (voiceNoteDurationMs != null) 'voice_note_duration_ms': voiceNoteDurationMs,
+      if (voiceNoteDurationMs != null)
+        'voice_note_duration_ms': voiceNoteDurationMs,
       if (pages != null) 'pages': pages,
       if (words != null) 'words': words,
       if (markedWordIndexes != null) 'marked_word_indexes': markedWordIndexes,
@@ -1444,8 +1462,12 @@ class LocalTheme extends DataClass implements Insertable<LocalTheme> {
     return ThemesCompanion(
       id: Value(id),
       name: Value(name),
-      accent: accent == null && nullToAbsent ? const Value.absent() : Value(accent),
-      symbol: symbol == null && nullToAbsent ? const Value.absent() : Value(symbol),
+      accent: accent == null && nullToAbsent
+          ? const Value.absent()
+          : Value(accent),
+      symbol: symbol == null && nullToAbsent
+          ? const Value.absent()
+          : Value(symbol),
       createdAt: Value(createdAt),
     );
   }
@@ -1622,7 +1644,8 @@ class ThemesCompanion extends UpdateCompanion<LocalTheme> {
   }
 }
 
-class $ThemeQuotesTable extends ThemeQuotes with TableInfo<$ThemeQuotesTable, LocalThemeQuote> {
+class $ThemeQuotesTable extends ThemeQuotes
+    with TableInfo<$ThemeQuotesTable, LocalThemeQuote> {
   @override
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
@@ -1749,10 +1772,11 @@ class LocalThemeQuote extends DataClass implements Insertable<LocalThemeQuote> {
     };
   }
 
-  LocalThemeQuote copyWith({String? themeId, String? quoteId}) => LocalThemeQuote(
-    themeId: themeId ?? this.themeId,
-    quoteId: quoteId ?? this.quoteId,
-  );
+  LocalThemeQuote copyWith({String? themeId, String? quoteId}) =>
+      LocalThemeQuote(
+        themeId: themeId ?? this.themeId,
+        quoteId: quoteId ?? this.quoteId,
+      );
   LocalThemeQuote copyWithCompanion(ThemeQuotesCompanion data) {
     return LocalThemeQuote(
       themeId: data.themeId.present ? data.themeId.value : this.themeId,
@@ -1774,7 +1798,9 @@ class LocalThemeQuote extends DataClass implements Insertable<LocalThemeQuote> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      (other is LocalThemeQuote && other.themeId == this.themeId && other.quoteId == this.quoteId);
+      (other is LocalThemeQuote &&
+          other.themeId == this.themeId &&
+          other.quoteId == this.quoteId);
 }
 
 class ThemeQuotesCompanion extends UpdateCompanion<LocalThemeQuote> {
@@ -2011,8 +2037,12 @@ class LocalShelf extends DataClass implements Insertable<LocalShelf> {
     return ShelvesCompanion(
       id: Value(id),
       name: Value(name),
-      accent: accent == null && nullToAbsent ? const Value.absent() : Value(accent),
-      symbol: symbol == null && nullToAbsent ? const Value.absent() : Value(symbol),
+      accent: accent == null && nullToAbsent
+          ? const Value.absent()
+          : Value(accent),
+      symbol: symbol == null && nullToAbsent
+          ? const Value.absent()
+          : Value(symbol),
       createdAt: Value(createdAt),
     );
   }
@@ -2189,7 +2219,8 @@ class ShelvesCompanion extends UpdateCompanion<LocalShelf> {
   }
 }
 
-class $ShelfBooksTable extends ShelfBooks with TableInfo<$ShelfBooksTable, LocalShelfBook> {
+class $ShelfBooksTable extends ShelfBooks
+    with TableInfo<$ShelfBooksTable, LocalShelfBook> {
   @override
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
@@ -2336,7 +2367,9 @@ class LocalShelfBook extends DataClass implements Insertable<LocalShelfBook> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      (other is LocalShelfBook && other.shelfId == this.shelfId && other.bookId == this.bookId);
+      (other is LocalShelfBook &&
+          other.shelfId == this.shelfId &&
+          other.bookId == this.bookId);
 }
 
 class ShelfBooksCompanion extends UpdateCompanion<LocalShelfBook> {
@@ -2404,7 +2437,8 @@ class ShelfBooksCompanion extends UpdateCompanion<LocalShelfBook> {
   }
 }
 
-class $SettingsTableTable extends SettingsTable with TableInfo<$SettingsTableTable, LocalSettings> {
+class $SettingsTableTable extends SettingsTable
+    with TableInfo<$SettingsTableTable, LocalSettings> {
   @override
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
@@ -2452,17 +2486,17 @@ class $SettingsTableTable extends SettingsTable with TableInfo<$SettingsTableTab
     type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
-  static const VerificationMeta _contrastPreferenceMeta = const VerificationMeta(
-    'contrastPreference',
-  );
+  static const VerificationMeta _contrastPreferenceMeta =
+      const VerificationMeta('contrastPreference');
   @override
-  late final GeneratedColumn<String> contrastPreference = GeneratedColumn<String>(
-    'contrast_preference',
-    aliasedName,
-    true,
-    type: DriftSqlType.string,
-    requiredDuringInsert: false,
-  );
+  late final GeneratedColumn<String> contrastPreference =
+      GeneratedColumn<String>(
+        'contrast_preference',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+      );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -2595,7 +2629,9 @@ class LocalSettings extends DataClass implements Insertable<LocalSettings> {
   SettingsTableCompanion toCompanion(bool nullToAbsent) {
     return SettingsTableCompanion(
       id: Value(id),
-      displayName: displayName == null && nullToAbsent ? const Value.absent() : Value(displayName),
+      displayName: displayName == null && nullToAbsent
+          ? const Value.absent()
+          : Value(displayName),
       localePreference: localePreference == null && nullToAbsent
           ? const Value.absent()
           : Value(localePreference),
@@ -2644,8 +2680,12 @@ class LocalSettings extends DataClass implements Insertable<LocalSettings> {
   }) => LocalSettings(
     id: id ?? this.id,
     displayName: displayName.present ? displayName.value : this.displayName,
-    localePreference: localePreference.present ? localePreference.value : this.localePreference,
-    themePreference: themePreference.present ? themePreference.value : this.themePreference,
+    localePreference: localePreference.present
+        ? localePreference.value
+        : this.localePreference,
+    themePreference: themePreference.present
+        ? themePreference.value
+        : this.themePreference,
     contrastPreference: contrastPreference.present
         ? contrastPreference.value
         : this.contrastPreference,
@@ -2653,7 +2693,9 @@ class LocalSettings extends DataClass implements Insertable<LocalSettings> {
   LocalSettings copyWithCompanion(SettingsTableCompanion data) {
     return LocalSettings(
       id: data.id.present ? data.id.value : this.id,
-      displayName: data.displayName.present ? data.displayName.value : this.displayName,
+      displayName: data.displayName.present
+          ? data.displayName.value
+          : this.displayName,
       localePreference: data.localePreference.present
           ? data.localePreference.value
           : this.localePreference,
@@ -2871,7 +2913,8 @@ typedef $$BooksTableUpdateCompanionBuilder = BooksCompanion Function({
   Value<int> rowid,
 });
 
-final class $$BooksTableReferences extends BaseReferences<_$AppDatabase, $BooksTable, LocalBook> {
+final class $$BooksTableReferences
+    extends BaseReferences<_$AppDatabase, $BooksTable, LocalBook> {
   $$BooksTableReferences(super.$_db, super.$_table, super.$_typedResult);
 
   static MultiTypedResultKey<$QuotesTable, List<LocalQuote>> _quotesRefsTable(
@@ -2893,9 +2936,8 @@ final class $$BooksTableReferences extends BaseReferences<_$AppDatabase, $BooksT
     );
   }
 
-  static MultiTypedResultKey<$ShelfBooksTable, List<LocalShelfBook>> _shelfBooksRefsTable(
-    _$AppDatabase db,
-  ) => MultiTypedResultKey.fromTable(
+  static MultiTypedResultKey<$ShelfBooksTable, List<LocalShelfBook>>
+  _shelfBooksRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
     db.shelfBooks,
     aliasName: 'books__id__shelf_books__book_id',
   );
@@ -2931,11 +2973,11 @@ class $$BooksTableFilterComposer extends Composer<_$AppDatabase, $BooksTable> {
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnWithTypeConverterFilters<List<String>, List<String>, String> get authors =>
-      $composableBuilder(
-        column: $table.authors,
-        builder: (column) => ColumnWithTypeConverterFilters(column),
-      );
+  ColumnWithTypeConverterFilters<List<String>, List<String>, String>
+  get authors => $composableBuilder(
+    column: $table.authors,
+    builder: (column) => ColumnWithTypeConverterFilters(column),
+  );
 
   ColumnFilters<String> get isbn => $composableBuilder(
     column: $table.isbn,
@@ -2985,7 +3027,8 @@ class $$BooksTableFilterComposer extends Composer<_$AppDatabase, $BooksTable> {
             $table: $db.quotes,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer: $removeJoinBuilderFromRootComposer,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
           ),
     );
     return f(composer);
@@ -3009,14 +3052,16 @@ class $$BooksTableFilterComposer extends Composer<_$AppDatabase, $BooksTable> {
             $table: $db.shelfBooks,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer: $removeJoinBuilderFromRootComposer,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
           ),
     );
     return f(composer);
   }
 }
 
-class $$BooksTableOrderingComposer extends Composer<_$AppDatabase, $BooksTable> {
+class $$BooksTableOrderingComposer
+    extends Composer<_$AppDatabase, $BooksTable> {
   $$BooksTableOrderingComposer({
     required super.$db,
     required super.$table,
@@ -3070,7 +3115,8 @@ class $$BooksTableOrderingComposer extends Composer<_$AppDatabase, $BooksTable> 
   );
 }
 
-class $$BooksTableAnnotationComposer extends Composer<_$AppDatabase, $BooksTable> {
+class $$BooksTableAnnotationComposer
+    extends Composer<_$AppDatabase, $BooksTable> {
   $$BooksTableAnnotationComposer({
     required super.$db,
     required super.$table,
@@ -3127,7 +3173,8 @@ class $$BooksTableAnnotationComposer extends Composer<_$AppDatabase, $BooksTable
             $table: $db.quotes,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer: $removeJoinBuilderFromRootComposer,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
           ),
     );
     return f(composer);
@@ -3151,7 +3198,8 @@ class $$BooksTableAnnotationComposer extends Composer<_$AppDatabase, $BooksTable
             $table: $db.shelfBooks,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer: $removeJoinBuilderFromRootComposer,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
           ),
     );
     return f(composer);
@@ -3178,9 +3226,12 @@ class $$BooksTableTableManager
         TableManagerState(
           db: db,
           table: table,
-          createFilteringComposer: () => $$BooksTableFilterComposer($db: db, $table: table),
-          createOrderingComposer: () => $$BooksTableOrderingComposer($db: db, $table: table),
-          createComputedFieldComposer: () => $$BooksTableAnnotationComposer($db: db, $table: table),
+          createFilteringComposer: () =>
+              $$BooksTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$BooksTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$BooksTableAnnotationComposer($db: db, $table: table),
           updateCompanionCallback:
               ({
                 Value<String> id = const Value.absent(),
@@ -3231,50 +3282,63 @@ class $$BooksTableTableManager
               ),
           withReferenceMapper: (p0) => p0
               .map(
-                (e) => (e.readTable(table), $$BooksTableReferences(db, table, e)),
+                (e) =>
+                    (e.readTable(table), $$BooksTableReferences(db, table, e)),
               )
               .toList(),
-          prefetchHooksCallback: ({quotesRefs = false, shelfBooksRefs = false}) {
-            return PrefetchHooks(
-              db: db,
-              explicitlyWatchedTables: [
-                if (quotesRefs) db.quotes,
-                if (shelfBooksRefs) db.shelfBooks,
-              ],
-              addJoins: null,
-              getPrefetchedDataCallback: (items) async {
-                return [
-                  if (quotesRefs)
-                    await $_getPrefetchedData<LocalBook, $BooksTable, LocalQuote>(
-                      currentTable: table,
-                      referencedTable: $$BooksTableReferences._quotesRefsTable(db),
-                      managerFromTypedResult: (p0) =>
-                          $$BooksTableReferences(db, table, p0).quotesRefs,
-                      referencedItemsForCurrentItem: (item, referencedItems) =>
-                          referencedItems.where(
-                            (e) => e.bookId == item.id,
-                          ),
-                      typedResults: items,
-                    ),
-                  if (shelfBooksRefs)
-                    await $_getPrefetchedData<LocalBook, $BooksTable, LocalShelfBook>(
-                      currentTable: table,
-                      referencedTable: $$BooksTableReferences._shelfBooksRefsTable(db),
-                      managerFromTypedResult: (p0) => $$BooksTableReferences(
-                        db,
-                        table,
-                        p0,
-                      ).shelfBooksRefs,
-                      referencedItemsForCurrentItem: (item, referencedItems) =>
-                          referencedItems.where(
-                            (e) => e.bookId == item.id,
-                          ),
-                      typedResults: items,
-                    ),
-                ];
+          prefetchHooksCallback:
+              ({quotesRefs = false, shelfBooksRefs = false}) {
+                return PrefetchHooks(
+                  db: db,
+                  explicitlyWatchedTables: [
+                    if (quotesRefs) db.quotes,
+                    if (shelfBooksRefs) db.shelfBooks,
+                  ],
+                  addJoins: null,
+                  getPrefetchedDataCallback: (items) async {
+                    return [
+                      if (quotesRefs)
+                        await $_getPrefetchedData<
+                          LocalBook,
+                          $BooksTable,
+                          LocalQuote
+                        >(
+                          currentTable: table,
+                          referencedTable: $$BooksTableReferences
+                              ._quotesRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$BooksTableReferences(db, table, p0).quotesRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.bookId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                      if (shelfBooksRefs)
+                        await $_getPrefetchedData<
+                          LocalBook,
+                          $BooksTable,
+                          LocalShelfBook
+                        >(
+                          currentTable: table,
+                          referencedTable: $$BooksTableReferences
+                              ._shelfBooksRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$BooksTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).shelfBooksRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.bookId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                    ];
+                  },
+                );
               },
-            );
-          },
         ),
       );
 }
@@ -3345,9 +3409,8 @@ final class $$QuotesTableReferences
     );
   }
 
-  static MultiTypedResultKey<$ThemeQuotesTable, List<LocalThemeQuote>> _themeQuotesRefsTable(
-    _$AppDatabase db,
-  ) => MultiTypedResultKey.fromTable(
+  static MultiTypedResultKey<$ThemeQuotesTable, List<LocalThemeQuote>>
+  _themeQuotesRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
     db.themeQuotes,
     aliasName: 'quotes__id__theme_quotes__quote_id',
   );
@@ -3365,7 +3428,8 @@ final class $$QuotesTableReferences
   }
 }
 
-class $$QuotesTableFilterComposer extends Composer<_$AppDatabase, $QuotesTable> {
+class $$QuotesTableFilterComposer
+    extends Composer<_$AppDatabase, $QuotesTable> {
   $$QuotesTableFilterComposer({
     required super.$db,
     required super.$table,
@@ -3378,11 +3442,11 @@ class $$QuotesTableFilterComposer extends Composer<_$AppDatabase, $QuotesTable> 
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnWithTypeConverterFilters<List<int>, List<int>, String> get pageNumbers =>
-      $composableBuilder(
-        column: $table.pageNumbers,
-        builder: (column) => ColumnWithTypeConverterFilters(column),
-      );
+  ColumnWithTypeConverterFilters<List<int>, List<int>, String>
+  get pageNumbers => $composableBuilder(
+    column: $table.pageNumbers,
+    builder: (column) => ColumnWithTypeConverterFilters(column),
+  );
 
   ColumnFilters<String> get quote => $composableBuilder(
     column: $table.quote,
@@ -3404,23 +3468,27 @@ class $$QuotesTableFilterComposer extends Composer<_$AppDatabase, $QuotesTable> 
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnWithTypeConverterFilters<List<QuotePage>, List<QuotePage>, String> get pages =>
-      $composableBuilder(
-        column: $table.pages,
-        builder: (column) => ColumnWithTypeConverterFilters(column),
-      );
+  ColumnWithTypeConverterFilters<List<QuotePage>, List<QuotePage>, String>
+  get pages => $composableBuilder(
+    column: $table.pages,
+    builder: (column) => ColumnWithTypeConverterFilters(column),
+  );
 
-  ColumnWithTypeConverterFilters<List<RecognizedWord>, List<RecognizedWord>, String> get words =>
-      $composableBuilder(
-        column: $table.words,
-        builder: (column) => ColumnWithTypeConverterFilters(column),
-      );
+  ColumnWithTypeConverterFilters<
+    List<RecognizedWord>,
+    List<RecognizedWord>,
+    String
+  >
+  get words => $composableBuilder(
+    column: $table.words,
+    builder: (column) => ColumnWithTypeConverterFilters(column),
+  );
 
-  ColumnWithTypeConverterFilters<List<int>, List<int>, String> get markedWordIndexes =>
-      $composableBuilder(
-        column: $table.markedWordIndexes,
-        builder: (column) => ColumnWithTypeConverterFilters(column),
-      );
+  ColumnWithTypeConverterFilters<List<int>, List<int>, String>
+  get markedWordIndexes => $composableBuilder(
+    column: $table.markedWordIndexes,
+    builder: (column) => ColumnWithTypeConverterFilters(column),
+  );
 
   ColumnFilters<bool> get isFavorite => $composableBuilder(
     column: $table.isFavorite,
@@ -3448,7 +3516,8 @@ class $$QuotesTableFilterComposer extends Composer<_$AppDatabase, $QuotesTable> 
             $table: $db.books,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer: $removeJoinBuilderFromRootComposer,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
           ),
     );
     return composer;
@@ -3472,14 +3541,16 @@ class $$QuotesTableFilterComposer extends Composer<_$AppDatabase, $QuotesTable> 
             $table: $db.themeQuotes,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer: $removeJoinBuilderFromRootComposer,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
           ),
     );
     return f(composer);
   }
 }
 
-class $$QuotesTableOrderingComposer extends Composer<_$AppDatabase, $QuotesTable> {
+class $$QuotesTableOrderingComposer
+    extends Composer<_$AppDatabase, $QuotesTable> {
   $$QuotesTableOrderingComposer({
     required super.$db,
     required super.$table,
@@ -3558,14 +3629,16 @@ class $$QuotesTableOrderingComposer extends Composer<_$AppDatabase, $QuotesTable
             $table: $db.books,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer: $removeJoinBuilderFromRootComposer,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
           ),
     );
     return composer;
   }
 }
 
-class $$QuotesTableAnnotationComposer extends Composer<_$AppDatabase, $QuotesTable> {
+class $$QuotesTableAnnotationComposer
+    extends Composer<_$AppDatabase, $QuotesTable> {
   $$QuotesTableAnnotationComposer({
     required super.$db,
     required super.$table,
@@ -3576,10 +3649,11 @@ class $$QuotesTableAnnotationComposer extends Composer<_$AppDatabase, $QuotesTab
   GeneratedColumn<String> get id =>
       $composableBuilder(column: $table.id, builder: (column) => column);
 
-  GeneratedColumnWithTypeConverter<List<int>, String> get pageNumbers => $composableBuilder(
-    column: $table.pageNumbers,
-    builder: (column) => column,
-  );
+  GeneratedColumnWithTypeConverter<List<int>, String> get pageNumbers =>
+      $composableBuilder(
+        column: $table.pageNumbers,
+        builder: (column) => column,
+      );
 
   GeneratedColumn<String> get quote =>
       $composableBuilder(column: $table.quote, builder: (column) => column);
@@ -3603,10 +3677,11 @@ class $$QuotesTableAnnotationComposer extends Composer<_$AppDatabase, $QuotesTab
   GeneratedColumnWithTypeConverter<List<RecognizedWord>, String> get words =>
       $composableBuilder(column: $table.words, builder: (column) => column);
 
-  GeneratedColumnWithTypeConverter<List<int>, String> get markedWordIndexes => $composableBuilder(
-    column: $table.markedWordIndexes,
-    builder: (column) => column,
-  );
+  GeneratedColumnWithTypeConverter<List<int>, String> get markedWordIndexes =>
+      $composableBuilder(
+        column: $table.markedWordIndexes,
+        builder: (column) => column,
+      );
 
   GeneratedColumn<bool> get isFavorite => $composableBuilder(
     column: $table.isFavorite,
@@ -3632,7 +3707,8 @@ class $$QuotesTableAnnotationComposer extends Composer<_$AppDatabase, $QuotesTab
             $table: $db.books,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer: $removeJoinBuilderFromRootComposer,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
           ),
     );
     return composer;
@@ -3656,7 +3732,8 @@ class $$QuotesTableAnnotationComposer extends Composer<_$AppDatabase, $QuotesTab
             $table: $db.themeQuotes,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer: $removeJoinBuilderFromRootComposer,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
           ),
     );
     return f(composer);
@@ -3683,8 +3760,10 @@ class $$QuotesTableTableManager
         TableManagerState(
           db: db,
           table: table,
-          createFilteringComposer: () => $$QuotesTableFilterComposer($db: db, $table: table),
-          createOrderingComposer: () => $$QuotesTableOrderingComposer($db: db, $table: table),
+          createFilteringComposer: () =>
+              $$QuotesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$QuotesTableOrderingComposer($db: db, $table: table),
           createComputedFieldComposer: () =>
               $$QuotesTableAnnotationComposer($db: db, $table: table),
           updateCompanionCallback:
@@ -3749,7 +3828,8 @@ class $$QuotesTableTableManager
               ),
           withReferenceMapper: (p0) => p0
               .map(
-                (e) => (e.readTable(table), $$QuotesTableReferences(db, table, e)),
+                (e) =>
+                    (e.readTable(table), $$QuotesTableReferences(db, table, e)),
               )
               .toList(),
           prefetchHooksCallback: ({bookId = false, themeQuotesRefs = false}) {
@@ -3779,7 +3859,9 @@ class $$QuotesTableTableManager
                         referencedTable: $$QuotesTableReferences._bookIdTable(
                           db,
                         ),
-                        referencedColumn: $$QuotesTableReferences._bookIdTable(db).id,
+                        referencedColumn: $$QuotesTableReferences
+                            ._bookIdTable(db)
+                            .id,
                       ) as T;
                     }
 
@@ -3788,9 +3870,14 @@ class $$QuotesTableTableManager
               getPrefetchedDataCallback: (items) async {
                 return [
                   if (themeQuotesRefs)
-                    await $_getPrefetchedData<LocalQuote, $QuotesTable, LocalThemeQuote>(
+                    await $_getPrefetchedData<
+                      LocalQuote,
+                      $QuotesTable,
+                      LocalThemeQuote
+                    >(
                       currentTable: table,
-                      referencedTable: $$QuotesTableReferences._themeQuotesRefsTable(db),
+                      referencedTable: $$QuotesTableReferences
+                          ._themeQuotesRefsTable(db),
                       managerFromTypedResult: (p0) => $$QuotesTableReferences(
                         db,
                         table,
@@ -3843,9 +3930,8 @@ final class $$ThemesTableReferences
     extends BaseReferences<_$AppDatabase, $ThemesTable, LocalTheme> {
   $$ThemesTableReferences(super.$_db, super.$_table, super.$_typedResult);
 
-  static MultiTypedResultKey<$ThemeQuotesTable, List<LocalThemeQuote>> _themeQuotesRefsTable(
-    _$AppDatabase db,
-  ) => MultiTypedResultKey.fromTable(
+  static MultiTypedResultKey<$ThemeQuotesTable, List<LocalThemeQuote>>
+  _themeQuotesRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
     db.themeQuotes,
     aliasName: 'themes__id__theme_quotes__theme_id',
   );
@@ -3863,7 +3949,8 @@ final class $$ThemesTableReferences
   }
 }
 
-class $$ThemesTableFilterComposer extends Composer<_$AppDatabase, $ThemesTable> {
+class $$ThemesTableFilterComposer
+    extends Composer<_$AppDatabase, $ThemesTable> {
   $$ThemesTableFilterComposer({
     required super.$db,
     required super.$table,
@@ -3914,14 +4001,16 @@ class $$ThemesTableFilterComposer extends Composer<_$AppDatabase, $ThemesTable> 
             $table: $db.themeQuotes,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer: $removeJoinBuilderFromRootComposer,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
           ),
     );
     return f(composer);
   }
 }
 
-class $$ThemesTableOrderingComposer extends Composer<_$AppDatabase, $ThemesTable> {
+class $$ThemesTableOrderingComposer
+    extends Composer<_$AppDatabase, $ThemesTable> {
   $$ThemesTableOrderingComposer({
     required super.$db,
     required super.$table,
@@ -3955,7 +4044,8 @@ class $$ThemesTableOrderingComposer extends Composer<_$AppDatabase, $ThemesTable
   );
 }
 
-class $$ThemesTableAnnotationComposer extends Composer<_$AppDatabase, $ThemesTable> {
+class $$ThemesTableAnnotationComposer
+    extends Composer<_$AppDatabase, $ThemesTable> {
   $$ThemesTableAnnotationComposer({
     required super.$db,
     required super.$table,
@@ -3996,7 +4086,8 @@ class $$ThemesTableAnnotationComposer extends Composer<_$AppDatabase, $ThemesTab
             $table: $db.themeQuotes,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer: $removeJoinBuilderFromRootComposer,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
           ),
     );
     return f(composer);
@@ -4023,8 +4114,10 @@ class $$ThemesTableTableManager
         TableManagerState(
           db: db,
           table: table,
-          createFilteringComposer: () => $$ThemesTableFilterComposer($db: db, $table: table),
-          createOrderingComposer: () => $$ThemesTableOrderingComposer($db: db, $table: table),
+          createFilteringComposer: () =>
+              $$ThemesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$ThemesTableOrderingComposer($db: db, $table: table),
           createComputedFieldComposer: () =>
               $$ThemesTableAnnotationComposer($db: db, $table: table),
           updateCompanionCallback:
@@ -4061,7 +4154,8 @@ class $$ThemesTableTableManager
               ),
           withReferenceMapper: (p0) => p0
               .map(
-                (e) => (e.readTable(table), $$ThemesTableReferences(db, table, e)),
+                (e) =>
+                    (e.readTable(table), $$ThemesTableReferences(db, table, e)),
               )
               .toList(),
           prefetchHooksCallback: ({themeQuotesRefs = false}) {
@@ -4072,9 +4166,14 @@ class $$ThemesTableTableManager
               getPrefetchedDataCallback: (items) async {
                 return [
                   if (themeQuotesRefs)
-                    await $_getPrefetchedData<LocalTheme, $ThemesTable, LocalThemeQuote>(
+                    await $_getPrefetchedData<
+                      LocalTheme,
+                      $ThemesTable,
+                      LocalThemeQuote
+                    >(
                       currentTable: table,
-                      referencedTable: $$ThemesTableReferences._themeQuotesRefsTable(db),
+                      referencedTable: $$ThemesTableReferences
+                          ._themeQuotesRefsTable(db),
                       managerFromTypedResult: (p0) => $$ThemesTableReferences(
                         db,
                         table,
@@ -4106,16 +4205,18 @@ typedef $$ThemesTableProcessedTableManager =
       LocalTheme,
       PrefetchHooks Function({bool themeQuotesRefs})
     >;
-typedef $$ThemeQuotesTableCreateCompanionBuilder = ThemeQuotesCompanion Function({
-  required String themeId,
-  required String quoteId,
-  Value<int> rowid,
-});
-typedef $$ThemeQuotesTableUpdateCompanionBuilder = ThemeQuotesCompanion Function({
-  Value<String> themeId,
-  Value<String> quoteId,
-  Value<int> rowid,
-});
+typedef $$ThemeQuotesTableCreateCompanionBuilder =
+    ThemeQuotesCompanion Function({
+      required String themeId,
+      required String quoteId,
+      Value<int> rowid,
+    });
+typedef $$ThemeQuotesTableUpdateCompanionBuilder =
+    ThemeQuotesCompanion Function({
+      Value<String> themeId,
+      Value<String> quoteId,
+      Value<int> rowid,
+    });
 
 final class $$ThemeQuotesTableReferences
     extends BaseReferences<_$AppDatabase, $ThemeQuotesTable, LocalThemeQuote> {
@@ -4156,7 +4257,8 @@ final class $$ThemeQuotesTableReferences
   }
 }
 
-class $$ThemeQuotesTableFilterComposer extends Composer<_$AppDatabase, $ThemeQuotesTable> {
+class $$ThemeQuotesTableFilterComposer
+    extends Composer<_$AppDatabase, $ThemeQuotesTable> {
   $$ThemeQuotesTableFilterComposer({
     required super.$db,
     required super.$table,
@@ -4180,7 +4282,8 @@ class $$ThemeQuotesTableFilterComposer extends Composer<_$AppDatabase, $ThemeQuo
             $table: $db.themes,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer: $removeJoinBuilderFromRootComposer,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
           ),
     );
     return composer;
@@ -4202,14 +4305,16 @@ class $$ThemeQuotesTableFilterComposer extends Composer<_$AppDatabase, $ThemeQuo
             $table: $db.quotes,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer: $removeJoinBuilderFromRootComposer,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
           ),
     );
     return composer;
   }
 }
 
-class $$ThemeQuotesTableOrderingComposer extends Composer<_$AppDatabase, $ThemeQuotesTable> {
+class $$ThemeQuotesTableOrderingComposer
+    extends Composer<_$AppDatabase, $ThemeQuotesTable> {
   $$ThemeQuotesTableOrderingComposer({
     required super.$db,
     required super.$table,
@@ -4233,7 +4338,8 @@ class $$ThemeQuotesTableOrderingComposer extends Composer<_$AppDatabase, $ThemeQ
             $table: $db.themes,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer: $removeJoinBuilderFromRootComposer,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
           ),
     );
     return composer;
@@ -4255,14 +4361,16 @@ class $$ThemeQuotesTableOrderingComposer extends Composer<_$AppDatabase, $ThemeQ
             $table: $db.quotes,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer: $removeJoinBuilderFromRootComposer,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
           ),
     );
     return composer;
   }
 }
 
-class $$ThemeQuotesTableAnnotationComposer extends Composer<_$AppDatabase, $ThemeQuotesTable> {
+class $$ThemeQuotesTableAnnotationComposer
+    extends Composer<_$AppDatabase, $ThemeQuotesTable> {
   $$ThemeQuotesTableAnnotationComposer({
     required super.$db,
     required super.$table,
@@ -4286,7 +4394,8 @@ class $$ThemeQuotesTableAnnotationComposer extends Composer<_$AppDatabase, $Them
             $table: $db.themes,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer: $removeJoinBuilderFromRootComposer,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
           ),
     );
     return composer;
@@ -4308,7 +4417,8 @@ class $$ThemeQuotesTableAnnotationComposer extends Composer<_$AppDatabase, $Them
             $table: $db.quotes,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer: $removeJoinBuilderFromRootComposer,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
           ),
     );
     return composer;
@@ -4335,8 +4445,10 @@ class $$ThemeQuotesTableTableManager
         TableManagerState(
           db: db,
           table: table,
-          createFilteringComposer: () => $$ThemeQuotesTableFilterComposer($db: db, $table: table),
-          createOrderingComposer: () => $$ThemeQuotesTableOrderingComposer($db: db, $table: table),
+          createFilteringComposer: () =>
+              $$ThemeQuotesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$ThemeQuotesTableOrderingComposer($db: db, $table: table),
           createComputedFieldComposer: () =>
               $$ThemeQuotesTableAnnotationComposer($db: db, $table: table),
           updateCompanionCallback:
@@ -4391,16 +4503,22 @@ class $$ThemeQuotesTableTableManager
                       state = state.withJoin(
                         currentTable: table,
                         currentColumn: table.themeId,
-                        referencedTable: $$ThemeQuotesTableReferences._themeIdTable(db),
-                        referencedColumn: $$ThemeQuotesTableReferences._themeIdTable(db).id,
+                        referencedTable: $$ThemeQuotesTableReferences
+                            ._themeIdTable(db),
+                        referencedColumn: $$ThemeQuotesTableReferences
+                            ._themeIdTable(db)
+                            .id,
                       ) as T;
                     }
                     if (quoteId) {
                       state = state.withJoin(
                         currentTable: table,
                         currentColumn: table.quoteId,
-                        referencedTable: $$ThemeQuotesTableReferences._quoteIdTable(db),
-                        referencedColumn: $$ThemeQuotesTableReferences._quoteIdTable(db).id,
+                        referencedTable: $$ThemeQuotesTableReferences
+                            ._quoteIdTable(db),
+                        referencedColumn: $$ThemeQuotesTableReferences
+                            ._quoteIdTable(db)
+                            .id,
                       ) as T;
                     }
 
@@ -4450,9 +4568,8 @@ final class $$ShelvesTableReferences
     extends BaseReferences<_$AppDatabase, $ShelvesTable, LocalShelf> {
   $$ShelvesTableReferences(super.$_db, super.$_table, super.$_typedResult);
 
-  static MultiTypedResultKey<$ShelfBooksTable, List<LocalShelfBook>> _shelfBooksRefsTable(
-    _$AppDatabase db,
-  ) => MultiTypedResultKey.fromTable(
+  static MultiTypedResultKey<$ShelfBooksTable, List<LocalShelfBook>>
+  _shelfBooksRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
     db.shelfBooks,
     aliasName: 'shelves__id__shelf_books__shelf_id',
   );
@@ -4470,7 +4587,8 @@ final class $$ShelvesTableReferences
   }
 }
 
-class $$ShelvesTableFilterComposer extends Composer<_$AppDatabase, $ShelvesTable> {
+class $$ShelvesTableFilterComposer
+    extends Composer<_$AppDatabase, $ShelvesTable> {
   $$ShelvesTableFilterComposer({
     required super.$db,
     required super.$table,
@@ -4521,14 +4639,16 @@ class $$ShelvesTableFilterComposer extends Composer<_$AppDatabase, $ShelvesTable
             $table: $db.shelfBooks,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer: $removeJoinBuilderFromRootComposer,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
           ),
     );
     return f(composer);
   }
 }
 
-class $$ShelvesTableOrderingComposer extends Composer<_$AppDatabase, $ShelvesTable> {
+class $$ShelvesTableOrderingComposer
+    extends Composer<_$AppDatabase, $ShelvesTable> {
   $$ShelvesTableOrderingComposer({
     required super.$db,
     required super.$table,
@@ -4562,7 +4682,8 @@ class $$ShelvesTableOrderingComposer extends Composer<_$AppDatabase, $ShelvesTab
   );
 }
 
-class $$ShelvesTableAnnotationComposer extends Composer<_$AppDatabase, $ShelvesTable> {
+class $$ShelvesTableAnnotationComposer
+    extends Composer<_$AppDatabase, $ShelvesTable> {
   $$ShelvesTableAnnotationComposer({
     required super.$db,
     required super.$table,
@@ -4603,7 +4724,8 @@ class $$ShelvesTableAnnotationComposer extends Composer<_$AppDatabase, $ShelvesT
             $table: $db.shelfBooks,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer: $removeJoinBuilderFromRootComposer,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
           ),
     );
     return f(composer);
@@ -4630,8 +4752,10 @@ class $$ShelvesTableTableManager
         TableManagerState(
           db: db,
           table: table,
-          createFilteringComposer: () => $$ShelvesTableFilterComposer($db: db, $table: table),
-          createOrderingComposer: () => $$ShelvesTableOrderingComposer($db: db, $table: table),
+          createFilteringComposer: () =>
+              $$ShelvesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$ShelvesTableOrderingComposer($db: db, $table: table),
           createComputedFieldComposer: () =>
               $$ShelvesTableAnnotationComposer($db: db, $table: table),
           updateCompanionCallback:
@@ -4682,9 +4806,14 @@ class $$ShelvesTableTableManager
               getPrefetchedDataCallback: (items) async {
                 return [
                   if (shelfBooksRefs)
-                    await $_getPrefetchedData<LocalShelf, $ShelvesTable, LocalShelfBook>(
+                    await $_getPrefetchedData<
+                      LocalShelf,
+                      $ShelvesTable,
+                      LocalShelfBook
+                    >(
                       currentTable: table,
-                      referencedTable: $$ShelvesTableReferences._shelfBooksRefsTable(db),
+                      referencedTable: $$ShelvesTableReferences
+                          ._shelfBooksRefsTable(db),
                       managerFromTypedResult: (p0) => $$ShelvesTableReferences(
                         db,
                         table,
@@ -4766,7 +4895,8 @@ final class $$ShelfBooksTableReferences
   }
 }
 
-class $$ShelfBooksTableFilterComposer extends Composer<_$AppDatabase, $ShelfBooksTable> {
+class $$ShelfBooksTableFilterComposer
+    extends Composer<_$AppDatabase, $ShelfBooksTable> {
   $$ShelfBooksTableFilterComposer({
     required super.$db,
     required super.$table,
@@ -4790,7 +4920,8 @@ class $$ShelfBooksTableFilterComposer extends Composer<_$AppDatabase, $ShelfBook
             $table: $db.shelves,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer: $removeJoinBuilderFromRootComposer,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
           ),
     );
     return composer;
@@ -4812,14 +4943,16 @@ class $$ShelfBooksTableFilterComposer extends Composer<_$AppDatabase, $ShelfBook
             $table: $db.books,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer: $removeJoinBuilderFromRootComposer,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
           ),
     );
     return composer;
   }
 }
 
-class $$ShelfBooksTableOrderingComposer extends Composer<_$AppDatabase, $ShelfBooksTable> {
+class $$ShelfBooksTableOrderingComposer
+    extends Composer<_$AppDatabase, $ShelfBooksTable> {
   $$ShelfBooksTableOrderingComposer({
     required super.$db,
     required super.$table,
@@ -4843,7 +4976,8 @@ class $$ShelfBooksTableOrderingComposer extends Composer<_$AppDatabase, $ShelfBo
             $table: $db.shelves,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer: $removeJoinBuilderFromRootComposer,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
           ),
     );
     return composer;
@@ -4865,14 +4999,16 @@ class $$ShelfBooksTableOrderingComposer extends Composer<_$AppDatabase, $ShelfBo
             $table: $db.books,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer: $removeJoinBuilderFromRootComposer,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
           ),
     );
     return composer;
   }
 }
 
-class $$ShelfBooksTableAnnotationComposer extends Composer<_$AppDatabase, $ShelfBooksTable> {
+class $$ShelfBooksTableAnnotationComposer
+    extends Composer<_$AppDatabase, $ShelfBooksTable> {
   $$ShelfBooksTableAnnotationComposer({
     required super.$db,
     required super.$table,
@@ -4896,7 +5032,8 @@ class $$ShelfBooksTableAnnotationComposer extends Composer<_$AppDatabase, $Shelf
             $table: $db.shelves,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer: $removeJoinBuilderFromRootComposer,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
           ),
     );
     return composer;
@@ -4918,7 +5055,8 @@ class $$ShelfBooksTableAnnotationComposer extends Composer<_$AppDatabase, $Shelf
             $table: $db.books,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer: $removeJoinBuilderFromRootComposer,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
           ),
     );
     return composer;
@@ -4945,8 +5083,10 @@ class $$ShelfBooksTableTableManager
         TableManagerState(
           db: db,
           table: table,
-          createFilteringComposer: () => $$ShelfBooksTableFilterComposer($db: db, $table: table),
-          createOrderingComposer: () => $$ShelfBooksTableOrderingComposer($db: db, $table: table),
+          createFilteringComposer: () =>
+              $$ShelfBooksTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$ShelfBooksTableOrderingComposer($db: db, $table: table),
           createComputedFieldComposer: () =>
               $$ShelfBooksTableAnnotationComposer($db: db, $table: table),
           updateCompanionCallback:
@@ -5001,16 +5141,22 @@ class $$ShelfBooksTableTableManager
                       state = state.withJoin(
                         currentTable: table,
                         currentColumn: table.shelfId,
-                        referencedTable: $$ShelfBooksTableReferences._shelfIdTable(db),
-                        referencedColumn: $$ShelfBooksTableReferences._shelfIdTable(db).id,
+                        referencedTable: $$ShelfBooksTableReferences
+                            ._shelfIdTable(db),
+                        referencedColumn: $$ShelfBooksTableReferences
+                            ._shelfIdTable(db)
+                            .id,
                       ) as T;
                     }
                     if (bookId) {
                       state = state.withJoin(
                         currentTable: table,
                         currentColumn: table.bookId,
-                        referencedTable: $$ShelfBooksTableReferences._bookIdTable(db),
-                        referencedColumn: $$ShelfBooksTableReferences._bookIdTable(db).id,
+                        referencedTable: $$ShelfBooksTableReferences
+                            ._bookIdTable(db),
+                        referencedColumn: $$ShelfBooksTableReferences
+                            ._bookIdTable(db)
+                            .id,
                       ) as T;
                     }
 
@@ -5039,22 +5185,25 @@ typedef $$ShelfBooksTableProcessedTableManager =
       LocalShelfBook,
       PrefetchHooks Function({bool shelfId, bool bookId})
     >;
-typedef $$SettingsTableTableCreateCompanionBuilder = SettingsTableCompanion Function({
-  Value<int> id,
-  Value<String?> displayName,
-  Value<String?> localePreference,
-  Value<String?> themePreference,
-  Value<String?> contrastPreference,
-});
-typedef $$SettingsTableTableUpdateCompanionBuilder = SettingsTableCompanion Function({
-  Value<int> id,
-  Value<String?> displayName,
-  Value<String?> localePreference,
-  Value<String?> themePreference,
-  Value<String?> contrastPreference,
-});
+typedef $$SettingsTableTableCreateCompanionBuilder =
+    SettingsTableCompanion Function({
+      Value<int> id,
+      Value<String?> displayName,
+      Value<String?> localePreference,
+      Value<String?> themePreference,
+      Value<String?> contrastPreference,
+    });
+typedef $$SettingsTableTableUpdateCompanionBuilder =
+    SettingsTableCompanion Function({
+      Value<int> id,
+      Value<String?> displayName,
+      Value<String?> localePreference,
+      Value<String?> themePreference,
+      Value<String?> contrastPreference,
+    });
 
-class $$SettingsTableTableFilterComposer extends Composer<_$AppDatabase, $SettingsTableTable> {
+class $$SettingsTableTableFilterComposer
+    extends Composer<_$AppDatabase, $SettingsTableTable> {
   $$SettingsTableTableFilterComposer({
     required super.$db,
     required super.$table,
@@ -5088,7 +5237,8 @@ class $$SettingsTableTableFilterComposer extends Composer<_$AppDatabase, $Settin
   );
 }
 
-class $$SettingsTableTableOrderingComposer extends Composer<_$AppDatabase, $SettingsTableTable> {
+class $$SettingsTableTableOrderingComposer
+    extends Composer<_$AppDatabase, $SettingsTableTable> {
   $$SettingsTableTableOrderingComposer({
     required super.$db,
     required super.$table,
@@ -5122,7 +5272,8 @@ class $$SettingsTableTableOrderingComposer extends Composer<_$AppDatabase, $Sett
   );
 }
 
-class $$SettingsTableTableAnnotationComposer extends Composer<_$AppDatabase, $SettingsTableTable> {
+class $$SettingsTableTableAnnotationComposer
+    extends Composer<_$AppDatabase, $SettingsTableTable> {
   $$SettingsTableTableAnnotationComposer({
     required super.$db,
     required super.$table,
@@ -5130,7 +5281,8 @@ class $$SettingsTableTableAnnotationComposer extends Composer<_$AppDatabase, $Se
     super.$addJoinBuilderToRootComposer,
     super.$removeJoinBuilderFromRootComposer,
   });
-  GeneratedColumn<int> get id => $composableBuilder(column: $table.id, builder: (column) => column);
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
 
   GeneratedColumn<String> get displayName => $composableBuilder(
     column: $table.displayName,
@@ -5176,7 +5328,8 @@ class $$SettingsTableTableTableManager
         TableManagerState(
           db: db,
           table: table,
-          createFilteringComposer: () => $$SettingsTableTableFilterComposer($db: db, $table: table),
+          createFilteringComposer: () =>
+              $$SettingsTableTableFilterComposer($db: db, $table: table),
           createOrderingComposer: () =>
               $$SettingsTableTableOrderingComposer($db: db, $table: table),
           createComputedFieldComposer: () =>
@@ -5209,8 +5362,9 @@ class $$SettingsTableTableTableManager
                 themePreference: themePreference,
                 contrastPreference: contrastPreference,
               ),
-          withReferenceMapper: (p0) =>
-              p0.map((e) => (e.readTable(table), BaseReferences(db, table, e))).toList(),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
           prefetchHooksCallback: null,
         ),
       );
@@ -5237,12 +5391,16 @@ typedef $$SettingsTableTableProcessedTableManager =
 class $AppDatabaseManager {
   final _$AppDatabase _db;
   $AppDatabaseManager(this._db);
-  $$BooksTableTableManager get books => $$BooksTableTableManager(_db, _db.books);
-  $$QuotesTableTableManager get quotes => $$QuotesTableTableManager(_db, _db.quotes);
-  $$ThemesTableTableManager get themes => $$ThemesTableTableManager(_db, _db.themes);
+  $$BooksTableTableManager get books =>
+      $$BooksTableTableManager(_db, _db.books);
+  $$QuotesTableTableManager get quotes =>
+      $$QuotesTableTableManager(_db, _db.quotes);
+  $$ThemesTableTableManager get themes =>
+      $$ThemesTableTableManager(_db, _db.themes);
   $$ThemeQuotesTableTableManager get themeQuotes =>
       $$ThemeQuotesTableTableManager(_db, _db.themeQuotes);
-  $$ShelvesTableTableManager get shelves => $$ShelvesTableTableManager(_db, _db.shelves);
+  $$ShelvesTableTableManager get shelves =>
+      $$ShelvesTableTableManager(_db, _db.shelves);
   $$ShelfBooksTableTableManager get shelfBooks =>
       $$ShelfBooksTableTableManager(_db, _db.shelfBooks);
   $$SettingsTableTableTableManager get settingsTable =>
