@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:core/config/build_config.dart';
+import 'package:injectable/injectable.dart';
 import 'package:powersync/powersync.dart';
 import 'package:shared/data/data_sources/sync_remote_data_source.dart';
 import 'package:shared/data/models/remote_sync_write.dart';
@@ -8,6 +9,7 @@ import 'package:shared/data/models/remote_sync_write.dart';
 // * the file where the two vendors meet: PowerSync's CRUD queue on one side,
 // * the generated Serverpod client on the other. Everything else sees the
 // * SyncService interface
+@lazySingleton
 class PowerSyncConnector(
   final SyncRemoteDataSource _dataSource,
 ) extends PowerSyncBackendConnector {

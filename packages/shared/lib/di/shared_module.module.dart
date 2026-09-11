@@ -120,6 +120,9 @@ class SharedPackageModule extends _i526.MicroPackageModule {
         gh<_i258.AttachmentPaths>(),
       ),
     );
+    gh.lazySingleton<_i1035.PowerSyncConnector>(
+      () => _i1035.PowerSyncConnector(gh<_i679.SyncRemoteDataSource>()),
+    );
     gh.lazySingleton<_i336.SyncService>(
       () => _i932.PowerSyncService(
         gh<_i659.SyncDatabase>(),

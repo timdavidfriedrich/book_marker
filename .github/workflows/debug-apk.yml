@@ -50,6 +50,12 @@ jobs:
       # Resolves the whole pub workspace from the root pubspec.
       - run: flutter pub get
 
+      # injectable emits a gh<T>() lookup whether or not T is registered, so a
+      # class that lost its annotation compiles, analyses and builds cleanly and
+      # then throws on the first frame. Cheap to check, invisible otherwise.
+      - name: Check the DI graph is complete
+        run: dart run tool/check_di.dart
+
       # No build_runner or gen-l10n step: service_locator.config.dart,
       # app_database.g.dart and the generated localizations are committed.
       # Gradle installs NDK 28.2.13676358 on the first run, which the sqlite3mc
