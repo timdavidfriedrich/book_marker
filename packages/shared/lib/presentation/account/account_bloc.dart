@@ -126,7 +126,14 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
     emit(const AccountSignedOut());
   }
 
+  // * the entitlement is re-read first, and that is the whole point of this
+  // * handler. Whatever sent this event just changed the key situation, and on
+  // * the setup path it also wrote the verifier on the server a moment ago.
+  // * Resolving against the snapshot taken at sign in would report an account
+  // * as still needing the backup it has only just created, which is a loop the
+  // * user cannot get out of: create a code, be told to create a code.
   Future<void> _onUnlocked(AccountUnlocked event, Emitter<AccountState> emit) async {
+    await _loadEntitlement();
     if (state case AccountLocked(:final account)) emit(await _resolve(account));
   }
 

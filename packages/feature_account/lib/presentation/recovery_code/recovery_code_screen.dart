@@ -46,6 +46,9 @@ class const RecoveryCodeScreen({
               // * another device already registered a backup, so this device
               // * has to use that code instead of the one it just generated
               if (state is RecoveryCodeReady) {
+                // * the account state is refreshed either way, so the card
+                // * behind says "enter your code" even if the push is lost
+                context.read<AccountBloc>().add(const AccountUnlocked());
                 context.closeScreen();
                 unawaited(context.appRouter.push(const RecoveryCodeUnlock()));
                 return;

@@ -1,4 +1,6 @@
+import 'package:core/config/build_config.dart';
 import 'package:core/sync/sync_service.dart';
+import 'package:flutter/foundation.dart';
 import 'package:injectable/injectable.dart';
 import 'package:powersync/powersync.dart' as ps;
 import 'package:shared/data/database/power_sync_connector.dart';
@@ -20,6 +22,20 @@ class const PowerSyncService(
   // * not query, and the library would look empty while syncing perfectly
   @override
   Future<void> connect() async {
+    // * without an endpoint there is nothing to connect to, and trying anyway
+    // * shows the user "Sicherung fehlgeschlagen" for a missing dart-define.
+    // * Nothing is adopted either: moving rows into the synced half for an
+    // * upload that cannot happen only changes the schema for no reason
+    if (syncBaseUrl.isEmpty) {
+      if (isInDebugMode) {
+        debugPrint(
+          "SYNC_BASE_URL is empty, so sync stays off. Add it to "
+          "dart_defines.json and rebuild; dart-defines are compile time and "
+          "survive hot restart.",
+        );
+      }
+      return;
+    }
     await _syncDatabase.adoptLocalLibrary();
     await _syncDatabase.database.connect(connector: _connector);
   }
