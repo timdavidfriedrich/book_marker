@@ -1,5 +1,7 @@
+import 'package:core/config/build_config.dart';
 import 'package:drift/drift.dart';
 import 'package:drift_sqlite_async/drift_sqlite_async.dart';
+import 'package:flutter/foundation.dart';
 import 'package:sqlite_async/sqlite_async.dart';
 
 part 'app_database.g.dart';
@@ -150,6 +152,12 @@ class ThemeQuotes extends Table {
 
 @DataClassName("LocalAppConfigCache")
 class AppConfigCacheTable extends Table {
+  // * PowerSync created the view, so its name is the one that exists. Drift
+  // * would otherwise derive `app_config_cache_table` from the class name and
+  // * query a table that is not there
+  @override
+  String get tableName => "app_config_cache";
+
   TextColumn get id => text()();
 
   IntColumn get version => integer()();
@@ -164,6 +172,9 @@ class AppConfigCacheTable extends Table {
 
 @DataClassName("LocalSettings")
 class SettingsTable extends Table {
+  @override
+  String get tableName => "settings";
+
   TextColumn get id => text()();
 
   TextColumn get displayName => text().nullable()();
@@ -178,6 +189,30 @@ class SettingsTable extends Table {
 
   @override
   Set<Column<Object>> get primaryKey => {id};
+}
+
+// * Drift derives a table name from the class name, PowerSync creates the view
+// * from the schema, and nothing checks that the two agree. When they did not,
+// * every read threw "no such table", each repository turned that into a
+// * Failure, and the app quietly fell back to defaults: settings stopped
+// * persisting and a signed in account looked like an unreachable server.
+Future<void> verifyTablesExist(AppDatabase database, SqliteConnection connection) async {
+  final rows = await connection.getAll(
+    "SELECT name FROM sqlite_master WHERE type IN ('table', 'view')",
+  );
+  final present = rows.map((row) => row['name'] as String).toSet();
+  final missing = database.allTables
+      .map((table) => table.actualTableName)
+      .where((name) => !present.contains(name))
+      .toList();
+  if (missing.isEmpty) return;
+  final message =
+      'The database has no ${missing.join(", ")}. Drift and the PowerSync '
+      'schema disagree about the name; see sync_schema.dart.';
+  // * loud in development, where it is a bug being written, and survivable in
+  // * release, where crashing on every launch would be worse than degraded
+  if (isInDebugMode) throw StateError(message);
+  debugPrint(message);
 }
 
 @DriftDatabase(

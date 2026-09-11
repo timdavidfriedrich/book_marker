@@ -36,15 +36,23 @@ class const EntitlementRepositoryImpl(
   Future<AppResult<AccountEntitlement>> _read(
     Future<RemoteEntitlement> Function() read,
   ) async {
+    final RemoteEntitlement remote;
     try {
-      final remote = await read();
+      remote = await read();
+    } on Object {
+      return const Failure(ConnectionError());
+    }
+    // * a separate try on purpose. The server has answered by this point, so a
+    // * failure here is ours, and calling it a connection problem sends people
+    // * to look at their wifi
+    try {
       return Success(
         remote.toAccountEntitlement(
           attachmentsEnabled: await _attachmentsEnabled(remote.plan),
         ),
       );
     } on Object {
-      return const Failure(ConnectionError());
+      return const Failure(UnexpectedError());
     }
   }
 }

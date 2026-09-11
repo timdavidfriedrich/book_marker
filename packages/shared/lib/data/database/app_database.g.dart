@@ -3307,7 +3307,7 @@ class $SettingsTableTable extends SettingsTable with TableInfo<$SettingsTableTab
   String get aliasedName => _alias ?? actualTableName;
   @override
   String get actualTableName => $name;
-  static const String $name = 'settings_table';
+  static const String $name = 'settings';
   @override
   VerificationContext validateIntegrity(
     Insertable<LocalSettings> instance, {
@@ -3730,7 +3730,7 @@ class $AppConfigCacheTableTable extends AppConfigCacheTable
   String get aliasedName => _alias ?? actualTableName;
   @override
   String get actualTableName => $name;
-  static const String $name = 'app_config_cache_table';
+  static const String $name = 'app_config_cache';
   @override
   VerificationContext validateIntegrity(
     Insertable<LocalAppConfigCache> instance, {

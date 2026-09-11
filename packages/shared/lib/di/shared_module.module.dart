@@ -104,7 +104,10 @@ class SharedPackageModule extends _i526.MicroPackageModule {
     gh.factory<_i833.AttachmentRemoteDataSource>(
       () => _i833.AttachmentRemoteDataSourceImpl(gh<_i63.Client>()),
     );
-    gh.lazySingleton<_i50.AppDatabase>(() => databaseModule.appDatabase(gh<_i659.SyncDatabase>()));
+    await gh.lazySingletonAsync<_i50.AppDatabase>(
+      () => databaseModule.appDatabase(gh<_i659.SyncDatabase>()),
+      preResolve: true,
+    );
     gh.factory<_i49.AppConfigLocalDataSource>(
       () => _i49.AppConfigLocalDataSourceImpl(gh<_i50.AppDatabase>()),
     );

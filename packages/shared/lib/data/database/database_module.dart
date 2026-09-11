@@ -20,8 +20,14 @@ abstract class DatabaseModule {
   @lazySingleton
   Future<AttachmentPaths> attachmentPaths() => AttachmentPaths.resolve();
 
+  // * preResolve so the name check runs before the first screen reads anything
+  @preResolve
   @lazySingleton
-  AppDatabase appDatabase(SyncDatabase syncDatabase) => AppDatabase(syncDatabase.connection);
+  Future<AppDatabase> appDatabase(SyncDatabase syncDatabase) async {
+    final database = AppDatabase(syncDatabase.connection);
+    await verifyTablesExist(database, syncDatabase.connection);
+    return database;
+  }
 
   // * built even for a free account. The queue is the gate: while it is stopped
   // * files are still written locally and simply never leave the device
