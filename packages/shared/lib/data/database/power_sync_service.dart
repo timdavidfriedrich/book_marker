@@ -14,8 +14,14 @@ class const PowerSyncService(
   @override
   DateTime? get lastSyncedAt => _syncDatabase.database.currentStatus.lastSyncedAt;
 
+  // * the current status is emitted first because statusStream does not replay
+  // * it. A subscriber that arrives after the database connected would
+  // * otherwise sit on "offline" while sync was working perfectly
   @override
-  Stream<SyncConnectionStatus> watchStatus() => _syncDatabase.database.statusStream.map(_toStatus);
+  Stream<SyncConnectionStatus> watchStatus() async* {
+    yield _toStatus(_syncDatabase.database.currentStatus);
+    yield* _syncDatabase.database.statusStream.map(_toStatus);
+  }
 
   // * adopting first is not optional: while the local only half owns the table
   // * names, a connected database would download rows into tables the app does

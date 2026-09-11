@@ -17,7 +17,9 @@ class PowerSyncConnector(
   Future<PowerSyncCredentials?> fetchCredentials() async {
     if (syncBaseUrl.isEmpty) return null;
     return PowerSyncCredentials(
-      endpoint: syncBaseUrl,
+      // * a trailing slash would make every request path start with a double
+      // * one, and the dart-define is the kind of value that collects them
+      endpoint: syncBaseUrl.replaceFirst(RegExp(r'/+$'), ""),
       token: await _dataSource.createSyncToken(),
     );
   }
