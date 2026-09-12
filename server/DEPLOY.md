@@ -36,41 +36,53 @@ book-marker project, `internal` network (nothing published):
 
 Everything here is done once, by hand.
 
-**1. Deploy key + sparse checkout**
+**1. Sparse checkout**
+
+The repository is public, so there is no deploy key and no SSH config. If it is
+ever made private, add a read-only deploy key and clone over SSH instead; nothing
+else in this file changes.
 
 ```bash
-ssh-keygen -t ed25519 -C "vps1686 book_marker deploy" -f ~/.ssh/book_marker_deploy -N ""
-cat ~/.ssh/book_marker_deploy.pub   # add to GitHub repo → Settings → Deploy keys (read-only)
-
-cat >> ~/.ssh/config <<'EOF'
-Host github-book-marker
-  HostName github.com
-  User git
-  IdentityFile ~/.ssh/book_marker_deploy
-EOF
-
 cd /home/informaten/workspaces
-git clone --filter=blob:none --sparse github-book-marker:timdavidfriedrich/book_marker.git book-marker
-cd book-marker
+git clone --filter=blob:none --sparse https://github.com/timdavidfriedrich/book_marker.git book_marker
+cd book_marker
 git sparse-checkout set server
 ```
+
+The VPS is pull-only. Nothing is ever authored here, so it cannot diverge.
 
 **2. Secrets**, neither file is in git.
 
 `server/.env` (from `.env.prod.example`):
 
 ```bash
-cd /home/informaten/workspaces/book-marker/server
+cd /home/informaten/workspaces/book_marker/server
 cp .env.prod.example .env && chmod 600 .env && vi .env
 ```
 
-`server/book_marker_server/config/passwords.yaml`, copy the local one, replace
-every value under `production:` with fresh secrets, and add the PowerSync signing
-key. `POSTGRES_PASSWORD`/`REDIS_PASSWORD` in `.env` **must match** `database:`
-and `redis:` under `production:`.
+`server/book_marker_server/config/passwords.yaml` is written here, not copied
+from the laptop: it holds a `production:` section and nothing else, so no
+development secret is ever carried onto the VPS. It needs `database`, `redis`,
+`serviceSecret`, `emailSecretHashPepper`, `jwtHmacSha512PrivateKey`,
+`jwtRefreshTokenHashPepper`, `powerSyncSigningKey`, and `googleClientSecret`.
+All but the last two are fresh `openssl rand` values.
+
+`googleClientSecret` is the **one** value that does come from the laptop, because
+it is the same Google web OAuth client in both run modes, so there is nothing to
+regenerate. `POSTGRES_PASSWORD`/`REDIS_PASSWORD` in `.env` **must match**
+`database:` and `redis:` under `production:`.
+
+Serverpod refuses to boot in production without at least one identity provider,
+so a missing `googleClientSecret` is a startup failure, not a degraded sign-in.
+
+Dart is not installed on the VPS and does not need to be. Generate the pair in a
+container, from a read-only mount, so the checkout stays pristine:
 
 ```bash
-cd server/book_marker_server && dart run tool/generate_keys.dart
+cd /home/informaten/workspaces/book_marker/server
+docker run --rm -v "$PWD":/src:ro dart:stable sh -c \
+  'cp -r /src /tmp/server && cd /tmp/server/book_marker_server \
+   && dart pub get >/dev/null 2>&1 && dart run tool/generate_keys.dart'
 ```
 Public half (`PS_JWK_N`, `PS_JWK_E`, `PS_JWK_KID`) → `.env`.
 Private half → `passwords.yaml` as `powerSyncSigningKey`.
@@ -92,7 +104,7 @@ the whole quota path with no key and no billing account.
 the replication role exist.
 
 ```bash
-cd /home/informaten/workspaces/book-marker/server
+cd /home/informaten/workspaces/book_marker/server
 docker compose -f docker-compose.prod.yaml up -d --build postgres redis
 docker compose -f docker-compose.prod.yaml run --rm migrate
 ```
@@ -103,7 +115,7 @@ password, and roles and publications are per-cluster while migrations are
 per-database).
 
 ```bash
-cd /home/informaten/workspaces/book-marker/server/book_marker_server
+cd /home/informaten/workspaces/book_marker/server/book_marker_server
 sed 's/CHANGE_ME/<the powersync_role password from .env>/' powersync/setup_replication.sql \
   | docker compose -f ../docker-compose.prod.yaml exec -T postgres psql -U postgres -d book_marker
 
@@ -120,7 +132,7 @@ docker compose -f docker-compose.prod.yaml up -d --build
 **6. Caddy**, append `caddy-snippet.conf` to the gateway's Caddyfile:
 
 ```bash
-cat /home/informaten/workspaces/book-marker/server/caddy-snippet.conf \
+cat /home/informaten/workspaces/book_marker/server/caddy-snippet.conf \
   >> /home/informaten/workspaces/global-gateway/Caddyfile
 docker compose -f /home/informaten/workspaces/global-gateway/docker-compose.yml restart caddy
 ```
@@ -136,7 +148,7 @@ Mode **off** (it rejects non-browser clients and silently kills sync).
 ## Routine deploy
 
 ```bash
-cd /home/informaten/workspaces/book-marker
+cd /home/informaten/workspaces/book_marker
 git pull
 docker compose -f server/docker-compose.prod.yaml up -d --build
 ```
@@ -181,7 +193,7 @@ docker compose -f docker-compose.prod.yaml logs --tail 40 powersync
 ## Verify
 
 ```bash
-cd /home/informaten/workspaces/book-marker/server
+cd /home/informaten/workspaces/book_marker/server
 docker compose -f docker-compose.prod.yaml ps
 docker compose -f docker-compose.prod.yaml exec -T postgres \
   psql -U postgres -d book_marker -c "SELECT slot_name, active FROM pg_replication_slots;"
@@ -226,8 +238,8 @@ Two cron entries, both scripts in this folder, both silent when healthy so cron
 only mails on trouble.
 
 ```cron
-0  3 * * * BACKUP_PASSPHRASE=... BACKUP_TARGET=user@host:/backups /home/informaten/workspaces/book-marker/server/backup.sh
-*/15 * * * *                                                     /home/informaten/workspaces/book-marker/server/check-replication.sh
+0  3 * * * BACKUP_PASSPHRASE=... BACKUP_TARGET=user@host:/backups /home/informaten/workspaces/book_marker/server/backup.sh
+*/15 * * * *                                                     /home/informaten/workspaces/book_marker/server/check-replication.sh
 ```
 
 `backup.sh` dumps `book_marker`, gzips it, encrypts it with AES-256 and pushes

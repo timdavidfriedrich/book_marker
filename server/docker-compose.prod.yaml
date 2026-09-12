@@ -1,6 +1,6 @@
 # Production stack for the Book Marker backend.
 #
-#   cd /home/informaten/workspaces/book-marker/server
+#   cd /home/informaten/workspaces/book_marker/server
 #   docker compose -f docker-compose.prod.yaml up -d --build
 #
 # Nothing here publishes a port. Postgres, Redis and PowerSync are reachable
@@ -130,7 +130,10 @@ services:
   # Nothing published except the console on loopback, reachable with
   #   ssh -L 9001:127.0.0.1:9001 <vps>
   minio:
-    image: minio/minio:latest
+    # * quay.io, not Docker Hub: MinIO no longer publishes a `latest` tag
+    # * there, so `minio/minio:latest` fails the pull and takes the whole
+    # * `up` down with it
+    image: quay.io/minio/minio:latest
     restart: unless-stopped
     command: ["server", "/data", "--console-address", ":9001"]
     environment:
