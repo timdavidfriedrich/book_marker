@@ -2,7 +2,7 @@
 # The single most likely way this stack breaks: an inactive replication slot
 # holds WAL until the disk fills, and nothing else complains until it does.
 #
-#   */15 * * * * /home/informaten/workspaces/book-marker/server/check-replication.sh
+#   */15 * * * * /home/informaten/workspaces/book_marker/server/check-replication.sh
 #
 # Prints nothing when healthy, so cron only mails on trouble.
 set -euo pipefail

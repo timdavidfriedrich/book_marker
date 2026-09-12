@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Nightly encrypted backup of the Serverpod database, pushed off the VPS.
 #
-#   0 3 * * * /home/informaten/workspaces/book-marker/server/backup.sh
+#   0 3 * * * /home/informaten/workspaces/book_marker/server/backup.sh
 #
 # powersync_storage is NOT backed up on purpose: it is derivable. Resetting
 # PowerSync rebuilds it from this dump, so a copy would only be a second thing
