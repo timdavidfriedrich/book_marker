@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:typed_data';
 
+import 'package:core/security/recovery_code.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:injectable/injectable.dart';
 
@@ -10,6 +11,8 @@ abstract class MasterKeyStore {
   Uint8List? get cached;
 
   Future<Uint8List?> read();
+
+  Future<Uint8List> readOrCreate();
 
   Future<void> write(Uint8List key);
 
@@ -38,6 +41,25 @@ class MasterKeyStoreImpl(
     } on FormatException {
       return null;
     }
+  }
+
+  // * signing in is optional, so the key cannot wait for it. Without one here
+  // * the first write on a fresh install throws MissingMasterKeyException and
+  // * nothing can be saved at all, which is not a degraded local mode but no
+  // * local mode.
+  //
+  // * Only ever called where there is no account. In the locked state a key is
+  // * deliberately absent, and minting one there would replace the key the
+  // * recovery code is about to restore, silently orphaning the library.
+  @override
+  Future<Uint8List> readOrCreate() async {
+    final existing = await read();
+    if (existing != null) return existing;
+    // * generated through RecoveryCode so it is exactly what a code can carry.
+    // * A key of any other length could never be shown to the user
+    final key = RecoveryCode.generate().key;
+    await write(key);
+    return key;
   }
 
   @override

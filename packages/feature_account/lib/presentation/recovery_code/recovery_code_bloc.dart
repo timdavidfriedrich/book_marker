@@ -24,8 +24,14 @@ class RecoveryCodeBloc extends Bloc<RecoveryCodeEvent, RecoveryCodeState> {
   final EntitlementRepository _entitlementRepository;
   RecoveryCode? _code;
 
-  void _onStarted(RecoveryCodeStarted event, Emitter<RecoveryCodeState> emit) {
-    final code = _code ??= RecoveryCode.generate();
+  // * the code renders the key this device is ALREADY using, it does not mint a
+  // * new one. A fresh key here would orphan everything written before signing
+  // * in, which for someone who tried the app first is the entire library
+  Future<void> _onStarted(RecoveryCodeStarted event, Emitter<RecoveryCodeState> emit) async {
+    final existing = await _masterKeyStore.read();
+    final code = _code ??= existing == null
+        ? RecoveryCode.generate()
+        : RecoveryCode.fromKey(existing);
     emit(
       RecoveryCodeReady(
         groups: code.groups,

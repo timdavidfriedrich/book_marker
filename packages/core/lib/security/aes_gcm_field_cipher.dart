@@ -16,6 +16,13 @@ class const AesGcmFieldCipher(
   Future<String> decrypt(String ciphertext) async =>
       decryptWithKey(await _requireKey(), ciphertext);
 
+  @override
+  Future<String> rotate(
+    String ciphertext, {
+    required Uint8List from,
+    required Uint8List to,
+  }) async => encryptWithKey(to, await decryptWithKey(from, ciphertext));
+
   Future<Uint8List> _requireKey() async {
     final key = await _keyStore.read();
     if (key == null) throw const MissingMasterKeyException();

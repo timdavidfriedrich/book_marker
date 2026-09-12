@@ -87,6 +87,7 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
     switch (event.result) {
       case Failure():
         _entitlement = null;
+        await _ensureLocalKey();
         emit(const AccountSignedOut());
       case Success(:final data?):
         // * paint from what is already on the device, then correct once the
@@ -95,9 +96,15 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
         add(const AccountEntitlementRefreshed());
       case Success():
         _entitlement = null;
+        await _ensureLocalKey();
         emit(const AccountSignedOut());
     }
   }
+
+  // * a library with no account behind it is still encrypted, so it still needs
+  // * a key, and this is the only place that knows there is no account to wait
+  // * for. Never called in the locked state, where the absent key is the point
+  Future<void> _ensureLocalKey() => _masterKeyStore.readOrCreate();
 
   Future<void> _onGoogleSignInRequested(
     AccountGoogleSignInRequested event,
@@ -123,6 +130,9 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
     }
     _blockedReason = null;
     _entitlement = null;
+    // * after the clear above there is no key at all, and the user is still
+    // * expected to keep writing locally
+    await _ensureLocalKey();
     emit(const AccountSignedOut());
   }
 

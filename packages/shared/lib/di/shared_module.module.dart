@@ -36,6 +36,7 @@ import 'package:shared/data/database/attachment_paths.dart' as _i258;
 import 'package:shared/data/database/cipher_codec.dart' as _i807;
 import 'package:shared/data/database/database_module.dart' as _i860;
 import 'package:shared/data/database/encrypted_attachment_storage.dart' as _i385;
+import 'package:shared/data/database/library_reencryption.dart' as _i55;
 import 'package:shared/data/database/power_sync_connector.dart' as _i1035;
 import 'package:shared/data/database/power_sync_service.dart' as _i932;
 import 'package:shared/data/database/sync_database.dart' as _i659;
@@ -125,6 +126,13 @@ class SharedPackageModule extends _i526.MicroPackageModule {
     );
     gh.lazySingleton<_i1035.PowerSyncConnector>(
       () => _i1035.PowerSyncConnector(gh<_i679.SyncRemoteDataSource>()),
+    );
+    gh.lazySingleton<_i55.LibraryReencryption>(
+      () => _i55.LibraryReencryption(
+        gh<_i659.SyncDatabase>(),
+        gh<_i92.FieldCipher>(),
+        gh<_i807.CipherCodec>(),
+      ),
     );
     gh.lazySingleton<_i336.SyncService>(
       () => _i932.PowerSyncService(
